@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/dtk
+dtk.so
+dtk.dylib
+dtk.dll
+dtk.a
+dtk.lib
+dtk-test-*
+*.exe
+*.o
+*.obj
+*.lst

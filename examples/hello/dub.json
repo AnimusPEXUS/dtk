@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"animuspexus"
+	],
+	"copyright": "Copyright © 2021, animuspexus",
+	"description": "A minimal D application.",
+	"license": "proprietary",
+	"name": "hello"
+}
