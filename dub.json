@@ -7,9 +7,14 @@
 	],
 	"copyright": "Copyright © 2021, animuspexus",
 
-	"dependencies": {
-		"bindbc-sdl": "~>0.21.4"
-	},
-	"versions": ["BindSDL_Static", "SDL_Image"],
-	"libs": ["SDL2", "SDL2_image"]
+	"configurations": [
+		{
+			"name": "platform-sdl-desktop",
+			"dependencies": {
+				"bindbc-sdl": "~>0.21.4"
+			},
+			"versions": ["BindSDL_Static", "SDL_Image", "DTK_PLATFORM_SDL_DESKTOP"],
+			"libs": ["SDL2", "SDL2_image"],
+		}
+	]
 }

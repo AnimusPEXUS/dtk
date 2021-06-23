@@ -13,3 +13,5 @@ dtk-test-*
 *.o
 *.obj
 *.lst
+/theme_screenshots
+/libdtk.a

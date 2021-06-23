@@ -2,7 +2,13 @@
 // there should not be separate radiobutton or checkbutton: this Button class
 // should be visually transformed to such using it's properties.
 
-class Button
+module dtk.widgets.Button;
+
+import dtk.miscs.RadioGroup;
+import dtk.interfaces.ContainerableI;
+import dtk.types.ButtonTypeE;
+
+class Button : ContainerableI
 {
     private
     {

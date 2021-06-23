@@ -1,0 +1,42 @@
+import std.stdio;
+
+import bindbc.sdl;
+
+void main()
+{
+    /* loadSDL(); */
+
+    auto res = SDL_Init(0);
+
+    if (res != 0)
+    {
+        writeln("error: couldn't init SDL");
+        return;
+    }
+
+    writeln("init ok");
+
+    auto win = SDL_CreateWindow("test", 20, 20, 640, 480,
+            SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL);
+
+    //Get window surface
+    auto screenSurface = SDL_GetWindowSurface(win);
+
+    //Fill the surface white
+    SDL_FillRect(screenSurface, null, SDL_MapRGB(screenSurface.format, 0xFF, 0xFF, 0xFF));
+
+    //Update the surface
+    SDL_UpdateWindowSurface(win);
+
+    //Wait two seconds
+    SDL_Delay(2000);
+
+    SDL_Delay(2000);
+
+    SDL_DestroyWindow(win);
+
+    scope (exit)
+        SDL_Quit();
+
+    return;
+}
