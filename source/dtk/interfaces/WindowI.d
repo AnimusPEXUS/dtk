@@ -5,11 +5,14 @@ import std.typecons;
 import dtk.types.Point;
 import dtk.types.Size;
 
+import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
 
 interface WindowI
 {
+    PlatformI getPlatform();
+
     DrawingSurfaceI getDrawingSurface();
     void setForm(FormI form);
     FormI getForm();
@@ -25,5 +28,4 @@ interface WindowI
 
     string getTitle();
     void setTitle(string value);
-
 }

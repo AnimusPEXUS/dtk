@@ -1,20 +1,33 @@
 {
-	"name": "dtk",
-	"description": "A minimal D application.",
-	"license": "gplv3",
 	"authors": [
 		"animuspexus"
 	],
-	"copyright": "Copyright © 2021, animuspexus",
-
 	"configurations": [
 		{
-			"name": "platform-sdl-desktop",
 			"dependencies": {
 				"bindbc-sdl": "~>0.21.4"
 			},
-			"versions": ["BindSDL_Static", "SDL_Image", "DTK_PLATFORM_SDL_DESKTOP"],
-			"libs": ["SDL2", "SDL2_image"],
+			"libs": [
+				"SDL2",
+				"SDL2_image"
+			],
+			"name": "platform-sdl-desktop",
+			"targetType": "library",
+			"versions": [
+				"BindSDL_Static",
+				"SDL_Image",
+				"DTK_PLATFORM_SDL_DESKTOP"
+			]
 		}
+	],
+	"copyright": "Copyright © 2021, animuspexus",
+	"dependencies": {
+		"observable": "~>1.0.0"
+	},
+	"description": "A minimal D application.",
+	"license": "gplv3",
+	"name": "dtk",
+	"excludedSourceFiles": [
+	    "source/dtk/types/KeyboardSourcesGenerator/*"
 	]
 }

@@ -1,8 +1,8 @@
-module dtk.types.ThemeS;
+module dtk.types.Theme;
 
 import dtk.types.Color;
 
-struct ThemeS
+class Theme
 {
     Color formBackground;
 }

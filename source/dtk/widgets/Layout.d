@@ -1,16 +1,35 @@
-module dtk.abstracts.Container;
+module dtk.widgets.Layout;
 
 import std.container;
 import std.algorithm;
 
 import dtk.interfaces.ContainerableI;
-import dtk.interfaces.ContainerI;
+import dtk.types.Property;
 
-class Container : ContainerI
+enum LayoutOverflowBehavior
 {
+    Ignore, // do nothing
+    Scroll, // show scrollbar
+    Clip, // don't draw overflow areas
+    Resize, // resize self to fit everything
+}
+
+class Layout : ContainerableI
+{
+    Property!LayoutOverflowBehavior vertival_overflow_behavior;
+    Property!LayoutOverflowBehavior horizontal_overflow_behavior;
+
     private
     {
         Array!ContainerableI _children;
+    }
+
+    this()
+    {
+        vertival_overflow_behavior = new Property!LayoutOverflowBehavior(
+                LayoutOverflowBehavior.Resize);
+        horizontal_overflow_behavior = new Property!LayoutOverflowBehavior(
+                LayoutOverflowBehavior.Resize);
     }
 
     size_t getChildrenCount()
@@ -66,5 +85,4 @@ class Container : ContainerI
     {
         _children.insertAfter(_children[], item);
     }
-
 }

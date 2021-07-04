@@ -1,5 +1,7 @@
 module dtk.main;
 
+import std.stdio;
+
 import dtk.interfaces.PlatformI;
 
 PlatformI instantiatePlatform()
@@ -9,6 +11,9 @@ PlatformI instantiatePlatform()
         import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 
         auto ret = new SDLDesktopPlatform();
+
+        writeln("SDLDesktopPlatform instantiated");
+
         return ret;
     }
     else version (DTK_PLATFORM_MOZILLA_WEB_EXTENSION)

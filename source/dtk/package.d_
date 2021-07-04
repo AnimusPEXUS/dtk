@@ -1,0 +1,5 @@
+module dtk;
+
+public import dtk.main;
+
+public import dtk.widgets;

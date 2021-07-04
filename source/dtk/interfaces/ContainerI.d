@@ -2,9 +2,9 @@ module dtk.interfaces.ContainerI;
 
 import dtk.interfaces.ContainerableI;
 
-interface ContainerI
+/* interface ContainerI
 {
-    /* void addChild(ContainerableI item); */
+    /* void addChild(ContainerableI item); /
     size_t getChildrenCount();
     ContainerableI getChildByIndex(size_t index);
     void deleteChild(size_t index);
@@ -15,5 +15,5 @@ interface ContainerI
     void putChildToStart(ContainerableI item);
     void putChildToEnd(ContainerableI item);
     /* ContainerableI popChildFromStart();
-    ContainerableI popChildFromEnd(); */
-}
+    ContainerableI popChildFromEnd(); /
+} */
