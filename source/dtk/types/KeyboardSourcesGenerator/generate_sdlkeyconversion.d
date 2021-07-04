@@ -64,7 +64,7 @@ import bindbc.sdl;
                 break main_loop;
             }
 
-            if (row[2] == "")
+            if (row[3] == "")
             {
                 continue;
             }
@@ -105,7 +105,7 @@ import bindbc.sdl;
                 break main_loop2;
             }
 
-            if (row[2] == "")
+            if (row[3] == "")
             {
                 continue;
             }

@@ -11,13 +11,13 @@ module dtk.types.EnumKeyboardModCode;
 enum EnumKeyboardModCode
 {
     LeftShift = 0b1,
-    LeftControl = 0b01,
-    LeftMenu = 0b001,
-    LeftSuper = 0b0001,
-    LeftAlt = 0b00001,
-    RightShift = 0b000001,
-    RightControl = 0b0000001,
-    RightMenu = 0b00000001,
-    RightSuper = 0b000000001,
-    RightAlt = 0b0000000001,
+    LeftControl = 0b10,
+    LeftMenu = 0b100,
+    LeftSuper = 0b1000,
+    LeftAlt = 0b10000,
+    RightShift = 0b100000,
+    RightControl = 0b1000000,
+    RightMenu = 0b10000000,
+    RightSuper = 0b100000000,
+    RightAlt = 0b1000000000,
 };
