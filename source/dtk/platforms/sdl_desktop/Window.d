@@ -12,10 +12,13 @@ import dtk.interfaces.WindowI;
 
 import dtk.platforms.sdl_desktop.DrawingSurface;
 import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
+import dtk.platforms.sdl_desktop.utils;
 
 import dtk.types.Point;
 import dtk.types.Size;
 import dtk.types.WindowCreationSettings;
+
+import dtk.tools.KeyboardProcessor;
 
 class Window : WindowI
 {
@@ -41,6 +44,8 @@ class Window : WindowI
         bool _maximized;
 
         bool _visible;
+
+        KeyboardProcessor kbp;
     }
 
     uint sdl_window_id;
@@ -51,6 +56,8 @@ class Window : WindowI
     {
         this.platform = platform;
         this.title = window_settings.title;
+
+        kbp = new KeyboardProcessor;
 
         auto flags = cast(SDL_WindowFlags) 0 /* else flags init with FULLSCREEN option */ ;
 
@@ -171,6 +178,11 @@ class Window : WindowI
         }
     }
 
+    void HandleKeyboardEvent(SDL_KeyboardEvent event)
+    {
+        auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
+    }
+
     void redraw()
     {
         auto f = getForm();
@@ -185,8 +197,8 @@ class Window : WindowI
 
     void printParams()
     {
-        writeln(
-                title , " : " , this.point.x , " " , this.point.y, " " , this.size.width , " " , this.size.height);
+        writeln(title, " : ", this.point.x, " ", this.point.y, " ",
+                this.size.width, " ", this.size.height);
     }
 
     PlatformI getPlatform()

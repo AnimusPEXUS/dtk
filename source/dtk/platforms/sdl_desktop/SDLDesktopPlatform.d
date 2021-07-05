@@ -121,6 +121,18 @@ class SDLDesktopPlatform : PlatformI
                 }
                 throw new Exception("got event for unregistered window");
                 /* break; */
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                auto keyb_event = event.key;
+                foreach (ref Window w; windows)
+                {
+                    if (w.sdl_window_id == keyb_event.windowID)
+                    {
+                        w.HandleKeyboardEvent(keyb_event);
+                        break event_type_switch;
+                    }
+                }
+                throw new Exception("got event for unregistered window");
             case SDL_QUIT:
                 break main_loop;
             }

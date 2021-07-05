@@ -1,44 +1,35 @@
 module dtk.platforms.sdl_desktop.utils;
-/*
 
-EventWindow convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent e)
+import bindbc.sdl;
+
+import dtk.types.EventKeyboard;
+import dtk.types.EnumKeyboardKeyState;
+import dtk.types.KeySym;
+
+import dtk.platforms.sdl_desktop.sdlkeyconversion;
+
+EventKeyboard convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent e)
 {
-    EventWindow ret;
-    switch (e.event)
+    EventKeyboard ret;
+
+    final switch (e.state)
     {
-        case SDL_WINDOWEVENT_NONE:
-            break;
-SDL_WINDOWEVENT_SHOWN
-break;
-SDL_WINDOWEVENT_HIDDEN
-break;
-SDL_WINDOWEVENT_EXPOSED
-break;
-SDL_WINDOWEVENT_MOVED
-break;
-SDL_WINDOWEVENT_RESIZED
-break;
-SDL_WINDOWEVENT_SIZE_CHANGED
-break;
-SDL_WINDOWEVENT_MINIMIZED
-break;
-SDL_WINDOWEVENT_MAXIMIZED
-break;
-SDL_WINDOWEVENT_RESTORED
-break;
-SDL_WINDOWEVENT_ENTER
-break;
-SDL_WINDOWEVENT_LEAVE
-break;
-SDL_WINDOWEVENT_FOCUS_GAINED
-break;
-SDL_WINDOWEVENT_FOCUS_LOST
-break;
-SDL_WINDOWEVENT_CLOSE
-break;
-SDL_WINDOWEVENT_TAKE_FOCUS
-break;
-SDL_WINDOWEVENT_HIT_TEST
-break;
+    case SDL_PRESSED:
+        ret.key_state = EnumKeyboardKeyState.pressed;
+        break;
+    case SDL_RELEASED:
+        ret.key_state = EnumKeyboardKeyState.depressed;
+        break;
     }
-} */
+
+    ret.repeat = e.repeat != 0;
+
+    auto sk = KeySym();
+    sk.keycode = convertSDLKeycodeToEnumKeyboardKeyCode(e.keysym.sym);
+
+    sk.modcode = convertCombinationSDLKeymodToEnumKeyboardModCode(cast(SDL_Keymod) e.keysym.mod);
+
+    ret.keysym = sk;
+
+    return ret;
+}

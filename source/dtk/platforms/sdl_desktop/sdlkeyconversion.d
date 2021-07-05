@@ -502,7 +502,7 @@ SDL_Keycode convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboardKeyCode code)
     }
 }
 
-EnumKeyboardModCode convertSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)
+EnumKeyboardModCode convertSingleSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)
 {
     switch (code)
     {
@@ -531,7 +531,7 @@ EnumKeyboardModCode convertSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)
     }
 }
 
-SDL_Keymod convertEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)
+SDL_Keymod convertSingleEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)
 {
     switch (code)
     {
@@ -554,4 +554,88 @@ SDL_Keymod convertEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)
     case EnumKeyboardModCode.NumLock:
         return SDL_Keymod.KMOD_NUM;
     }
+}
+
+EnumKeyboardModCode convertCombinationSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)
+{
+    EnumKeyboardModCode ret;
+    if ((code & SDL_Keymod.KMOD_LSHIFT) != 0)
+    {
+        ret |= EnumKeyboardModCode.LeftShift;
+    }
+    if ((code & SDL_Keymod.KMOD_LCTRL) != 0)
+    {
+        ret |= EnumKeyboardModCode.LeftControl;
+    }
+    if ((code & SDL_Keymod.KMOD_LGUI) != 0)
+    {
+        ret |= EnumKeyboardModCode.LeftSuper;
+    }
+    if ((code & SDL_Keymod.KMOD_LALT) != 0)
+    {
+        ret |= EnumKeyboardModCode.LeftAlt;
+    }
+    if ((code & SDL_Keymod.KMOD_RSHIFT) != 0)
+    {
+        ret |= EnumKeyboardModCode.RightShift;
+    }
+    if ((code & SDL_Keymod.KMOD_RCTRL) != 0)
+    {
+        ret |= EnumKeyboardModCode.RightControl;
+    }
+    if ((code & SDL_Keymod.KMOD_RGUI) != 0)
+    {
+        ret |= EnumKeyboardModCode.RightSuper;
+    }
+    if ((code & SDL_Keymod.KMOD_RALT) != 0)
+    {
+        ret |= EnumKeyboardModCode.RightAlt;
+    }
+    if ((code & SDL_Keymod.KMOD_CAPS) != 0)
+    {
+        ret |= EnumKeyboardModCode.CapsLock;
+    }
+    if ((code & SDL_Keymod.KMOD_NUM) != 0)
+    {
+        ret |= EnumKeyboardModCode.NumLock;
+    }
+    return ret;
+}
+
+SDL_Keymod convertCombinationEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)
+{
+    SDL_Keymod ret;
+    if ((code & EnumKeyboardModCode.LeftShift) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_LSHIFT;
+    }
+    if ((code & EnumKeyboardModCode.LeftControl) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_LCTRL;
+    }
+    if ((code & EnumKeyboardModCode.LeftAlt) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_LALT;
+    }
+    if ((code & EnumKeyboardModCode.RightShift) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_RSHIFT;
+    }
+    if ((code & EnumKeyboardModCode.RightControl) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_RCTRL;
+    }
+    if ((code & EnumKeyboardModCode.RightAlt) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_RALT;
+    }
+    if ((code & EnumKeyboardModCode.CapsLock) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_CAPS;
+    }
+    if ((code & EnumKeyboardModCode.NumLock) != 0)
+    {
+        ret |= SDL_Keymod.KMOD_NUM;
+    }
+    return ret;
 }

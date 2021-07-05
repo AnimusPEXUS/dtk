@@ -128,11 +128,11 @@ import bindbc.sdl;
         fout.rawWrite("\n");
     }
 
-    // ------------------ Mod Codes ------------------
+    // ------------------ Mod Codes ------------------ Single
 
     {
         fout.rawWrite(
-                "EnumKeyboardModCode convertSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
+                "EnumKeyboardModCode convertSingleSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
@@ -176,7 +176,7 @@ import bindbc.sdl;
 
     {
         fout.rawWrite(
-                "SDL_Keymod convertEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
+                "SDL_Keymod convertSingleEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
@@ -214,6 +214,100 @@ import bindbc.sdl;
         }
 
         fout.rawWrite("    }\n");
+        fout.rawWrite("}\n");
+        fout.rawWrite("\n");
+    }
+
+    // ------------------ Mod Codes ------------------ Combination
+
+    {
+        fout.rawWrite(
+                "EnumKeyboardModCode convertCombinationSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
+
+        fout.rawWrite("    EnumKeyboardModCode ret;\n");
+
+        mixin makecsvreader;
+        /* auto reader = makecsvreader(keyinfo_csv); */
+        bool skipped = false;
+        main_loop5: foreach (row; reader)
+
+        {
+            if (!skipped)
+            {
+                skipped = true;
+                continue;
+            }
+            switch (row[TableColumns.COLUMN_BUTTONS])
+            {
+            default:
+                break;
+            case "":
+                continue main_loop5;
+            case ".":
+                break main_loop5;
+            }
+
+            if (row[TableColumns.COLUMN_SDL_KEYMOD] == "")
+            {
+                continue;
+            }
+
+            fout.rawWrite(format("if ((code & SDL_Keymod.%s) != 0)\n",
+                    row[TableColumns.COLUMN_SDL_KEYMOD]));
+            fout.rawWrite("{\n");
+            fout.rawWrite(format("    ret |= EnumKeyboardModCode.%s;\n",
+                    row[TableColumns.COLUMN_BUTTONS]));
+            fout.rawWrite("}\n");
+
+        }
+
+        fout.rawWrite("   return ret;\n");
+
+        fout.rawWrite("}\n");
+        fout.rawWrite("\n");
+    }
+
+    {
+        fout.rawWrite(
+                "SDL_Keymod convertCombinationEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
+
+        fout.rawWrite("    SDL_Keymod ret;\n");
+
+        mixin makecsvreader;
+        /* auto reader = makecsvreader(keyinfo_csv); */
+        bool skipped = false;
+        main_loop6: foreach (row; reader)
+        {
+            if (!skipped)
+            {
+                skipped = true;
+                continue;
+            }
+            switch (row[TableColumns.COLUMN_SDL_KEYMOD])
+            {
+            default:
+                break;
+            case "":
+                continue main_loop6;
+            case ".":
+                break main_loop6;
+            }
+
+            if (row[TableColumns.COLUMN_SDL_KEYCODE] == "")
+            {
+                continue;
+            }
+
+            fout.rawWrite(format("if ((code & EnumKeyboardModCode.%s) != 0)\n",
+                    row[TableColumns.COLUMN_BUTTONS]));
+            fout.rawWrite("{\n");
+            fout.rawWrite(format("    ret |= SDL_Keymod.%s;\n",
+                    row[TableColumns.COLUMN_SDL_KEYMOD]));
+            fout.rawWrite("}\n");
+        }
+
+        fout.rawWrite("   return ret;\n");
+
         fout.rawWrite("}\n");
         fout.rawWrite("\n");
     }
