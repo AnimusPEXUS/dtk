@@ -145,12 +145,6 @@ EnumKeyboardKeyCode convertSDLKeycodeToEnumKeyboardKeyCode(SDL_Keycode code)
         return EnumKeyboardKeyCode.Minus;
     case SDL_Keycode.SDLK_EQUALS:
         return EnumKeyboardKeyCode.Equals;
-    case SDL_Keycode.SDLK_CAPSLOCK:
-        return EnumKeyboardKeyCode.CapsLock;
-    case SDL_Keycode.SDLK_NUMLOCKCLEAR:
-        return EnumKeyboardKeyCode.NumLock;
-    case SDL_Keycode.SDLK_SCROLLLOCK:
-        return EnumKeyboardKeyCode.ScrollLock;
     case SDL_Keycode.SDLK_BACKQUOTE:
         return EnumKeyboardKeyCode.BackSingleQuote;
     case SDL_Keycode.SDLK_TAB:
@@ -169,6 +163,12 @@ EnumKeyboardKeyCode convertSDLKeycodeToEnumKeyboardKeyCode(SDL_Keycode code)
         return EnumKeyboardKeyCode.RightMenu;
     case SDL_Keycode.SDLK_RALT:
         return EnumKeyboardKeyCode.RightAlt;
+    case SDL_Keycode.SDLK_CAPSLOCK:
+        return EnumKeyboardKeyCode.CapsLock;
+    case SDL_Keycode.SDLK_NUMLOCKCLEAR:
+        return EnumKeyboardKeyCode.NumLock;
+    case SDL_Keycode.SDLK_SCROLLLOCK:
+        return EnumKeyboardKeyCode.ScrollLock;
     case SDL_Keycode.SDLK_BACKSPACE:
         return EnumKeyboardKeyCode.BackSpace;
     case SDL_Keycode.SDLK_RETURN:
@@ -390,12 +390,6 @@ SDL_Keycode convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboardKeyCode code)
         return SDL_Keycode.SDLK_MINUS;
     case EnumKeyboardKeyCode.Equals:
         return SDL_Keycode.SDLK_EQUALS;
-    case EnumKeyboardKeyCode.CapsLock:
-        return SDL_Keycode.SDLK_CAPSLOCK;
-    case EnumKeyboardKeyCode.NumLock:
-        return SDL_Keycode.SDLK_NUMLOCKCLEAR;
-    case EnumKeyboardKeyCode.ScrollLock:
-        return SDL_Keycode.SDLK_SCROLLLOCK;
     case EnumKeyboardKeyCode.BackSingleQuote:
         return SDL_Keycode.SDLK_BACKQUOTE;
     case EnumKeyboardKeyCode.Tabulation:
@@ -414,6 +408,12 @@ SDL_Keycode convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboardKeyCode code)
         return SDL_Keycode.SDLK_APPLICATION;
     case EnumKeyboardKeyCode.RightAlt:
         return SDL_Keycode.SDLK_RALT;
+    case EnumKeyboardKeyCode.CapsLock:
+        return SDL_Keycode.SDLK_CAPSLOCK;
+    case EnumKeyboardKeyCode.NumLock:
+        return SDL_Keycode.SDLK_NUMLOCKCLEAR;
+    case EnumKeyboardKeyCode.ScrollLock:
+        return SDL_Keycode.SDLK_SCROLLLOCK;
     case EnumKeyboardKeyCode.BackSpace:
         return SDL_Keycode.SDLK_BACKSPACE;
     case EnumKeyboardKeyCode.Return:
@@ -498,5 +498,59 @@ SDL_Keycode convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboardKeyCode code)
         return SDL_Keycode.SDLK_KP_MULTIPLY;
     case EnumKeyboardKeyCode.KpPlus:
         return SDL_Keycode.SDLK_KP_PLUS;
+    }
+}
+
+EnumKeyboardModCode convertSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)
+{
+    switch (code)
+    {
+    default:
+        throw new Exception("could not decode supplied keymod");
+    case SDL_Keymod.KMOD_LSHIFT:
+        return EnumKeyboardKeyCode.LeftShift;
+    case SDL_Keymod.KMOD_LCTRL:
+        return EnumKeyboardKeyCode.LeftControl;
+    case SDL_Keymod.KMOD_LGUI:
+        return EnumKeyboardKeyCode.LeftSuper;
+    case SDL_Keymod.KMOD_LALT:
+        return EnumKeyboardKeyCode.LeftAlt;
+    case SDL_Keymod.KMOD_RSHIFT:
+        return EnumKeyboardKeyCode.RightShift;
+    case SDL_Keymod.KMOD_RCTRL:
+        return EnumKeyboardKeyCode.RightControl;
+    case SDL_Keymod.KMOD_RGUI:
+        return EnumKeyboardKeyCode.RightSuper;
+    case SDL_Keymod.KMOD_RALT:
+        return EnumKeyboardKeyCode.RightAlt;
+    case SDL_Keymod.KMOD_CAPS:
+        return EnumKeyboardKeyCode.CapsLock;
+    case SDL_Keymod.KMOD_NUM:
+        return EnumKeyboardKeyCode.NumLock;
+    }
+}
+
+SDL_Keymod convertEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)
+{
+    switch (code)
+    {
+    default:
+        throw new Exception("could not decode supplied keymod");
+    case EnumKeyboardModCode.LeftShift:
+        return SDL_Keymod.KMOD_LSHIFT;
+    case EnumKeyboardModCode.LeftControl:
+        return SDL_Keymod.KMOD_LCTRL;
+    case EnumKeyboardModCode.LeftAlt:
+        return SDL_Keymod.KMOD_LALT;
+    case EnumKeyboardModCode.RightShift:
+        return SDL_Keymod.KMOD_RSHIFT;
+    case EnumKeyboardModCode.RightControl:
+        return SDL_Keymod.KMOD_RCTRL;
+    case EnumKeyboardModCode.RightAlt:
+        return SDL_Keymod.KMOD_RALT;
+    case EnumKeyboardModCode.CapsLock:
+        return SDL_Keymod.KMOD_CAPS;
+    case EnumKeyboardModCode.NumLock:
+        return SDL_Keymod.KMOD_NUM;
     }
 }

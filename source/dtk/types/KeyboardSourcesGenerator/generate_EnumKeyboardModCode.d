@@ -32,9 +32,10 @@ int main()
 
     fout.rawWrite("\n");
 
-    fout.rawWrite("enum EnumKeyboardModCode\n{\n");
+    fout.rawWrite("enum EnumKeyboardModCode : ushort\n{\n");
 
-    auto reader = csvReader!(Tuple!(string, string, string, string))(keyinfo_csv);
+    mixin makecsvreader;
+    /* auto reader = makecsvreader(keyinfo_csv); */
     bool skipped = false;
     main_loop: foreach (row; reader)
     {
@@ -43,7 +44,7 @@ int main()
             skipped = true;
             continue;
         }
-        switch (row[0])
+        switch (row[TableColumns.COLUMN_BUTTONS])
         {
         default:
             break;
@@ -52,11 +53,12 @@ int main()
         case ".":
             break main_loop;
         }
-        if (row[1] == "")
+        if (row[TableColumns.COLUMN_MOD_BITS] == "")
         {
             continue;
         }
-        fout.rawWrite(format("    %s = %s,\n", row[0], row[1]));
+        fout.rawWrite(format("    %s = %s,\n", row[TableColumns.COLUMN_BUTTONS],
+                row[TableColumns.COLUMN_MOD_BITS]));
     }
 
     fout.rawWrite("};\n");

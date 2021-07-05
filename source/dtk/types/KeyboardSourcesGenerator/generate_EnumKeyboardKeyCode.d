@@ -34,7 +34,8 @@ int main()
 
     fout.rawWrite("enum EnumKeyboardKeyCode\n{\n");
 
-    auto reader = csvReader!(Tuple!(string, string, string, string))(keyinfo_csv);
+    mixin makecsvreader;
+    /* auto reader = makecsvreader(keyinfo_csv); */
     bool skipped = false;
     main_loop: foreach (row; reader)
     {
@@ -43,7 +44,7 @@ int main()
             skipped = true;
             continue;
         }
-        switch (row[0])
+        switch (row[TableColumns.COLUMN_BUTTONS])
         {
         default:
             break;
@@ -52,7 +53,7 @@ int main()
         case ".":
             break main_loop;
         }
-        fout.rawWrite(format("    %s,\n", row[0]));
+        fout.rawWrite(format("    %s,\n", row[TableColumns.COLUMN_BUTTONS]));
     }
 
     fout.rawWrite("};\n");
