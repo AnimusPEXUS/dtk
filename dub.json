@@ -26,8 +26,5 @@
 	},
 	"description": "A minimal D application.",
 	"license": "gplv3",
-	"name": "dtk",
-	"excludedSourceFiles": [
-	    "source/dtk/types/KeyboardSourcesGenerator/*"
-	]
+	"name": "dtk"
 }

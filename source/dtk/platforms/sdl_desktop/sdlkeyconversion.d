@@ -9,6 +9,7 @@ module dtk.platforms.sdl_desktop.sdlkeyconversion;
 */
 
 import dtk.types.EnumKeyboardKeyCode;
+import dtk.types.EnumKeyboardModCode;
 import bindbc.sdl;
 
 EnumKeyboardKeyCode convertSDLKeycodeToEnumKeyboardKeyCode(SDL_Keycode code)
@@ -508,25 +509,25 @@ EnumKeyboardModCode convertSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)
     default:
         throw new Exception("could not decode supplied keymod");
     case SDL_Keymod.KMOD_LSHIFT:
-        return EnumKeyboardKeyCode.LeftShift;
+        return EnumKeyboardModCode.LeftShift;
     case SDL_Keymod.KMOD_LCTRL:
-        return EnumKeyboardKeyCode.LeftControl;
+        return EnumKeyboardModCode.LeftControl;
     case SDL_Keymod.KMOD_LGUI:
-        return EnumKeyboardKeyCode.LeftSuper;
+        return EnumKeyboardModCode.LeftSuper;
     case SDL_Keymod.KMOD_LALT:
-        return EnumKeyboardKeyCode.LeftAlt;
+        return EnumKeyboardModCode.LeftAlt;
     case SDL_Keymod.KMOD_RSHIFT:
-        return EnumKeyboardKeyCode.RightShift;
+        return EnumKeyboardModCode.RightShift;
     case SDL_Keymod.KMOD_RCTRL:
-        return EnumKeyboardKeyCode.RightControl;
+        return EnumKeyboardModCode.RightControl;
     case SDL_Keymod.KMOD_RGUI:
-        return EnumKeyboardKeyCode.RightSuper;
+        return EnumKeyboardModCode.RightSuper;
     case SDL_Keymod.KMOD_RALT:
-        return EnumKeyboardKeyCode.RightAlt;
+        return EnumKeyboardModCode.RightAlt;
     case SDL_Keymod.KMOD_CAPS:
-        return EnumKeyboardKeyCode.CapsLock;
+        return EnumKeyboardModCode.CapsLock;
     case SDL_Keymod.KMOD_NUM:
-        return EnumKeyboardKeyCode.NumLock;
+        return EnumKeyboardModCode.NumLock;
     }
 }
 

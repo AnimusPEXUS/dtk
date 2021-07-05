@@ -32,6 +32,7 @@ int main()
 
     fout.rawWrite("
 import dtk.types.EnumKeyboardKeyCode;
+import dtk.types.EnumKeyboardModCode;
 import bindbc.sdl;
 ");
 
@@ -164,7 +165,7 @@ import bindbc.sdl;
 
             fout.rawWrite("        case SDL_Keymod." ~ row[TableColumns.COLUMN_SDL_KEYMOD] ~ ":\n");
             fout.rawWrite(
-                    "            return EnumKeyboardKeyCode."
+                    "            return EnumKeyboardModCode."
                     ~ row[TableColumns.COLUMN_BUTTONS] ~ ";\n");
         }
 
