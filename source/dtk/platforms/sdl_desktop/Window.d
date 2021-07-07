@@ -18,7 +18,7 @@ import dtk.types.Point;
 import dtk.types.Size;
 import dtk.types.WindowCreationSettings;
 
-import dtk.tools.KeyboardProcessor;
+import dtk.miscs.KeyboardProcessor;
 
 class Window : WindowI
 {

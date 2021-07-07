@@ -25,8 +25,8 @@ EventKeyboard convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent e)
     ret.repeat = e.repeat != 0;
 
     auto sk = KeySym();
-    sk.keycode = convertSDLKeycodeToEnumKeyboardKeyCode(e.keysym.sym);
 
+    sk.keycode = convertSDLKeycodeToEnumKeyboardKeyCode(e.keysym.sym);
     sk.modcode = convertCombinationSDLKeymodToEnumKeyboardModCode(cast(SDL_Keymod) e.keysym.mod);
 
     ret.keysym = sk;

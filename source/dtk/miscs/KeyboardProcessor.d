@@ -1,4 +1,4 @@
-module dtk.tools.KeyboardProcessor;
+module dtk.miscs.KeyboardProcessor;
 
 import dtk.types.EventKeyboard;
 
