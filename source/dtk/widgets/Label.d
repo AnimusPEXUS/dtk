@@ -1,7 +1,32 @@
 module dtk.widgets.Label;
 
-import dtk.interfaces.ContainerableI;
+import std.typecons;
 
-class Label : ContainerableI
+import dtk.types.Size;
+
+import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.WidgetI;
+import dtk.interfaces.FormI;
+
+import dtk.widgets.mixins;
+
+class Label : ContainerableWidgetI
 {
+
+    mixin mixin_getWidgetType!"Label";
+
+    mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
+            "private", "_parent", "Parent", "WidgetI", "");
+
+    mixin mixin_getForm_from_WidgetI;
+
+    Size calculateSizesAndPositions(Size size)
+    {
+        return Size();
+    }
+
+    void redraw()
+    {
+    }
+
 }

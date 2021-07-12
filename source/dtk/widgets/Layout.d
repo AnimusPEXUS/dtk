@@ -2,9 +2,15 @@ module dtk.widgets.Layout;
 
 import std.container;
 import std.algorithm;
+import std.typecons;
 
-import dtk.interfaces.ContainerableI;
-import dtk.types.Property;
+import dtk.interfaces.ContainerableWidgetI;
+import dtk.types.Size;
+
+import dtk.interfaces.FormI;
+import dtk.interfaces.WidgetI;
+
+import dtk.widgets.mixins;
 
 enum LayoutOverflowBehavior
 {
@@ -14,22 +20,42 @@ enum LayoutOverflowBehavior
     Resize, // resize self to fit everything
 }
 
-class Layout : ContainerableI
+class Layout : ContainerableWidgetI
 {
-    Property!LayoutOverflowBehavior vertival_overflow_behavior;
-    Property!LayoutOverflowBehavior horizontal_overflow_behavior;
 
     private
     {
-        Array!ContainerableI _children;
+        Array!ContainerableWidgetI _children;
     }
 
     this()
     {
-        vertival_overflow_behavior = new Property!LayoutOverflowBehavior(
-                LayoutOverflowBehavior.Resize);
-        horizontal_overflow_behavior = new Property!LayoutOverflowBehavior(
-                LayoutOverflowBehavior.Resize);
+        _vertival_overflow_behavior = LayoutOverflowBehavior.Resize;
+        _horizontal_overflow_behavior = LayoutOverflowBehavior.Resize;
+    }
+
+    mixin mixin_getWidgetType!"Layout";
+
+    mixin mixin_variable!(GetterSetterBothOrNone.getterAndSetter, "private",
+            "_vertival_overflow_behavior", "VerticalOverflowBehavior",
+            "LayoutOverflowBehavior", "");
+
+    mixin mixin_variable!(GetterSetterBothOrNone.getterAndSetter, "private",
+            "_horizontal_overflow_behavior", "HorizontalOverflowBehavior",
+            "LayoutOverflowBehavior", "");
+
+    mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
+            "private", "_parent", "Parent", "WidgetI", "");
+
+    mixin mixin_getForm_from_WidgetI;
+
+    Size calculateSizesAndPositions(Size size)
+    {
+        return Size();
+    }
+
+    void redraw()
+    {
     }
 
     size_t getChildrenCount()
@@ -37,7 +63,7 @@ class Layout : ContainerableI
         return _children.length;
     }
 
-    ContainerableI getChildByIndex(size_t index)
+    ContainerableWidgetI getChildByIndex(size_t index)
     {
         return _children[index];
     }
@@ -54,12 +80,12 @@ class Layout : ContainerableI
         _children[index1] = z;
     }
 
-    void insertChild(size_t index, ContainerableI item)
+    void insertChild(size_t index, ContainerableWidgetI item)
     {
         _children.insertAfter(_children[1 .. 2], item);
     }
 
-    void insertChild(ContainerableI after_this, ContainerableI item)
+    void insertChild(ContainerableWidgetI after_this, ContainerableWidgetI item)
     {
         int pos;
         for (int i = 0; i != _children.length; i++)
@@ -76,12 +102,12 @@ class Layout : ContainerableI
         }
     }
 
-    void putChildToStart(ContainerableI item)
+    void putChildToStart(ContainerableWidgetI item)
     {
         _children.insert(item);
     }
 
-    void putChildToEnd(ContainerableI item)
+    void putChildToEnd(ContainerableWidgetI item)
     {
         _children.insertAfter(_children[], item);
     }

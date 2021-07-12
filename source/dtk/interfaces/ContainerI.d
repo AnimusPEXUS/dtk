@@ -1,6 +1,6 @@
 module dtk.interfaces.ContainerI;
 
-import dtk.interfaces.ContainerableI;
+/* import dtk.interfaces.ContainerableI; */
 
 /* interface ContainerI
 {

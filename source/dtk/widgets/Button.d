@@ -4,11 +4,19 @@
 
 module dtk.widgets.Button;
 
-import dtk.miscs.RadioGroup;
-import dtk.interfaces.ContainerableI;
-import dtk.types.ButtonTypeE;
+import std.typecons;
 
-class Button : ContainerableI
+import dtk.miscs.RadioGroup;
+import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.WidgetI;
+import dtk.interfaces.FormI;
+
+import dtk.types.ButtonTypeE;
+import dtk.types.Size;
+
+import dtk.widgets.mixins;
+
+class Button : ContainerableWidgetI
 {
     private
     {
@@ -21,5 +29,21 @@ class Button : ContainerableI
 
         bool _switchable;
         ButtonTypeE _button_type;
+    }
+
+    mixin mixin_getWidgetType!"Button";
+
+    mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
+            "private", "_parent", "Parent", "WidgetI", "");
+
+    mixin mixin_getForm_from_WidgetI;
+
+    Size calculateSizesAndPositions(Size size)
+    {
+        return Size();
+    }
+
+    void redraw()
+    {
     }
 }

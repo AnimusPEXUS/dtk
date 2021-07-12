@@ -2,13 +2,18 @@
 
 module dtk.widgets.Form;
 
+import std.stdio;
+
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.ContainerableWidgetI;
 
 import dtk.types.Size;
 import dtk.types.Theme;
+
+import dtk.widgets.mixins;
 
 class Form : FormI, WidgetI
 {
@@ -19,11 +24,29 @@ class Form : FormI, WidgetI
         Size _size;
         Theme _theme;
         DrawingSurfaceI _drawing_surface;
+        ContainerableWidgetI child;
     }
+
+    mixin mixin_getWidgetType!"Form";
 
     DrawingSurfaceI getDrawingSurface()
     {
         return _drawing_surface;
+    }
+
+    void setParent(WidgetI widget)
+    {
+        return;
+    }
+
+    void nullifyParent()
+    {
+        return;
+    }
+
+    WidgetI getParent()
+    {
+        return null;
     }
 
     Theme getTheme()
@@ -36,45 +59,19 @@ class Form : FormI, WidgetI
         _theme = theme;
     }
 
-    void Resize(uint width, uint height)
-    {
-
-    }
-
-    /* @property void visible(bool value)
-    {
-        _visible = value;
-    }
-
-    @property bool visible()
-    {
-        return _visible;
-    } */
-
-    void setParent(WidgetI widget)
-    {
-    }
-
-    void unsetParent()
-    {
-    }
-
     FormI getForm()
     {
         return this;
     }
 
-    Size calculateSize()
+    Size calculateSizesAndPositions(Size size)
     {
         return Size();
     }
 
-    void calculateChildrenPositions()
-    {
-    }
-
     void redraw()
     {
+        writeln("Form redraw() requested");
     }
 
 }

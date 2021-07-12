@@ -6,32 +6,19 @@ import dtk.types.Size;
 
 interface WidgetI
 {
-    /* bool haveContainer();
-    ContainerI getContainer(); */
-
-    /* bool havePadding();
-    Offset getPadding();
-
-    bool haveMargin();
-    Offset getMargin();
-
-    bool haveAlignment();
-    Alignment getAlignment(); */
-
-    /* bool haveVerticalScrolling();
-    ScrollingI getVerticalScrolling();
-
-    bool haveHorizontalScrolling();
-    ScrollingI getHorizontalScrolling(); */
-
-    /* void calculateChildrenSizes(); // for internal usage */ // note: probably, this function is not needed
-
+    WidgetI getParent();
     void setParent(WidgetI widget);
-    void unsetParent();
+    void nullifyParent();
 
+    /++ return FormI on which this Widget is placed. throws exception in case if
+    there is no attached form or if this widget if deeper than 200 in level to
+    FormI instance (too deep); +/
     FormI getForm();
 
-    Size calculateSize();
-    void calculateChildrenPositions();
+    /++ calculate sizes of children (by recursively calling
+    calculateSizesAndPositions()) and than calculate own size and return own
+    size. size - maximum size, which parent allows this child to resize it self.
+    +/
+    Size calculateSizesAndPositions(Size size);
     void redraw();
 }
