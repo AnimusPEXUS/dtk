@@ -113,7 +113,7 @@ class SDLDesktopPlatform : PlatformI
                 auto window_event = event.window;
                 foreach (ref Window w; windows)
                 {
-                    if (w.sdl_window_id == window_event.windowID)
+                    if (w._sdl_window_id == window_event.windowID)
                     {
                         w.HandleWindowEvent(window_event);
                         break event_type_switch;
@@ -126,7 +126,7 @@ class SDLDesktopPlatform : PlatformI
                 auto keyb_event = event.key;
                 foreach (ref Window w; windows)
                 {
-                    if (w.sdl_window_id == keyb_event.windowID)
+                    if (w._sdl_window_id == keyb_event.windowID)
                     {
                         w.HandleKeyboardEvent(keyb_event);
                         break event_type_switch;

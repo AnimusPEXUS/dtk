@@ -34,8 +34,6 @@ class Layout : ContainerableWidgetI
         _horizontal_overflow_behavior = LayoutOverflowBehavior.Resize;
     }
 
-    mixin mixin_getWidgetType!"Layout";
-
     mixin mixin_variable!(GetterSetterBothOrNone.getterAndSetter, "private",
             "_vertival_overflow_behavior", "VerticalOverflowBehavior",
             "LayoutOverflowBehavior", "");

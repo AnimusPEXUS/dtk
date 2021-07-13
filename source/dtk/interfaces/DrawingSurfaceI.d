@@ -12,7 +12,15 @@ import dtk.types.TextStyle;
 interface DrawingSurfaceI
 {
     void DrawDot(Point pos, Color color);
-    void DrawRectangle(Point pos, Size size, LineStyle top_style, LineStyle left_style,
-            LineStyle bottom_style, LineStyle right_style, FillStyle fill_style);
+    void DrawLine(Point pos, Point pos2, LineStyle style);
+    void DrawRectangle(
+        Point pos,
+        Size size,
+        LineStyle top_style,
+        LineStyle left_style,
+        LineStyle bottom_style,
+        LineStyle right_style,
+        FillStyle fill_style
+        );
     void DrawText(string text, Point pos, Font font, FontStyle font_style, TextStyle text_style,);
 }

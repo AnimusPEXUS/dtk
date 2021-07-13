@@ -3,6 +3,7 @@
 module dtk.widgets.Form;
 
 import std.stdio;
+import std.typecons;
 
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FormI;
@@ -10,8 +11,11 @@ import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ContainerableWidgetI;
 
+import dtk.types.Point;
 import dtk.types.Size;
 import dtk.types.Theme;
+import dtk.types.LineStyle;
+import dtk.types.FillStyle;
 
 import dtk.widgets.mixins;
 
@@ -24,13 +28,32 @@ class Form : FormI, WidgetI
         Size _size;
         Theme _theme;
         DrawingSurfaceI _drawing_surface;
-        ContainerableWidgetI child;
     }
 
-    mixin mixin_getWidgetType!"Form";
+    mixin mixin_child!("0");
+
+    void setWindow(WindowI win)
+    {
+        this._window = win;
+    }
+
+    void unsetWindow()
+    {
+        this._window = null;
+    }
+
+    void setSize(Size s)
+    {
+        this._size = s;
+    }
 
     DrawingSurfaceI getDrawingSurface()
     {
+        if (_drawing_surface is null)
+        {
+            assert(_window !is null);
+            _drawing_surface = _window.getDrawingSurface();
+        }
         return _drawing_surface;
     }
 
@@ -72,6 +95,18 @@ class Form : FormI, WidgetI
     void redraw()
     {
         writeln("Form redraw() requested");
+        auto ds = this.getDrawingSurface();
+        assert(ds !is null);
+        writeln("sd == ",ds);
+        ds.DrawRectangle(
+            Point(0,0),
+            this._size,
+            LineStyle(),
+            LineStyle(),
+            LineStyle(),
+            LineStyle(),
+            FillStyle()
+            );
     }
 
 }

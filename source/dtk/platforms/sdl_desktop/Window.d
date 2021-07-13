@@ -24,40 +24,46 @@ class Window : WindowI
 {
     private
     {
-        SDLDesktopPlatform platform;
+        SDLDesktopPlatform _platform;
 
-        SDL_Window* sdl_window;
+        DrawingSurface _drawing_surface;
 
-        DrawingSurface drawing_surface;
+        FormI _form;
 
-        FormI form;
+        Point _point;
+        Size _size;
 
-        Point point;
-        Size size;
+        Point _form_point;
+        Size _form_size;
 
-        Point form_point;
-        Size form_size;
-
-        string title;
+        string _title;
 
         bool _minimized;
         bool _maximized;
 
         bool _visible;
 
-        KeyboardProcessor kbp;
+        KeyboardProcessor _kbp;
     }
 
-    uint sdl_window_id;
+    SDL_Window* _sdl_window;
+
+    uint _sdl_window_id;
 
     @disable this();
 
     this(WindowCreationSettings window_settings, SDLDesktopPlatform platform)
     {
-        this.platform = platform;
-        this.title = window_settings.title;
+        _platform = platform;
+        _title = window_settings.title;
 
-        kbp = new KeyboardProcessor;
+        if (!window_settings.size.isNull())
+        {
+            this._size = window_settings.size.get();
+        }
+
+        _kbp = new KeyboardProcessor;
+        _drawing_surface = new DrawingSurface(this);
 
         auto flags = cast(SDL_WindowFlags) 0 /* else flags init with FULLSCREEN option */ ;
 
@@ -80,14 +86,14 @@ class Window : WindowI
             h = z.height;
         }
 
-        sdl_window = SDL_CreateWindow(cast(char*) window_settings.title, x, y, w, h, flags);
-        if (sdl_window is null)
+        _sdl_window = SDL_CreateWindow(cast(char*) window_settings.title, x, y, w, h, flags);
+        if (_sdl_window is null)
         {
             throw new Exception("window creation error");
         }
 
-        sdl_window_id = SDL_GetWindowID(sdl_window);
-        if (sdl_window_id == 0)
+        _sdl_window_id = SDL_GetWindowID(_sdl_window);
+        if (_sdl_window_id == 0)
         {
             throw new Exception("error getting window id");
         }
@@ -97,7 +103,7 @@ class Window : WindowI
 
     ~this()
     {
-        platform.unregisterWindow(this);
+        _platform.unregisterWindow(this);
     }
 
     void HandleWindowEvent(SDL_WindowEvent e)
@@ -113,6 +119,7 @@ class Window : WindowI
 
         case SDL_WINDOWEVENT_SHOWN:
             this._visible = true;
+            this.redraw();
             break;
 
         case SDL_WINDOWEVENT_HIDDEN:
@@ -124,14 +131,15 @@ class Window : WindowI
             break;
 
         case SDL_WINDOWEVENT_MOVED:
-            this.point.x = e.data1;
-            this.point.y = e.data2;
+            this._point.x = e.data1;
+            this._point.y = e.data2;
             printParams();
             break;
 
         case SDL_WINDOWEVENT_RESIZED:
-            this.size.width = e.data1;
-            this.size.height = e.data2;
+            this._size.width = e.data1;
+            this._size.height = e.data2;
+            this._form.setSize(this._size);
             this.redraw(); // TODO: remove here or here
             printParams();
             break;
@@ -185,6 +193,7 @@ class Window : WindowI
 
     void redraw()
     {
+        writeln("Window redraw() i called 111");
         auto f = getForm();
         if (f is null)
         {
@@ -197,70 +206,91 @@ class Window : WindowI
 
     void printParams()
     {
-        writeln(title, " : ", this.point.x, " ", this.point.y, " ",
-                this.size.width, " ", this.size.height);
+        writeln(_title, " : ", this._point.x, " ", this._point.y, " ",
+                this._size.width, " ", this._size.height);
     }
 
     PlatformI getPlatform()
     {
-        return platform;
+        return _platform;
     }
 
     DrawingSurfaceI getDrawingSurface()
     {
-        return drawing_surface;
+        return _drawing_surface;
+    }
+
+    void installForm(FormI form)
+    {
+        this.setForm(form);
+        auto x = getForm();
+        if (x !is null)
+            x.setWindow(this);
+    }
+
+    void uninstallForm()
+    {
+        auto x = getForm();
+        if (x !is null)
+            x.unsetWindow();
+        this.unsetForm();
     }
 
     void setForm(FormI form)
     {
-        form = form;
+        this._form = form;
+    }
+
+    void unsetForm()
+    {
+        this._form = null;
     }
 
     FormI getForm()
     {
-        return form;
+        return _form;
     }
 
     Point getPoint()
     {
-        return point;
+        return _point;
     }
 
     Tuple!(bool, Point) setPoint(Point point)
     {
-        this.point = point;
-        return tuple(true, this.point);
+        this._point = point;
+        return tuple(true, this._point);
     }
 
     Size getSize()
     {
-        return size;
+        return _size;
     }
 
     Tuple!(bool, Size) setSize(Size size)
     {
-        this.size = size;
-        return tuple(true, this.size);
+        this._size = size;
+        return tuple(true, this._size);
     }
 
     Point getFormPoint()
     {
-        return form_point;
+        return _form_point;
     }
 
     Size getFormSize()
     {
-        return form_size;
+        return _form_size;
     }
 
     string getTitle()
     {
-        return title;
+        return _title;
     }
 
     void setTitle(string value)
     {
-        title = value;
+        _title = value;
     }
 
 }

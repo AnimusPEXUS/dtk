@@ -20,7 +20,7 @@ class MenuItem : ContainerableWidgetI
         ContainerableWidgetI _contained;
     }
 
-    mixin mixin_getWidgetType!"MenuItem";
+    mixin mixin_child!("Primary");
 
     mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
             "private", "_parent", "Parent", "WidgetI", "");

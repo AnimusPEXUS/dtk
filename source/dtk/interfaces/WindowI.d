@@ -13,9 +13,13 @@ interface WindowI
 {
     PlatformI getPlatform();
 
-    DrawingSurfaceI getDrawingSurface();
+    void installForm(FormI form);
+    void uninstallForm();
+
     void setForm(FormI form);
     FormI getForm();
+
+    DrawingSurfaceI getDrawingSurface();
 
     Point getPoint();
     Tuple!(bool, Point) setPoint(Point point);

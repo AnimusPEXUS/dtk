@@ -1,4 +1,6 @@
-// ToolBar should/can be both used for buttons and menus
+/++
+ToolBar should/can be both used for buttons and menus
++/
 module dtk.widgets.ToolBar;
 
 import std.typecons;
@@ -11,14 +13,15 @@ import dtk.types.Size;
 
 import dtk.widgets.mixins;
 
+/++
+Test documentation
++/
 class ToolBar : ContainerableWidgetI
 {
     private
     {
         ContainerableWidgetI[] _children;
     }
-
-    mixin mixin_getWidgetType!"ToolBar";
 
     mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
             "private", "_parent", "Parent", "WidgetI", "");

@@ -12,8 +12,6 @@ import dtk.widgets.mixins;
 
 class Image : ContainerableWidgetI
 {
-    mixin mixin_getWidgetType!"Image";
-
     mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
             "private", "_parent", "Parent", "WidgetI", "");
 

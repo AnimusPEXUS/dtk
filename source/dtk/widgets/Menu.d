@@ -28,8 +28,6 @@ class Menu : ContainerableWidgetI
         SizeGroup _menu_item_hotkey_size_group;
     }
 
-    mixin mixin_getWidgetType!"Menu";
-
     mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
             "private", "_parent", "Parent", "WidgetI", "");
 

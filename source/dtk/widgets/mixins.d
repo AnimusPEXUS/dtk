@@ -1,3 +1,7 @@
+/++
+mixins
++/
+
 module dtk.widgets.mixins;
 
 enum GetterSetterBothOrNone
@@ -10,8 +14,14 @@ enum GetterSetterBothOrNone
     getterSetterAndNullable = getterAndSetter | nullable,
 }
 
-mixin template mixin_variable(GetterSetterBothOrNone settings, string public_or_private,
-        string internal_name, string external_name, string type_, string call_on_set)
+mixin template mixin_variable(
+        GetterSetterBothOrNone settings,
+        string public_or_private,
+        string internal_name,
+        string external_name,
+        string type_,
+        string call_on_set
+        )
 {
     mixin(function string() {
 
@@ -33,6 +43,7 @@ mixin template mixin_variable(GetterSetterBothOrNone settings, string public_or_
 
         if (getter_)
         {
+            ret ~= "\n/// returns value\n";
             ret ~= type_ ~ " get" ~ external_name ~ "() {";
             if (internal_name != "")
             {
@@ -55,6 +66,7 @@ mixin template mixin_variable(GetterSetterBothOrNone settings, string public_or_
 
         if (setter_)
         {
+            ret ~= "\n/// sets value\n";
             ret ~= "void set" ~ external_name ~ "(" ~ type_ ~ " value) {";
             if (internal_name != "")
             {
@@ -74,6 +86,7 @@ mixin template mixin_variable(GetterSetterBothOrNone settings, string public_or_
             }
             ret ~= "}";
             // this comment is to avoid dfmt from squishing this empty line
+            ret ~= "\n/// sets value\n";
             ret ~= "void set" ~ external_name ~ "(" ~ nullable_type_ ~ " value) {";
             if (internal_name != "")
             {
@@ -88,10 +101,12 @@ mixin template mixin_variable(GetterSetterBothOrNone settings, string public_or_
 
         if (nullable_ && internal_name)
         {
+            ret ~= "\n/// checks is value equals to null\n";
             ret ~= "bool isnull" ~ external_name ~ "() {";
             ret ~= "return " ~ internal_name ~ ".isNull();";
             ret ~= "}";
             // this comment is to avoid dfmt from squishing this empty line
+            ret ~= "\n/// nullifies value\n";
             ret ~= "void nullify" ~ external_name ~ "() {";
             ret ~= internal_name ~ ".nullify();";
             if (call_on_set != "")
@@ -105,6 +120,9 @@ mixin template mixin_variable(GetterSetterBothOrNone settings, string public_or_
     }());
 }
 
+/++
+    returns FormI value
++/
 mixin template mixin_getForm_from_WidgetI()
 {
     import dtk.widgets.utils;
@@ -115,6 +133,9 @@ mixin template mixin_getForm_from_WidgetI()
     }
 }
 
+/++
+    rutine for every widget
++/
 mixin template mixin_widgetPositionsAndSizes()
 {
     private
@@ -146,10 +167,17 @@ mixin template mixin_widgetPositionsAndSizes()
 
 }
 
-mixin template mixin_getWidgetType(string value)
+/++
+    makes place for child
++/
+mixin template mixin_child(string name_suffix)
 {
-    string getWidgetType()
-    {
-        return value;
-    }
+    mixin mixin_variable!(
+        GetterSetterBothOrNone.getterSetterAndNullable,
+        "private",
+        "_child_"~name_suffix,
+        "Child"~name_suffix,
+        "WidgetI",
+        "",
+        );
 }

@@ -8,15 +8,15 @@ import dtk.types.Point;
 import dtk.types.Size;
 import dtk.types.WindowCreationSettings;
 
+import dtk.widgets.Form;
+import dtk.widgets.Layout;
+import dtk.widgets.Button;
+
 void main()
 {
 	auto pl = instantiatePlatform();
 
 	pl.init();
-
-	/* Point a = {x:10, y:10};
-	Size b = {width:200, height: 200}; */
-
 
 	WindowCreationSettings wcs = {
 		title:"123",
@@ -25,15 +25,17 @@ void main()
 		resizable:true,
 	};
 
-	WindowCreationSettings wcs2 = {
-		title:"456",
-		position: Point(200, 200),
-		size: Size(200, 200),
-		resizable:true,
-	};
+	auto w = pl.createWindow(wcs);
 
-	pl.createWindow(wcs);
-	pl.createWindow(wcs2);
+	Form form = new Form();
+
+	Layout lo = new Layout();
+
+	Button btn = new Button();
+
+	form.setChild0(lo);
+
+	w.installForm(form);
 
 	pl.mainLoop();
 

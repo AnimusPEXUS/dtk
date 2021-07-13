@@ -13,8 +13,6 @@ import dtk.widgets.mixins;
 class Label : ContainerableWidgetI
 {
 
-    mixin mixin_getWidgetType!"Label";
-
     mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
             "private", "_parent", "Parent", "WidgetI", "");
 
