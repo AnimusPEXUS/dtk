@@ -17,6 +17,9 @@ import dtk.platforms.sdl_desktop.utils;
 import dtk.types.Point;
 import dtk.types.Size;
 import dtk.types.WindowCreationSettings;
+import dtk.types.EventWindow;
+import dtk.types.EventKeyboard;
+import dtk.types.EventMouse;
 
 import dtk.miscs.KeyboardProcessor;
 
@@ -44,11 +47,15 @@ class Window : WindowI
         bool _visible;
 
         KeyboardProcessor _kbp;
+
+        void delegate(EventWindow event) eventWindowCB;
+        void delegate(EventKeyboard event) eventKeyboardCB;
+        void delegate(EventMouse event) eventMouseCB;
     }
 
     SDL_Window* _sdl_window;
 
-    uint _sdl_window_id;
+    typeof (SDL_WindowEvent.windowID) _sdl_window_id;
 
     @disable this();
 
@@ -106,6 +113,11 @@ class Window : WindowI
         _platform.unregisterWindow(this);
     }
 
+    void eventReceiver(SDL_Event *e)
+    {
+
+    }
+
     void HandleWindowEvent(SDL_WindowEvent e)
     {
         writeln(e.event);
@@ -139,7 +151,7 @@ class Window : WindowI
         case SDL_WINDOWEVENT_RESIZED:
             this._size.width = e.data1;
             this._size.height = e.data2;
-            this._form.setSize(this._size);
+            /* this._form.setSize(this._size); */
             this.redraw(); // TODO: remove here or here
             printParams();
             break;
@@ -194,14 +206,14 @@ class Window : WindowI
     void redraw()
     {
         writeln("Window redraw() i called 111");
-        auto f = getForm();
+        /* auto f = getForm();
         if (f is null)
         {
             writeln("form not attached");
             return;
         }
 
-        f.redraw();
+        f.redraw(); */
     }
 
     void printParams()
@@ -292,5 +304,18 @@ class Window : WindowI
     {
         _title = value;
     }
+
+    void setWindowEventCB(void delegate(EventWindow event))
+    {
+
+    }
+    void unsetWindowEventCB();
+
+    void setKeyboardEventCB(void delegate(EventKeyboard event));
+    void unsetKeyboardEventCB();
+
+    void setMouseEventCB(void delegate(EventMouse event));
+    void unsetMouseEventCB();
+
 
 }

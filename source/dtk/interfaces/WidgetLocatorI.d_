@@ -1,0 +1,7 @@
+module dtk.interfaces.WidgetLocatorI;
+
+
+interface WidgetLocatorI
+{
+    
+}

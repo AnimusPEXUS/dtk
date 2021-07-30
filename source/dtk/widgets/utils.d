@@ -10,7 +10,7 @@ begin:
 
     if (failure_countdown == 0)
     {
-        throw new Exception("parrent search failure countdown exceeded");
+        return null;
     }
 
     auto ret = cast(FormI) w;
@@ -22,7 +22,7 @@ begin:
     w = w.getParent();
     if (w is null)
     {
-        throw new Exception("widget returned null parrent while being not FormI");
+        return null;
     }
 
     failure_countdown--;

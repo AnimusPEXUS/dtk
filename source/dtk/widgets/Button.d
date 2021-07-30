@@ -17,9 +17,10 @@ import dtk.types.ButtonTypeE;
 import dtk.types.Size;
 
 import dtk.widgets.mixins;
+import dtk.widgets.Widget;
 
 /// Button class
-class Button : ContainerableWidgetI
+class Button : Widget
 {
     private
     {
@@ -34,19 +35,19 @@ class Button : ContainerableWidgetI
         ButtonTypeE _button_type;
     }
 
-    mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
+    /* mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
             "private", "_parent", "Parent", "WidgetI", "");
 
     mixin mixin_getForm_from_WidgetI;
 
-    mixin mixin_child!("Label");
+    mixin mixin_child!("Label"); */
 
     Size calculateSizesAndPositions(Size size)
     {
         return Size();
     }
 
-    void redraw()
+    override void redraw()
     {
     }
 }

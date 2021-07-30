@@ -16,73 +16,40 @@ import dtk.types.Size;
 import dtk.types.Theme;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
+import dtk.types.Property;
 
 import dtk.widgets.mixins;
+import dtk.widgets.Widget;
 
-class Form : FormI, WidgetI
+class Form : Widget, FormI
 {
     private
     {
-        /* bool _visible; */
-        WindowI _window;
-        Size _size;
-        Theme _theme;
-        DrawingSurfaceI _drawing_surface;
+        mixin Property_gsu!(WindowI, "window");
+        mixin Property_gs!(Theme, "theme");
+        mixin Property_gsu!(DrawingSurfaceI, "drawing_surface");
     }
 
-    mixin mixin_child!("0");
+    mixin Property_forwarding!(WindowI, window, "Window");
+    mixin Property_forwarding!(Theme, theme, "Theme");
+    mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface");
 
-    void setWindow(WindowI win)
-    {
-        this._window = win;
-    }
-
-    void unsetWindow()
-    {
-        this._window = null;
-    }
-
-    void setSize(Size s)
-    {
-        this._size = s;
-    }
-
-    DrawingSurfaceI getDrawingSurface()
-    {
-        if (_drawing_surface is null)
-        {
-            assert(_window !is null);
-            _drawing_surface = _window.getDrawingSurface();
-        }
-        return _drawing_surface;
-    }
-
-    void setParent(WidgetI widget)
+    override void setParent(WidgetI widget)
     {
         return;
     }
 
-    void nullifyParent()
+    override void unsetParent()
     {
         return;
     }
 
-    WidgetI getParent()
+    override WidgetI getParent()
     {
         return null;
     }
 
-    Theme getTheme()
-    {
-        return _theme;
-    }
-
-    void setTheme(Theme theme)
-    {
-        _theme = theme;
-    }
-
-    FormI getForm()
+    override Form getForm()
     {
         return this;
     }
@@ -92,15 +59,16 @@ class Form : FormI, WidgetI
         return Size();
     }
 
-    void redraw()
+    override void redraw()
     {
         writeln("Form redraw() requested");
         auto ds = this.getDrawingSurface();
         assert(ds !is null);
+        auto size = this.locator.getCalculatedSize();
         writeln("sd == ",ds);
         ds.DrawRectangle(
             Point(0,0),
-            this._size,
+            size,
             LineStyle(),
             LineStyle(),
             LineStyle(),
@@ -108,5 +76,7 @@ class Form : FormI, WidgetI
             FillStyle()
             );
     }
+
+    void onWindowResize(){}
 
 }

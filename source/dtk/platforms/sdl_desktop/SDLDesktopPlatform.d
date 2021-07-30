@@ -87,14 +87,14 @@ class SDLDesktopPlatform : PlatformI
 
     void mainLoop()
     {
-        SDL_Event event;
+        SDL_Event *event = new SDL_Event;
 
         main_loop: while (true)
         {
             if (exit)
                 break;
 
-            auto res = SDL_WaitEvent(&event);
+            auto res = SDL_WaitEvent(event);
 
             if (res == 0) // TODO: use GetError()
             {
@@ -102,40 +102,37 @@ class SDLDesktopPlatform : PlatformI
                 return;
             }
 
+            // TODO: probably, at this point, things have to become asynchronous
+
             writeln(event.type);
+
+        typeof (SDL_WindowEvent.windowID) windowID;
 
         event_type_switch:
             switch (event.type)
             {
             default:
-                break;
+                continue main_loop;
             case SDL_WINDOWEVENT:
-                auto window_event = event.window;
-                foreach (ref Window w; windows)
-                {
-                    if (w._sdl_window_id == window_event.windowID)
-                    {
-                        w.HandleWindowEvent(window_event);
-                        break event_type_switch;
-                    }
-                }
-                throw new Exception("got event for unregistered window");
-                /* break; */
+                windowID = event.window.windowID;
+                break;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                auto keyb_event = event.key;
-                foreach (ref Window w; windows)
-                {
-                    if (w._sdl_window_id == keyb_event.windowID)
-                    {
-                        w.HandleKeyboardEvent(keyb_event);
-                        break event_type_switch;
-                    }
-                }
-                throw new Exception("got event for unregistered window");
+                windowID = event.key.windowID;
+                break;
             case SDL_QUIT:
                 break main_loop;
             }
+
+            foreach (ref Window w; windows)
+            {
+                if (w._sdl_window_id == windowID)
+                {
+                    w.eventReceiver(event);
+                    continue main_loop;
+                }
+            }
+            throw new Exception("got event for unregistered window");
 
         }
 

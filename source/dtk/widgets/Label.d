@@ -8,22 +8,23 @@ import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 
+import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class Label : ContainerableWidgetI
+class Label : Widget
 {
 
-    mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
-            "private", "_parent", "Parent", "WidgetI", "");
+    /* mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
+            "private", "_parent", "Parent", "WidgetI", ""); */
 
-    mixin mixin_getForm_from_WidgetI;
+    /* mixin mixin_getForm_from_WidgetI; */
 
     Size calculateSizesAndPositions(Size size)
     {
         return Size();
     }
 
-    void redraw()
+    override void redraw()
     {
     }
 

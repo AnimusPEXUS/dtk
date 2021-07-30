@@ -11,28 +11,29 @@ import dtk.interfaces.FormI;
 
 import dtk.types.Size;
 
+import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class MenuItem : ContainerableWidgetI
+class MenuItem : Widget
 {
     private
     {
         ContainerableWidgetI _contained;
     }
 
-    mixin mixin_child!("Primary");
+    /* mixin mixin_child!("Primary"); */
 
-    mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
-            "private", "_parent", "Parent", "WidgetI", "");
+    /* mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
+            "private", "_parent", "Parent", "WidgetI", ""); */
 
-    mixin mixin_getForm_from_WidgetI;
+    /* mixin mixin_getForm_from_WidgetI; */
 
     Size calculateSizesAndPositions(Size size)
     {
         return Size();
     }
 
-    void redraw()
+    override void redraw()
     {
     }
 

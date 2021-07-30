@@ -4,6 +4,9 @@ import std.typecons;
 
 import dtk.types.Point;
 import dtk.types.Size;
+import dtk.types.EventWindow;
+import dtk.types.EventKeyboard;
+import dtk.types.EventMouse;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -13,11 +16,8 @@ interface WindowI
 {
     PlatformI getPlatform();
 
-    void installForm(FormI form);
-    void uninstallForm();
-
     void setForm(FormI form);
-    FormI getForm();
+    void unsetForm();
 
     DrawingSurfaceI getDrawingSurface();
 
@@ -32,4 +32,13 @@ interface WindowI
 
     string getTitle();
     void setTitle(string value);
+
+    void setWindowEventCB(void delegate(EventWindow event));
+    void unsetWindowEventCB();
+
+    void setKeyboardEventCB(void delegate(EventKeyboard event));
+    void unsetKeyboardEventCB();
+
+    void setMouseEventCB(void delegate(EventMouse event));
+    void unsetMouseEventCB();
 }

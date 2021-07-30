@@ -14,7 +14,7 @@ enum GetterSetterBothOrNone
     getterSetterAndNullable = getterAndSetter | nullable,
 }
 
-mixin template mixin_variable(
+/* mixin template mixin_property(
         GetterSetterBothOrNone settings,
         string public_or_private,
         string internal_name,
@@ -102,12 +102,12 @@ mixin template mixin_variable(
         if (nullable_ && internal_name)
         {
             ret ~= "\n/// checks is value equals to null\n";
-            ret ~= "bool isnull" ~ external_name ~ "() {";
-            ret ~= "return " ~ internal_name ~ ".isNull();";
+            ret ~= "bool isset" ~ external_name ~ "() {";
+            ret ~= "return !" ~ internal_name ~ ".isNull();";
             ret ~= "}";
             // this comment is to avoid dfmt from squishing this empty line
             ret ~= "\n/// nullifies value\n";
-            ret ~= "void nullify" ~ external_name ~ "() {";
+            ret ~= "void unset" ~ external_name ~ "() {";
             ret ~= internal_name ~ ".nullify();";
             if (call_on_set != "")
             {
@@ -118,7 +118,7 @@ mixin template mixin_variable(
 
         return ret;
     }());
-}
+} */
 
 /++
     returns FormI value
@@ -170,7 +170,7 @@ mixin template mixin_widgetPositionsAndSizes()
 /++
     makes place for child
 +/
-mixin template mixin_child(string name_suffix)
+/* mixin template mixin_child(string name_suffix)
 {
     mixin mixin_variable!(
         GetterSetterBothOrNone.getterSetterAndNullable,
@@ -180,4 +180,4 @@ mixin template mixin_child(string name_suffix)
         "WidgetI",
         "",
         );
-}
+} */

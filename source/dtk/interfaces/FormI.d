@@ -7,13 +7,10 @@ import dtk.types.Size;
 
 interface FormI
 {
-    void setWindow(WindowI);
+    void setWindow(WindowI window);
     void unsetWindow();
-
-    void setSize(Size s);
 
     DrawingSurfaceI getDrawingSurface();
     Theme getTheme();
     void setTheme(Theme theme);
-    void redraw();
 }

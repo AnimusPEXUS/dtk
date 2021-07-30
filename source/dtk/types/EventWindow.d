@@ -18,9 +18,6 @@ enum EventWindowID
     FocusLost,
     Close, /* TAKE_FOCUS, */
     /* HIT_TEST, */
-
-
-
 }
 
 struct EventWindow

@@ -1,24 +1,23 @@
 module dtk.interfaces.WidgetI;
 
 import dtk.interfaces.FormI;
+/* import dtk.interfaces.WidgetLocatorI; */
 
 import dtk.types.Size;
+import dtk.types.Point;
 
 interface WidgetI
 {
     WidgetI getParent();
     void setParent(WidgetI widget);
-    void nullifyParent();
+    void unsetParent();
 
-    /++ return FormI on which this Widget is placed. throws exception in case if
-    there is no attached form or if this widget if deeper than 200 in level to
-    FormI instance (too deep); +/
+    /* WidgetLocatorI getWidgetLocator(); */
+
     FormI getForm();
 
-    /++ calculate sizes of children (by recursively calling
-    calculateSizesAndPositions()) and than calculate own size and return own
-    size. size - maximum size, which parent allows this child to resize it self.
-    +/
-    Size calculateSizesAndPositions(Size size);
+    void event_mouse();
+    void event_keyboard();
+
     void redraw();
 }
