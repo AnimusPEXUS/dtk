@@ -1,4 +1,4 @@
-module dtk.widgets.Label;
+module dtk.widgets.TextEntry;
 
 import std.typecons;
 
@@ -11,7 +11,9 @@ import dtk.interfaces.FormI;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class Label : Widget
+class TextEntry : Widget
 {
+
+
 
 }

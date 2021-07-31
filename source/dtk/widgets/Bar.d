@@ -1,7 +1,7 @@
 /++
 ToolBar should/can be both used for buttons and menus
 +/
-module dtk.widgets.ToolBar;
+module dtk.widgets.Bar;
 
 // TODO: decide, whatever I need one class for menu and tool bars, or different
 // classes for each
@@ -20,24 +20,12 @@ import dtk.widgets.mixins;
 /++
 Test documentation
 +/
-class ToolBar : Widget
+class Bar : Widget
 {
     private
     {
         ContainerableWidgetI[] _children;
     }
 
-    /* mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
-            "private", "_parent", "Parent", "WidgetI", ""); */
 
-    /* mixin mixin_getForm_from_WidgetI; */
-
-    Size calculateSizesAndPositions(Size size)
-    {
-        return Size();
-    }
-
-    override void redraw()
-    {
-    }
 }

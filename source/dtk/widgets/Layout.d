@@ -42,11 +42,6 @@ class Layout : Widget
     mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "VerticalOverflowBehavior");
     mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "HorizontalOverflowBehavior");
 
-    Size calculateSizesAndPositions(Size size)
-    {
-        return Size();
-    }
-
     size_t getChildrenCount()
     {
         return children.length;
@@ -64,16 +59,8 @@ class Layout : Widget
 
     void removeChild(ContainerableWidgetI widget)
     {
-        auto x = children.find(widget);
-        children = children[  ] ;
+        assert(false, "todo");
     }
-
-    /* void swapChildren(size_t index0, size_t index1)
-    {
-        auto z = children[index0];
-        children[index0] = children[index1];
-        children[index1] = z;
-    } */
 
     void packStart(ContainerableWidgetI widget, bool expand, bool fill)
     {

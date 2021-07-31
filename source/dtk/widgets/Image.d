@@ -13,18 +13,5 @@ import dtk.widgets.mixins;
 
 class Image : Widget
 {
-    /* mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
-            "private", "_parent", "Parent", "WidgetI", ""); */
-
-    /* mixin mixin_getForm_from_WidgetI; */
-
-    Size calculateSizesAndPositions(Size size)
-    {
-        return Size();
-    }
-
-    override void redraw()
-    {
-    }
 
 }

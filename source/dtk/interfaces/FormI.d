@@ -2,7 +2,8 @@ module dtk.interfaces.FormI;
 
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.types.Theme;
+import dtk.interfaces.ThemeI;
+/* import dtk.types.Theme; */
 import dtk.types.Size;
 
 interface FormI
@@ -11,6 +12,6 @@ interface FormI
     void unsetWindow();
 
     DrawingSurfaceI getDrawingSurface();
-    Theme getTheme();
-    void setTheme(Theme theme);
+    ThemeI getTheme();
+    void setTheme(ThemeI theme);
 }

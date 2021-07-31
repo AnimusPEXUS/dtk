@@ -35,19 +35,5 @@ class Button : Widget
         ButtonTypeE _button_type;
     }
 
-    /* mixin mixin_variable!(GetterSetterBothOrNone.getterSetterAndNullable,
-            "private", "_parent", "Parent", "WidgetI", "");
 
-    mixin mixin_getForm_from_WidgetI;
-
-    mixin mixin_child!("Label"); */
-
-    Size calculateSizesAndPositions(Size size)
-    {
-        return Size();
-    }
-
-    override void redraw()
-    {
-    }
 }

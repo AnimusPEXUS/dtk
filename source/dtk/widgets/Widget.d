@@ -1,5 +1,8 @@
 module dtk.widgets.Widget;
 
+import std.stdio;
+import std.conv;
+
 import dtk.interfaces.WidgetI;
 
 import dtk.types.Property;
@@ -85,5 +88,31 @@ class Widget : WidgetI
     void event_mouse();
     void event_keyboard();
 
-    void redraw();
+    // NOTE: this function final only for limited period of time.
+    //       users should be allowed to override this redraw() function
+    final void redraw() {
+        Form form = this.getForm();
+        if (form is null)
+        {
+            writeln("error: redraw() function couldn't get Form. this is: ", this);
+            return;
+        }
+
+        auto theme = form.getTheme();
+        auto ds = form.getDrawingSurface();
+
+        static foreach (v; ["Form"])
+        {
+            {
+                mixin(v~" widget = cast("~v~") this;");
+                /* __traits(toType, v) widget = cast(__traits(toType, v)) this; */
+                if (widget !is null)
+                {
+                    (__traits(getMember, theme, "draw"~v))(ds, widget);
+                }
+            }
+        }
+
+        writeln("TODO: redraw() function does not supports "~ to!string(this));
+    }
 }
