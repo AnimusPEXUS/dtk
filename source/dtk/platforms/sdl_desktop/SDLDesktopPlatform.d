@@ -10,6 +10,7 @@ import dtk.interfaces.WindowI;
 import dtk.types.WindowCreationSettings;
 
 import dtk.platforms.sdl_desktop.Window;
+import dtk.platforms.sdl_desktop.utils;
 
 class SDLDesktopPlatform : PlatformI
 {
@@ -85,6 +86,23 @@ class SDLDesktopPlatform : PlatformI
         SDL_Quit();
     }
 
+    Window getWindowByWindowID(typeof (SDL_WindowEvent.windowID) windowID){
+        Window ret;
+        foreach (Window w; windows)
+        {
+            if (w._sdl_window_id == windowID)
+            {
+                ret =w ;
+                break;
+            }
+        }
+        if (ret is null)
+        {
+            throw new Exception("got event for unregistered window");
+        }
+        return ret;
+    }
+
     void mainLoop()
     {
         SDL_Event *event = new SDL_Event;
@@ -114,25 +132,19 @@ class SDLDesktopPlatform : PlatformI
             default:
                 continue main_loop;
             case SDL_WINDOWEVENT:
-                windowID = event.window.windowID;
-                break;
+                auto w = getWindowByWindowID(event.window.windowID);
+                auto ew = convertSDLWindowEventToDtkEventWindow(event.window);
+                w.handle_event_window(ew);
+                continue main_loop;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                windowID = event.key.windowID;
-                break;
+                auto w = getWindowByWindowID(event.key.windowID);
+                auto ek = convertSDLKeyboardEventToDtkEventKeyboard(event.key);
+                w.handle_event_keyboard(ek);
+                continue main_loop;
             case SDL_QUIT:
                 break main_loop;
             }
-
-            foreach (ref Window w; windows)
-            {
-                if (w._sdl_window_id == windowID)
-                {
-                    w.eventReceiver(event);
-                    continue main_loop;
-                }
-            }
-            throw new Exception("got event for unregistered window");
 
         }
 

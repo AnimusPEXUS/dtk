@@ -3,6 +3,9 @@ module dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 /* import dtk.interfaces.WidgetLocatorI; */
 
+import dtk.types.EventKeyboard;
+import dtk.types.EventMouse;
+import dtk.types.EventTextInput;
 import dtk.types.Size;
 import dtk.types.Point;
 
@@ -12,12 +15,11 @@ interface WidgetI
     void setParent(WidgetI widget);
     void unsetParent();
 
-    /* WidgetLocatorI getWidgetLocator(); */
-
     FormI getForm();
 
-    void event_mouse();
-    void event_keyboard();
+    void handle_event_keyboard(EventKeyboard* e);
+    void handle_event_mouse(EventMouse* e);
+    void handle_event_textinput(EventTextInput* e);
 
     void redraw();
 }

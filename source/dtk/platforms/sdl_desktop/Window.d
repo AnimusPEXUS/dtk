@@ -20,6 +20,7 @@ import dtk.types.WindowCreationSettings;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
+import dtk.types.EventTextInput;
 
 import dtk.miscs.KeyboardProcessor;
 
@@ -48,9 +49,9 @@ class Window : WindowI
 
         KeyboardProcessor _kbp;
 
-        void delegate(EventWindow event) eventWindowCB;
+        /* void delegate(EventWindow event) eventWindowCB;
         void delegate(EventKeyboard event) eventKeyboardCB;
-        void delegate(EventMouse event) eventMouseCB;
+        void delegate(EventMouse event) eventMouseCB; */
     }
 
     SDL_Window* _sdl_window;
@@ -113,12 +114,25 @@ class Window : WindowI
         _platform.unregisterWindow(this);
     }
 
-    void eventReceiver(SDL_Event *e)
-    {
-
+    void handle_event_window(EventWindow* e) {
+        writeln("Window::handle_event_window");
     }
 
-    void HandleWindowEvent(SDL_WindowEvent e)
+    void handle_event_keyboard(EventKeyboard* e) {
+        writeln("Window::handle_event_keyboard");
+    }
+
+    void handle_event_mouse(EventMouse* e) {
+        writeln("Window::handle_event_mouse");
+    }
+
+    void handle_event_textinput(EventTextInput* e)
+    {
+        writeln("Window::handle_event_textinput");
+    }
+
+    /+
+    void HandleWindowEvent(SDL_WindowEvent* e)
     {
         writeln(e.event);
         switch (e.event)
@@ -196,7 +210,7 @@ class Window : WindowI
         case SDL_WINDOWEVENT_HIT_TEST:
             break; */
         }
-    }
+    } +/
 
     void HandleKeyboardEvent(SDL_KeyboardEvent event)
     {
@@ -234,10 +248,14 @@ class Window : WindowI
 
     void installForm(FormI form)
     {
-        this.setForm(form);
+        assert(form !is null);
+
+        uninstallForm();
+
+        setForm(form);
         auto x = getForm();
-        if (x !is null)
-            x.setWindow(this);
+        assert(x !is null);
+        x.setWindow(this);
     }
 
     void uninstallForm()
@@ -305,17 +323,34 @@ class Window : WindowI
         _title = value;
     }
 
-    void setWindowEventCB(void delegate(EventWindow event))
+    /* void setWindowEventCB(void delegate(EventWindow event) cb)
     {
-
+        eventWindowCB = cb;
     }
-    void unsetWindowEventCB();
 
-    void setKeyboardEventCB(void delegate(EventKeyboard event));
-    void unsetKeyboardEventCB();
+    void unsetWindowEventCB(){
+        eventWindowCB = null;
+    }
 
-    void setMouseEventCB(void delegate(EventMouse event));
-    void unsetMouseEventCB();
+    void setKeyboardEventCB(void delegate(EventKeyboard event) cb)
+    {
+        eventKeyboardCB = cb;
+    }
+
+    void unsetKeyboardEventCB()
+    {
+        eventKeyboardCB = null;
+    }
+
+    void setMouseEventCB(void delegate(EventMouse event) cb)
+    {
+        eventMouseCB = cb;
+    }
+
+    void unsetMouseEventCB()
+    {
+        eventMouseCB = null;
+    } */
 
 
 }

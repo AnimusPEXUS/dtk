@@ -24,7 +24,7 @@ enum LayoutOverflowBehavior
     Resize, // resize self to fit everything
 }
 
-class Layout : Widget
+class Layout : Widget, ContainerableWidgetI
 {
 
     private
@@ -33,10 +33,6 @@ class Layout : Widget
 
         mixin Property_gs_w_d!(LayoutOverflowBehavior, "vertical_overflow_behavior", LayoutOverflowBehavior.Resize);
         mixin Property_gs_w_d!(LayoutOverflowBehavior, "horizontal_overflow_behavior", LayoutOverflowBehavior.Resize);
-    }
-
-    this()
-    {
     }
 
     mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "VerticalOverflowBehavior");

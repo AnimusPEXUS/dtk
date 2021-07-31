@@ -135,6 +135,9 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
             Signal!() onBeforeUnset;
             Signal!() onAfterUnset;
         }
+
+        Signal!() onBeforeChanged;
+        Signal!() onAfterChanged;
     }
 
     /* @disable this(this); */
@@ -159,6 +162,9 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
     {
         void reset()
         {
+            onBeforeChanged.emit();
+            scope (success)
+                onAfterChanged.emit();
             onBeforeReset.emit();
             scope (success)
                 onAfterReset.emit();
@@ -188,6 +194,9 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
     {
         void unset()
         {
+            onBeforeChanged.emit();
+            scope (success)
+                onAfterChanged.emit();
             onBeforeUnset.emit();
             scope (success)
                 onAfterUnset.emit();
@@ -272,6 +281,9 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
     {
         void set(T1 new_value)
         {
+            onBeforeChanged.emit();
+            scope (success)
+                onAfterChanged.emit();
             onBeforeSet.emit();
             scope (success)
                 onAfterSet.emit();

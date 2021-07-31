@@ -33,7 +33,7 @@ void main()
 
 	Button btn = new Button();
 
-	form.setChild0(lo);
+	form.setChild(lo);
 
 	w.installForm(form);
 

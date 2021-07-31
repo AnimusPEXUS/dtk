@@ -2,6 +2,8 @@
 
 module dtk.widgets.Form;
 
+import observable.signal;
+
 import std.stdio;
 import std.typecons;
 
@@ -29,11 +31,29 @@ class Form : Widget, FormI
         mixin Property_gsu!(WindowI, "window");
         mixin Property_gs!(ThemeI, "theme");
         mixin Property_gsu!(DrawingSurfaceI, "drawing_surface");
+        mixin Property_gsu!(ContainerableWidgetI, "child");
+
+        SignalConnection onwindowchanged_sc;
     }
 
     mixin Property_forwarding!(WindowI, window, "Window");
     mixin Property_forwarding!(ThemeI, theme, "Theme");
     mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface");
+    mixin Property_forwarding!(ContainerableWidgetI, child, "Child");
+
+    this()
+    {
+        // window.onAfterChanged.socket.connect(onwindowchanged_sc, &onwindowchanged);
+    }
+
+    /* private nothrow void onwindowchanged()
+    {
+        try {
+            writeln("onwindowchanged()");
+        } catch (Exception e) {
+            // TODO:
+        }
+    } */
 
     override void setParent(WidgetI widget)
     {
