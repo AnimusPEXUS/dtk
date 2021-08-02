@@ -114,6 +114,39 @@ class Window : WindowI
         _platform.unregisterWindow(this);
     }
 
+    void handle_SDL_Event(SDL_Event* event) {
+        writeln("Window::handle_SDL_Event");
+
+        switch (event.type)
+        {
+        default:
+            return;
+        case SDL_WINDOWEVENT:
+            handle_SDL_WindowEvent(&event.window);
+            break;
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            handle_SDL_WindowKeyboard(&event.key);
+            break;
+        }
+
+    }
+
+    void handle_SDL_WindowEvent(SDL_WindowEvent* event) {
+        writeln("Window::handle_SDL_WindowEvent");
+        // TODO: ensure event consistency
+        auto res = convertSDLWindowEventToDtkEventWindow(event);
+        handle_event_window(res);
+    }
+
+    void handle_SDL_WindowKeyboard(SDL_KeyboardEvent *event)
+    {
+        writeln("Window::handle_SDL_WindowKeyboard");
+        // TODO: ensure event consistency
+        auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
+        handle_event_keyboard(res);
+    }
+
     void handle_event_window(EventWindow* e) {
         writeln("Window::handle_event_window");
     }
@@ -129,92 +162,6 @@ class Window : WindowI
     void handle_event_textinput(EventTextInput* e)
     {
         writeln("Window::handle_event_textinput");
-    }
-
-    /+
-    void HandleWindowEvent(SDL_WindowEvent* e)
-    {
-        writeln(e.event);
-        switch (e.event)
-        {
-        default:
-            writeln("   NOT HANDLED!");
-            break;
-        case SDL_WINDOWEVENT_NONE:
-            break;
-
-        case SDL_WINDOWEVENT_SHOWN:
-            this._visible = true;
-            this.redraw();
-            break;
-
-        case SDL_WINDOWEVENT_HIDDEN:
-            this._visible = false;
-            break;
-
-        case SDL_WINDOWEVENT_EXPOSED:
-            this.redraw();
-            break;
-
-        case SDL_WINDOWEVENT_MOVED:
-            this._point.x = e.data1;
-            this._point.y = e.data2;
-            printParams();
-            break;
-
-        case SDL_WINDOWEVENT_RESIZED:
-            this._size.width = e.data1;
-            this._size.height = e.data2;
-            /* this._form.setSize(this._size); */
-            this.redraw(); // TODO: remove here or here
-            printParams();
-            break;
-
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-            this.redraw(); // TODO: remove here or here
-            break;
-
-        case SDL_WINDOWEVENT_MINIMIZED:
-            this._minimized = true;
-            break;
-
-        case SDL_WINDOWEVENT_MAXIMIZED:
-            this._maximized = true;
-            break;
-
-        case SDL_WINDOWEVENT_RESTORED:
-            // NOTE: I didn't get it: SDL logic is: window can't be semultaniously maximized and minimized?  -
-            //       so it emits RESTORED on unminimization and on un maximization?
-            this._minimized = true;
-            break;
-
-        case SDL_WINDOWEVENT_ENTER:
-            break;
-
-        case SDL_WINDOWEVENT_LEAVE:
-            break;
-
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            break;
-
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            break;
-
-        case SDL_WINDOWEVENT_CLOSE:
-            // TODO: catch this somehow and don't allow SDL to emit SDL_QUIT
-            break;
-
-            /* case SDL_WINDOWEVENT_TAKE_FOCUS:
-            break;
-
-        case SDL_WINDOWEVENT_HIT_TEST:
-            break; */
-        }
-    } +/
-
-    void HandleKeyboardEvent(SDL_KeyboardEvent event)
-    {
-        auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
     }
 
     void redraw()

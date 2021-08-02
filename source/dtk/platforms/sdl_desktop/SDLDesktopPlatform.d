@@ -132,20 +132,23 @@ class SDLDesktopPlatform : PlatformI
             default:
                 continue main_loop;
             case SDL_WINDOWEVENT:
-                auto w = getWindowByWindowID(event.window.windowID);
-                auto ew = convertSDLWindowEventToDtkEventWindow(event.window);
-                w.handle_event_window(ew);
-                continue main_loop;
+                windowID = event.window.windowID;
+                break;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                auto w = getWindowByWindowID(event.key.windowID);
-                auto ek = convertSDLKeyboardEventToDtkEventKeyboard(event.key);
-                w.handle_event_keyboard(ek);
-                continue main_loop;
+                windowID = event.key.windowID;
+                break;
             case SDL_QUIT:
                 break main_loop;
             }
 
+            auto w = getWindowByWindowID(event.window.windowID);
+
+            // NOTE: window have to recieve all events, because not all
+            // platforms have same set of events, and so, Window may be required
+            // to emitate event emission in some curcumstances based on it's
+            // current state.
+            w.handle_SDL_Event(event);
         }
 
         return;

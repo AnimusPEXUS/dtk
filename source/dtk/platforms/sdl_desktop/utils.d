@@ -11,37 +11,13 @@ import dtk.types.KeySym;
 
 import dtk.platforms.sdl_desktop.sdlkeyconversion;
 
-EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent e)
+EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
 {
     EventWindow* ret = new EventWindow;
     return ret;
 }
 
-EventMouse* convertSDLMouseMotionEventToDtkEventMouse(SDL_MouseMotionEvent e)
-{
-    EventMouse* ret = new EventMouse;
-    return ret;
-}
-
-EventMouse* convertSDLMouseButtonEventToDtkEventMouse(SDL_MouseButtonEvent e)
-{
-    EventMouse* ret = new EventMouse;
-    return ret;
-}
-
-EventMouse* convertSDLMouseWheelEventToDtkEventMouse(SDL_MouseWheelEvent e)
-{
-    EventMouse* ret = new EventMouse;
-    return ret;
-}
-
-EventTextInput* convertSDLWindowEventToDtkEventMouse(SDL_TextInputEvent e)
-{
-    EventTextInput* ret = new EventTextInput;
-    return ret;
-}
-
-EventKeyboard* convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent e)
+EventKeyboard* convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent* e)
 {
     EventKeyboard* ret = new EventKeyboard;
 
@@ -64,5 +40,29 @@ EventKeyboard* convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent e)
 
     ret.keysym = sk;
 
+    return ret;
+}
+
+EventMouse* convertSDLMouseMotionEventToDtkEventMouse(SDL_MouseMotionEvent* e)
+{
+    EventMouse* ret = new EventMouse;
+    return ret;
+}
+
+EventMouse* convertSDLMouseButtonEventToDtkEventMouse(SDL_MouseButtonEvent* e)
+{
+    EventMouse* ret = new EventMouse;
+    return ret;
+}
+
+EventMouse* convertSDLMouseWheelEventToDtkEventMouse(SDL_MouseWheelEvent* e)
+{
+    EventMouse* ret = new EventMouse;
+    return ret;
+}
+
+EventTextInput* convertSDLWindowEventToDtkEventMouse(SDL_TextInputEvent* e)
+{
+    EventTextInput* ret = new EventTextInput;
     return ret;
 }
