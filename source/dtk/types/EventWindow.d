@@ -1,28 +1,10 @@
 module dtk.types.EventWindow;
 
-enum EventWindowID
-{
-    None,
-    Shown,
-    Hidden,
-    Exposed,
-    Moved,
-    Resized,
-    SizeChanged,
-    Minimized,
-    Maximized,
-    Restored,
-    Enter,
-    Leave,
-    FocusGained,
-    FocusLost,
-    Close, /* TAKE_FOCUS, */
-    /* HIT_TEST, */
-}
+import dtk.types.EnumWindowEvent;
 
 struct EventWindow
 {
-    EventWindowID eventId;
+    EnumWindowEvent eventId;
     int data1;
     int data2;
 }
