@@ -2,8 +2,8 @@ module dtk.types.WindowCreationSettings;
 
 import std.typecons;
 
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 
 /* import dtk.types.UndefinedNoYes; */
 
@@ -11,8 +11,8 @@ struct WindowCreationSettings
 {
     string title;
 
-    Nullable!Point position;
-    Nullable!Size size;
+    Nullable!Position2D position;
+    Nullable!Size2D size;
 
     Nullable!bool fullscreen;
     Nullable!bool fullscreen_desktop;

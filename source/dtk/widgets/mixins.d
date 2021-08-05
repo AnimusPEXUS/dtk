@@ -140,27 +140,27 @@ mixin template mixin_widgetPositionsAndSizes()
 {
     private
     {
-        Point positionOnParent;
+        Position2D positionOnParent;
 
         // set -1 if unset;
-        Size _minimumSize;
-        Size _maximumSize;
+        Size2D _minimumSize;
+        Size2D _maximumSize;
 
         // minimum size, which is summ of minimum sizes of all
         // non-scrollable/non-clipped children + own minimum size
-        Size _calculatedMinimumSize;
+        Size2D _calculatedMinimumSize;
 
         // this value is for redrawing widgets and to route pointer
         // events
-        Size _calculatedSize;
+        Size2D _calculatedSize;
     }
 
-    Size getMinimumSize()
+    Size2D getMinimumSize()
     {
         return _minimumSize;
     }
 
-    Size getMaximumSize()
+    Size2D getMaximumSize()
     {
         return _maximumSize;
     }

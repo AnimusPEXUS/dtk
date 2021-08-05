@@ -4,8 +4,8 @@ import std.stdio;
 
 import bindbc.sdl;
 
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 import dtk.types.Color;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
@@ -27,19 +27,19 @@ class DrawingSurface : DrawingSurfaceI
         this.w=w;
     }
 
-    void DrawDot(Point pos, Color color)
+    void DrawDot(Position2D pos, Color color)
     {
 
     }
 
-    void DrawLine(Point pos, Point pos2, LineStyle style)
+    void DrawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
 
     }
 
     void DrawRectangle(
-            Point pos,
-            Size size,
+            Position2D pos,
+            Size2D size,
             LineStyle top_style,
             LineStyle left_style,
             LineStyle bottom_style,
@@ -60,7 +60,7 @@ class DrawingSurface : DrawingSurfaceI
         SDL_UpdateWindowSurface(w._sdl_window);
     }
 
-    void DrawText(string text, Point pos, Font font, FontStyle font_style, TextStyle text_style,)
+    void DrawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style,)
     {
 
     }

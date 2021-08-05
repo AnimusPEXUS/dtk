@@ -6,8 +6,8 @@ import dtk.interfaces.FormI;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
-import dtk.types.Size;
-import dtk.types.Point;
+import dtk.types.Size2D;
+import dtk.types.Position2D;
 
 interface WidgetI
 {

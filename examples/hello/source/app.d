@@ -4,8 +4,8 @@ import std.typecons;
 
 import dtk.main;
 
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 import dtk.types.WindowCreationSettings;
 
 import dtk.widgets.Form;
@@ -20,8 +20,8 @@ void main()
 
 	WindowCreationSettings wcs = {
 		title:"123",
-		position: Point(0, 0),
-		size: Size(200, 200),
+		position: Position2D(0, 0),
+		size: Size2D(200, 200),
 		resizable:true,
 	};
 

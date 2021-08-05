@@ -2,8 +2,8 @@ module dtk.interfaces.WindowI;
 
 import std.typecons;
 
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
@@ -25,14 +25,14 @@ interface WindowI
 
     DrawingSurfaceI getDrawingSurface();
 
-    Point getPoint();
-    Tuple!(bool, Point) setPoint(Point point);
+    Position2D getPoint();
+    Tuple!(bool, Position2D) setPoint(Position2D point);
 
-    Size getSize();
-    Tuple!(bool, Size) setSize(Size size);
+    Size2D getSize();
+    Tuple!(bool, Size2D) setSize(Size2D size);
 
-    Point getFormPoint();
-    Size getFormSize();
+    Position2D getFormPoint();
+    Size2D getFormSize();
 
     string getTitle();
     void setTitle(string value);

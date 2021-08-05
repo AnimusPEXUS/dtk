@@ -15,7 +15,7 @@ import dtk.miscs.SizeGroup;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 
-import dtk.types.Size;
+import dtk.types.Size2D;
 
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;

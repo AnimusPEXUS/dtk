@@ -14,7 +14,7 @@ import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 
 import dtk.types.ButtonTypeE;
-import dtk.types.Size;
+import dtk.types.Size2D;
 
 import dtk.widgets.mixins;
 import dtk.widgets.Widget;

@@ -4,7 +4,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ThemeI;
 /* import dtk.types.Theme; */
-import dtk.types.Size;
+import dtk.types.Size2D;
 
 interface FormI
 {

@@ -3,8 +3,8 @@ module dtk.themes.chicago98.Chicago98Theme;
 import std.stdio;
 
 import dtk.types.Color;
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 
@@ -21,7 +21,7 @@ class Chicago98Theme : ThemeI
 
         auto size = widget.locator.getCalculatedSize();
         ds.DrawRectangle(
-            Point(0,0),
+            Position2D(0,0),
             size,
             LineStyle(),
             LineStyle(),

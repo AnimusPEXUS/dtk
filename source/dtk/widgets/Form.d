@@ -14,8 +14,8 @@ import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ContainerableWidgetI;
 
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 /* import dtk.types.Theme; */
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;

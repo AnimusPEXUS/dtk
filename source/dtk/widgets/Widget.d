@@ -12,8 +12,8 @@ import dtk.types.EventTextInput;
 import dtk.types.Property;
 import dtk.types.Property_mixins;
 
-import dtk.types.Size;
-import dtk.types.Point;
+import dtk.types.Size2D;
+import dtk.types.Position2D;
 
 import dtk.widgets.WidgetLocator;
 import dtk.widgets.Form;

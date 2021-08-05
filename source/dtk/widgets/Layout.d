@@ -6,7 +6,7 @@ import std.typecons;
 import std.array;
 
 import dtk.interfaces.ContainerableWidgetI;
-import dtk.types.Size;
+import dtk.types.Size2D;
 import dtk.types.Property;
 
 import dtk.interfaces.FormI;

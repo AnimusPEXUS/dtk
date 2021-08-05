@@ -2,7 +2,7 @@ module dtk.interfaces.ResizableI;
 /*
 interface ResizableI
 {
-    resize(Size size);
+    resize(Size2D size);
 
     void setMinWidth()
 } */

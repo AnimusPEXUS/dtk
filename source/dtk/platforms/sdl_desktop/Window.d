@@ -14,8 +14,8 @@ import dtk.platforms.sdl_desktop.DrawingSurface;
 import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 import dtk.platforms.sdl_desktop.utils;
 
-import dtk.types.Point;
-import dtk.types.Size;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
 import dtk.types.WindowCreationSettings;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
@@ -34,11 +34,11 @@ class Window : WindowI
 
         FormI _form;
 
-        Point _point;
-        Size _size;
+        Position2D _point;
+        Size2D _size;
 
-        Point _form_point;
-        Size _form_size;
+        Position2D _form_point;
+        Size2D _form_size;
 
         string _title;
 
@@ -49,14 +49,12 @@ class Window : WindowI
 
         KeyboardProcessor _kbp;
 
-        /* void delegate(EventWindow event) eventWindowCB;
-        void delegate(EventKeyboard event) eventKeyboardCB;
-        void delegate(EventMouse event) eventMouseCB; */
     }
 
-    SDL_Window* _sdl_window;
-
-    typeof (SDL_WindowEvent.windowID) _sdl_window_id;
+    public {
+        SDL_Window* _sdl_window;
+        typeof (SDL_WindowEvent.windowID) _sdl_window_id;
+    }
 
     @disable this();
 
@@ -228,34 +226,34 @@ class Window : WindowI
         return _form;
     }
 
-    Point getPoint()
+    Position2D getPoint()
     {
         return _point;
     }
 
-    Tuple!(bool, Point) setPoint(Point point)
+    Tuple!(bool, Position2D) setPoint(Position2D point)
     {
         this._point = point;
         return tuple(true, this._point);
     }
 
-    Size getSize()
+    Size2D getSize()
     {
         return _size;
     }
 
-    Tuple!(bool, Size) setSize(Size size)
+    Tuple!(bool, Size2D) setSize(Size2D size)
     {
         this._size = size;
         return tuple(true, this._size);
     }
 
-    Point getFormPoint()
+    Position2D getFormPoint()
     {
         return _form_point;
     }
 
-    Size getFormSize()
+    Size2D getFormSize()
     {
         return _form_size;
     }
@@ -269,35 +267,6 @@ class Window : WindowI
     {
         _title = value;
     }
-
-    /* void setWindowEventCB(void delegate(EventWindow event) cb)
-    {
-        eventWindowCB = cb;
-    }
-
-    void unsetWindowEventCB(){
-        eventWindowCB = null;
-    }
-
-    void setKeyboardEventCB(void delegate(EventKeyboard event) cb)
-    {
-        eventKeyboardCB = cb;
-    }
-
-    void unsetKeyboardEventCB()
-    {
-        eventKeyboardCB = null;
-    }
-
-    void setMouseEventCB(void delegate(EventMouse event) cb)
-    {
-        eventMouseCB = cb;
-    }
-
-    void unsetMouseEventCB()
-    {
-        eventMouseCB = null;
-    } */
 
 
 }

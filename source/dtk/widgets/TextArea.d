@@ -2,7 +2,7 @@ module dtk.widgets.TextArea;
 
 import std.typecons;
 
-import dtk.types.Size;
+import dtk.types.Size2D;
 
 import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
