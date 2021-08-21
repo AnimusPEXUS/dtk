@@ -1,6 +1,7 @@
 module dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 
 import std.stdio;
+import std.algorithm;
 
 import bindbc.sdl;
 
@@ -11,6 +12,13 @@ import dtk.types.WindowCreationSettings;
 
 import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
+
+// TODO: ensure those events are not needed
+immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
+    SDL_WINDOWEVENT_NONE,
+    SDL_WINDOWEVENT_SIZE_CHANGED,
+    cast(SDL_WindowEventID)15 //SDL_WINDOWEVENT_TAKE_FOCUS
+    ];
 
 class SDLDesktopPlatform : PlatformI
 {
@@ -133,10 +141,27 @@ class SDLDesktopPlatform : PlatformI
                 continue main_loop;
             case SDL_WINDOWEVENT:
                 windowID = event.window.windowID;
+                if (ignoredSDLWindowEvents.canFind(event.window.event)) {
+                    writeln("warning: ignored SDL_WINDOWEVENT::", event.window.event, " just now");
+                    continue main_loop;
+                }
                 break;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
                 windowID = event.key.windowID;
+                break;
+            case SDL_MOUSEMOTION:
+                windowID = event.motion.windowID;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+                windowID = event.button.windowID;
+                break;
+            case SDL_MOUSEWHEEL:
+                windowID = event.wheel.windowID;
+                break;
+            case SDL_TEXTINPUT:
+                windowID = event.text.windowID;
                 break;
             case SDL_QUIT:
                 break main_loop;

@@ -124,12 +124,23 @@ class Window : WindowI
             break;
         case SDL_KEYDOWN:
         case SDL_KEYUP:
-            handle_SDL_WindowKeyboard(&event.key);
+            handle_SDL_KeyboardEvent(&event.key);
+            break;
+        case SDL_MOUSEMOTION:
+            handle_SDL_MouseMotionEvent(&event.motion);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            handle_SDL_MouseButtonEvent(&event.button);
+            break;
+        case SDL_MOUSEWHEEL:
+            handle_SDL_MouseWheelEvent(&event.wheel);
             break;
         }
 
     }
 
+    // ? status: started. fast checked ok.
     void handle_SDL_WindowEvent(SDL_WindowEvent* event) {
         writeln("Window::handle_SDL_WindowEvent");
         // TODO: ensure event consistency
@@ -137,13 +148,48 @@ class Window : WindowI
         handle_event_window(res);
     }
 
-    void handle_SDL_WindowKeyboard(SDL_KeyboardEvent *event)
+    // ? status: started. fast checked ok.
+    void handle_SDL_KeyboardEvent(SDL_KeyboardEvent *event)
     {
-        writeln("Window::handle_SDL_WindowKeyboard");
+        writeln("Window::handle_SDL_KeyboardEvent");
         // TODO: ensure event consistency
         auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
         handle_event_keyboard(res);
     }
+
+    // ? status: started.  fast checked ok.
+    void handle_SDL_MouseMotionEvent(SDL_MouseMotionEvent *event) {
+        writeln("Window::handle_SDL_MouseMotionEvent");
+        // TODO: ensure event consistency
+        auto res = convertSDLMouseMotionEventToDtkEventMouse(event);
+        handle_event_mouse(res);
+    }
+
+    // ? status: started. fast checked ok.
+    void handle_SDL_MouseButtonEvent(SDL_MouseButtonEvent *event) {
+        writeln("Window::handle_SDL_MouseButtonEvent");
+        // TODO: ensure event consistency
+        auto res = convertSDLMouseButtonEventToDtkEventMouse(event);
+        handle_event_mouse(res);
+    }
+
+    // ? status: needs completion
+    void handle_SDL_MouseWheelEvent(SDL_MouseWheelEvent *event) {
+        writeln("Window::handle_SDL_MouseWheelEvent");
+        // TODO: ensure event consistency
+        auto res = convertSDLMouseWheelEventToDtkEventMouse(event);
+        handle_event_mouse(res);
+    }
+
+    // ? status: fast checked ok.
+    void handle_SDL_TextInputEvent(SDL_TextInputEvent *event) {
+        writeln("Window::handle_SDL_TextInputEvent");
+        // TODO: ensure event consistency
+        auto res = convertSDLTextInputEventToDtkEventMouse(event);
+        handle_event_textinput(res);
+    }
+
+
 
     void handle_event_window(EventWindow* e) {
         writeln("Window::handle_event_window");
@@ -165,14 +211,6 @@ class Window : WindowI
     void redraw()
     {
         writeln("Window redraw() i called 111");
-        /* auto f = getForm();
-        if (f is null)
-        {
-            writeln("form not attached");
-            return;
-        }
-
-        f.redraw(); */
     }
 
     void printParams()

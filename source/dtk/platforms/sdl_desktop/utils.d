@@ -1,5 +1,8 @@
 module dtk.platforms.sdl_desktop.utils;
 
+import std.stdio;
+import std.conv;
+
 import bindbc.sdl;
 
 import dtk.types.EventWindow;
@@ -23,8 +26,12 @@ EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
     {
         default:
         /* case SDL_WINDOWEVENT_HIT_TEST: */
+            writeln("warning: ", "unsupported SDL_WindowEvent.event:", e.event);
+            break;
         case SDL_WINDOWEVENT_NONE:
-            throw new Exception("unsupported SDL_WindowEvent.event");
+            /* throw new Exception("unsupported SDL_WindowEvent.event"); */
+            writeln("warning: ", "unsupported SDL_WindowEvent.event:"~ to!string(e.event));
+            break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
             throw new Exception("should be ignored, not processed");
         case SDL_WINDOWEVENT_SHOWN:
@@ -73,6 +80,7 @@ EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
         /* case SDL_WINDOWEVENT_TAKE_FOCUS:
             ret.eventId = EnumWindowEvent.focusProposed; */
     }
+
     return ret;
 }
 
@@ -105,23 +113,110 @@ EventKeyboard* convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent* e)
 EventMouse* convertSDLMouseMotionEventToDtkEventMouse(SDL_MouseMotionEvent* e)
 {
     EventMouse* ret = new EventMouse;
+
+    ret.type = EventMouseType.movement;
+
+    ret.mouseId = e.which;
+    ret.movement.button = EnumMouseButton.none;
+    if ((e.state && SDL_BUTTON_LEFT) != 0)
+    {
+        ret.movement.button |= EnumMouseButton.bl;
+    }
+
+    if ((e.state && SDL_BUTTON_MIDDLE ) != 0)
+    {
+        ret.movement.button |= EnumMouseButton.bm;
+    }
+
+    if ((e.state && SDL_BUTTON_RIGHT ) != 0)
+    {
+        ret.movement.button |= EnumMouseButton.br;
+    }
+
+    if ((e.state && SDL_BUTTON_X1 ) != 0)
+    {
+        ret.movement.button |= EnumMouseButton.b4;
+    }
+
+    if ((e.state && SDL_BUTTON_X2 ) != 0)
+    {
+        ret.movement.button |= EnumMouseButton.b5;
+    }
+
+    ret.x = e.x;
+    ret.y = e.y;
+    ret.movement.xr = e.xrel;
+    ret.movement.yr = e.yrel;
+
     return ret;
 }
 
 EventMouse* convertSDLMouseButtonEventToDtkEventMouse(SDL_MouseButtonEvent* e)
 {
     EventMouse* ret = new EventMouse;
+
+    ret.type = EventMouseType.button;
+
+    ret.button.button = EnumMouseButton.none;
+    switch (e.button) {
+    default:
+        writeln("warning: resulted in default case at convertSDLMouseButtonEventToDtkEventMouse");
+        break;
+    case SDL_BUTTON_LEFT:
+        ret.button.button = EnumMouseButton.bl;
+        break;
+    case SDL_BUTTON_MIDDLE:
+        ret.button.button = EnumMouseButton.bm;
+        break;
+    case SDL_BUTTON_RIGHT:
+        ret.button.button = EnumMouseButton.br;
+        break;
+    case SDL_BUTTON_X1:
+        ret.button.button = EnumMouseButton.b4;
+        break;
+    case SDL_BUTTON_X2:
+        ret.button.button = EnumMouseButton.b5;
+        break;
+    }
+
+    if (e.state == SDL_PRESSED)
+    {
+        ret.button.buttonState= EnumMouseButtonState.pressed;
+    }
+    else
+    {
+        ret.button.buttonState= EnumMouseButtonState.depressed;
+    }
+
+    // TODO: todo
+    // Error: no property `clicks` for type `bindbc.sdl.bind.sdlevents.SDL_MouseButtonEvent*`
+    /* ret.button.clicks = e.clicks; */
+
+    ret.x = e.x;
+    ret.y = e.y;
+
     return ret;
 }
 
 EventMouse* convertSDLMouseWheelEventToDtkEventMouse(SDL_MouseWheelEvent* e)
 {
     EventMouse* ret = new EventMouse;
+
+    ret.type = EventMouseType.wheel;
+
+    ret.x = e.x;
+    ret.y = e.y;
+
     return ret;
 }
 
-EventTextInput* convertSDLWindowEventToDtkEventMouse(SDL_TextInputEvent* e)
+EventTextInput* convertSDLTextInputEventToDtkEventMouse(SDL_TextInputEvent* e)
 {
+    import std.conv;
+
     EventTextInput* ret = new EventTextInput;
+
+    ret.character = to!string(e.text)[0];
+
     return ret;
 }
