@@ -2,6 +2,7 @@ module dtk.platforms.sdl_desktop.Window;
 
 import std.typecons;
 import std.stdio;
+import std.algorithm;
 
 import bindbc.sdl;
 
@@ -192,7 +193,17 @@ class Window : WindowI
 
 
     void handle_event_window(EventWindow* e) {
-        writeln("Window::handle_event_window");
+
+        writeln("Window::handle_event_window ", e.eventId);
+        if ((cast(EnumWindowEvent[])[
+            EnumWindowEvent.resize
+            ]).canFind(e.eventId)) {
+                writeln("  Window::handle_event_window ok");
+                redraw();
+        } else {
+            writeln("  Window::handle_event_window notok");
+        }
+
     }
 
     void handle_event_keyboard(EventKeyboard* e) {
@@ -210,7 +221,10 @@ class Window : WindowI
 
     void redraw()
     {
-        writeln("Window redraw() i called 111");
+        if (this._form is null)
+            return;
+
+         this._form.redraw();
     }
 
     void printParams()
@@ -239,13 +253,18 @@ class Window : WindowI
         auto x = getForm();
         assert(x !is null);
         x.setWindow(this);
+        x.setDrawingSurface(this._drawing_surface);
+        x.setTheme(getPlatform().getTheme());
     }
 
     void uninstallForm()
     {
         auto x = getForm();
-        if (x !is null)
+        if (x !is null) {
+            x.unsetTheme();
+            x.unsetDrawingSurface();
             x.unsetWindow();
+        }
         this.unsetForm();
     }
 

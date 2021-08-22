@@ -5,6 +5,7 @@ import std.algorithm;
 
 import bindbc.sdl;
 
+import dtk.interfaces.ThemeI;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 
@@ -27,6 +28,7 @@ class SDLDesktopPlatform : PlatformI
     {
         bool exit;
         Window[] windows;
+        ThemeI theme;
     }
 
     string getName()
@@ -177,5 +179,19 @@ class SDLDesktopPlatform : PlatformI
         }
 
         return;
+    }
+
+    ThemeI getTheme() {
+        return theme;
+    }
+
+    void setTheme(ThemeI t)
+    {
+        theme = t;
+    }
+
+    void unsetTheme()
+    {
+        theme = null;
     }
 }

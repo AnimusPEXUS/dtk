@@ -19,6 +19,7 @@ class Chicago98Theme : ThemeI
     Color formBackground = Color(0xdddddd);
     void drawForm(DrawingSurfaceI ds, Form widget) {
 
+        writeln("drawForm called");
         auto size = widget.locator.getCalculatedSize();
         ds.DrawRectangle(
             Position2D(0,0),

@@ -29,7 +29,7 @@ class Form : Widget, FormI
     private
     {
         mixin Property_gsu!(WindowI, "window");
-        mixin Property_gs!(ThemeI, "theme");
+        mixin Property_gsu!(ThemeI, "theme");
         mixin Property_gsu!(DrawingSurfaceI, "drawing_surface");
         mixin Property_gsu!(ContainerableWidgetI, "child");
 
@@ -75,6 +75,13 @@ class Form : Widget, FormI
         return this;
     }
 
-    void onWindowResize(){}
+    void onWindowResize(){
+        redraw();
+    }
+
+    override void redraw() {
+        super.redraw();
+    }
+
 
 }

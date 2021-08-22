@@ -7,6 +7,7 @@ import dtk.main;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.WindowCreationSettings;
+import dtk.themes.chicago98.Chicago98Theme;
 
 import dtk.widgets.Form;
 import dtk.widgets.Layout;
@@ -17,6 +18,8 @@ void main()
 	auto pl = instantiatePlatform();
 
 	pl.init();
+
+	pl.setTheme(new Chicago98Theme);
 
 	WindowCreationSettings wcs = {
 		title:"123",

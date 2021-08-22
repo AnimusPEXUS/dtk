@@ -12,6 +12,12 @@ interface FormI
     void unsetWindow();
 
     DrawingSurfaceI getDrawingSurface();
+    void setDrawingSurface(DrawingSurfaceI);
+    void unsetDrawingSurface();
+
     ThemeI getTheme();
     void setTheme(ThemeI theme);
+    void unsetTheme();
+
+    void redraw();
 }

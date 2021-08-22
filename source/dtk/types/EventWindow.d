@@ -1,6 +1,6 @@
 module dtk.types.EventWindow;
 
-import dtk.types.EnumWindowEvent;
+public import dtk.types.EnumWindowEvent;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 

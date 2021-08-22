@@ -62,9 +62,10 @@ class Widget : WidgetI
         goto begin;
     }
 
-    // NOTE: this function final only for limited period of time.
-    //       users should be allowed to override this redraw() function
-    final void redraw() {
+    void redraw() {
+
+        writeln("Widget::draw() <----------------------------");
+
         Form form = this.getForm();
         if (form is null)
         {
@@ -75,6 +76,20 @@ class Widget : WidgetI
         auto theme = form.getTheme();
         auto ds = form.getDrawingSurface();
 
+        if (theme is null)
+        {
+            throw new Exception("theme not set");
+        }
+
+        if (ds is null)
+        {
+            throw new Exception("drawing surface not set");
+        }
+
+        /* auto x = __traits(getMember, theme, "draw"~v);
+        x(ds, widget);
+         */
+
         static foreach (v; ["Form"])
         {
             {
@@ -82,12 +97,13 @@ class Widget : WidgetI
                 /* __traits(toType, v) widget = cast(__traits(toType, v)) this; */
                 if (widget !is null)
                 {
-                    (__traits(getMember, theme, "draw"~v))(ds, widget);
+                    __traits(getMember, theme, "draw"~v)(ds, widget);
                 }
             }
         }
 
-        writeln("TODO: redraw() function does not supports "~ to!string(this));
+        /* writeln("Widget::draw() <----------------------------");
+        writeln("   this widget is Form?:", (cast(Form) this !is null )); */
     }
 
     void handle_event_keyboard(EventKeyboard* e)
