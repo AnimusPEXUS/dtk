@@ -30,7 +30,7 @@ class Form : Widget, FormI
     {
         mixin Property_gsu!(WindowI, "window");
         mixin Property_gsu!(ThemeI, "theme");
-        mixin Property_gsu!(DrawingSurfaceI, "drawing_surface");
+        /* mixin Property_gsu!(DrawingSurfaceI, "drawing_surface"); */
         mixin Property_gsu!(ContainerableWidgetI, "child");
 
         SignalConnection onwindowchanged_sc;
@@ -38,12 +38,25 @@ class Form : Widget, FormI
 
     mixin Property_forwarding!(WindowI, window, "Window");
     mixin Property_forwarding!(ThemeI, theme, "Theme");
-    mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface");
+    /* mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface"); */
     mixin Property_forwarding!(ContainerableWidgetI, child, "Child");
+
+    private
+    {
+
+    }
 
     this()
     {
         // window.onAfterChanged.socket.connect(onwindowchanged_sc, &onwindowchanged);
+    }
+
+    override DrawingSurfaceI getDrawingSurface()
+    {
+        DrawingSurfaceI ret = null;
+        if (isSetWindow())
+            ret = getWindow().getDrawingSurface();
+        return ret;
     }
 
     /* private nothrow void onwindowchanged()
@@ -75,8 +88,11 @@ class Form : Widget, FormI
         return this;
     }
 
-    void onWindowResize(){
-        redraw();
+    override void positionAndSizeRequest(Position2D position, Size2D size)
+    {
+        /* setCalculatedPosition(position);
+        setCalculatedSize(size); */
+        super.positionAndSizeRequest(position, size);
     }
 
     override void redraw() {

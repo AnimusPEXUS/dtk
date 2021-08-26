@@ -5,6 +5,7 @@ import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ThemeI;
 /* import dtk.types.Theme; */
 import dtk.types.Size2D;
+import dtk.types.Position2D;
 
 interface FormI
 {
@@ -12,12 +13,14 @@ interface FormI
     void unsetWindow();
 
     DrawingSurfaceI getDrawingSurface();
-    void setDrawingSurface(DrawingSurfaceI);
-    void unsetDrawingSurface();
+    /* void setDrawingSurface(DrawingSurfaceI);
+    void unsetDrawingSurface(); */
 
     ThemeI getTheme();
     void setTheme(ThemeI theme);
     void unsetTheme();
+
+    void positionAndSizeRequest(Position2D, Size2D);
 
     void redraw();
 }

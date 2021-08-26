@@ -17,12 +17,16 @@ import dtk.widgets;
 class Chicago98Theme : ThemeI
 {
     Color formBackground = Color(0xdddddd);
-    void drawForm(DrawingSurfaceI ds, Form widget) {
+    void drawForm(Form widget) {
 
         writeln("drawForm called");
-        auto size = widget.locator.getCalculatedSize();
+
+        auto ds = widget.getDrawingSurface();
+
+        auto pos = widget.getPosition();
+        auto size = widget.getSize();
         ds.DrawRectangle(
-            Position2D(0,0),
+            pos,
             size,
             LineStyle(),
             LineStyle(),
@@ -32,52 +36,52 @@ class Chicago98Theme : ThemeI
             );
     }
 
-    void drawButton(DrawingSurfaceI ds, Button widget)
+    void drawButton(Button widget)
     {
         writeln("drawButton called");
     }
 
-    void drawImage(DrawingSurfaceI ds, Image widget)
+    void drawImage(Image widget)
     {
         writeln("drawImage called");
     }
 
-    void drawLabel(DrawingSurfaceI ds, Label widget)
+    void drawLabel(Label widget)
     {
         writeln("drawLabel called");
     }
 
-    void drawLayout(DrawingSurfaceI ds, Layout widget)
+    void drawLayout(Layout widget)
     {
         writeln("drawLayout called");
     }
 
-    void drawMenu(DrawingSurfaceI ds, Menu widget)
+    void drawMenu(Menu widget)
     {
         writeln("drawMenu called");
     }
 
-    void drawMenuItem(DrawingSurfaceI ds, MenuItem widget)
+    void drawMenuItem(MenuItem widget)
     {
         writeln("drawMenuItem called");
     }
 
-    void drawBar(DrawingSurfaceI ds, Bar widget)
+    void drawBar(Bar widget)
     {
         writeln("drawBar called");
     }
 
-    void drawScrollBar(DrawingSurfaceI ds, ScrollBar widget)
+    void drawScrollBar(ScrollBar widget)
     {
         writeln("drawScrollBar called");
     }
 
-    void drawTextEntry(DrawingSurfaceI ds, TextEntry widget)
+    void drawTextEntry(TextEntry widget)
     {
         writeln("drawTextEntry called");
     }
 
-    void drawTextArea(DrawingSurfaceI ds, TextArea widget)
+    void drawTextArea(TextArea widget)
     {
         writeln("drawTextArea called");
     }

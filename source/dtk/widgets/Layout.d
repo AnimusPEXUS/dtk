@@ -13,7 +13,7 @@ import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 
 import dtk.widgets.mixins;
-import dtk.widgets.WidgetLocator;
+/* import dtk.widgets.WidgetLocator; */
 import dtk.widgets.Widget;
 
 enum LayoutOverflowBehavior
@@ -64,8 +64,8 @@ class Layout : Widget, ContainerableWidgetI
         {
             children = children ~ widget;
             auto WidgetX = cast(Widget) widget;
-            WidgetX.locator.setExpand(expand);
-            WidgetX.locator.setFill(fill);
+            WidgetX.setExpand(expand);
+            WidgetX.setFill(fill);
         }
     }
 
@@ -75,8 +75,8 @@ class Layout : Widget, ContainerableWidgetI
         {
             children = widget ~ children;
             auto WidgetX = cast(Widget) widget;
-            WidgetX.locator.setExpand(expand);
-            WidgetX.locator.setFill(fill);
+            WidgetX.setExpand(expand);
+            WidgetX.setFill(fill);
         }
     }
 }

@@ -11,7 +11,7 @@ import dtk.types.Size2D;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class ScrollBar : Widget
+class ScrollBar : Widget, ContainerableWidgetI
 {
 
 }

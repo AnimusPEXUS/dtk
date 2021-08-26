@@ -20,7 +20,7 @@ import dtk.widgets.mixins;
 /++
 Test documentation
 +/
-class Bar : Widget
+class Bar : Widget, ContainerableWidgetI
 {
     private
     {

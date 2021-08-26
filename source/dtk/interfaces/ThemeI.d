@@ -6,15 +6,15 @@ import dtk.widgets;
 
 interface ThemeI
 {
-    void drawForm(DrawingSurfaceI ds, Form widget);
-    void drawButton(DrawingSurfaceI ds, Button widget);
-    void drawImage(DrawingSurfaceI ds, Image widget);
-    void drawLabel(DrawingSurfaceI ds, Label widget);
-    void drawLayout(DrawingSurfaceI ds, Layout widget);
-    void drawMenu(DrawingSurfaceI ds, Menu widget);
-    void drawMenuItem(DrawingSurfaceI ds, MenuItem widget);
-    void drawBar(DrawingSurfaceI ds, Bar widget);
-    void drawScrollBar(DrawingSurfaceI ds, ScrollBar widget);
-    void drawTextEntry(DrawingSurfaceI ds, TextEntry widget);
-    void drawTextArea(DrawingSurfaceI ds, TextArea widget);
+    void drawForm(Form widget);
+    void drawButton(Button widget);
+    void drawImage(Image widget);
+    void drawLabel(Label widget);
+    void drawLayout(Layout widget);
+    void drawMenu(Menu widget);
+    void drawMenuItem(MenuItem widget);
+    void drawBar(Bar widget);
+    void drawScrollBar(ScrollBar widget);
+    void drawTextEntry(TextEntry widget);
+    void drawTextArea(TextArea widget);
 }

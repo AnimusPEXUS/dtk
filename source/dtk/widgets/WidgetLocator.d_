@@ -1,0 +1,65 @@
+/++ used to position and size Widget on parent with automatic or manual layout
+and positioning. or on widgets with +/
+
+module dtk.widgets.WidgetLocator;
+
+import dtk.interfaces.WidgetI;
+/* import dtk.interfaces.WidgetLocatorI; */
+
+import dtk.types.Position2D;
+import dtk.types.Size2D;
+import dtk.types.Property;
+
+import dtk.widgets.Layout;
+
+struct WidgetLocator //  : WidgetLocatorI
+{
+    private{
+        mixin Property_gsu!(WidgetI, "widget");
+        /* mixin Property_gsu!(Layout, "layout"); */
+
+
+        /* bool _widget_requested_layout_resize;
+        Size2D _widget_layout_resize_request; */
+    }
+
+    mixin Property_forwarding!(WidgetI, widget, "Widget");
+    /* mixin Property_forwarding!(Layout, layout, "Layout"); */
+
+
+    this(WidgetI widget)
+    {
+        this.setWidget(widget);
+    }
+
+    /* mixin Property_forwarding!(Layout, layout, "Layout");
+    mixin Property_forwarding!(Layout, layout, "Layout");
+
+    mixin Property_forwarding!(Layout, layout, "Layout");
+    mixin Property_forwarding!(Layout, layout, "Layout"); */
+
+
+    /++ request widget to recalculate own size (so it could be gotten throug
+    getCalculatedSize()). Widget is supposed to recursively call calculateSize on all it's
+    children and return it's own Size2D +/
+    Size2D calculateSize(){
+        // TODO: todo
+        return getCalculatedSize();
+    }
+
+    Position2D calculateLocalPosition() {
+        // TODO: todo
+        return getCalculatedLocalPosition();
+    }
+
+    Position2D calculateFormPosition() {
+        // TODO: todo
+        return getCalculatedFormPosition();
+    }
+
+    /* void draw()
+    {
+        widget.draw();
+    } */
+
+}

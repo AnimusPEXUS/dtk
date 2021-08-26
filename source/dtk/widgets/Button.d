@@ -20,7 +20,7 @@ import dtk.widgets.mixins;
 import dtk.widgets.Widget;
 
 /// Button class
-class Button : Widget
+class Button : Widget, ContainerableWidgetI
 {
     private
     {

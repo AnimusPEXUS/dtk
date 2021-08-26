@@ -36,6 +36,8 @@ void main()
 
 	Button btn = new Button();
 
+	lo.packStart(btn,true, true);
+
 	form.setChild(lo);
 
 	w.installForm(form);

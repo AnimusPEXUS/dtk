@@ -1,7 +1,7 @@
 module dtk.interfaces.WidgetI;
 
 import dtk.interfaces.FormI;
-/* import dtk.interfaces.WidgetLocatorI; */
+import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
@@ -16,6 +16,10 @@ interface WidgetI
     void unsetParent();
 
     FormI getForm();
+
+    DrawingSurfaceI getDrawingSurface();
+
+    void positionAndSizeRequest(Position2D, Size2D);
 
     void handle_event_keyboard(EventKeyboard* e);
     void handle_event_mouse(EventMouse* e);

@@ -11,7 +11,7 @@ import dtk.interfaces.FormI;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class Label : Widget
+class Label : Widget, ContainerableWidgetI
 {
 
 }

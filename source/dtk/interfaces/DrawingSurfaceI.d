@@ -22,5 +22,5 @@ interface DrawingSurfaceI
         LineStyle right_style,
         FillStyle fill_style
         );
-    void DrawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style,);
+    void DrawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style);
 }

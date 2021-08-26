@@ -20,7 +20,7 @@ import dtk.types.Size2D;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class Menu : Widget
+class Menu : Widget, ContainerableWidgetI
 {
     private
     {

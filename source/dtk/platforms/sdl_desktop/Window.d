@@ -195,6 +195,22 @@ class Window : WindowI
     void handle_event_window(EventWindow* e) {
 
         writeln("Window::handle_event_window ", e.eventId);
+
+        switch (e.eventId)
+        {
+            default:
+                return;
+            case EnumWindowEvent.resize:
+                if (_form !is null)
+                {
+                    _form.positionAndSizeRequest(
+                        Position2D(0,0),
+                        Size2D(e.size.width, e.size.height)
+                        );
+                }
+                break;
+        }
+
         if ((cast(EnumWindowEvent[])[
             EnumWindowEvent.resize
             ]).canFind(e.eventId)) {
@@ -253,7 +269,7 @@ class Window : WindowI
         auto x = getForm();
         assert(x !is null);
         x.setWindow(this);
-        x.setDrawingSurface(this._drawing_surface);
+        /* x.setDrawingSurface(this._drawing_surface); */
         x.setTheme(getPlatform().getTheme());
     }
 
@@ -262,7 +278,7 @@ class Window : WindowI
         auto x = getForm();
         if (x !is null) {
             x.unsetTheme();
-            x.unsetDrawingSurface();
+            /* x.unsetDrawingSurface(); */
             x.unsetWindow();
         }
         this.unsetForm();
