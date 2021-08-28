@@ -208,6 +208,8 @@ class Window : WindowI
         {
             default:
                 return;
+            /* case EnumWindowEvent.show:
+                break; */
             case EnumWindowEvent.resize:
                 if (_form !is null)
                 {
@@ -237,6 +239,7 @@ class Window : WindowI
 
     void handle_event_mouse(EventMouse* e) {
         writeln("Window::handle_event_mouse");
+        writeln("   mouse clicks:", e.button.clicks);
     }
 
     void handle_event_textinput(EventTextInput* e)

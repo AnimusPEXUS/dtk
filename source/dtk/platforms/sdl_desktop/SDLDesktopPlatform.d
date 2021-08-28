@@ -89,6 +89,9 @@ class SDLDesktopPlatform : PlatformI
     void init()
     {
         SDL_Init(SDL_INIT_VIDEO);
+        SDL_version v;
+        SDL_GetVersion(&v);
+        writeln("SDL Version: ", v.major, ".",v.minor, ".",v.patch);
     }
 
     void destroy_()

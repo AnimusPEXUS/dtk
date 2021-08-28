@@ -190,7 +190,7 @@ EventMouse* convertSDLMouseButtonEventToDtkEventMouse(SDL_MouseButtonEvent* e)
 
     // TODO: todo
     // Error: no property `clicks` for type `bindbc.sdl.bind.sdlevents.SDL_MouseButtonEvent*`
-    /* ret.button.clicks = e.clicks; */
+    ret.button.clicks = e.clicks;
 
     ret.x = e.x;
     ret.y = e.y;
