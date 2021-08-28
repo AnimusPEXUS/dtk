@@ -77,17 +77,17 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
 
     // =============== implimentation ===============
 
-    void DrawDot(Position2D pos, Color color)
+    void drawDot(Position2D pos, Color color)
     {
         Position2D npos;
         npos.x = pos.x + x;
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.DrawDot(npos, color);
+         pds.drawDot(npos, color);
     }
 
-    void DrawLine(Position2D pos, Position2D pos2, LineStyle style)
+    void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
         Position2D npos;
         Position2D npos2;
@@ -97,10 +97,10 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         npos2.y = pos2.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.DrawLine(npos, npos2, style);
+         pds.drawLine(npos, npos2, style);
     }
 
-    void DrawRectangle(
+    void drawRectangle(
         Position2D pos,
         Size2D size,
         LineStyle top_style,
@@ -115,7 +115,7 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.DrawRectangle(
+         pds.drawRectangle(
              npos,
              size,
              top_style,
@@ -126,14 +126,14 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
              );
     }
 
-    void DrawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style)
+    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style)
     {
         Position2D npos;
         npos.x = pos.x + x;
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.DrawText(
+         pds.drawText(
              text,
              npos,
              font,
@@ -142,6 +142,10 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
              );
     }
 
-
+    void present()
+    {
+        auto pds = getParentDS();
+        pds.present();
+    }
 
 }

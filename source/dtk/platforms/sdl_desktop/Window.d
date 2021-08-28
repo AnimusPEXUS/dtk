@@ -220,7 +220,8 @@ class Window : WindowI
         }
 
         if ((cast(EnumWindowEvent[])[
-            EnumWindowEvent.resize
+            EnumWindowEvent.resize,
+            EnumWindowEvent.show
             ]).canFind(e.eventId)) {
                 writeln("  Window::handle_event_window ok");
                 redraw();

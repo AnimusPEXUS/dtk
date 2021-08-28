@@ -28,15 +28,15 @@ class Chicago98Theme : ThemeI
     Color elementDarkedColor = Color(0x000000);
     Color elementDarkedColor2 = Color(0x808080);
 
-    void drawBewel(
+    /* void drawBewel(
         bool top,
         bool right,
         bool left,
         bool bottom,
         )
         {
-            
-        }
+
+        } */
 
     void drawForm(Form widget) {
 
@@ -46,7 +46,7 @@ class Chicago98Theme : ThemeI
 
         auto pos = widget.getPosition();
         auto size = widget.getSize();
-        ds.DrawRectangle(
+        ds.drawRectangle(
             pos,
             size,
             LineStyle(formBackground),
@@ -61,33 +61,63 @@ class Chicago98Theme : ThemeI
     {
         writeln("drawButton called");
 
+        bool is_default = true;
+        bool is_focused = true;
+
         auto ds = widget.getDrawingSurface();
 
-        /* auto pos = widget.getPosition(); */
+
+
+        auto pos = Position2D(0,0);
         auto size = widget.getSize();
 
-        ds.DrawRectangle(
-            Position2D(0,0),
+        if (is_default)
+        {
+            ds.drawRectangle(
+                Position2D(0,0),
+                size,
+                LineStyle(Color(0)),
+                Nullable!FillStyle()
+                );
+            pos.x++;
+            pos.y++;
+            size.width -= 2;
+            size.height -= 2;
+        }
+
+
+        ds.drawRectangle(
+            pos,
             size,
             LineStyle(elementLightedColor),
             LineStyle(elementDarkedColor),
             Nullable!FillStyle()
             );
 
-        ds.DrawRectangle(
-            Position2D(1,1),
+        ds.drawRectangle(
+            Position2D(pos.x+1,pos.y+1),
             Size2D(size.width-2, size.height-2),
             LineStyle(elementLightedColor2),
             LineStyle(elementDarkedColor2),
             Nullable!FillStyle()
             );
 
-        ds.DrawRectangle(
-            Position2D(3,3),
+        ds.drawRectangle(
+            Position2D(pos.x+2,pos.y+2),
             Size2D(size.width-4, size.height-4),
             LineStyle(buttonColor),
             nullable(FillStyle(buttonColor))
             );
+
+        if (is_focused)
+        {
+            ds.drawRectangle(
+                Position2D(pos.x+4,pos.y+4),
+                Size2D(size.width-8, size.height-8),
+                LineStyle(Color(0),[true,false]),
+                Nullable!FillStyle()
+                );
+        }
     }
 
     void drawImage(Image widget)

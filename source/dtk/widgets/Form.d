@@ -122,6 +122,9 @@ class Form : Widget, FormI
             writeln("getChild().redraw();");
             getChild().redraw();
         }
+
+        auto ds = getDrawingSurface();
+        ds.present();
     }
 
 

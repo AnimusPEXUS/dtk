@@ -28,17 +28,37 @@ class DrawingSurface : DrawingSurfaceI
         this.w=w;
     }
 
-    void DrawDot(Position2D pos, Color color)
+    void drawDot(Position2D pos, Color color)
     {
-
+        auto rndr = SDL_GetRenderer(w._sdl_window);
+        SDL_SetRenderDrawColor(rndr, color.r, color.g, color.b, color.a);
+        SDL_RenderDrawPoint(rndr, pos.x, pos.y);
     }
 
-    void DrawLine(Position2D pos, Position2D pos2, LineStyle style)
+    void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
+        if (style.style == null)
+        {
+            auto rndr = SDL_GetRenderer(w._sdl_window);
+            SDL_SetRenderDrawColor(rndr, style.color.r, style.color.g, style.color.b, style.color.a);
+            SDL_RenderDrawLine(rndr, pos.x, pos.y, pos2.x, pos2.y);
+        }
+        else
+        {
+            auto style_dup = style.style.dup();
 
+            for (int x = pos.x; x != pos2.x; x++)
+            {
+                if (style_dup[0])
+                {
+                    drawDot(Position2D(x, pos.y), style.color);
+                }
+                style_dup = style_dup[1 .. $] ~ style_dup[0];
+            }
+        }
     }
 
-    void DrawRectangle(
+    void drawRectangle(
             Position2D pos,
             Size2D size,
             LineStyle top_style,
@@ -51,17 +71,13 @@ class DrawingSurface : DrawingSurfaceI
         auto rndr = SDL_GetRenderer(w._sdl_window);
         assert(rndr !is null);
 
-        if (top_style == left_style && top_style == bottom_style && top_style == right_style)
+        if (top_style == left_style && top_style == bottom_style && top_style == right_style && top_style.style==null)
         {
             SDL_SetRenderDrawColor(rndr, top_style.color.r, top_style.color.g, top_style.color.b, top_style.color.a);
             auto r = new SDL_Rect(pos.x, pos.y, size.width, size.height);
             SDL_RenderDrawRect(rndr, r);
         }
         else {
-
-            void ttt1(LineStyle name) {
-                SDL_SetRenderDrawColor(rndr, name.color.r, name.color.g, name.color.b, name.color.a);
-            }
 
             // top+left
             auto p1_x = pos.x;
@@ -76,17 +92,10 @@ class DrawingSurface : DrawingSurfaceI
             auto p4_x = p1_x;
             auto p4_y = p3_y;
 
-            ttt1(top_style);
-            SDL_RenderDrawLine(rndr, p1_x, p1_y, p2_x, p2_y);
-
-            ttt1(left_style);
-            SDL_RenderDrawLine(rndr, p1_x, p1_y, p4_x, p4_y);
-
-            ttt1(bottom_style);
-            SDL_RenderDrawLine(rndr, p4_x, p4_y, p3_x, p3_y);
-
-            ttt1(right_style);
-            SDL_RenderDrawLine(rndr, p2_x, p2_y, p3_x, p3_y);
+            drawLine(Position2D(p1_x, p1_y), Position2D(p2_x, p2_y),top_style);
+            drawLine(Position2D(p1_x, p1_y), Position2D(p4_x, p4_y),left_style);
+            drawLine(Position2D(p4_x, p4_y), Position2D(p3_x, p3_y),bottom_style);
+            drawLine(Position2D(p2_x, p2_y), Position2D(p3_x, p3_y),right_style);
 
         }
 
@@ -98,7 +107,6 @@ class DrawingSurface : DrawingSurfaceI
             SDL_RenderFillRect(rndr,r);
         }
 
-        SDL_RenderPresent(rndr);
 
         /* auto surf = SDL_GetWindowSurface(w._sdl_window);
         assert(surf !is null);
@@ -108,8 +116,14 @@ class DrawingSurface : DrawingSurfaceI
         SDL_UpdateWindowSurface(w._sdl_window); */
     }
 
-    void DrawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style,)
+    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style,)
     {
 
     }
+
+    void present() {
+        auto rndr = SDL_GetRenderer(w._sdl_window);
+        SDL_RenderPresent(rndr);
+    }
+
 }
