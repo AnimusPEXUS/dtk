@@ -1,11 +1,13 @@
 module dtk.widgets.Layout;
 
+import std.stdio;
 import std.container;
 import std.algorithm;
 import std.typecons;
 import std.array;
 
 import dtk.interfaces.ContainerableWidgetI;
+import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
 
@@ -22,6 +24,24 @@ enum LayoutOverflowBehavior
     Scroll, // show scrollbar
     Clip, // don't draw overflow areas
     Resize, // resize self to fit everything
+}
+
+enum LayoutDirections : ubyte {
+    undefined,
+    leftToRightTopToBottom,
+    leftToRightBottomToTop,
+    topToBottomLeftToRight,
+    topToBottomRightToLeft,
+    rightToLeftTopToBottom,
+    rightToLeftBottomToTop,
+    bottomToTopLeftToRight,
+    bottomToTopRightToLeft,
+}
+
+enum LayoutType : ubyte {
+    undefined,
+    linearScrolled,
+    linearWrapped,
 }
 
 class Layout : Widget, ContainerableWidgetI
@@ -66,6 +86,7 @@ class Layout : Widget, ContainerableWidgetI
             auto WidgetX = cast(Widget) widget;
             WidgetX.setExpand(expand);
             WidgetX.setFill(fill);
+            WidgetX.setParent(this);
         }
     }
 
@@ -77,6 +98,32 @@ class Layout : Widget, ContainerableWidgetI
             auto WidgetX = cast(Widget) widget;
             WidgetX.setExpand(expand);
             WidgetX.setFill(fill);
+            WidgetX.setParent(this);
+        }
+    }
+
+    override void positionAndSizeRequest(Position2D position, Size2D size)
+    {
+        /* setCalculatedPosition(position);
+        setCalculatedSize(size); */
+        super.positionAndSizeRequest(position, size);
+
+        uint counter;
+        foreach (v; children) {
+            v.positionAndSizeRequest(
+                Position2D(counter*(20+2),counter*(20+2)),
+                Size2D((counter*(20+2)+20), (counter*(20+2)+20))
+                );
+            counter++;
+        }
+
+    }
+
+    override void redraw() {
+        super.redraw();
+        foreach (size_t i, v; children) {
+            writeln(i," - Layout child redraw()");
+            v.redraw();
         }
     }
 }

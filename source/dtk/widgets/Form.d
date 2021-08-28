@@ -48,7 +48,19 @@ class Form : Widget, FormI
 
     this()
     {
-        // window.onAfterChanged.socket.connect(onwindowchanged_sc, &onwindowchanged);
+        connectToChild_onAfterChanged(&onChiledChanged);
+    }
+
+    void onChiledChanged() nothrow
+    {
+        try {
+            writeln("Form child changed");
+            auto c = getChild();
+            c.setParent(this);
+        } catch (Exception e) {
+
+        }
+
     }
 
     override DrawingSurfaceI getDrawingSurface()
@@ -93,10 +105,23 @@ class Form : Widget, FormI
         /* setCalculatedPosition(position);
         setCalculatedSize(size); */
         super.positionAndSizeRequest(position, size);
+
+        if (isSetChild()) {
+            auto c = getChild();
+            c.positionAndSizeRequest(
+                Position2D(position.x+5, position.y+5),
+                Size2D(size.width-10, size.height-10)
+                );
+        }
     }
 
     override void redraw() {
         super.redraw();
+
+        if (isSetChild()) {
+            writeln("getChild().redraw();");
+            getChild().redraw();
+        }
     }
 
 

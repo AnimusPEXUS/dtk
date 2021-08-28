@@ -18,6 +18,8 @@ import dtk.types.Position2D;
 
 /* import dtk.widgets.WidgetLocator; */
 import dtk.widgets.Form;
+import dtk.widgets.Button;
+import dtk.widgets.Layout;
 import dtk.widgets.WidgetDrawingSurface;
 
 class Widget : WidgetI
@@ -25,6 +27,8 @@ class Widget : WidgetI
     private {
         mixin Property_gsu!(WidgetI, "parent");
     }
+
+    mixin Property_forwarding!(WidgetI, parent, "Parent");
 
     // =====^===^===^===== [locator] =====^===^===^===== start
 
@@ -69,36 +73,47 @@ class Widget : WidgetI
         WidgetDrawingSurfaceShifted _ds;
     }
 
-    mixin Property_forwarding!(WidgetI, parent, "Parent");
+    this()
+    {
+        this.connectToParent_onAfterChanged(&onParentChanged);
+    }
+
+    void onParentChanged() nothrow
+    {
+        try {
+            writeln(this," parent changed");
+        } catch  (Exception e) {
+        }
+    }
 
     /++ return FormI on which this Widget is placed. returns null in case if
     there is no attached form or if this widget is deeper than 200 levels to
     FormI instance (too deep); +/
     Form getForm() {
         WidgetI w = this;
-        ubyte failure_countdown = 200;
-    begin:
+        Form ret;
 
-        if (failure_countdown == 0)
+        for (byte failure_countdown = cast(byte)200; failure_countdown != -1; failure_countdown--)
         {
-            return null;
+
+            ret = cast(Form) w;
+            if (ret !is null)
+            {
+                return ret;
+            }
+
+            if (w.isUnsetParent()) {
+                return null;
+            }
+
+            w = w.getParent();
+            if (w is null)
+            {
+                return null;
+            }
         }
 
-        Form ret = cast(Form) w;
-        if (ret !is null)
-        {
-            return ret;
-        }
-
-        w = w.getParent();
-        if (w is null)
-        {
-            return null;
-        }
-
-        failure_countdown--;
-
-        goto begin;
+        return ret;
     }
 
     DrawingSurfaceI getDrawingSurface() {
@@ -111,7 +126,7 @@ class Widget : WidgetI
 
     void redraw() {
 
-        writeln("Widget::draw() <----------------------------");
+        writeln("Widget::draw() <---------------------------- ", this);
 
         Form form = this.getForm();
         if (form is null)
@@ -137,13 +152,14 @@ class Widget : WidgetI
         x(ds, widget);
          */
 
-        static foreach (v; ["Form"])
+        static foreach (v; ["Form", "Button", "Layout"])
         {
             {
                 mixin(v~" widget = cast("~v~") this;");
                 /* __traits(toType, v) widget = cast(__traits(toType, v)) this; */
                 if (widget !is null)
                 {
+                    writeln("calling draw"~v);
                     __traits(getMember, theme, "draw"~v)(widget);
                 }
             }

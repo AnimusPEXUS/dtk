@@ -12,8 +12,10 @@ import dtk.types.Position2D;
 interface WidgetI
 {
     WidgetI getParent();
+
     void setParent(WidgetI widget);
     void unsetParent();
+    bool isUnsetParent();
 
     FormI getForm();
 

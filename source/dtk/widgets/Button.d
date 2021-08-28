@@ -26,9 +26,10 @@ class Button : Widget, ContainerableWidgetI
     {
         RadioGroup _radio_group;
 
-        // this is used when button consissts in RadioGroup,
+        // this is used when button participates in RadioGroup,
         // so you could use RadioGroup's getValue() function and get selected
         // value easily
+        // TODO: replace this with propery and name it RadioValue
         string _value;
 
         bool _switchable;

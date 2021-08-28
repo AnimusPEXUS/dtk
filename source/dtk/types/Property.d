@@ -368,7 +368,7 @@ mixin template Property_forwarding(T, alias property, string new_suffix,)
             static if (__traits(hasMember, property, v))
             {
                 mixin(
-                    "void connectTo" ~ new_suffix~v ~ "( void delegate() nothrow  cb) { "
+                    "void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate() nothrow  cb) { "
                         ~ "import observable.signal;"
                         ~"SignalConnection conn;"
                         ~"this."~__traits(identifier, property)~ "."~v~".socket.connect("

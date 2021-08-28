@@ -35,8 +35,10 @@ void main()
 	Layout lo = new Layout();
 
 	Button btn = new Button();
+	Button btn2 = new Button();
 
 	lo.packStart(btn,true, true);
+	lo.packStart(btn2,false, true);
 
 	form.setChild(lo);
 

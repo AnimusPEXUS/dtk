@@ -1,6 +1,7 @@
 module dtk.widgets.WidgetDrawingSurface;
 
 import std.stdio;
+import std.typecons;
 
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -27,8 +28,8 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
     this(Widget widget)
     {
         this.widget=widget;
-        this.widget.connectToPositiononAfterChanged(&onWidgetPosChange);
-        this.widget.connectToSizeonAfterChanged(&onWidgetSizeChange);
+        this.widget.connectToPosition_onAfterChanged(&onWidgetPosChange);
+        this.widget.connectToSize_onAfterChanged(&onWidgetSizeChange);
     }
 
     bool isValid()
@@ -106,7 +107,7 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         LineStyle left_style,
         LineStyle bottom_style,
         LineStyle right_style,
-        FillStyle fill_style
+        Nullable!FillStyle fill_style
         )
     {
         Position2D npos;

@@ -99,6 +99,14 @@ class Window : WindowI
             throw new Exception("window creation error");
         }
 
+        {
+            SDL_CreateRenderer(_sdl_window, -1, SDL_RENDERER_SOFTWARE);
+            auto r = SDL_GetRenderer(_sdl_window);
+            SDL_RendererInfo ri;
+            SDL_GetRendererInfo(r, &ri);
+            writeln(ri.name);
+        }
+
         _sdl_window_id = SDL_GetWindowID(_sdl_window);
         if (_sdl_window_id == 0)
         {
