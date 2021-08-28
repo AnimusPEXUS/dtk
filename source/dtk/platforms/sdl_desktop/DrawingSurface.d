@@ -2,6 +2,8 @@ module dtk.platforms.sdl_desktop.DrawingSurface;
 
 import std.stdio;
 import std.typecons;
+import std.math;
+import std.conv;
 
 import bindbc.sdl;
 
@@ -35,6 +37,42 @@ class DrawingSurface : DrawingSurfaceI
         SDL_RenderDrawPoint(rndr, pos.x, pos.y);
     }
 
+    private Position2D[] calculateDotsInLine(Position2D pos, Position2D pos2)
+    {
+
+        int calc_y(int x_high, int x_low, int y_high, int y_low, int x)
+        {
+            auto x_razn = x_high - x_high;
+            auto a = x_high - x;
+            auto b = x_razn - a;
+            auto c = ( b!=0 ? x_razn / b : 0);
+            auto d = y_high-y_low;
+            auto e = ( c!=0 ? d/c : 0);
+            auto f = d-e;
+            auto y = cast(int)lround(y_high-f);
+            return y;
+        }
+
+        Position2D[] ret;
+        bool is_x = ((pos2.x - pos.x) > (pos2.y - pos.y));
+        if (is_x)
+        {
+            for (int x = pos.x; x != pos2.x+1; x++)
+            {
+                auto y = calc_y(pos2.x, pos.x, pos2.y, pos.y, x);
+                ret ~= Position2D(x,y);
+            }
+        } else
+        {
+            for (int y = pos.y; y != pos2.y+1; y++)
+            {
+                auto x = calc_y(pos2.y, pos.y, pos2.x, pos.x, y);
+                ret ~= Position2D(x,y);
+            }
+        }
+        return ret;
+    }
+
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
         if (style.style == null)
@@ -47,14 +85,20 @@ class DrawingSurface : DrawingSurfaceI
         {
             auto style_dup = style.style.dup();
 
-            for (int x = pos.x; x != pos2.x; x++)
+            auto dots = calculateDotsInLine(pos, pos2);
+
+            writeln("dots");
+
+            foreach (v;dots)
             {
+                write("  dot[",v.x,":",v.y,"], ");
                 if (style_dup[0])
                 {
-                    drawDot(Position2D(x, pos.y), style.color);
+                    drawDot(v, style.color);
                 }
                 style_dup = style_dup[1 .. $] ~ style_dup[0];
             }
+            writeln();
         }
     }
 
