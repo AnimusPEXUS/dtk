@@ -1,15 +1,15 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"bindbc-loader": "0.3.2",
-		"bindbc-sdl": "0.21.4",
+		"bindbc-loader": "1.0.1",
+		"bindbc-sdl": "1.0.1",
 		"dtk": "~master",
-		"eventcore": "0.9.14",
+		"eventcore": "0.9.17",
 		"libasync": "0.8.6",
 		"memutils": "1.0.4",
-		"observable": "1.0.0",
+		"observable": "1.0.3",
 		"stdx-allocator": "2.77.5",
 		"taggedalgebraic": "0.11.22",
-		"vibe-core": "1.18.0"
+		"vibe-core": "1.20.0"
 	}
 }

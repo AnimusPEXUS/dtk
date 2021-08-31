@@ -23,7 +23,7 @@ void main()
 
 	WindowCreationSettings wcs = {
 		title:"123",
-		position: Position2D(0, 0),
+		position: Position2D(300, 300),
 		size: Size2D(200, 200),
 		resizable:true,
 	};
@@ -36,6 +36,9 @@ void main()
 
 	Button btn = new Button();
 	Button btn2 = new Button();
+
+	btn.setPosition(Position2D(20, 20)).setSize(Size2D(40, 40));
+	btn2.setPosition(Position2D(100, 20)).setSize(Size2D(40, 40));
 
 	lo.packStart(btn,true, true);
 	lo.packStart(btn2,false, true);

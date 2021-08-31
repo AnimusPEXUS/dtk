@@ -321,20 +321,20 @@ mixin template Property_forwarding(T, alias property, string new_suffix,)
 
     static if (__traits(hasMember, property, "set"))
     {
-        mixin("void set" ~ new_suffix ~ "(T x) { this." ~ __traits(identifier,
-                property) ~ ".set(x); }");
+        mixin("typeof(this) set" ~ new_suffix ~ "(T x) { this." ~ __traits(identifier,
+                property) ~ ".set(x); return this; }");
     }
 
     static if (__traits(hasMember, property, "reset"))
     {
-        mixin("void reset" ~ new_suffix ~ "() { this." ~ __traits(identifier,
-                property) ~ ".reset(); }");
+        mixin("typeof(this) reset" ~ new_suffix ~ "() { this." ~ __traits(identifier,
+                property) ~ ".reset();  return this;  }");
     }
 
     static if (__traits(hasMember, property, "unset"))
     {
-        mixin("void unset" ~ new_suffix ~ "() { this." ~ __traits(identifier,
-                property) ~ ".unset(); }");
+        mixin("typeof(this)  unset" ~ new_suffix ~ "() { this." ~ __traits(identifier,
+                property) ~ ".unset();   return this; }");
     }
 
     static if (__traits(hasMember, property, "isDefault"))

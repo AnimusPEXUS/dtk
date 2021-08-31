@@ -2,6 +2,7 @@ module dtk.widgets.Widget;
 
 import std.stdio;
 import std.conv;
+import std.typecons;
 
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -73,8 +74,10 @@ class Widget : WidgetI
         WidgetDrawingSurfaceShifted _ds;
     }
 
+    // TODO: ensure all subclasses calls for super();
     this()
     {
+        writeln("Widget:init() is started for ", this);
         this.connectToParent_onAfterChanged(&onParentChanged);
     }
 
@@ -136,21 +139,11 @@ class Widget : WidgetI
         }
 
         auto theme = form.getTheme();
-        /* auto ds = form.getDrawingSurface(); */
 
         if (theme is null)
         {
             throw new Exception("theme not set");
         }
-
-        /* if (ds is null)
-        {
-            throw new Exception("drawing surface not set");
-        } */
-
-        /* auto x = __traits(getMember, theme, "draw"~v);
-        x(ds, widget);
-         */
 
         static foreach (v; ["Form", "Button", "Layout"])
         {
@@ -171,22 +164,36 @@ class Widget : WidgetI
 
     void positionAndSizeRequest(Position2D position, Size2D size)
     {
+        writeln("setting ", this, " position to ", position.x, ",", position.y);
         setPosition(position);
         setSize(size);
     }
 
-    void handle_event_keyboard(EventKeyboard* e)
+    void recalculateChildrenPositionsAndSizes() {
+        return;
+    }
+
+    bool handle_event_keyboard(EventKeyboard* e)
     {
         writeln("handle_event_keyboard() called ", this);
+        return false;
     }
 
-    void handle_event_mouse(EventMouse* e)
+    bool handle_event_mouse(EventMouse* e)
     {
         writeln("handle_event_mouse() called ", this);
+        return false;
     }
 
-    void handle_event_textinput(EventTextInput* e)
+    bool handle_event_textinput(EventTextInput* e)
     {
         writeln("handle_event_textinput() called ", this);
+        return false;
     }
+
+    WidgetI getWidgetAtVisible(Position2D point)
+    {
+        return this;
+    }
+
 }

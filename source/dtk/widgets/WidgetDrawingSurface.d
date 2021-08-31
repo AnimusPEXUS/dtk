@@ -22,14 +22,14 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
 {
     private{
         Widget widget;
-        int w,h, x,y;
+        /* int w,h, x,y; */
     }
 
     this(Widget widget)
     {
         this.widget=widget;
-        this.widget.connectToPosition_onAfterChanged(&onWidgetPosChange);
-        this.widget.connectToSize_onAfterChanged(&onWidgetSizeChange);
+        /* this.widget.connectToPosition_onAfterChanged(&onWidgetPosChange);
+        this.widget.connectToSize_onAfterChanged(&onWidgetSizeChange); */
     }
 
     bool isValid()
@@ -51,7 +51,27 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         return pds;
     }
 
-    void onWidgetPosChange() nothrow
+    private int x() @property
+    {
+        return widget.getPosition().x;
+    }
+
+    private int y() @property
+    {
+        return widget.getPosition().y;
+    }
+
+    private int w() @property
+    {
+        return widget.getSize().width;
+    }
+
+    private int h() @property
+    {
+        return widget.getSize().height;
+    }
+
+    /* void onWidgetPosChange() nothrow
     {
         try {
         writeln("WidgetDrawingSurfaceShifted:onWidgetPosChange");
@@ -73,7 +93,7 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         } catch (Exception e) {
 
         }
-    }
+    } */
 
     // =============== implimentation ===============
 

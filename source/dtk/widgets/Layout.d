@@ -1,5 +1,6 @@
 module dtk.widgets.Layout;
 
+import std.conv;
 import std.stdio;
 import std.container;
 import std.algorithm;
@@ -44,6 +45,15 @@ enum LayoutType : ubyte {
     linearWrapped,
 }
 
+/++
+
+    new layouts can be implimented by inheriting Layout and overriding functions
+    such as positionAndSizeRequest() and redraw().
+
+    NOTE: Layout should not do any changes to any positions and sizes of it's
+    own children.
+
++/
 class Layout : Widget, ContainerableWidgetI
 {
 
@@ -58,27 +68,32 @@ class Layout : Widget, ContainerableWidgetI
     mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "VerticalOverflowBehavior");
     mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "HorizontalOverflowBehavior");
 
-    size_t getChildrenCount()
+    final ContainerableWidgetI[] getChildren()
+    {
+        return children;
+    }
+
+    final size_t getChildrenCount()
     {
         return children.length;
     }
 
-    WidgetI getChildByIndex(size_t index)
+    final WidgetI getChildByIndex(size_t index)
     {
         return children[index];
     }
 
-    void removeChild(size_t index)
+    final void removeChild(size_t index)
     {
         children = children[index .. index + 1];
     }
 
-    void removeChild(ContainerableWidgetI widget)
+    final void removeChild(ContainerableWidgetI widget)
     {
         assert(false, "todo");
     }
 
-    void packStart(ContainerableWidgetI widget, bool expand, bool fill)
+    final void packStart(ContainerableWidgetI widget, bool expand, bool fill)
     {
         if (!children.canFind(widget))
         {
@@ -90,7 +105,7 @@ class Layout : Widget, ContainerableWidgetI
         }
     }
 
-    void packEnd(ContainerableWidgetI widget, bool expand, bool fill)
+    final void packEnd(ContainerableWidgetI widget, bool expand, bool fill)
     {
         if (!children.canFind(widget))
         {
@@ -107,23 +122,31 @@ class Layout : Widget, ContainerableWidgetI
         /* setCalculatedPosition(position);
         setCalculatedSize(size); */
         super.positionAndSizeRequest(position, size);
+        this.recalculateChildrenPositionsAndSizes();
+    }
 
-        uint counter;
-        foreach (v; children) {
-            v.positionAndSizeRequest(
-                Position2D(counter*(20+2),counter*(20+2)),
-                Size2D((counter*(20+2)+20), (counter*(20+2)+20))
-                );
-            counter++;
+    override void recalculateChildrenPositionsAndSizes()
+    {
+        foreach (size_t counter, v; children) {
+            if (v.isUnsetPosition() || v.isUnsetSize())
+            {
+                throw new Exception(to!string(this) ~ " child size or position is not set");
+            }
+            v.recalculateChildrenPositionsAndSizes();
         }
-
     }
 
     override void redraw() {
         super.redraw();
         foreach (size_t i, v; children) {
             writeln(i," - Layout child redraw()");
+            auto p= v.getPosition();
+            auto s= v.getSize();
+            writeln(i," child position is ",p.x, ",", p.y);
+            writeln(i," child size is     ",s.width, ",", s.height);
             v.redraw();
         }
     }
+
+    mixin mixin_getWidgetAtVisible;
 }

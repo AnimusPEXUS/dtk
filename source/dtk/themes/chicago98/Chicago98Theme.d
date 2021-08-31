@@ -66,8 +66,6 @@ class Chicago98Theme : ThemeI
 
         auto ds = widget.getDrawingSurface();
 
-
-
         auto pos = Position2D(0,0);
         auto size = widget.getSize();
 

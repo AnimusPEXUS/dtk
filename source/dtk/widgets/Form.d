@@ -33,13 +33,16 @@ class Form : Widget, FormI
         /* mixin Property_gsu!(DrawingSurfaceI, "drawing_surface"); */
         mixin Property_gsu!(ContainerableWidgetI, "child");
 
-        SignalConnection onwindowchanged_sc;
+        mixin Property_gsu!(WidgetI, "focused_widget");
+
     }
 
     mixin Property_forwarding!(WindowI, window, "Window");
     mixin Property_forwarding!(ThemeI, theme, "Theme");
     /* mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface"); */
     mixin Property_forwarding!(ContainerableWidgetI, child, "Child");
+
+    mixin Property_forwarding!(WidgetI, focused_widget, "FocusedWidget");
 
     private
     {
@@ -48,15 +51,19 @@ class Form : Widget, FormI
 
     this()
     {
-        connectToChild_onAfterChanged(&onChiledChanged);
+        connectToChild_onAfterChanged(&onChildChanged);
     }
 
-    void onChiledChanged() nothrow
+    void onChildChanged() nothrow
     {
         try {
             writeln("Form child changed");
             auto c = getChild();
             c.setParent(this);
+            /* c.setPosition(Position2D(5,5));
+            auto = this_size
+            c.setSize(Size2D()); */
+            this.recalculateChildrenPositionsAndSizes();
         } catch (Exception e) {
 
         }
@@ -80,14 +87,14 @@ class Form : Widget, FormI
         }
     } */
 
-    override void setParent(WidgetI widget)
+    override typeof(this) setParent(WidgetI widget)
     {
-        return;
+        return null;
     }
 
-    override void unsetParent()
+    override typeof(this) unsetParent()
     {
-        return;
+        return null;
     }
 
     override WidgetI getParent()
@@ -102,10 +109,14 @@ class Form : Widget, FormI
 
     override void positionAndSizeRequest(Position2D position, Size2D size)
     {
-        /* setCalculatedPosition(position);
-        setCalculatedSize(size); */
         super.positionAndSizeRequest(position, size);
+        this.recalculateChildrenPositionsAndSizes();
+    }
 
+    override void recalculateChildrenPositionsAndSizes()
+    {
+        auto position = getPosition();
+        auto size = getSize();
         if (isSetChild()) {
             auto c = getChild();
             c.positionAndSizeRequest(
@@ -114,6 +125,7 @@ class Form : Widget, FormI
                 );
         }
     }
+
 
     override void redraw() {
         super.redraw();
@@ -125,6 +137,17 @@ class Form : Widget, FormI
 
         auto ds = getDrawingSurface();
         ds.present();
+    }
+
+    mixin mixin_getWidgetAtVisible;
+
+    WidgetI focusNextWidget()
+    {
+        return this;
+    }
+    WidgetI focusPrevWidget()
+    {
+        return this;
     }
 
 

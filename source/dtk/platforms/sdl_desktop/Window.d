@@ -10,6 +10,7 @@ import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
+import dtk.interfaces.WidgetI;
 
 import dtk.platforms.sdl_desktop.DrawingSurface;
 import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
@@ -204,31 +205,37 @@ class Window : WindowI
 
         writeln("Window::handle_event_window ", e.eventId);
 
+        bool needs_resize = false;
+        bool needs_redraw = false;
+
         switch (e.eventId)
         {
             default:
                 return;
             /* case EnumWindowEvent.show:
                 break; */
+            case EnumWindowEvent.show:
             case EnumWindowEvent.resize:
-                if (_form !is null)
-                {
-                    _form.positionAndSizeRequest(
-                        Position2D(0,0),
-                        Size2D(e.size.width, e.size.height)
-                        );
-                }
+                needs_resize = true;
+                needs_redraw = true;
                 break;
         }
 
-        if ((cast(EnumWindowEvent[])[
-            EnumWindowEvent.resize,
-            EnumWindowEvent.show
-            ]).canFind(e.eventId)) {
-                writeln("  Window::handle_event_window ok");
-                redraw();
-        } else {
-            writeln("  Window::handle_event_window notok");
+
+        if (needs_resize)
+        {
+            if (_form !is null) {
+            _form.positionAndSizeRequest(
+                Position2D(0,0),
+                Size2D(e.size.width, e.size.height)
+                );
+            }
+            needs_redraw = true;
+        }
+
+        if (needs_redraw)
+        {
+            redraw();
         }
 
     }
@@ -240,6 +247,22 @@ class Window : WindowI
     void handle_event_mouse(EventMouse* e) {
         writeln("Window::handle_event_mouse");
         writeln("   mouse clicks:", e.button.clicks);
+
+        WidgetI w = getWidgetAtVisible(Position2D(e.x, e.y));
+        writeln("widget at [", e.x, ",",e.y,"] ",w);
+
+        while (true)
+        {
+            auto res = w.handle_event_mouse(e);
+            if (res) {
+                break;
+            }
+            w=w.getParent();
+            if (w is null)
+            {
+                break;
+            }
+        }
     }
 
     void handle_event_textinput(EventTextInput* e)
@@ -351,6 +374,16 @@ class Window : WindowI
     void setTitle(string value)
     {
         _title = value;
+    }
+
+    WidgetI getWidgetAtVisible(Position2D point)
+    {
+        WidgetI ret = null;
+        if (_form !is null)
+        {
+            ret = _form.getWidgetAtVisible(point);
+        }
+        return ret;
     }
 
 

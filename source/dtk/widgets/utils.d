@@ -3,7 +3,7 @@ module dtk.widgets.utils;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 
-FormI getForm(WidgetI w)
+/* FormI getForm(WidgetI w)
 {
     ubyte failure_countdown = 200;
 begin:
@@ -28,4 +28,7 @@ begin:
     failure_countdown--;
 
     goto begin;
-}
+} */
+
+
+/* mixin template  */
