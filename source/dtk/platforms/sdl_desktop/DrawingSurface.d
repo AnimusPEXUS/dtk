@@ -171,18 +171,20 @@ class DrawingSurface : DrawingSurfaceI
     {
         import std.math;
 
-        Position2D[] points;
-
-        for (real current_step = start_angle; current_step < stop_angle; current_step += turn_step)
+        Position2D pcalc(real current_step)
         {
             real x = cos(current_step) * radius;
             real y = sin(current_step) * radius;
-            points ~= Position2D(cast(int)(lround(x))+pos.x,cast(int)(lround(y))+pos.y);
+            return Position2D(cast(int)(lround(x))+pos.x,cast(int)(lround(y))+pos.y);
         }
 
-        for (int i; i != points.length-1; i++)
+        Position2D prev_point = pcalc(0);
+
+        for (real current_step = start_angle; current_step <= stop_angle; current_step += turn_step)
         {
-            drawLine(points[i], points[i+1], LineStyle(color));
+            auto point = pcalc(current_step);
+            drawLine(prev_point, point, LineStyle(color));
+            prev_point = point;
         }
 
     }
