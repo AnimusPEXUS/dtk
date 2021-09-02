@@ -160,9 +160,36 @@ class DrawingSurface : DrawingSurfaceI
         SDL_UpdateWindowSurface(w._sdl_window); */
     }
 
-    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style,)
+    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style)
     {
 
+    }
+
+    // TODO: performance check required. probably functions which use it, have
+    //       to use catching
+    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle, real turn_step, Color color)
+    {
+        import std.math;
+
+        Position2D[] points;
+
+        for (real current_step = start_angle; current_step < stop_angle; current_step += turn_step)
+        {
+            real x = cos(current_step) * radius;
+            real y = sin(current_step) * radius;
+            points ~= Position2D(cast(int)(lround(x))+pos.x,cast(int)(lround(y))+pos.y);
+        }
+
+        for (int i; i != points.length-1; i++)
+        {
+            drawLine(points[i], points[i+1], LineStyle(color));
+        }
+
+    }
+
+    final void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
+    {
+        drawArc(pos, radius, 0, 2*PI, turn_step, color);
     }
 
     void present() {

@@ -51,21 +51,25 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         return pds;
     }
 
+    // TODO: probably refactoring needed
     private int x() @property
     {
         return widget.getPosition().x;
     }
 
+    // TODO: probably refactoring needed
     private int y() @property
     {
         return widget.getPosition().y;
     }
 
+    // TODO: probably refactoring needed
     private int w() @property
     {
         return widget.getSize().width;
     }
 
+    // TODO: probably refactoring needed
     private int h() @property
     {
         return widget.getSize().height;
@@ -160,6 +164,26 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
              font_style,
              text_style
              );
+    }
+
+    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle, real turn_step, Color color)
+    {
+        Position2D npos;
+        npos.x = pos.x + x;
+        npos.y = pos.y + y;
+        auto pds = getParentDS();
+        if (pds)
+            pds.drawArc(npos, radius, start_angle, stop_angle, turn_step, color);
+    }
+
+    void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
+    {
+        Position2D npos;
+        npos.x = pos.x + x;
+        npos.y = pos.y + y;
+        auto pds = getParentDS();
+        if (pds)
+            pds.drawCircle(npos, radius, turn_step, color);
     }
 
     void present()

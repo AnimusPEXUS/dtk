@@ -28,15 +28,29 @@ class Chicago98Theme : ThemeI
     Color elementDarkedColor = Color(0x000000);
     Color elementDarkedColor2 = Color(0x808080);
 
-    /* void drawBewel(
-        bool top,
-        bool right,
-        bool left,
-        bool bottom,
+     void drawBewel(
+         DrawingSurfaceI ds,
+        Position2D pos,
+        Size2D size,
+        bool inverted
         )
         {
+            ds.drawRectangle(
+                pos,
+                size,
+                LineStyle(elementLightedColor),
+                LineStyle(elementDarkedColor),
+                Nullable!FillStyle()
+                );
 
-        } */
+            ds.drawRectangle(
+                Position2D(pos.x+1,pos.y+1),
+                Size2D(size.width-2, size.height-2),
+                LineStyle(elementLightedColor2),
+                LineStyle(elementDarkedColor2),
+                Nullable!FillStyle()
+                );
+        }
 
     void drawForm(Form widget) {
 
@@ -83,22 +97,7 @@ class Chicago98Theme : ThemeI
             size.height -= 2;
         }
 
-
-        ds.drawRectangle(
-            pos,
-            size,
-            LineStyle(elementLightedColor),
-            LineStyle(elementDarkedColor),
-            Nullable!FillStyle()
-            );
-
-        ds.drawRectangle(
-            Position2D(pos.x+1,pos.y+1),
-            Size2D(size.width-2, size.height-2),
-            LineStyle(elementLightedColor2),
-            LineStyle(elementDarkedColor2),
-            Nullable!FillStyle()
-            );
+        drawBewel(ds, pos, size, false);
 
         ds.drawRectangle(
             Position2D(pos.x+2,pos.y+2),

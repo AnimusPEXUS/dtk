@@ -25,6 +25,7 @@ interface WidgetI
 
     void positionAndSizeRequest(Position2D, Size2D);
     void recalculateChildrenPositionsAndSizes();
+    void redraw();
 
     typeof(this) setPosition(Position2D);
     typeof(this) unsetPosition();
@@ -39,8 +40,6 @@ interface WidgetI
     bool handle_event_keyboard(EventKeyboard* e);
     bool handle_event_mouse(EventMouse* e);
     bool handle_event_textinput(EventTextInput* e);
-
-    void redraw();
 
     WidgetI getWidgetAtVisible(Position2D point);
 

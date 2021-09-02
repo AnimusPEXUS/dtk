@@ -50,5 +50,9 @@ interface DrawingSurfaceI
 
     void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style);
 
+    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle, real turn_step, Color color);
+
+    void drawCircle(Position2D pos, uint radius, real turn_step, Color color);
+
     void present();
 }

@@ -1,5 +1,6 @@
 module dtk.widgets;
 
+public import dtk.widgets.DrawingSurface;
 public import dtk.widgets.Form;
 public import dtk.widgets.Button;
 public import dtk.widgets.Label;
