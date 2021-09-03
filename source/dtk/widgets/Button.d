@@ -6,6 +6,7 @@ should be visually transformed to such using it's properties.
 
 module dtk.widgets.Button;
 
+import std.stdio;
 import std.typecons;
 
 import dtk.miscs.RadioGroup;
@@ -16,8 +17,8 @@ import dtk.interfaces.FormI;
 import dtk.types.ButtonTypeE;
 import dtk.types.Size2D;
 
+import dtk.widgets;
 import dtk.widgets.mixins;
-import dtk.widgets.Widget;
 
 /// Button class
 class Button : Widget, ContainerableWidgetI
@@ -34,11 +35,6 @@ class Button : Widget, ContainerableWidgetI
 
         bool _switchable;
         ButtonTypeE _button_type;
-    }
-
-    this()
-    {
-        super();
     }
 
 

@@ -15,9 +15,8 @@ import dtk.types.Property;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 
+import dtk.widgets;
 import dtk.widgets.mixins;
-/* import dtk.widgets.WidgetLocator; */
-import dtk.widgets.Widget;
 
 enum LayoutOverflowBehavior
 {
@@ -137,7 +136,9 @@ class Layout : Widget, ContainerableWidgetI
     }
 
     override void redraw() {
+
         super.redraw();
+
         foreach (size_t i, v; children) {
             writeln(i," - Layout child redraw()");
             auto p= v.getPosition();

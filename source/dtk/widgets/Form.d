@@ -128,6 +128,7 @@ class Form : Widget, FormI
 
 
     override void redraw() {
+
         super.redraw();
 
         if (isSetChild()) {

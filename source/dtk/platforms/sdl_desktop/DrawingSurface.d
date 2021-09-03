@@ -171,16 +171,34 @@ class DrawingSurface : DrawingSurfaceI
     {
         import std.math;
 
+        if (turn_step < 0)
+        {
+            turn_step = -turn_step;
+        }
+
+        if (stop_angle < start_angle)
+        {
+            turn_step = -turn_step;
+        }
+
         Position2D pcalc(real current_step)
         {
             real x = cos(current_step) * radius;
             real y = sin(current_step) * radius;
-            return Position2D(cast(int)(lround(x))+pos.x,cast(int)(lround(y))+pos.y);
+            return Position2D(
+                cast(int)(lround(x))+pos.x,
+                cast(int)(lround(y))+pos.y
+                );
         }
 
-        Position2D prev_point = pcalc(0);
+        Position2D prev_point = pcalc(start_angle);
 
-        for (real current_step = start_angle; current_step <= stop_angle; current_step += turn_step)
+        for (
+            real current_step = start_angle;
+            (current_step >= start_angle)
+            && (current_step <= stop_angle);
+            current_step += turn_step
+            )
         {
             auto point = pcalc(current_step);
             drawLine(prev_point, point, LineStyle(color));
@@ -191,6 +209,10 @@ class DrawingSurface : DrawingSurfaceI
 
     final void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
     {
+        if (turn_step < 0)
+        {
+            turn_step = -turn_step;
+        }
         drawArc(pos, radius, 0, 2*PI, turn_step, color);
     }
 

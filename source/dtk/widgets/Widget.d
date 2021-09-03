@@ -18,9 +18,7 @@ import dtk.types.Size2D;
 import dtk.types.Position2D;
 
 /* import dtk.widgets.WidgetLocator; */
-import dtk.widgets.Form;
-import dtk.widgets.Button;
-import dtk.widgets.Layout;
+import dtk.widgets;
 import dtk.widgets.WidgetDrawingSurface;
 
 class Widget : WidgetI
@@ -127,7 +125,7 @@ class Widget : WidgetI
         return _ds;
     }
 
-    void redraw() {
+     void redraw() {
 
         writeln("Widget::draw() <---------------------------- ", this);
 
@@ -145,7 +143,7 @@ class Widget : WidgetI
             throw new Exception("theme not set");
         }
 
-        static foreach (v; ["Form", "Button", "Layout"])
+        static foreach (v; ["Form", "ButtonCheck", "ButtonRadio", "Button", "Layout"])
         {
             {
                 mixin(v~" widget = cast("~v~") this;");
@@ -154,13 +152,21 @@ class Widget : WidgetI
                 {
                     writeln("calling draw"~v);
                     __traits(getMember, theme, "draw"~v)(widget);
+                    goto exit;
                 }
             }
         }
 
+        exit:
+
         /* writeln("Widget::draw() <----------------------------");
         writeln("   this widget is Form?:", (cast(Form) this !is null )); */
     }
+
+    /* void redraw()
+    {
+
+    } */
 
     void positionAndSizeRequest(Position2D position, Size2D size)
     {
