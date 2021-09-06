@@ -1,8 +1,8 @@
 #!/bin/bash
 
-dfmt -i src/dtk/interfaces/*.d
-dfmt -i src/dtk/types/*.d
-dfmt -i src/dtk/widgets/*.d
-dfmt -i src/dtk/miscs/*.d
-dfmt -i src/dtk/platforms/*/*.d
-dfmt -i src/dtk/themes/*/*.d
+dfmt -i source/dtk/interfaces/*.d
+dfmt -i source/dtk/types/*.d
+dfmt -i source/dtk/widgets/*.d
+dfmt -i source/dtk/miscs/*.d
+dfmt -i source/dtk/platforms/*/*.d
+dfmt -i source/dtk/themes/*/*.d

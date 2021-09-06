@@ -14,5 +14,4 @@ import dtk.widgets.mixins;
 class TextArea : Widget, ContainerableWidgetI
 {
 
-
 }

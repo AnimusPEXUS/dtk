@@ -7,7 +7,8 @@ import dtk.types.Size2D;
 struct EventWindow
 {
     EnumWindowEvent eventId;
-    union {
+    union
+    {
         Position2D position;
         Size2D size;
     };

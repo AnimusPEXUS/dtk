@@ -46,5 +46,4 @@ interface WidgetI
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
 
-
 }

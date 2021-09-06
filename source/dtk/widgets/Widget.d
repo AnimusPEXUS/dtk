@@ -23,7 +23,8 @@ import dtk.widgets.WidgetDrawingSurface;
 
 class Widget : WidgetI
 {
-    private {
+    private
+    {
         mixin Property_gsu!(WidgetI, "parent");
     }
 
@@ -31,7 +32,8 @@ class Widget : WidgetI
 
     // =====^===^===^===== [locator] =====^===^===^===== start
 
-    private {
+    private
+    {
         mixin Property_gs_w_d!(bool, "vertical_expand", false);
         mixin Property_gs_w_d!(bool, "horizontal_expand", false);
         mixin Property_gs_w_d!(bool, "vertical_fill", false);
@@ -58,17 +60,17 @@ class Widget : WidgetI
     mixin Property_forwarding!(Size2D, minimal_size, "MinimalSize");
     mixin Property_forwarding!(Size2D, maximal_size, "MaximalSize");
 
-
     // =====^===^===^===== [locator] =====^===^===^===== end
 
-
-    public {
+    public
+    {
         // NOTE: this (locator) should always be a part of Widget and so should
         //       not be created with Property or it's mixins
         /* WidgetLocator locator; */
     }
 
-    private {
+    private
+    {
         WidgetDrawingSurfaceShifted _ds;
     }
 
@@ -81,20 +83,24 @@ class Widget : WidgetI
 
     void onParentChanged() nothrow
     {
-        try {
-            writeln(this," parent changed");
-        } catch  (Exception e) {
+        try
+        {
+            writeln(this, " parent changed");
+        }
+        catch (Exception e)
+        {
         }
     }
 
     /++ return FormI on which this Widget is placed. returns null in case if
     there is no attached form or if this widget is deeper than 200 levels to
     FormI instance (too deep); +/
-    Form getForm() {
+    Form getForm()
+    {
         WidgetI w = this;
         Form ret;
 
-        for (byte failure_countdown = cast(byte)200; failure_countdown != -1; failure_countdown--)
+        for (byte failure_countdown = cast(byte) 200; failure_countdown != -1; failure_countdown--)
         {
 
             ret = cast(Form) w;
@@ -103,7 +109,8 @@ class Widget : WidgetI
                 return ret;
             }
 
-            if (w.isUnsetParent()) {
+            if (w.isUnsetParent())
+            {
                 return null;
             }
 
@@ -117,15 +124,17 @@ class Widget : WidgetI
         return ret;
     }
 
-    DrawingSurfaceI getDrawingSurface() {
-        if (_ds is null || !_ds.isValid() )
+    DrawingSurfaceI getDrawingSurface()
+    {
+        if (_ds is null || !_ds.isValid())
         {
             _ds = new WidgetDrawingSurfaceShifted(this);
         }
         return _ds;
     }
 
-     void redraw() {
+    void redraw()
+    {
 
         writeln("Widget::draw() <---------------------------- ", this);
 
@@ -143,21 +152,23 @@ class Widget : WidgetI
             throw new Exception("theme not set");
         }
 
-        static foreach (v; ["Form", "ButtonCheck", "ButtonRadio", "Button", "Layout"])
+        static foreach (v; [
+                "Form", "ButtonCheck", "ButtonRadio", "Button", "Layout"
+            ])
         {
             {
-                mixin(v~" widget = cast("~v~") this;");
+                mixin(v ~ " widget = cast(" ~ v ~ ") this;");
                 /* __traits(toType, v) widget = cast(__traits(toType, v)) this; */
                 if (widget !is null)
                 {
-                    writeln("calling draw"~v);
-                    __traits(getMember, theme, "draw"~v)(widget);
+                    writeln("calling draw" ~ v);
+                    __traits(getMember, theme, "draw" ~ v)(widget);
                     goto exit;
                 }
             }
         }
 
-        exit:
+    exit:
 
         /* writeln("Widget::draw() <----------------------------");
         writeln("   this widget is Form?:", (cast(Form) this !is null )); */
@@ -175,7 +186,8 @@ class Widget : WidgetI
         setSize(size);
     }
 
-    void recalculateChildrenPositionsAndSizes() {
+    void recalculateChildrenPositionsAndSizes()
+    {
         return;
     }
 

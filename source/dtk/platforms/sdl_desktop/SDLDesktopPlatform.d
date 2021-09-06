@@ -16,10 +16,9 @@ import dtk.platforms.sdl_desktop.utils;
 
 // TODO: ensure those events are not needed
 immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
-    SDL_WINDOWEVENT_NONE,
-    SDL_WINDOWEVENT_SIZE_CHANGED,
-    cast(SDL_WindowEventID)15 //SDL_WINDOWEVENT_TAKE_FOCUS
-    ];
+    SDL_WINDOWEVENT_NONE, SDL_WINDOWEVENT_SIZE_CHANGED,
+    cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
+];
 
 class SDLDesktopPlatform : PlatformI
 {
@@ -91,7 +90,7 @@ class SDLDesktopPlatform : PlatformI
         SDL_Init(SDL_INIT_VIDEO);
         SDL_version v;
         SDL_GetVersion(&v);
-        writeln("SDL Version: ", v.major, ".",v.minor, ".",v.patch);
+        writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
     }
 
     void destroy_()
@@ -99,13 +98,14 @@ class SDLDesktopPlatform : PlatformI
         SDL_Quit();
     }
 
-    Window getWindowByWindowID(typeof (SDL_WindowEvent.windowID) windowID){
+    Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)
+    {
         Window ret;
         foreach (Window w; windows)
         {
             if (w._sdl_window_id == windowID)
             {
-                ret =w ;
+                ret = w;
                 break;
             }
         }
@@ -118,7 +118,7 @@ class SDLDesktopPlatform : PlatformI
 
     void mainLoop()
     {
-        SDL_Event *event = new SDL_Event;
+        SDL_Event* event = new SDL_Event;
 
         main_loop: while (true)
         {
@@ -137,7 +137,7 @@ class SDLDesktopPlatform : PlatformI
 
             writeln(event.type);
 
-        typeof (SDL_WindowEvent.windowID) windowID;
+            typeof(SDL_WindowEvent.windowID) windowID;
 
         event_type_switch:
             switch (event.type)
@@ -146,7 +146,8 @@ class SDLDesktopPlatform : PlatformI
                 continue main_loop;
             case SDL_WINDOWEVENT:
                 windowID = event.window.windowID;
-                if (ignoredSDLWindowEvents.canFind(event.window.event)) {
+                if (ignoredSDLWindowEvents.canFind(event.window.event))
+                {
                     writeln("warning: ignored SDL_WINDOWEVENT::", event.window.event, " just now");
                     continue main_loop;
                 }
@@ -184,7 +185,8 @@ class SDLDesktopPlatform : PlatformI
         return;
     }
 
-    ThemeI getTheme() {
+    ThemeI getTheme()
+    {
         return theme;
     }
 

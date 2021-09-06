@@ -37,6 +37,4 @@ class Button : Widget, ContainerableWidgetI
         ButtonTypeE _button_type;
     }
 
-
-
 }

@@ -16,6 +16,7 @@ import dtk.interfaces.ContainerableWidgetI;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
+
 /* import dtk.types.Theme; */
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
@@ -56,7 +57,8 @@ class Form : Widget, FormI
 
     void onChildChanged() nothrow
     {
-        try {
+        try
+        {
             writeln("Form child changed");
             auto c = getChild();
             c.setParent(this);
@@ -64,7 +66,9 @@ class Form : Widget, FormI
             auto = this_size
             c.setSize(Size2D()); */
             this.recalculateChildrenPositionsAndSizes();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
 
         }
 
@@ -117,21 +121,21 @@ class Form : Widget, FormI
     {
         auto position = getPosition();
         auto size = getSize();
-        if (isSetChild()) {
+        if (isSetChild())
+        {
             auto c = getChild();
-            c.positionAndSizeRequest(
-                Position2D(position.x+5, position.y+5),
-                Size2D(size.width-10, size.height-10)
-                );
+            c.positionAndSizeRequest(Position2D(position.x + 5, position.y + 5),
+                    Size2D(size.width - 10, size.height - 10));
         }
     }
 
-
-    override void redraw() {
+    override void redraw()
+    {
 
         super.redraw();
 
-        if (isSetChild()) {
+        if (isSetChild())
+        {
             writeln("getChild().redraw();");
             getChild().redraw();
         }
@@ -142,7 +146,7 @@ class Form : Widget, FormI
 
     mixin mixin_getWidgetAtVisible;
 
-    private WidgetI focusXWidget( WidgetI delegate() getXFocusableWidget)
+    private WidgetI focusXWidget(WidgetI delegate() getXFocusableWidget)
     {
         WidgetI cfw;
 

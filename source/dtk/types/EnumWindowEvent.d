@@ -1,6 +1,5 @@
 module dtk.types.EnumWindowEvent;
 
-
 enum EnumWindowEvent
 {
     none,

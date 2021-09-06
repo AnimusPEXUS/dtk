@@ -27,5 +27,4 @@ class Bar : Widget, ContainerableWidgetI
         ContainerableWidgetI[] _children;
     }
 
-
 }

@@ -15,19 +15,19 @@ import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.widgets;
 
-const {
-auto P_45 = PI / 4;
-auto P_M45 = -P_45;
-auto P_135 = PI/2 + P_45;
-auto P_135M2 = PI*2 - P_45;
+const
+{
+    auto P_45 = PI / 4;
+    auto P_M45 = -P_45;
+    auto P_135 = PI / 2 + P_45;
+    auto P_135M2 = PI * 2 - P_45;
 }
-
 
 class Chicago98Theme : ThemeI
 {
 
     Color formBackground = Color(0xc0c0c0);
-    Color buttonBorderColor = Color(cast(ubyte[3])[0,0,0]);
+    Color buttonBorderColor = Color(cast(ubyte[3])[0, 0, 0]);
     Color buttonColor = Color(0xc0c0c0);
 
     Color elementLightedColor = Color(0xffffff);
@@ -36,44 +36,27 @@ class Chicago98Theme : ThemeI
     Color elementDarkedColor = Color(0x000000);
     Color elementDarkedColor2 = Color(0x808080);
 
+    void drawBewel(DrawingSurfaceI ds, Position2D pos, Size2D size, bool inverted)
+    {
+        auto c1 = elementLightedColor, c2 = elementDarkedColor,
+            c3 = elementLightedColor2, c4 = elementDarkedColor2;
 
-     void drawBewel(
-         DrawingSurfaceI ds,
-        Position2D pos,
-        Size2D size,
-        bool inverted
-        )
+        if (inverted)
         {
-            auto c1 = elementLightedColor,
-                c2 =elementDarkedColor,
-                c3=elementLightedColor2,
-                c4=elementDarkedColor2;
-
-            if (inverted) {
-                c1=elementDarkedColor2;
-                c2=elementLightedColor2;
-                c3=elementLightedColor2;
-                c4=elementLightedColor;
-            }
-
-            ds.drawRectangle(
-                pos,
-                size,
-                LineStyle(c1),
-                LineStyle(c2),
-                Nullable!FillStyle()
-                );
-
-            ds.drawRectangle(
-                Position2D(pos.x+1,pos.y+1),
-                Size2D(size.width-2, size.height-2),
-                LineStyle(c3),
-                LineStyle(c4),
-                Nullable!FillStyle()
-                );
+            c1 = elementDarkedColor2;
+            c2 = elementLightedColor2;
+            c3 = elementLightedColor2;
+            c4 = elementLightedColor;
         }
 
-    void drawForm(Form widget) {
+        ds.drawRectangle(pos, size, LineStyle(c1), LineStyle(c2), Nullable!FillStyle());
+
+        ds.drawRectangle(Position2D(pos.x + 1, pos.y + 1), Size2D(size.width - 2,
+                size.height - 2), LineStyle(c3), LineStyle(c4), Nullable!FillStyle());
+    }
+
+    void drawForm(Form widget)
+    {
 
         writeln("drawForm called");
 
@@ -81,15 +64,9 @@ class Chicago98Theme : ThemeI
 
         auto pos = widget.getPosition();
         auto size = widget.getSize();
-        ds.drawRectangle(
-            pos,
-            size,
-            LineStyle(formBackground),
-            LineStyle(formBackground),
-            LineStyle(formBackground),
-            LineStyle(formBackground),
-            nullable(FillStyle(formBackground))
-            );
+        ds.drawRectangle(pos, size, LineStyle(formBackground), LineStyle(formBackground),
+                LineStyle(formBackground), LineStyle(formBackground),
+                nullable(FillStyle(formBackground)));
     }
 
     void drawButton(Button widget)
@@ -101,17 +78,12 @@ class Chicago98Theme : ThemeI
 
         auto ds = widget.getDrawingSurface();
 
-        auto pos = Position2D(0,0);
+        auto pos = Position2D(0, 0);
         auto size = widget.getSize();
 
         if (is_default)
         {
-            ds.drawRectangle(
-                Position2D(0,0),
-                size,
-                LineStyle(Color(0)),
-                Nullable!FillStyle()
-                );
+            ds.drawRectangle(Position2D(0, 0), size, LineStyle(Color(0)), Nullable!FillStyle());
             pos.x++;
             pos.y++;
             size.width -= 2;
@@ -120,21 +92,14 @@ class Chicago98Theme : ThemeI
 
         drawBewel(ds, pos, size, false);
 
-        ds.drawRectangle(
-            Position2D(pos.x+2,pos.y+2),
-            Size2D(size.width-4, size.height-4),
-            LineStyle(buttonColor),
-            nullable(FillStyle(buttonColor))
-            );
+        ds.drawRectangle(Position2D(pos.x + 2, pos.y + 2), Size2D(size.width - 4,
+                size.height - 4), LineStyle(buttonColor), nullable(FillStyle(buttonColor)));
 
         if (is_focused)
         {
-            ds.drawRectangle(
-                Position2D(pos.x+4,pos.y+4),
-                Size2D(size.width-8, size.height-8),
-                LineStyle(Color(0),[true,false]),
-                Nullable!FillStyle()
-                );
+            ds.drawRectangle(Position2D(pos.x + 4, pos.y + 4),
+                    Size2D(size.width - 8, size.height - 8), LineStyle(Color(0),
+                        [true, false]), Nullable!FillStyle());
         }
     }
 
@@ -142,11 +107,11 @@ class Chicago98Theme : ThemeI
     void drawButtonRadio(ButtonRadio widget)
     {
         auto ds = widget.getDrawingSurface();
-        auto pos = Position2D(0,0);
+        auto pos = Position2D(0, 0);
         auto size = widget.getSize();
 
         // TODO: this have to be more flexible
-        auto step = 2*PI / 16;
+        auto step = 2 * PI / 16;
 
         auto p = Position2D(6, 6);
 
@@ -161,11 +126,10 @@ class Chicago98Theme : ThemeI
     void drawButtonCheck(ButtonCheck widget)
     {
         auto ds = widget.getDrawingSurface();
-        auto pos = Position2D(0,0);
+        auto pos = Position2D(0, 0);
         auto size = widget.getSize();
-        drawBewel(ds,pos,size,true);
+        drawBewel(ds, pos, size, true);
     }
-
 
     void drawImage(Image widget)
     {

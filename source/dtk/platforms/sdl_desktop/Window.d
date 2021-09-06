@@ -53,9 +53,10 @@ class Window : WindowI
 
     }
 
-    public {
+    public
+    {
         SDL_Window* _sdl_window;
-        typeof (SDL_WindowEvent.windowID) _sdl_window_id;
+        typeof(SDL_WindowEvent.windowID) _sdl_window_id;
     }
 
     @disable this();
@@ -122,7 +123,8 @@ class Window : WindowI
         _platform.unregisterWindow(this);
     }
 
-    void handle_SDL_Event(SDL_Event* event) {
+    void handle_SDL_Event(SDL_Event* event)
+    {
         writeln("Window::handle_SDL_Event");
 
         switch (event.type)
@@ -151,7 +153,8 @@ class Window : WindowI
     }
 
     // ? status: started. fast checked ok.
-    void handle_SDL_WindowEvent(SDL_WindowEvent* event) {
+    void handle_SDL_WindowEvent(SDL_WindowEvent* event)
+    {
         writeln("Window::handle_SDL_WindowEvent");
         // TODO: ensure event consistency
         auto res = convertSDLWindowEventToDtkEventWindow(event);
@@ -159,7 +162,7 @@ class Window : WindowI
     }
 
     // ? status: started. fast checked ok.
-    void handle_SDL_KeyboardEvent(SDL_KeyboardEvent *event)
+    void handle_SDL_KeyboardEvent(SDL_KeyboardEvent* event)
     {
         writeln("Window::handle_SDL_KeyboardEvent");
         // TODO: ensure event consistency
@@ -168,7 +171,8 @@ class Window : WindowI
     }
 
     // ? status: started.  fast checked ok.
-    void handle_SDL_MouseMotionEvent(SDL_MouseMotionEvent *event) {
+    void handle_SDL_MouseMotionEvent(SDL_MouseMotionEvent* event)
+    {
         writeln("Window::handle_SDL_MouseMotionEvent");
         // TODO: ensure event consistency
         auto res = convertSDLMouseMotionEventToDtkEventMouse(event);
@@ -176,7 +180,8 @@ class Window : WindowI
     }
 
     // ? status: started. fast checked ok.
-    void handle_SDL_MouseButtonEvent(SDL_MouseButtonEvent *event) {
+    void handle_SDL_MouseButtonEvent(SDL_MouseButtonEvent* event)
+    {
         writeln("Window::handle_SDL_MouseButtonEvent");
         // TODO: ensure event consistency
         auto res = convertSDLMouseButtonEventToDtkEventMouse(event);
@@ -184,7 +189,8 @@ class Window : WindowI
     }
 
     // ? status: needs completion
-    void handle_SDL_MouseWheelEvent(SDL_MouseWheelEvent *event) {
+    void handle_SDL_MouseWheelEvent(SDL_MouseWheelEvent* event)
+    {
         writeln("Window::handle_SDL_MouseWheelEvent");
         // TODO: ensure event consistency
         auto res = convertSDLMouseWheelEventToDtkEventMouse(event);
@@ -192,16 +198,16 @@ class Window : WindowI
     }
 
     // ? status: fast checked ok.
-    void handle_SDL_TextInputEvent(SDL_TextInputEvent *event) {
+    void handle_SDL_TextInputEvent(SDL_TextInputEvent* event)
+    {
         writeln("Window::handle_SDL_TextInputEvent");
         // TODO: ensure event consistency
         auto res = convertSDLTextInputEventToDtkEventMouse(event);
         handle_event_textinput(res);
     }
 
-
-
-    void handle_event_window(EventWindow* e) {
+    void handle_event_window(EventWindow* e)
+    {
 
         writeln("Window::handle_event_window ", e.eventId);
 
@@ -210,25 +216,22 @@ class Window : WindowI
 
         switch (e.eventId)
         {
-            default:
-                return;
+        default:
+            return;
             /* case EnumWindowEvent.show:
                 break; */
-            case EnumWindowEvent.show:
-            case EnumWindowEvent.resize:
-                needs_resize = true;
-                needs_redraw = true;
-                break;
+        case EnumWindowEvent.show:
+        case EnumWindowEvent.resize:
+            needs_resize = true;
+            needs_redraw = true;
+            break;
         }
-
 
         if (needs_resize)
         {
-            if (_form !is null) {
-            _form.positionAndSizeRequest(
-                Position2D(0,0),
-                Size2D(e.size.width, e.size.height)
-                );
+            if (_form !is null)
+            {
+                _form.positionAndSizeRequest(Position2D(0, 0), Size2D(e.size.width, e.size.height));
             }
             needs_redraw = true;
         }
@@ -240,24 +243,27 @@ class Window : WindowI
 
     }
 
-    void handle_event_keyboard(EventKeyboard* e) {
+    void handle_event_keyboard(EventKeyboard* e)
+    {
         writeln("Window::handle_event_keyboard");
     }
 
-    void handle_event_mouse(EventMouse* e) {
+    void handle_event_mouse(EventMouse* e)
+    {
         writeln("Window::handle_event_mouse");
         writeln("   mouse clicks:", e.button.clicks);
 
         WidgetI w = getWidgetAtVisible(Position2D(e.x, e.y));
-        writeln("widget at [", e.x, ",",e.y,"] ",w);
+        writeln("widget at [", e.x, ",", e.y, "] ", w);
 
         while (true)
         {
             auto res = w.handle_event_mouse(e);
-            if (res) {
+            if (res)
+            {
                 break;
             }
-            w=w.getParent();
+            w = w.getParent();
             if (w is null)
             {
                 break;
@@ -275,7 +281,7 @@ class Window : WindowI
         if (this._form is null)
             return;
 
-         this._form.redraw();
+        this._form.redraw();
     }
 
     void printParams()
@@ -311,7 +317,8 @@ class Window : WindowI
     void uninstallForm()
     {
         auto x = getForm();
-        if (x !is null) {
+        if (x !is null)
+        {
             x.unsetTheme();
             /* x.unsetDrawingSurface(); */
             x.unsetWindow();
@@ -385,6 +392,5 @@ class Window : WindowI
         }
         return ret;
     }
-
 
 }

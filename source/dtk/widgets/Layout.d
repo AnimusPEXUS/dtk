@@ -26,7 +26,8 @@ enum LayoutOverflowBehavior
     Resize, // resize self to fit everything
 }
 
-enum LayoutDirections : ubyte {
+enum LayoutDirections : ubyte
+{
     undefined,
     leftToRightTopToBottom,
     leftToRightBottomToTop,
@@ -38,7 +39,8 @@ enum LayoutDirections : ubyte {
     bottomToTopRightToLeft,
 }
 
-enum LayoutType : ubyte {
+enum LayoutType : ubyte
+{
     undefined,
     linearScrolled,
     linearWrapped,
@@ -60,12 +62,16 @@ class Layout : Widget, ContainerableWidgetI
     {
         ContainerableWidgetI[] children;
 
-        mixin Property_gs_w_d!(LayoutOverflowBehavior, "vertical_overflow_behavior", LayoutOverflowBehavior.Resize);
-        mixin Property_gs_w_d!(LayoutOverflowBehavior, "horizontal_overflow_behavior", LayoutOverflowBehavior.Resize);
+        mixin Property_gs_w_d!(LayoutOverflowBehavior,
+                "vertical_overflow_behavior", LayoutOverflowBehavior.Resize);
+        mixin Property_gs_w_d!(LayoutOverflowBehavior,
+                "horizontal_overflow_behavior", LayoutOverflowBehavior.Resize);
     }
 
-    mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "VerticalOverflowBehavior");
-    mixin Property_forwarding!(LayoutOverflowBehavior, vertical_overflow_behavior, "HorizontalOverflowBehavior");
+    mixin Property_forwarding!(LayoutOverflowBehavior,
+            vertical_overflow_behavior, "VerticalOverflowBehavior");
+    mixin Property_forwarding!(LayoutOverflowBehavior,
+            vertical_overflow_behavior, "HorizontalOverflowBehavior");
 
     final ContainerableWidgetI[] getChildren()
     {
@@ -126,7 +132,8 @@ class Layout : Widget, ContainerableWidgetI
 
     override void recalculateChildrenPositionsAndSizes()
     {
-        foreach (size_t counter, v; children) {
+        foreach (size_t counter, v; children)
+        {
             if (v.isUnsetPosition() || v.isUnsetSize())
             {
                 throw new Exception(to!string(this) ~ " child size or position is not set");
@@ -135,16 +142,18 @@ class Layout : Widget, ContainerableWidgetI
         }
     }
 
-    override void redraw() {
+    override void redraw()
+    {
 
         super.redraw();
 
-        foreach (size_t i, v; children) {
-            writeln(i," - Layout child redraw()");
-            auto p= v.getPosition();
-            auto s= v.getSize();
-            writeln(i," child position is ",p.x, ",", p.y);
-            writeln(i," child size is     ",s.width, ",", s.height);
+        foreach (size_t i, v; children)
+        {
+            writeln(i, " - Layout child redraw()");
+            auto p = v.getPosition();
+            auto s = v.getSize();
+            writeln(i, " child position is ", p.x, ",", p.y);
+            writeln(i, " child size is     ", s.width, ",", s.height);
             v.redraw();
         }
     }

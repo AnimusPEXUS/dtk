@@ -35,13 +35,15 @@ mixin template mixin_getWidgetAtVisible()
             auto c_pos = c.getPosition();
             auto c_size = c.getSize();
 
-            if (x >= c_pos.x && x < (c_pos.x+c_size.width) && y >= c_pos.y && y < (c_pos.y+c_size.height))
+            if (x >= c_pos.x && x < (c_pos.x + c_size.width) && y >= c_pos.y
+                    && y < (c_pos.y + c_size.height))
             {
-                writeln("x/y is in ",c);
-                return c.getWidgetAtVisible(Position2D(x - c_pos.x,y - c_pos.y));
-            } else
+                writeln("x/y is in ", c);
+                return c.getWidgetAtVisible(Position2D(x - c_pos.x, y - c_pos.y));
+            }
+            else
             {
-                writeln("x/y is not in ",c);
+                writeln("x/y is not in ", c);
             }
         }
 
@@ -57,17 +59,20 @@ mixin template mixin_getWidgetAtVisible()
             }
 
             // TODO: optimize for visible part
-            foreach (c;children)
+            foreach (c; children)
             {
                 auto c_pos = c.getPosition();
                 auto c_size = c.getSize();
 
-                if (x >= c_pos.x && x < (c_pos.x+c_size.width) && y >= c_pos.y && y < (c_pos.y+c_size.height))
+                if (x >= c_pos.x && x < (c_pos.x + c_size.width) && y >= c_pos.y
+                        && y < (c_pos.y + c_size.height))
                 {
-                    writeln("x/y is in ",c);
-                    return c.getWidgetAtVisible(Position2D(x - c_pos.x,y - c_pos.y));
-                } else {
-                    writeln("x/y is not in ",c);
+                    writeln("x/y is in ", c);
+                    return c.getWidgetAtVisible(Position2D(x - c_pos.x, y - c_pos.y));
+                }
+                else
+                {
+                    writeln("x/y is not in ", c);
                 }
             }
 

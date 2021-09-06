@@ -27,7 +27,7 @@ class DrawingSurface : DrawingSurfaceI
 
     this(Window w)
     {
-        this.w=w;
+        this.w = w;
     }
 
     void drawDot(Position2D pos, Color color)
@@ -45,11 +45,11 @@ class DrawingSurface : DrawingSurfaceI
             auto x_razn = x_high - x_high;
             auto a = x_high - x;
             auto b = x_razn - a;
-            auto c = ( b!=0 ? x_razn / b : 0);
-            auto d = y_high-y_low;
-            auto e = ( c!=0 ? d/c : 0);
-            auto f = d-e;
-            auto y = cast(int)lround(y_high-f);
+            auto c = (b != 0 ? x_razn / b : 0);
+            auto d = y_high - y_low;
+            auto e = (c != 0 ? d / c : 0);
+            auto f = d - e;
+            auto y = cast(int) lround(y_high - f);
             return y;
         }
 
@@ -57,17 +57,18 @@ class DrawingSurface : DrawingSurfaceI
         bool is_x = ((pos2.x - pos.x) > (pos2.y - pos.y));
         if (is_x)
         {
-            for (int x = pos.x; x != pos2.x+1; x++)
+            for (int x = pos.x; x != pos2.x + 1; x++)
             {
                 auto y = calc_y(pos2.x, pos.x, pos2.y, pos.y, x);
-                ret ~= Position2D(x,y);
+                ret ~= Position2D(x, y);
             }
-        } else
+        }
+        else
         {
-            for (int y = pos.y; y != pos2.y+1; y++)
+            for (int y = pos.y; y != pos2.y + 1; y++)
             {
                 auto x = calc_y(pos2.y, pos.y, pos2.x, pos.x, y);
-                ret ~= Position2D(x,y);
+                ret ~= Position2D(x, y);
             }
         }
         return ret;
@@ -78,7 +79,8 @@ class DrawingSurface : DrawingSurfaceI
         if (style.style == null)
         {
             auto rndr = SDL_GetRenderer(w._sdl_window);
-            SDL_SetRenderDrawColor(rndr, style.color.r, style.color.g, style.color.b, style.color.a);
+            SDL_SetRenderDrawColor(rndr, style.color.r, style.color.g,
+                    style.color.b, style.color.a);
             SDL_RenderDrawLine(rndr, pos.x, pos.y, pos2.x, pos2.y);
         }
         else
@@ -89,9 +91,9 @@ class DrawingSurface : DrawingSurfaceI
 
             writeln("dots");
 
-            foreach (v;dots)
+            foreach (v; dots)
             {
-                write("  dot[",v.x,":",v.y,"], ");
+                write("  dot[", v.x, ":", v.y, "], ");
                 if (style_dup[0])
                 {
                     drawDot(v, style.color);
@@ -102,32 +104,28 @@ class DrawingSurface : DrawingSurfaceI
         }
     }
 
-    void drawRectangle(
-            Position2D pos,
-            Size2D size,
-            LineStyle top_style,
-            LineStyle left_style,
-            LineStyle bottom_style,
-            LineStyle right_style,
-            Nullable!FillStyle fill_style
-            )
+    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
+            LineStyle bottom_style, LineStyle right_style, Nullable!FillStyle fill_style)
     {
         auto rndr = SDL_GetRenderer(w._sdl_window);
         assert(rndr !is null);
 
-        if (top_style == left_style && top_style == bottom_style && top_style == right_style && top_style.style==null)
+        if (top_style == left_style && top_style == bottom_style
+                && top_style == right_style && top_style.style == null)
         {
-            SDL_SetRenderDrawColor(rndr, top_style.color.r, top_style.color.g, top_style.color.b, top_style.color.a);
+            SDL_SetRenderDrawColor(rndr, top_style.color.r, top_style.color.g,
+                    top_style.color.b, top_style.color.a);
             auto r = new SDL_Rect(pos.x, pos.y, size.width, size.height);
             SDL_RenderDrawRect(rndr, r);
         }
-        else {
+        else
+        {
 
             // top+left
             auto p1_x = pos.x;
             auto p1_y = pos.y;
             // top+right
-            auto p2_x = p1_x+size.width;
+            auto p2_x = p1_x + size.width;
             auto p2_y = p1_y;
             // bottom+right
             auto p3_x = p2_x;
@@ -136,10 +134,10 @@ class DrawingSurface : DrawingSurfaceI
             auto p4_x = p1_x;
             auto p4_y = p3_y;
 
-            drawLine(Position2D(p1_x, p1_y), Position2D(p2_x, p2_y),top_style);
-            drawLine(Position2D(p1_x, p1_y), Position2D(p4_x, p4_y),left_style);
-            drawLine(Position2D(p4_x, p4_y), Position2D(p3_x, p3_y),bottom_style);
-            drawLine(Position2D(p2_x, p2_y), Position2D(p3_x, p3_y),right_style);
+            drawLine(Position2D(p1_x, p1_y), Position2D(p2_x, p2_y), top_style);
+            drawLine(Position2D(p1_x, p1_y), Position2D(p4_x, p4_y), left_style);
+            drawLine(Position2D(p4_x, p4_y), Position2D(p3_x, p3_y), bottom_style);
+            drawLine(Position2D(p2_x, p2_y), Position2D(p3_x, p3_y), right_style);
 
         }
 
@@ -148,9 +146,8 @@ class DrawingSurface : DrawingSurfaceI
             auto x_c = fill_style.get().color;
             SDL_SetRenderDrawColor(rndr, x_c.r, x_c.g, x_c.b, x_c.a);
             auto r = new SDL_Rect(pos.x, pos.y, size.width, size.height);
-            SDL_RenderFillRect(rndr,r);
+            SDL_RenderFillRect(rndr, r);
         }
-
 
         /* auto surf = SDL_GetWindowSurface(w._sdl_window);
         assert(surf !is null);
@@ -167,7 +164,8 @@ class DrawingSurface : DrawingSurfaceI
 
     // TODO: performance check required. probably functions which use it, have
     //       to use catching
-    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle, real turn_step, Color color)
+    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle,
+            real turn_step, Color color)
     {
         import std.math;
 
@@ -185,20 +183,13 @@ class DrawingSurface : DrawingSurfaceI
         {
             real x = cos(current_step) * radius;
             real y = sin(current_step) * radius;
-            return Position2D(
-                cast(int)(lround(x))+pos.x,
-                cast(int)(lround(y))+pos.y
-                );
+            return Position2D(cast(int)(lround(x)) + pos.x, cast(int)(lround(y)) + pos.y);
         }
 
         Position2D prev_point = pcalc(start_angle);
 
-        for (
-            real current_step = start_angle;
-            (current_step >= start_angle)
-            && (current_step <= stop_angle);
-            current_step += turn_step
-            )
+        for (real current_step = start_angle; (current_step >= start_angle)
+                && (current_step <= stop_angle); current_step += turn_step)
         {
             auto point = pcalc(current_step);
             drawLine(prev_point, point, LineStyle(color));
@@ -213,10 +204,11 @@ class DrawingSurface : DrawingSurfaceI
         {
             turn_step = -turn_step;
         }
-        drawArc(pos, radius, 0, 2*PI, turn_step, color);
+        drawArc(pos, radius, 0, 2 * PI, turn_step, color);
     }
 
-    void present() {
+    void present()
+    {
         auto rndr = SDL_GetRenderer(w._sdl_window);
         SDL_RenderPresent(rndr);
     }

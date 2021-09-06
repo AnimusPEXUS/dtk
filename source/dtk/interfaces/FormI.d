@@ -4,6 +4,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ThemeI;
 import dtk.interfaces.WidgetI;
+
 /* import dtk.types.Theme; */
 import dtk.types.Size2D;
 import dtk.types.Position2D;

@@ -5,6 +5,7 @@ module dtk.types.Property;
 public import dtk.types.Property_mixins;
 
 import observable.signal;
+
 /* import observable.signal.SignalConnection;  */
 
 enum PropertyActionInCaseIfGettingUnsetValue
@@ -76,12 +77,12 @@ struct PropertySettings(T)
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
 
-    static if (settings.action_in_case_if_getting_unset_value == PropertyActionInCaseIfGettingUnsetValue.returnNull)
+    static if (settings.action_in_case_if_getting_unset_value
+            == PropertyActionInCaseIfGettingUnsetValue.returnNull)
     {
-        static assert(
-            __traits(compiles, cast(T1) null),
-            "trying to use PropertyActionInCaseIfGettingUnsetValue.returnNull, but "~__traits(identifier, T1)~" can't be null"
-            );
+        static assert(__traits(compiles, cast(T1) null),
+                "trying to use PropertyActionInCaseIfGettingUnsetValue.returnNull, but " ~ __traits(identifier,
+                    T1) ~ " can't be null");
     }
 
     private
@@ -102,7 +103,6 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         {
             bool value_is_default = settings.initially_value_is_default;
         }
-
 
     }
 
@@ -357,29 +357,21 @@ mixin template Property_forwarding(T, alias property, string new_suffix,)
 
     // =========== signals ===========
 
-     static foreach (v; [
-        "onBeforeGet", "onAfterGet",
-        "onBeforeSet", "onAfterSet",
-        "onBeforeReset", "onAfterReset",
-        "onBeforeUnset", "onAfterUnset",
-        "onBeforeChanged", "onAfterChanged",
+    static foreach (v; [
+            "onBeforeGet", "onAfterGet", "onBeforeSet", "onAfterSet",
+            "onBeforeReset", "onAfterReset", "onBeforeUnset", "onAfterUnset",
+            "onBeforeChanged", "onAfterChanged",
         ])
+    {
+        static if (__traits(hasMember, property, v))
         {
-            static if (__traits(hasMember, property, v))
-            {
-                mixin(
-                    "void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate() nothrow  cb) { "
-                        ~ "import observable.signal;"
-                        ~"SignalConnection conn;"
-                        ~"this."~__traits(identifier, property)~ "."~v~".socket.connect("
-                            ~"conn,"
-                            ~"cb); "
-                        ~"this."~__traits(identifier, property)~ ".propery_cc.add(conn);"
-                        ~"}"
-                );
-            }
-
+            mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate() nothrow  cb) { "
+                    ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
+                        property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
+                        property) ~ ".propery_cc.add(conn);" ~ "}");
         }
+
+    }
 }
 
 unittest

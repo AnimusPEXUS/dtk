@@ -30,5 +30,4 @@ begin:
     goto begin;
 } */
 
-
 /* mixin template  */

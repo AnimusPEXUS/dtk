@@ -1,6 +1,5 @@
 module dtk.interfaces.ThemeI;
 
-
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.widgets;
 

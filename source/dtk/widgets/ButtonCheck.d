@@ -4,9 +4,7 @@ import std.stdio;
 
 import dtk.widgets;
 
-
 class ButtonCheck : Button
 {
-
 
 }

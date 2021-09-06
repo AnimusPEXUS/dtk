@@ -8,7 +8,6 @@ import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.widgets.Widget;
 
-
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Color;
@@ -20,14 +19,15 @@ import dtk.types.TextStyle;
 
 class WidgetDrawingSurfaceShifted : DrawingSurfaceI
 {
-    private{
+    private
+    {
         Widget widget;
         /* int w,h, x,y; */
     }
 
     this(Widget widget)
     {
-        this.widget=widget;
+        this.widget = widget;
         /* this.widget.connectToPosition_onAfterChanged(&onWidgetPosChange);
         this.widget.connectToSize_onAfterChanged(&onWidgetSizeChange); */
     }
@@ -43,8 +43,8 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         if (!widget)
             return null;
         auto p = widget.getParent();
-            if (!p)
-                return null;
+        if (!p)
+            return null;
         auto pds = p.getDrawingSurface();
         if (!pds)
             return null;
@@ -108,7 +108,7 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.drawDot(npos, color);
+            pds.drawDot(npos, color);
     }
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
@@ -121,33 +121,19 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         npos2.y = pos2.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.drawLine(npos, npos2, style);
+            pds.drawLine(npos, npos2, style);
     }
 
-    void drawRectangle(
-        Position2D pos,
-        Size2D size,
-        LineStyle top_style,
-        LineStyle left_style,
-        LineStyle bottom_style,
-        LineStyle right_style,
-        Nullable!FillStyle fill_style
-        )
+    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
+            LineStyle bottom_style, LineStyle right_style, Nullable!FillStyle fill_style)
     {
         Position2D npos;
         npos.x = pos.x + x;
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.drawRectangle(
-             npos,
-             size,
-             top_style,
-             left_style,
-             bottom_style,
-             right_style,
-             fill_style
-             );
+            pds.drawRectangle(npos, size, top_style, left_style, bottom_style,
+                    right_style, fill_style);
     }
 
     void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style)
@@ -157,16 +143,11 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-         pds.drawText(
-             text,
-             npos,
-             font,
-             font_style,
-             text_style
-             );
+            pds.drawText(text, npos, font, font_style, text_style);
     }
 
-    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle, real turn_step, Color color)
+    void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle,
+            real turn_step, Color color)
     {
         Position2D npos;
         npos.x = pos.x + x;
