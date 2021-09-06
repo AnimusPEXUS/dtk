@@ -202,4 +202,14 @@ class Widget : WidgetI
         return this;
     }
 
+    WidgetI getNextFocusableWidget()
+    {
+        return null;
+    }
+
+    WidgetI getPrevFocusableWidget()
+    {
+        return null;
+    }
+
 }

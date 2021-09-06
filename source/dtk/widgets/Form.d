@@ -142,14 +142,43 @@ class Form : Widget, FormI
 
     mixin mixin_getWidgetAtVisible;
 
-    WidgetI focusNextWidget()
+    private WidgetI focusXWidget( WidgetI delegate() getXFocusableWidget)
     {
-        return this;
-    }
-    WidgetI focusPrevWidget()
-    {
-        return this;
+        WidgetI cfw;
+
+        if (isSetFocusedWidget())
+        {
+            cfw = getFocusedWidget();
+        }
+
+        auto w = getXFocusableWidget();
+        setFocusedWidget(w);
+        if (w is null)
+        {
+            unsetFocusedWidget();
+        }
+
+        return (isSetFocusedWidget() ? getFocusedWidget() : null);
     }
 
+    WidgetI focusNextWidget()
+    {
+        return focusXWidget(&getNextFocusableWidget);
+    }
+
+    WidgetI focusPrevWidget()
+    {
+        return focusXWidget(&getPrevFocusableWidget);
+    }
+
+    override WidgetI getNextFocusableWidget()
+    {
+        return null;
+    }
+
+    override WidgetI getPrevFocusableWidget()
+    {
+        return null;
+    }
 
 }

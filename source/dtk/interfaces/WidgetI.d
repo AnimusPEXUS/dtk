@@ -43,4 +43,8 @@ interface WidgetI
 
     WidgetI getWidgetAtVisible(Position2D point);
 
+    WidgetI getNextFocusableWidget();
+    WidgetI getPrevFocusableWidget();
+
+
 }
