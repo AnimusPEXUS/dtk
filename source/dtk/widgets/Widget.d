@@ -30,7 +30,7 @@ class Widget : WidgetI
 
     mixin Property_forwarding!(WidgetI, parent, "Parent");
 
-    // =====^===^===^===== [locator] =====^===^===^===== start
+    // =====v===v===v===== [locator] =====v===v===v===== start
 
     private
     {
@@ -62,22 +62,16 @@ class Widget : WidgetI
 
     // =====^===^===^===== [locator] =====^===^===^===== end
 
-    public
-    {
-        // NOTE: this (locator) should always be a part of Widget and so should
-        //       not be created with Property or it's mixins
-        /* WidgetLocator locator; */
-    }
-
     private
     {
         WidgetDrawingSurfaceShifted _ds;
     }
 
     // TODO: ensure all subclasses calls for super();
+    // NOTE: ensured. init called implicitly by dlang
     this()
     {
-        writeln("Widget:init() is started for ", this);
+        writeln("Widget:init() is called for ", this);
         this.connectToParent_onAfterChanged(&onParentChanged);
     }
 
