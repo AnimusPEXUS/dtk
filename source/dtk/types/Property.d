@@ -53,27 +53,6 @@ struct PropertySettings(T)
     bool variable_use_on_unset = true; /// actually change variable on unset() call
 }
 
-/* struct PropertySettings(T)
-{
-
-    // note: no 'get' here
-    /* static foreach (k, v; cast(string[])["set"])
-    {
-        mixin("/// return true if wish to cancel action" ~ "\n");
-        mixin("bool delegate(T) callback_before_" ~ v ~ ";\n");
-        mixin("void delegate() callback_after_" ~ v ~ ";\n");
-    }
-
-    // note: no 'set' here
-    static foreach (k, v; cast(string[])["reset", "unset"])
-    {
-        mixin("/// return true if wish to cancel action" ~ "\n");
-        mixin("bool delegate() callback_before_" ~ v ~ ";\n");
-        mixin("void delegate() callback_after_" ~ v ~ ";\n");
-    } * /
-
-} */
-
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
 

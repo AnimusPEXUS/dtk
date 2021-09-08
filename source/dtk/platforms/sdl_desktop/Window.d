@@ -11,6 +11,7 @@ import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.WidgetI;
+import dtk.interfaces.WindowEventMgrI;
 
 import dtk.platforms.sdl_desktop.DrawingSurface;
 import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
@@ -24,7 +25,8 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
-import dtk.miscs.KeyboardProcessor;
+/* import dtk.miscs.WindowEventMgr; */
+
 
 class Window : WindowI
 {
@@ -48,9 +50,6 @@ class Window : WindowI
         bool _maximized;
 
         bool _visible;
-
-        KeyboardProcessor _kbp;
-
     }
 
     public
@@ -71,7 +70,6 @@ class Window : WindowI
             this._size = window_settings.size.get();
         }
 
-        _kbp = new KeyboardProcessor;
         _drawing_surface = new DrawingSurface(this);
 
         auto flags = cast(SDL_WindowFlags) 0 /* else flags init with FULLSCREEN option */ ;
@@ -112,7 +110,7 @@ class Window : WindowI
         _sdl_window_id = SDL_GetWindowID(_sdl_window);
         if (_sdl_window_id == 0)
         {
-            throw new Exception("error getting window id");
+            throw new Exception("error getting SDL window id");
         }
 
         platform.registerWindow(this);
@@ -121,6 +119,20 @@ class Window : WindowI
     ~this()
     {
         _platform.unregisterWindow(this);
+    }
+
+    private {
+        WindowEventMgrI _emgr;
+    }
+
+    void setEventManager(WindowEventMgrI mgr)
+    {
+        _emgr = mgr;
+    }
+
+    WindowEventMgrI getEventManager()
+    {
+        return _emgr;
     }
 
     void handle_SDL_Event(SDL_Event* event)
@@ -206,74 +218,40 @@ class Window : WindowI
         handle_event_textinput(res);
     }
 
-    void handle_event_window(EventWindow* e)
+    bool handle_event_window(EventWindow* e)
     {
-
         writeln("Window::handle_event_window ", e.eventId);
-
-        bool needs_resize = false;
-        bool needs_redraw = false;
-
-        switch (e.eventId)
-        {
-        default:
-            return;
-            /* case EnumWindowEvent.show:
-                break; */
-        case EnumWindowEvent.show:
-        case EnumWindowEvent.resize:
-            needs_resize = true;
-            needs_redraw = true;
-            break;
-        }
-
-        if (needs_resize)
-        {
-            if (_form !is null)
-            {
-                _form.positionAndSizeRequest(Position2D(0, 0), Size2D(e.size.width, e.size.height));
-            }
-            needs_redraw = true;
-        }
-
-        if (needs_redraw)
-        {
-            redraw();
-        }
-
+        auto emgr = getEventManager();
+        if (!emgr)
+            return false;
+        return emgr.handle_event_window(e);
     }
 
-    void handle_event_keyboard(EventKeyboard* e)
+    bool handle_event_keyboard(EventKeyboard* e)
     {
         writeln("Window::handle_event_keyboard");
+        auto emgr = getEventManager();
+        if (!emgr)
+            return false;
+        return emgr.handle_event_keyboard(e);
     }
 
-    void handle_event_mouse(EventMouse* e)
+    bool handle_event_mouse(EventMouse* e)
     {
         writeln("Window::handle_event_mouse");
-        writeln("   mouse clicks:", e.button.clicks);
-
-        WidgetI w = getWidgetAtVisible(Position2D(e.x, e.y));
-        writeln("widget at [", e.x, ",", e.y, "] ", w);
-
-        while (true)
-        {
-            auto res = w.handle_event_mouse(e);
-            if (res)
-            {
-                break;
-            }
-            w = w.getParent();
-            if (w is null)
-            {
-                break;
-            }
-        }
+        auto emgr = getEventManager();
+        if (!emgr)
+            return false;
+        return emgr.handle_event_mouse(e);
     }
 
-    void handle_event_textinput(EventTextInput* e)
+    bool handle_event_textinput(EventTextInput* e)
     {
         writeln("Window::handle_event_textinput");
+        auto emgr = getEventManager();
+        if (!emgr)
+            return false;
+        return emgr.handle_event_textinput(e);
     }
 
     void redraw()
@@ -383,14 +361,5 @@ class Window : WindowI
         _title = value;
     }
 
-    WidgetI getWidgetAtVisible(Position2D point)
-    {
-        WidgetI ret = null;
-        if (_form !is null)
-        {
-            ret = _form.getWidgetAtVisible(point);
-        }
-        return ret;
-    }
 
 }

@@ -4,6 +4,7 @@ import std.typecons;
 
 import dtk.interfaces.FormI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.event_receivers;
 
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
@@ -11,7 +12,7 @@ import dtk.types.EventTextInput;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
-interface WidgetI
+interface WidgetI : EventReceiverWidgetI
 {
     WidgetI getParent();
 
@@ -36,10 +37,6 @@ interface WidgetI
     typeof(this) unsetSize();
     Size2D getSize();
     bool isUnsetSize();
-
-    bool handle_event_keyboard(EventKeyboard* e);
-    bool handle_event_mouse(EventMouse* e);
-    bool handle_event_textinput(EventTextInput* e);
 
     WidgetI getWidgetAtVisible(Position2D point);
 

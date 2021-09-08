@@ -14,6 +14,8 @@ import dtk.types.WindowCreationSettings;
 import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
 
+import dtk.miscs.WindowEventMgr;
+
 // TODO: ensure those events are not needed
 immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
     SDL_WINDOWEVENT_NONE, SDL_WINDOWEVENT_SIZE_CHANGED,
@@ -52,7 +54,10 @@ class SDLDesktopPlatform : PlatformI
 
     WindowI createWindow(WindowCreationSettings window_settings)
     {
-        return new Window(window_settings, this);
+        auto w = new Window(window_settings, this);
+        auto m = new WindowEventMgr(w);
+        w.setEventManager(m);
+        return w;
     }
 
     void registerWindow(Window win)

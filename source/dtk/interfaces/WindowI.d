@@ -12,16 +12,22 @@ import dtk.types.EventTextInput;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
+import dtk.interfaces.WindowEventMgrI;
+import dtk.interfaces.event_receivers;
 
 interface WindowI
 {
     PlatformI getPlatform();
+
+    void setEventManager(WindowEventMgrI mgr);
+    WindowEventMgrI getEventManager();
 
     void installForm(FormI form);
     void uninstallForm();
 
     void setForm(FormI form);
     void unsetForm();
+    FormI getForm();
 
     DrawingSurfaceI getDrawingSurface();
 
@@ -37,10 +43,7 @@ interface WindowI
     string getTitle();
     void setTitle(string value);
 
-    void handle_event_window(EventWindow* e);
-    void handle_event_keyboard(EventKeyboard* e);
-    void handle_event_mouse(EventMouse* e);
-    void handle_event_textinput(EventTextInput* e);
+    void redraw();
 
     /* void setWindowEventCB(void delegate(EventWindow event));
     void unsetWindowEventCB();
