@@ -5,7 +5,7 @@ import std.algorithm;
 
 import bindbc.sdl;
 
-import dtk.interfaces.ThemeI;
+import dtk.interfaces.LafI;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 
@@ -29,7 +29,7 @@ class SDLDesktopPlatform : PlatformI
     {
         bool exit;
         Window[] windows;
-        ThemeI theme;
+        LafI laf;
     }
 
     string getName()
@@ -98,7 +98,7 @@ class SDLDesktopPlatform : PlatformI
         writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
     }
 
-    void destroy_()
+    void destroy()
     {
         SDL_Quit();
     }
@@ -190,18 +190,18 @@ class SDLDesktopPlatform : PlatformI
         return;
     }
 
-    ThemeI getTheme()
+    LafI getLaf()
     {
-        return theme;
+        return laf;
     }
 
-    void setTheme(ThemeI t)
+    void setLaf(LafI t)
     {
-        theme = t;
+        laf = t;
     }
 
-    void unsetTheme()
+    void unsetLaf()
     {
-        theme = null;
+        laf = null;
     }
 }

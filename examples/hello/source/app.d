@@ -8,7 +8,7 @@ import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.WindowCreationSettings;
-import dtk.themes.chicago98.Chicago98Theme;
+import dtk.laf.chicago98.Chicago98Laf;
 
 import dtk.widgets;
 import dtk.widgets.DrawingSurface;
@@ -19,7 +19,7 @@ import dtk.widgets.DrawingSurface;
     {
         auto ds = getDrawingSurface();
 
-        auto t = new Chicago98Theme();
+        auto t = new Chicago98Laf();
 
 		auto p_45 = PI / 4;
 		auto p_m45 = -p_45;
@@ -56,7 +56,7 @@ void main()
 
     pl.init();
 
-    pl.setTheme(new Chicago98Theme);
+    pl.setLaf(new Chicago98Laf);
 
     WindowCreationSettings wcs = {
         title: "123", position: Position2D(500, 500), size: Size2D(200, 200), resizable: true,
@@ -93,5 +93,5 @@ void main()
 
     pl.mainLoop();
 
-    pl.destroy_();
+    pl.destroy();
 }

@@ -1,4 +1,4 @@
-module dtk.themes.chicago98.Chicago98Theme;
+module dtk.themes.chicago98.Chicago98Laf;
 
 import std.stdio;
 import std.typecons;
@@ -10,8 +10,9 @@ import dtk.types.Size2D;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 
-import dtk.interfaces.ThemeI;
+import dtk.interfaces.LafI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.WindowEventMgrI;
 
 import dtk.widgets;
 
@@ -23,7 +24,7 @@ const
     auto P_135M2 = PI * 2 - P_45;
 }
 
-class Chicago98Theme : ThemeI
+class Chicago98Laf : LafI
 {
 
     Color formBackground = Color(0xc0c0c0);
@@ -174,5 +175,10 @@ class Chicago98Theme : ThemeI
     void drawTextArea(TextArea widget)
     {
         writeln("drawTextArea called");
+    }
+
+    void addEventHandling(WindowEventMgrI mgr)
+    {
+
     }
 }

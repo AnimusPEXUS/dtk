@@ -9,7 +9,7 @@ import std.typecons;
 
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FormI;
-import dtk.interfaces.ThemeI;
+import dtk.interfaces.LafI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ContainerableWidgetI;
@@ -17,7 +17,7 @@ import dtk.interfaces.ContainerableWidgetI;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 
-/* import dtk.types.Theme; */
+/* import dtk.types.Laf; */
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 import dtk.types.Property;
@@ -30,7 +30,7 @@ class Form : Widget, FormI
     private
     {
         mixin Property_gsun!(WindowI, "window");
-        mixin Property_gsun!(ThemeI, "theme");
+        mixin Property_gsun!(LafI, "theme");
         /* mixin Property_gsu!(DrawingSurfaceI, "drawing_surface"); */
         mixin Property_gsun!(ContainerableWidgetI, "child");
 
@@ -39,7 +39,7 @@ class Form : Widget, FormI
     }
 
     mixin Property_forwarding!(WindowI, window, "Window");
-    mixin Property_forwarding!(ThemeI, theme, "Theme");
+    mixin Property_forwarding!(LafI, theme, "Laf");
     /* mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface"); */
     mixin Property_forwarding!(ContainerableWidgetI, child, "Child");
 

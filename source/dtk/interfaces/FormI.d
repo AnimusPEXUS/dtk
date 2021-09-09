@@ -2,10 +2,9 @@ module dtk.interfaces.FormI;
 
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.ThemeI;
+import dtk.interfaces.LafI;
 import dtk.interfaces.WidgetI;
 
-/* import dtk.types.Theme; */
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
@@ -15,12 +14,10 @@ interface FormI
     typeof(this) unsetWindow();
 
     DrawingSurfaceI getDrawingSurface();
-    /* void setDrawingSurface(DrawingSurfaceI);
-    void unsetDrawingSurface(); */
 
-    ThemeI getTheme();
-    typeof(this) setTheme(ThemeI theme);
-    typeof(this) unsetTheme();
+    LafI getLaf();
+    typeof(this) setLaf(LafI theme);
+    typeof(this) unsetLaf();
 
     void positionAndSizeRequest(Position2D, Size2D);
     void recalculateChildrenPositionsAndSizes();

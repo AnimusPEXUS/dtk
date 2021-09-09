@@ -163,7 +163,7 @@ class Widget : WidgetI
             return;
         }
 
-        auto theme = form.getTheme();
+        auto theme = form.getLaf();
 
         if (theme is null)
         {

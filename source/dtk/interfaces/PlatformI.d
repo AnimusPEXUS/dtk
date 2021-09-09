@@ -1,7 +1,7 @@
 module dtk.interfaces.PlatformI;
 
 import dtk.interfaces.WindowI;
-import dtk.interfaces.ThemeI;
+import dtk.interfaces.LafI;
 
 import dtk.types.WindowCreationSettings;
 
@@ -11,9 +11,9 @@ interface PlatformI
     string getDescription();
     string getSystemTriplet();
 
-    ThemeI getTheme();
-    void setTheme(ThemeI);
-    void unsetTheme();
+    LafI getLaf();
+    void setLaf(LafI);
+    void unsetLaf();
 
     bool canCreateWindow();
     WindowI createWindow(WindowCreationSettings window_settings);
@@ -22,5 +22,5 @@ interface PlatformI
 
     void init();
     void mainLoop();
-    void destroy_();
+    void destroy();
 }

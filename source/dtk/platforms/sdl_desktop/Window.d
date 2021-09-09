@@ -289,7 +289,7 @@ class Window : WindowI
         assert(x !is null);
         x.setWindow(this);
         /* x.setDrawingSurface(this._drawing_surface); */
-        x.setTheme(getPlatform().getTheme());
+        x.setLaf(getPlatform().getLaf());
     }
 
     void uninstallForm()
@@ -297,7 +297,7 @@ class Window : WindowI
         auto x = getForm();
         if (x !is null)
         {
-            x.unsetTheme();
+            x.unsetLaf();
             /* x.unsetDrawingSurface(); */
             x.unsetWindow();
         }

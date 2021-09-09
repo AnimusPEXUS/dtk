@@ -1,9 +1,11 @@
-module dtk.interfaces.ThemeI;
+module dtk.interfaces.LafI;
 
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.WindowEventMgrI;
+
 import dtk.widgets;
 
-interface ThemeI
+interface LafI
 {
     void drawForm(Form widget);
     void drawButton(Button widget);
@@ -18,4 +20,6 @@ interface ThemeI
     void drawScrollBar(ScrollBar widget);
     void drawTextEntry(TextEntry widget);
     void drawTextArea(TextArea widget);
+
+    void addEventHandling(WindowEventMgrI mgr);
 }
