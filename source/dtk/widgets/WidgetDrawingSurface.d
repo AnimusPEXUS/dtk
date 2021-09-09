@@ -28,6 +28,8 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
     this(Widget widget)
     {
         this.widget = widget;
+
+        // TODO: fix next or delete next
         /* this.widget.connectToPosition_onAfterChanged(&onWidgetPosChange);
         this.widget.connectToSize_onAfterChanged(&onWidgetSizeChange); */
     }

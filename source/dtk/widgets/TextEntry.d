@@ -13,5 +13,9 @@ import dtk.widgets.mixins;
 
 class TextEntry : Widget, ContainerableWidgetI
 {
+    this()
+    {
+        setFocusable(true);
+    }
 
 }

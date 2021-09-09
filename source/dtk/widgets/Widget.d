@@ -13,6 +13,8 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Property;
 import dtk.types.Property_mixins;
+import dtk.types.MoveT;
+
 
 import dtk.types.Size2D;
 import dtk.types.Position2D;
@@ -25,7 +27,7 @@ class Widget : WidgetI
 {
     private
     {
-        mixin Property_gsu!(WidgetI, "parent");
+        mixin Property_gsun!(WidgetI, "parent");
     }
 
     mixin Property_forwarding!(WidgetI, parent, "Parent");
@@ -61,6 +63,28 @@ class Widget : WidgetI
     mixin Property_forwarding!(Size2D, maximal_size, "MaximalSize");
 
     // =====^===^===^===== [locator] =====^===^===^===== end
+
+    // =====v===v===v===== [info] =====v===v===v===== start
+
+    private
+    {
+        mixin Property_gs_w_d!(bool, "visible", false);
+        mixin Property_gs_w_d!(bool, "enabled", false);
+        mixin Property_gs_w_d!(bool, "focusable", false);
+        mixin Property_gs_w_d!(bool, "focus_kb_capture", false);
+        mixin Property_gs_w_d!(bool, "uses_text_input", false);
+        mixin Property_gs_w_d!(MoveT, "move_type", MoveT.none);
+    }
+
+    mixin Property_forwarding!(bool, visible, "Visible");
+    mixin Property_forwarding!(bool, enabled, "Enabled");
+    mixin Property_forwarding!(bool, focusable, "Focusable");
+    mixin Property_forwarding!(bool, focus_kb_capture, "FocusKeyboardCapture");
+    mixin Property_forwarding!(bool, uses_text_input, "UsesTextInput");
+    mixin Property_forwarding!(MoveT, move_type, "MoveType");
+
+
+    // =====^===^===^===== [info] =====^===^===^===== end
 
     private
     {

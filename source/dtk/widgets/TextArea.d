@@ -13,5 +13,10 @@ import dtk.widgets.mixins;
 
 class TextArea : Widget, ContainerableWidgetI
 {
+    this()
+    {
+        setFocusable(true);
+        setFocusKeyboardCapture(true);
+    }
 
 }

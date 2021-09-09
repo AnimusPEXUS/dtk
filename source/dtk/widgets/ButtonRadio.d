@@ -6,5 +6,9 @@ import dtk.widgets;
 
 class ButtonRadio : Button
 {
+    this()
+    {
+        setFocusable(true);
+    }
 
 }

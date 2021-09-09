@@ -29,12 +29,12 @@ class Form : Widget, FormI
 {
     private
     {
-        mixin Property_gsu!(WindowI, "window");
-        mixin Property_gsu!(ThemeI, "theme");
+        mixin Property_gsun!(WindowI, "window");
+        mixin Property_gsun!(ThemeI, "theme");
         /* mixin Property_gsu!(DrawingSurfaceI, "drawing_surface"); */
-        mixin Property_gsu!(ContainerableWidgetI, "child");
+        mixin Property_gsun!(ContainerableWidgetI, "child");
 
-        mixin Property_gsu!(WidgetI, "focused_widget");
+        mixin Property_gsun!(WidgetI, "focused_widget");
 
     }
 
@@ -45,10 +45,6 @@ class Form : Widget, FormI
 
     mixin Property_forwarding!(WidgetI, focused_widget, "FocusedWidget");
 
-    private
-    {
-
-    }
 
     this()
     {

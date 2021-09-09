@@ -6,5 +6,9 @@ import dtk.widgets;
 
 class ButtonCheck : Button
 {
+    this()
+    {
+        setFocusable(true);
+    }
 
 }
