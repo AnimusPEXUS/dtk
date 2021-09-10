@@ -37,8 +37,8 @@ interface WindowI
     Size2D getSize();
     Tuple!(bool, Size2D) setSize(Size2D size);
 
-    Position2D getFormPoint();
-    Size2D getFormSize();
+    /* Position2D getFormPoint();
+    Size2D getFormSize(); */
 
     string getTitle();
     void setTitle(string value);

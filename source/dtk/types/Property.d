@@ -1,5 +1,7 @@
 module dtk.types.Property;
 
+// TODO: Property requires clarification and determination
+
 // import std.stdio;
 
 public import dtk.types.Property_mixins;
@@ -26,13 +28,21 @@ enum PropertyActionInCaseIfGettingUnsetValue
     Property to default state; +/
 struct PropertySettings(T)
 {
-    T init_value = T.init;
-    T default_value = T.init; /// value, to which variable is set on reset() call
+    // TODO: decide what to do with this
+    /* T init_value = T.init;
+    T default_value = T.init; /// value, to which variable is set on reset() call */
+
+    T init_value;
+    T default_value; /// value, to which variable is set on reset() call
 
     bool initially_value_is_default = true;
     bool initially_value_is_unset = true;
     bool default_is_unset = false; // if reset() called, property becomes unset
     alias resetting_value_makes_it_unset = default_is_unset;
+
+    // TODO: complete this
+    /* bool setting_to_default_value_makes_property_reset = false;
+    bool setting_to_default_value_makes_property_unset = false; */
 
     bool on_unset_also_reset = false;
 

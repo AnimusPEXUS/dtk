@@ -41,7 +41,8 @@ mixin template Property_gsun(T, string variable)
     mixin("
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
-            init_value : T.init, // note: here must be T.init, not cast(T) null
+            init_value : cast(T) null,
+            default_value : cast(T) null, 
 
             gettable: true,
             settable: true,

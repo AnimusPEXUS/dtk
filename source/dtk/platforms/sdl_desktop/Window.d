@@ -12,6 +12,7 @@ import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.WindowEventMgrI;
+import dtk.interfaces.LafI;
 
 import dtk.platforms.sdl_desktop.DrawingSurface;
 import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
@@ -30,6 +31,7 @@ import dtk.types.EventTextInput;
 
 class Window : WindowI
 {
+
     private
     {
         SDLDesktopPlatform _platform;
@@ -50,6 +52,8 @@ class Window : WindowI
         bool _maximized;
 
         bool _visible;
+
+        LafI laf;
     }
 
     public
@@ -341,7 +345,7 @@ class Window : WindowI
         return tuple(true, this._size);
     }
 
-    Position2D getFormPoint()
+    /* Position2D getFormPoint()
     {
         return _form_point;
     }
@@ -349,7 +353,7 @@ class Window : WindowI
     Size2D getFormSize()
     {
         return _form_size;
-    }
+    } */
 
     string getTitle()
     {
