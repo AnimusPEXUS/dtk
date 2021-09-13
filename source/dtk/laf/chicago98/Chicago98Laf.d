@@ -9,8 +9,16 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
+import dtk.types.EventXAction;
+import dtk.types.EventWindow;
+import dtk.types.EventKeyboard;
+import dtk.types.EventMouse;
+import dtk.types.EventTextInput;
 
 import dtk.interfaces.LafI;
+import dtk.interfaces.WindowI;
+import dtk.interfaces.FormI;
+import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.WindowEventMgrI;
 
@@ -179,6 +187,195 @@ class Chicago98Laf : LafI
 
     void addEventHandling(WindowEventMgrI mgr)
     {
+        {
+            EventKeyboardAction ea = {
+                any_focusedWidget: true,
+                any_mouseWidget:true,
+                checkMatch: delegate bool(
+                    WindowEventMgrI mgr,
+                    WindowI window,
+                    EventKeyboard* e,
+                    WidgetI focusedWidget,
+                    WidgetI mouseWidget,
+                    )
+                    {
+                        auto mc = e.keysym.modcode;
+                        writeln("caps:", (mc & EnumKeyboardModCode.CapsLock) != 0);
+                        writeln("num:", (mc & EnumKeyboardModCode.NumLock) != 0);
+                        writeln("scroll:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
+                        mc &= EnumKeyboardModCodeNOT.Locks;
+                        writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
+                        writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
+                        writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
+                        if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation && mc == 0)
+                            return true;
+                        return false;
+                    },
+                action: delegate void(
+                    WindowEventMgrI mgr,
+                    WindowI window,
+                    EventKeyboard* e,
+                    WidgetI focusedWidget,
+                    WidgetI mouseWidget,
+                    )
+                    {
+                        writeln("tab pressed");
+                        return;
+                    },
+            };
 
+            mgr.addKeyboardAction(ea);
+        }
+
+        {
+            EventMouseAction ea = {
+                any_focusedWidget: true,
+                any_mouseWidget:true,
+                checkMatch: delegate bool(
+                    WindowEventMgrI mgr,
+                    WindowI window,
+                    EventMouse* e,
+                    WidgetI focusedWidget,
+                    WidgetI mouseWidget,
+                    )
+                    {
+                        writeln("checkMatch 1 called");
+                        return true;
+                    },
+                action: delegate void(
+                    WindowEventMgrI mgr,
+                    WindowI window,
+                    EventMouse* e,
+                    WidgetI focusedWidget,
+                    WidgetI mouseWidget,
+                    )
+                    {
+                        writeln("action 1 called");
+                        return;
+                    },
+            };
+
+            mgr.addMouseAction(ea);
+        }
+
+        {
+            EventWindowAction ea = {
+                any_focusedWidget: true,
+                any_mouseWidget:true,
+                checkMatch: delegate bool(
+                    WindowEventMgrI mgr,
+                    WindowI window,
+                    EventWindow* e,
+                    WidgetI focusedWidget,
+                    WidgetI mouseWidget,
+                    )
+                    {
+                        writeln("checkMatch 1 called");
+                        return true;
+                    },
+                action: delegate void(
+                    WindowEventMgrI mgr,
+                    WindowI window,
+                    EventWindow* e,
+                    WidgetI focusedWidget,
+                    WidgetI mouseWidget,
+                    )
+                    {
+                        bool needs_resize = false;
+                        bool needs_redraw = false;
+
+                        switch (e.eventId)
+                        {
+                        default:
+                            return;
+                            /* case EnumWindowEvent.show:
+                                break; */
+                        case EnumWindowEvent.show:
+                        case EnumWindowEvent.resize:
+                            needs_resize = true;
+                            needs_redraw = true;
+                            break;
+                        }
+
+                        if (needs_resize)
+                        {
+                            FormI _form = window.getForm() ;
+                            if (_form !is null)
+                            {
+                                _form.positionAndSizeRequest(Position2D(0, 0), Size2D(e.size.width, e.size.height));
+                                needs_redraw = true;
+                            }
+                        }
+
+                        if (needs_redraw)
+                        {
+                            window.redraw();
+                        }
+                        return;
+                    },
+            };
+
+            mgr.addWindowAction(ea);
+        }
     }
 }
+
+
+/* bool handle_event_mouse(EventMouse* e)
+{
+    writeln("   mouse clicks:", e.button.clicks);
+
+    WidgetI w = getWidgetAtVisible(Position2D(e.x, e.y));
+    writeln("widget at [", e.x, ",", e.y, "] ", w);
+
+    while (true)
+    {
+        auto res = w.handle_event_mouse(e);
+        if (res)
+        {
+            break;
+        }
+        w = w.getParent();
+        if (w is null)
+        {
+            break;
+        }
+    }
+    return true;
+} */
+
+/* bool handle_event_window(EventWindow* e)
+{
+    bool needs_resize = false;
+    bool needs_redraw = false;
+
+    switch (e.eventId)
+    {
+    default:
+        return true; // TODO: is it really should be 'true'?
+        /* case EnumWindowEvent.show:
+            break; * /
+    case EnumWindowEvent.show:
+    case EnumWindowEvent.resize:
+        needs_resize = true;
+        needs_redraw = true;
+        break;
+    }
+
+    if (needs_resize)
+    {
+        FormI _form = window.getForm() ;
+        if (_form !is null)
+        {
+            _form.positionAndSizeRequest(Position2D(0, 0), Size2D(e.size.width, e.size.height));
+        }
+        needs_redraw = true;
+    }
+
+    if (needs_redraw)
+    {
+        window.redraw();
+    }
+
+    return true;
+} */

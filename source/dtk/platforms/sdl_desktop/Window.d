@@ -26,7 +26,7 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
-/* import dtk.miscs.WindowEventMgr; */
+import dtk.miscs.WindowEventMgr;
 
 
 class Window : WindowI
@@ -53,7 +53,8 @@ class Window : WindowI
 
         bool _visible;
 
-        LafI laf;
+        LafI _laf;
+        WindowEventMgrI _emgr;
     }
 
     public
@@ -117,16 +118,21 @@ class Window : WindowI
             throw new Exception("error getting SDL window id");
         }
 
+        setEventManager(new WindowEventMgr(this));
+        if (window_settings.laf !is null)
+            setLaf(window_settings.laf);
+        else {
+            auto plaf = _platform.getLaf();
+            assert(plaf !is null, "platform doesn't have Laf defined. this is not ok");
+            setLaf(plaf);
+        }
+
         platform.registerWindow(this);
     }
 
     ~this()
     {
         _platform.unregisterWindow(this);
-    }
-
-    private {
-        WindowEventMgrI _emgr;
     }
 
     void setEventManager(WindowEventMgrI mgr)
@@ -137,6 +143,17 @@ class Window : WindowI
     WindowEventMgrI getEventManager()
     {
         return _emgr;
+    }
+
+    void setLaf(LafI laf)
+    {
+        _laf = laf;
+        if (_emgr !is null)
+        {
+            _emgr.removeAllActions();
+            assert(_laf !is null);
+            _laf.addEventHandling(_emgr);
+        }
     }
 
     void handle_SDL_Event(SDL_Event* event)

@@ -2,14 +2,16 @@ module dtk.types.WindowCreationSettings;
 
 import std.typecons;
 
+import dtk.interfaces.LafI;
+
 import dtk.types.Position2D;
 import dtk.types.Size2D;
-
-/* import dtk.types.UndefinedNoYes; */
 
 struct WindowCreationSettings
 {
     string title;
+
+    LafI laf;
 
     Nullable!Position2D position;
     Nullable!Size2D size;

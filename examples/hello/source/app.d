@@ -8,6 +8,9 @@ import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.WindowCreationSettings;
+
+import dtk.types.EnumKeyboardModCode;
+
 import dtk.laf.chicago98.Chicago98Laf;
 
 import dtk.widgets;
@@ -52,6 +55,8 @@ import dtk.widgets.DrawingSurface;
 
 void main()
 {
+
+
     auto pl = instantiatePlatform();
 
     pl.init();

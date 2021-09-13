@@ -62,6 +62,34 @@ int main()
     }
 
     fout.rawWrite("};\n");
+
+    fout.rawWrite("\n");
+
+     fout.rawWrite("
+
+    enum EnumKeyboardModCodeNOT : ushort
+    {
+        None          =  cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.None,
+        LeftShift     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftShift,
+        LeftControl   = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftControl,
+        LeftMenu      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftMenu,
+        LeftSuper     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftSuper,
+        LeftAlt       = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftAlt,
+        LeftMode      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftMode,
+        RightShift    = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightShift,
+        RightControl  = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightControl,
+        RightMenu     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightMenu,
+        RightSuper    = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightSuper,
+        RightAlt      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightAlt,
+        RightMode     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightMode,
+        CapsLock      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.CapsLock,
+        NumLock       = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.NumLock,
+        ScrollLock    = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.ScrollLock,
+        Locks = ScrollLock & NumLock & CapsLock
+    };
+
+    ");
+
     fout.rawWrite("\n");
     scope (failure)
     {

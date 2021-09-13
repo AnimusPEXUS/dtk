@@ -27,7 +27,6 @@ interface FormI
     WidgetI getWidgetAtVisible(Position2D point);
 
     WidgetI getFocusedWidget();
-    bool isSetFocusedWidget();
     bool isUnsetFocusedWidget();
     WidgetI focusNextWidget();
     WidgetI focusPrevWidget();

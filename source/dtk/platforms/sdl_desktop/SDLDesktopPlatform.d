@@ -55,8 +55,6 @@ class SDLDesktopPlatform : PlatformI
     WindowI createWindow(WindowCreationSettings window_settings)
     {
         auto w = new Window(window_settings, this);
-        auto m = new WindowEventMgr(w);
-        w.setEventManager(m);
         return w;
     }
 

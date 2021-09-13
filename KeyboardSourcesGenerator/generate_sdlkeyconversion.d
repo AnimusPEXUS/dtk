@@ -34,6 +34,10 @@ int main()
 import dtk.types.EnumKeyboardKeyCode;
 import dtk.types.EnumKeyboardModCode;
 import bindbc.sdl;
+
+class EKeycodeConversionError : Exception {}
+class EKeymodConversionError : Exception {}
+
 ");
 
     fout.rawWrite("\n");
@@ -46,7 +50,8 @@ import bindbc.sdl;
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
-        fout.rawWrite("            throw new Exception(\"could not decode supplied keycode\");\n");
+        fout.rawWrite(
+                "            throw new EKeycodeConversionError(\"could not decode supplied keycode\");\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -90,7 +95,8 @@ import bindbc.sdl;
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
-        fout.rawWrite("            throw new Exception(\"could not decode supplied keycode\");\n");
+        fout.rawWrite(
+                "            throw new EKeycodeConversionError(\"could not decode supplied keycode\");\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -136,7 +142,8 @@ import bindbc.sdl;
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
-        fout.rawWrite("            throw new Exception(\"could not decode supplied keymod\");\n");
+        fout.rawWrite(
+                "            throw new EKeymodConversionError(\"could not decode supplied keymod\");\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -180,7 +187,8 @@ import bindbc.sdl;
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
-        fout.rawWrite("            throw new Exception(\"could not decode supplied keymod\");\n");
+        fout.rawWrite(
+                "            throw new EKeymodConversionError(\"could not decode supplied keymod\");\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */

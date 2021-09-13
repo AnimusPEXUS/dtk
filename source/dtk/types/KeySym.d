@@ -2,9 +2,9 @@ module dtk.types.KeySym;
 // NOTE: this module should be named KeySym, because it's separate entety
 //       from Keyboard Signal Processing
 
-import dtk.types.EnumKeyboardKeyState;
-import dtk.types.EnumKeyboardKeyCode;
-import dtk.types.EnumKeyboardModCode;
+public import dtk.types.EnumKeyboardKeyState;
+public import dtk.types.EnumKeyboardKeyCode;
+public import dtk.types.EnumKeyboardModCode;
 
 struct KeySym
 {

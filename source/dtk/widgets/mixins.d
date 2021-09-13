@@ -32,6 +32,11 @@ mixin template mixin_getWidgetAtVisible()
 
             writeln("child of ", this, " is ", c);
 
+            if (c.isUnsetPosition() || c.isUnsetSize())
+            {
+                return this;
+            }
+
             auto c_pos = c.getPosition();
             auto c_size = c.getSize();
 
@@ -61,6 +66,11 @@ mixin template mixin_getWidgetAtVisible()
             // TODO: optimize for visible part
             foreach (c; children)
             {
+                if (c.isUnsetPosition() || c.isUnsetSize())
+                {
+                    return this;
+                }
+
                 auto c_pos = c.getPosition();
                 auto c_size = c.getSize();
 
