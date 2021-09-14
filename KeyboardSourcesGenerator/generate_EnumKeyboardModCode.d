@@ -34,6 +34,8 @@ int main()
 
     fout.rawWrite("enum EnumKeyboardModCode : ushort\n{\n");
 
+    fout.rawWrite("None          =  0,\n");
+
     mixin makecsvreader;
     /* auto reader = makecsvreader(keyinfo_csv); */
     bool skipped = false;
@@ -65,7 +67,7 @@ int main()
 
     fout.rawWrite("\n");
 
-     fout.rawWrite("
+    fout.rawWrite("
 
     enum EnumKeyboardModCodeNOT : ushort
     {

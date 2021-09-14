@@ -2,6 +2,7 @@ module dtk.platforms.sdl_desktop.utils;
 
 import std.stdio;
 import std.conv;
+import std.typecons;
 
 import bindbc.sdl;
 
@@ -84,7 +85,7 @@ EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
     return ret;
 }
 
-EventKeyboard* convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent* e)
+Tuple!(EventKeyboard*, Exception) convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent* e)
 {
     EventKeyboard* ret = new EventKeyboard;
 
@@ -102,12 +103,27 @@ EventKeyboard* convertSDLKeyboardEventToDtkEventKeyboard(SDL_KeyboardEvent* e)
 
     auto sk = KeySym();
 
-    sk.keycode = convertSDLKeycodeToEnumKeyboardKeyCode(e.keysym.sym);
-    sk.modcode = convertCombinationSDLKeymodToEnumKeyboardModCode(cast(SDL_Keymod) e.keysym.mod);
+    {
+        auto res = convertSDLKeycodeToEnumKeyboardKeyCode(e.keysym.sym);
+        if (res[1] !is null)
+        {
+            return tuple(cast(EventKeyboard*)null, res[1]);
+        }
+        sk.keycode = res[0];
+    }
+
+    {
+        auto res = convertCombinationSDLKeymodToEnumKeyboardModCode(cast(SDL_Keymod) e.keysym.mod);
+        if (res[1] !is null)
+        {
+            return tuple(cast(EventKeyboard*)null, res[1]);
+        }
+        sk.modcode = res[0];
+    }
 
     ret.keysym = sk;
 
-    return ret;
+    return tuple(ret, cast(Exception) null);
 }
 
 EventMouse* convertSDLMouseMotionEventToDtkEventMouse(SDL_MouseMotionEvent* e)

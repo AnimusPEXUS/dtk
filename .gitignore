@@ -16,3 +16,6 @@ dtk-test-*
 /theme_screenshots
 /libdtk.a
 /examples/hello/hello
+/KeyboardSourcesGenerator/EnumKeyboardKeyCode.d
+/KeyboardSourcesGenerator/EnumKeyboardModCode.d
+/KeyboardSourcesGenerator/sdlkeyconversion.d

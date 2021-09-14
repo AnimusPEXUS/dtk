@@ -31,12 +31,12 @@ int main()
     fout.rawWrite(HEADER_TEXT);
 
     fout.rawWrite("
-import dtk.types.EnumKeyboardKeyCode;
-import dtk.types.EnumKeyboardModCode;
+import std.typecons;
+
 import bindbc.sdl;
 
-class EKeycodeConversionError : Exception {}
-class EKeymodConversionError : Exception {}
+import dtk.types.EnumKeyboardKeyCode;
+import dtk.types.EnumKeyboardModCode;
 
 ");
 
@@ -46,12 +46,12 @@ class EKeymodConversionError : Exception {}
 
     {
         fout.rawWrite(
-                "EnumKeyboardKeyCode convertSDLKeycodeToEnumKeyboardKeyCode(SDL_Keycode code)\n{\n");
+                "Tuple!(EnumKeyboardKeyCode, Exception) convertSDLKeycodeToEnumKeyboardKeyCode(SDL_Keycode code)\n{\n");
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            throw new EKeycodeConversionError(\"could not decode supplied keycode\");\n");
+                "            return tuple(cast(EnumKeyboardKeyCode)0, new Exception(\"could not decode supplied keycode\"));\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -79,9 +79,8 @@ class EKeymodConversionError : Exception {}
             }
 
             fout.rawWrite("        case SDL_Keycode." ~ row[TableColumns.COLUMN_SDL_KEYCODE] ~ ":\n");
-            fout.rawWrite(
-                    "            return EnumKeyboardKeyCode."
-                    ~ row[TableColumns.COLUMN_BUTTONS] ~ ";\n");
+            fout.rawWrite("            return tuple(EnumKeyboardKeyCode."
+                    ~ row[TableColumns.COLUMN_BUTTONS] ~ ", cast(Exception)null);\n");
         }
 
         fout.rawWrite("    }\n");
@@ -91,12 +90,12 @@ class EKeymodConversionError : Exception {}
 
     {
         fout.rawWrite(
-                "SDL_Keycode convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboardKeyCode code)\n{\n");
+                "Tuple!(SDL_Keycode, Exception) convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboardKeyCode code)\n{\n");
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            throw new EKeycodeConversionError(\"could not decode supplied keycode\");\n");
+                "            return tuple(cast(SDL_Keycode)0, new Exception(\"could not decode supplied keycode\"));\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -125,8 +124,8 @@ class EKeymodConversionError : Exception {}
 
             fout.rawWrite(
                     "        case EnumKeyboardKeyCode." ~ row[TableColumns.COLUMN_BUTTONS] ~ ":\n");
-            fout.rawWrite(
-                    "            return SDL_Keycode." ~ row[TableColumns.COLUMN_SDL_KEYCODE] ~ ";\n");
+            fout.rawWrite("            return tuple(SDL_Keycode."
+                    ~ row[TableColumns.COLUMN_SDL_KEYCODE] ~ ", cast(Exception) null);\n");
         }
 
         fout.rawWrite("    }\n");
@@ -138,12 +137,12 @@ class EKeymodConversionError : Exception {}
 
     {
         fout.rawWrite(
-                "EnumKeyboardModCode convertSingleSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
+                "Tuple!(EnumKeyboardModCode, Exception) convertSingleSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            throw new EKeymodConversionError(\"could not decode supplied keymod\");\n");
+                "            return tuple(cast(EnumKeyboardModCode)0, new Exception(\"could not decode supplied keycode\"));\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -171,9 +170,8 @@ class EKeymodConversionError : Exception {}
             }
 
             fout.rawWrite("        case SDL_Keymod." ~ row[TableColumns.COLUMN_SDL_KEYMOD] ~ ":\n");
-            fout.rawWrite(
-                    "            return EnumKeyboardModCode."
-                    ~ row[TableColumns.COLUMN_BUTTONS] ~ ";\n");
+            fout.rawWrite("            return tuple(EnumKeyboardModCode."
+                    ~ row[TableColumns.COLUMN_BUTTONS] ~ ", cast(Exception)null);\n");
         }
 
         fout.rawWrite("    }\n");
@@ -183,12 +181,12 @@ class EKeymodConversionError : Exception {}
 
     {
         fout.rawWrite(
-                "SDL_Keymod convertSingleEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
+                "Tuple!(SDL_Keymod, Exception) convertSingleEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
 
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            throw new EKeymodConversionError(\"could not decode supplied keymod\");\n");
+                "            return tuple(cast(SDL_Keymod)0, new Exception(\"could not decode supplied keycode\"));\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -218,7 +216,8 @@ class EKeymodConversionError : Exception {}
             fout.rawWrite(
                     "        case EnumKeyboardModCode." ~ row[TableColumns.COLUMN_BUTTONS] ~ ":\n");
             fout.rawWrite(
-                    "            return SDL_Keymod." ~ row[TableColumns.COLUMN_SDL_KEYMOD] ~ ";\n");
+                    "            return tuple(SDL_Keymod."
+                    ~ row[TableColumns.COLUMN_SDL_KEYMOD] ~ ",cast(Exception)null);\n");
         }
 
         fout.rawWrite("    }\n");
@@ -229,8 +228,7 @@ class EKeymodConversionError : Exception {}
     // ------------------ Mod Codes ------------------ Combination
 
     {
-        fout.rawWrite(
-                "EnumKeyboardModCode convertCombinationSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
+        fout.rawWrite("Tuple!(EnumKeyboardModCode, Exception) convertCombinationSDLKeymodToEnumKeyboardModCode(SDL_Keymod code)\n{\n");
 
         fout.rawWrite("    EnumKeyboardModCode ret;\n");
 
@@ -269,15 +267,14 @@ class EKeymodConversionError : Exception {}
 
         }
 
-        fout.rawWrite("   return ret;\n");
+        fout.rawWrite("   return tuple(ret, cast(Exception) null);\n");
 
         fout.rawWrite("}\n");
         fout.rawWrite("\n");
     }
 
     {
-        fout.rawWrite(
-                "SDL_Keymod convertCombinationEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
+        fout.rawWrite("Tuple!(SDL_Keymod, Exception) convertCombinationEnumKeyboardModCodeToSDLKeymod(EnumKeyboardModCode code)\n{\n");
 
         fout.rawWrite("    SDL_Keymod ret;\n");
 
@@ -314,7 +311,7 @@ class EKeymodConversionError : Exception {}
             fout.rawWrite("}\n");
         }
 
-        fout.rawWrite("   return ret;\n");
+        fout.rawWrite("   return tuple(ret, cast(Exception)null);\n");
 
         fout.rawWrite("}\n");
         fout.rawWrite("\n");

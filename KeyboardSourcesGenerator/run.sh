@@ -3,4 +3,4 @@
 ./generate_EnumKeyboardKeyCode.d
 ./generate_EnumKeyboardModCode.d
 ./generate_sdlkeyconversion.d
-dfmt -i ./*.d
+#dfmt -i ./*.d

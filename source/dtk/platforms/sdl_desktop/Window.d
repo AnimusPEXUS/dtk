@@ -200,7 +200,11 @@ class Window : WindowI
         writeln("Window::handle_SDL_KeyboardEvent");
         // TODO: ensure event consistency
         auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
-        handle_event_keyboard(res);
+        if (res[1] !is null) {
+            writeln("couldn't convert SDL keyboard event to Dtk keyboard event: "~res[1].msg);
+            return;
+        }
+        handle_event_keyboard(res[0]);
     }
 
     // ? status: started.  fast checked ok.
