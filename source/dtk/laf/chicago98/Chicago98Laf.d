@@ -207,7 +207,7 @@ class Chicago98Laf : LafI
                         writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
                         writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
                         writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
-                        if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation && mc == 0)
+                        if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation && (mc == 0 || mc == EnumKeyboardModCode.LeftShift ))
                             return true;
                         return false;
                     },
@@ -219,7 +219,13 @@ class Chicago98Laf : LafI
                     WidgetI mouseWidget,
                     )
                     {
+                        auto mc = e.keysym.modcode;
+                        mc &= EnumKeyboardModCodeNOT.Locks;
                         writeln("tab pressed");
+                        if (mc == EnumKeyboardModCode.LeftShift)
+                        {
+                            writeln("with shift");
+                        }
                         return;
                     },
             };
@@ -239,7 +245,6 @@ class Chicago98Laf : LafI
                     WidgetI mouseWidget,
                     )
                     {
-                        writeln("checkMatch 1 called");
                         return true;
                     },
                 action: delegate void(
@@ -319,63 +324,3 @@ class Chicago98Laf : LafI
         }
     }
 }
-
-
-/* bool handle_event_mouse(EventMouse* e)
-{
-    writeln("   mouse clicks:", e.button.clicks);
-
-    WidgetI w = getWidgetAtVisible(Position2D(e.x, e.y));
-    writeln("widget at [", e.x, ",", e.y, "] ", w);
-
-    while (true)
-    {
-        auto res = w.handle_event_mouse(e);
-        if (res)
-        {
-            break;
-        }
-        w = w.getParent();
-        if (w is null)
-        {
-            break;
-        }
-    }
-    return true;
-} */
-
-/* bool handle_event_window(EventWindow* e)
-{
-    bool needs_resize = false;
-    bool needs_redraw = false;
-
-    switch (e.eventId)
-    {
-    default:
-        return true; // TODO: is it really should be 'true'?
-        /* case EnumWindowEvent.show:
-            break; * /
-    case EnumWindowEvent.show:
-    case EnumWindowEvent.resize:
-        needs_resize = true;
-        needs_redraw = true;
-        break;
-    }
-
-    if (needs_resize)
-    {
-        FormI _form = window.getForm() ;
-        if (_form !is null)
-        {
-            _form.positionAndSizeRequest(Position2D(0, 0), Size2D(e.size.width, e.size.height));
-        }
-        needs_redraw = true;
-    }
-
-    if (needs_redraw)
-    {
-        window.redraw();
-    }
-
-    return true;
-} */

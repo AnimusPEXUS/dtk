@@ -9,6 +9,7 @@ module dtk.platforms.sdl_desktop.sdlkeyconversion;
 */
 
 import std.typecons;
+import std.format;
 
 import bindbc.sdl;
 
@@ -16,11 +17,12 @@ import dtk.types.EnumKeyboardKeyCode;
 import dtk.types.EnumKeyboardModCode;
 
 
+
 Tuple!(EnumKeyboardKeyCode, Exception) convertSDLKeycodeToEnumKeyboardKeyCode(SDL_Keycode code)
 {
     switch (code) {
         default:
-            return tuple(cast(EnumKeyboardKeyCode)0, new Exception("could not decode supplied keycode"));
+            return tuple(cast(EnumKeyboardKeyCode)0, new Exception("could not decode supplied keycode: " ~ format("%s", code)));
         case SDL_Keycode.SDLK_ESCAPE:
             return tuple(EnumKeyboardKeyCode.Escape, cast(Exception)null);
         case SDL_Keycode.SDLK_F1:
@@ -264,7 +266,7 @@ Tuple!(SDL_Keycode, Exception) convertEnumKeyboardKeyCodeToSDLKeycode(EnumKeyboa
 {
     switch (code) {
         default:
-            return tuple(cast(SDL_Keycode)0, new Exception("could not decode supplied keycode"));
+            return tuple(cast(SDL_Keycode)0, new Exception("could not decode supplied keycode: " ~ format("%s", code)));
         case EnumKeyboardKeyCode.Escape:
             return tuple(SDL_Keycode.SDLK_ESCAPE, cast(Exception) null);
         case EnumKeyboardKeyCode.F1:
@@ -508,7 +510,7 @@ Tuple!(EnumKeyboardModCode, Exception) convertSingleSDLKeymodToEnumKeyboardModCo
 {
     switch (code) {
         default:
-            return tuple(cast(EnumKeyboardModCode)0, new Exception("could not decode supplied keycode"));
+            return tuple(cast(EnumKeyboardModCode)0, new Exception("could not decode supplied keycode: "~ format("%s", code)) );
         case SDL_Keymod.KMOD_LSHIFT:
             return tuple(EnumKeyboardModCode.LeftShift, cast(Exception)null);
         case SDL_Keymod.KMOD_LCTRL:
@@ -536,7 +538,7 @@ Tuple!(SDL_Keymod, Exception) convertSingleEnumKeyboardModCodeToSDLKeymod(EnumKe
 {
     switch (code) {
         default:
-            return tuple(cast(SDL_Keymod)0, new Exception("could not decode supplied keycode"));
+            return tuple(cast(SDL_Keymod)0, new Exception("could not decode supplied keycode: "~ format("%s", code)) );
         case EnumKeyboardModCode.LeftShift:
             return tuple(SDL_Keymod.KMOD_LSHIFT,cast(Exception)null);
         case EnumKeyboardModCode.LeftControl:

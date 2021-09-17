@@ -32,11 +32,13 @@ int main()
 
     fout.rawWrite("
 import std.typecons;
+import std.format;
 
 import bindbc.sdl;
 
 import dtk.types.EnumKeyboardKeyCode;
 import dtk.types.EnumKeyboardModCode;
+
 
 ");
 
@@ -51,7 +53,7 @@ import dtk.types.EnumKeyboardModCode;
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            return tuple(cast(EnumKeyboardKeyCode)0, new Exception(\"could not decode supplied keycode\"));\n");
+                "            return tuple(cast(EnumKeyboardKeyCode)0, new Exception(\"could not decode supplied keycode: \" ~ format(\"%s\", code)));\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -95,7 +97,7 @@ import dtk.types.EnumKeyboardModCode;
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            return tuple(cast(SDL_Keycode)0, new Exception(\"could not decode supplied keycode\"));\n");
+                "            return tuple(cast(SDL_Keycode)0, new Exception(\"could not decode supplied keycode: \" ~ format(\"%s\", code)));\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -142,7 +144,7 @@ import dtk.types.EnumKeyboardModCode;
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            return tuple(cast(EnumKeyboardModCode)0, new Exception(\"could not decode supplied keycode\"));\n");
+                "            return tuple(cast(EnumKeyboardModCode)0, new Exception(\"could not decode supplied keycode: \"~ format(\"%s\", code)) );\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */
@@ -186,7 +188,7 @@ import dtk.types.EnumKeyboardModCode;
         fout.rawWrite("    switch (code) {\n");
         fout.rawWrite("        default:\n");
         fout.rawWrite(
-                "            return tuple(cast(SDL_Keymod)0, new Exception(\"could not decode supplied keycode\"));\n");
+                "            return tuple(cast(SDL_Keymod)0, new Exception(\"could not decode supplied keycode: \"~ format(\"%s\", code)) );\n");
 
         mixin makecsvreader;
         /* auto reader = makecsvreader(keyinfo_csv); */

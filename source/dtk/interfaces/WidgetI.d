@@ -43,4 +43,25 @@ interface WidgetI : EventReceiverWidgetI
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
 
+    // -------------- Events --------------
+
+    bool on_mouse_event_internal(EventMouse* event);
+
+    bool on_mouse_click_internal(EventMouse* event);
+    bool on_mouse_down_internal(EventMouse* event);
+    bool on_mouse_up_internal(EventMouse* event);
+
+    bool on_mouse_enter_internal(EventMouse* event);
+    bool on_mouse_leave_internal(EventMouse* event);
+
+    bool on_mouse_over_internal(EventMouse* event);
+
+
+    bool on_keyboard_click_internal(EventKeyboard* event);
+    bool on_keyboard_down_internal(EventKeyboard* event);
+    bool on_keyboard_up_internal(EventKeyboard* event);
+
+    bool on_keyboard_enter_internal(EventKeyboard* event);
+    bool on_keyboard_leave_internal(EventKeyboard* event);
+
 }
