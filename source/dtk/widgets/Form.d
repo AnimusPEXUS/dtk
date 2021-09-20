@@ -31,19 +31,18 @@ class Form : Widget, FormI
     {
         mixin Property_gsun!(WindowI, "window");
         mixin Property_gsun!(LafI, "theme");
-        /* mixin Property_gsu!(DrawingSurfaceI, "drawing_surface"); */
         mixin Property_gsun!(ContainerableWidgetI, "child");
 
         mixin Property_gsun!(WidgetI, "focused_widget");
-
+        mixin Property_gsun!(WidgetI, "default_widget");
     }
 
     mixin Property_forwarding!(WindowI, window, "Window");
     mixin Property_forwarding!(LafI, theme, "Laf");
-    /* mixin Property_forwarding!(DrawingSurfaceI, drawing_surface, "DrawingSurface"); */
     mixin Property_forwarding!(ContainerableWidgetI, child, "Child");
 
     mixin Property_forwarding!(WidgetI, focused_widget, "FocusedWidget");
+    mixin Property_forwarding!(WidgetI, default_widget, "DefaultWidget");
 
 
     this()
@@ -141,6 +140,16 @@ class Form : Widget, FormI
     }
 
     mixin mixin_getWidgetAtVisible;
+
+    void focusTo(WidgetI widget)
+    {
+        auto x = getFocusedWidget();
+        setFocusedWidget(widget);
+        if (x !is null)
+        {
+            x.redraw();
+        }
+    }
 
     private WidgetI focusXWidget(WidgetI delegate() getXFocusableWidget)
     {

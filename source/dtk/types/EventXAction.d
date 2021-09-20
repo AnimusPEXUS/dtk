@@ -30,7 +30,9 @@ struct Event"~subject~"Action
     bool delegate(WindowEventMgrI mgr, WindowI window, Event"~subject~"* e, WidgetI focusedWidget, WidgetI mouseWidget) checkMatch;
 
     /// this is called then all filters successfully passed.
-    void delegate(WindowEventMgrI mgr, WindowI window, Event"~subject~"* e, WidgetI focusedWidget, WidgetI mouseWidget) action;
+    /// if false returned - event manager shoud continue to search for action handler.
+    /// if true returned - event manager should not continue search for action handler.
+    bool delegate(WindowEventMgrI mgr, WindowI window, Event"~subject~"* e, WidgetI focusedWidget, WidgetI mouseWidget) action;
 }"
 );
 }

@@ -73,17 +73,36 @@ class Chicago98Laf : LafI
 
         auto pos = widget.getPosition();
         auto size = widget.getSize();
-        ds.drawRectangle(pos, size, LineStyle(formBackground), LineStyle(formBackground),
-                LineStyle(formBackground), LineStyle(formBackground),
-                nullable(FillStyle(formBackground)));
+        ds.drawRectangle(
+            pos,
+            size,
+            LineStyle(formBackground),
+            LineStyle(formBackground),
+            LineStyle(formBackground),
+            LineStyle(formBackground),
+            nullable(FillStyle(formBackground))
+        );
     }
 
     void drawButton(Button widget)
     {
         writeln("drawButton called");
 
-        bool is_default = true;
-        bool is_focused = true;
+        bool is_default = delegate bool () {
+            auto f = widget.getForm() ;
+            if (f is null)
+                return false;
+            auto def = f.getDefaultWidget();
+            return widget == def;
+        }();
+        bool is_focused = delegate bool () {
+            auto f = widget.getForm() ;
+            if (f is null)
+                return false;
+            auto curvid = f.getFocusedWidget();
+            return widget == curvid;
+        }();
+        bool is_down = widget.button_is_down;
 
         auto ds = widget.getDrawingSurface();
 
@@ -99,17 +118,26 @@ class Chicago98Laf : LafI
             size.height -= 2;
         }
 
-        drawBewel(ds, pos, size, false);
+        drawBewel(ds, pos, size, is_down);
 
-        ds.drawRectangle(Position2D(pos.x + 2, pos.y + 2), Size2D(size.width - 4,
-                size.height - 4), LineStyle(buttonColor), nullable(FillStyle(buttonColor)));
+        ds.drawRectangle(
+            Position2D(pos.x + 2, pos.y + 2),
+            Size2D(size.width - 4, size.height - 4),
+            LineStyle(buttonColor),
+            nullable(FillStyle(buttonColor))
+        );
 
         if (is_focused)
         {
-            ds.drawRectangle(Position2D(pos.x + 4, pos.y + 4),
-                    Size2D(size.width - 8, size.height - 8), LineStyle(Color(0),
-                        [true, false]), Nullable!FillStyle());
+            ds.drawRectangle(
+                Position2D(pos.x + 4, pos.y + 4),
+                Size2D(size.width - 8, size.height - 8),
+                LineStyle(Color(0), [true, false]),
+                Nullable!FillStyle()
+            );
         }
+
+        ds.present();
     }
 
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
@@ -138,6 +166,45 @@ class Chicago98Laf : LafI
         auto pos = Position2D(0, 0);
         auto size = widget.getSize();
         drawBewel(ds, pos, size, true);
+        ds.drawRectangle(
+            Position2D(pos.x + 2, pos.y + 2),
+            Size2D(size.width - 4, size.height - 4),
+            LineStyle(Color(0xffffff)),
+            Nullable!FillStyle()
+        );
+
+        ds.drawRectangle(
+            Position2D(pos.x + 3, pos.y + 3),
+            Size2D(size.width - 6, size.height - 6),
+            LineStyle(Color(0xffffff)),
+            Nullable!FillStyle()
+        );
+
+        if (widget.getForm().getFocusedWidget() == this)
+        {
+            ds.drawRectangle(
+                Position2D(pos.x + 3, pos.y + 3),
+                Size2D(size.width - 6, size.height - 6),
+                LineStyle(Color(0), [true, false]),
+                Nullable!FillStyle()
+            );
+        }
+
+        auto fillColor=Color(0xffffff);
+
+        if (widget.checked)
+        {
+            fillColor = Color(0);
+        }
+
+        ds.drawRectangle(
+            Position2D(pos.x + 4, pos.y + 4),
+            Size2D(size.width - 8, size.height - 8),
+            LineStyle(Color(0)),
+            nullable(FillStyle(fillColor))
+        );
+
+        ds.present();
     }
 
     void drawImage(Image widget)
@@ -211,7 +278,7 @@ class Chicago98Laf : LafI
                             return true;
                         return false;
                     },
-                action: delegate void(
+                action: delegate bool(
                     WindowEventMgrI mgr,
                     WindowI window,
                     EventKeyboard* e,
@@ -226,7 +293,7 @@ class Chicago98Laf : LafI
                         {
                             writeln("with shift");
                         }
-                        return;
+                        return true;
                     },
             };
 
@@ -245,9 +312,9 @@ class Chicago98Laf : LafI
                     WidgetI mouseWidget,
                     )
                     {
-                        return true;
+                        return e.type == EventMouseType.button;
                     },
-                action: delegate void(
+                action: delegate bool(
                     WindowEventMgrI mgr,
                     WindowI window,
                     EventMouse* e,
@@ -255,8 +322,25 @@ class Chicago98Laf : LafI
                     WidgetI mouseWidget,
                     )
                     {
-                        writeln("action 1 called");
-                        return;
+                        if (mouseWidget is null)
+                        {
+                            writeln("error: got mouse event, but mouseWidget is null");
+                            return false;
+                        }
+
+                        if (e.button.buttonState == EnumMouseButtonState.pressed) {
+                            mouseWidget.on_mouse_down_internal(e);
+                        }
+
+                        if (e.button.buttonState == EnumMouseButtonState.released) {
+                            mouseWidget.on_mouse_up_internal(e);
+
+                            if (e.button.clicks != 0) {
+                                mouseWidget.on_mouse_click_internal(e);
+                            }
+                        }
+
+                        return true;
                     },
             };
 
@@ -278,7 +362,7 @@ class Chicago98Laf : LafI
                         writeln("checkMatch 1 called");
                         return true;
                     },
-                action: delegate void(
+                action: delegate bool(
                     WindowEventMgrI mgr,
                     WindowI window,
                     EventWindow* e,
@@ -292,7 +376,7 @@ class Chicago98Laf : LafI
                         switch (e.eventId)
                         {
                         default:
-                            return;
+                            return false;
                             /* case EnumWindowEvent.show:
                                 break; */
                         case EnumWindowEvent.show:
@@ -316,7 +400,7 @@ class Chicago98Laf : LafI
                         {
                             window.redraw();
                         }
-                        return;
+                        return true;
                     },
             };
 

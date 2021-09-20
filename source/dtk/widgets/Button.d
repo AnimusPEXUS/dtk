@@ -16,6 +16,7 @@ import dtk.interfaces.FormI;
 
 import dtk.types.ButtonTypeE;
 import dtk.types.Size2D;
+import dtk.types.EventMouse;
 
 import dtk.widgets;
 import dtk.widgets.mixins;
@@ -37,9 +38,38 @@ class Button : Widget, ContainerableWidgetI
         ButtonTypeE _button_type;
     }
 
+    bool button_is_down;
+
     this()
     {
         setFocusable(true);
     }
+
+    override bool on_mouse_click_internal(EventMouse* event)
+    {
+        writeln("button click");
+        return false;
+    }
+
+    override bool on_mouse_down_internal(EventMouse* event)
+    {
+        button_is_down = true;
+        auto f = getForm();
+        if (f !is null){
+            f.focusTo(this);
+        }
+        writeln("button down");
+        redraw();
+        return false;
+    }
+
+    override bool on_mouse_up_internal(EventMouse* event)
+    {
+        button_is_down = false;
+        writeln("button up");
+        redraw();
+        return false;
+    }
+
 
 }

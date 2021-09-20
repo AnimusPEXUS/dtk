@@ -26,6 +26,11 @@ interface FormI
 
     WidgetI getWidgetAtVisible(Position2D point);
 
+    WidgetI getDefaultWidget();
+    typeof(this) setDefaultWidget(WidgetI);
+
+    void focusTo(WidgetI);
+
     WidgetI getFocusedWidget();
     bool isUnsetFocusedWidget();
     WidgetI focusNextWidget();

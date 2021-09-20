@@ -91,141 +91,39 @@ class WindowEventMgr: WindowEventMgrI
                 if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
                     continue;
 
-                if (!v.checkMatch(this, window, event, focusedWidget, mouseWidget))
-                    continue;
+                if (v.checkMatch !is null)
+                    if (!v.checkMatch(this, window, event, focusedWidget, mouseWidget))
+                        continue;
 
-                v.action(this, window, event, focusedWidget, mouseWidget);
-                processed = true;
+                if (v.action !is null)
+                    processed = v.action(this, window, event, focusedWidget, mouseWidget);
+
                 continue;
             }
 
         return processed;
     }
 
-    /* bool handle_event_x(XEvent event, XEventType type)
-    {
-        WidgetI focusedWidget;
-        WidgetI mouseWidget;
-
-        auto form = window.getForm();
-        if (form !is null)
-        {
-            focusedWidget = form.getFocusedWidget();
-        }
-
-        // TODO: if mouse info isn't available - get is using platform
-
-        if (type == XEventType.mouse)
-        {
-            mouseWidget=getWidgetAtVisible(Position2D(event.emouse.x, event.emouse.y));
-        }
-
-        switch (type)
-        {
-            default:
-            case XEventType.none:
-                return false;
-            case XEventType.window:
-                foreach (ref v; listWindowActions)
-                {
-                    if (!v.any_focusedWidget && focusedWidget != v.focusedWidget)
-                        continue;
-
-                    if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
-                        continue;
-
-                    if (!v.checkMatch(this, window, event.ewindow, focusedWidget, mouseWidget))
-                        continue;
-
-                    v.action(this, window, event.ewindow, focusedWidget, mouseWidget);
-                    continue;
-                }
-                break;
-            case XEventType.keyboard:
-                foreach (ref v; listKeyboardActions)
-                {
-                    if (!v.any_focusedWidget && focusedWidget != v.focusedWidget)
-                        continue;
-
-                    if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
-                        continue;
-
-                    if (!v.checkMatch(this, window, event.ekeyboard, focusedWidget, mouseWidget))
-                        continue;
-
-                    v.action(this, window, event.ekeyboard, focusedWidget, mouseWidget);
-                    continue;
-                }
-                break;
-            case XEventType.mouse:
-                foreach (ref v; listMouseActions)
-                {
-                    if (!v.any_focusedWidget && focusedWidget != v.focusedWidget)
-                        continue;
-
-                    if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
-                        continue;
-
-                    if (!v.checkMatch(this, window, event.emouse, focusedWidget, mouseWidget))
-                        continue;
-
-                    v.action(this, window, event.emouse, focusedWidget, mouseWidget);
-                    continue;
-                }
-                break;
-            case XEventType.textInput:
-                foreach (ref v; listTextInputActions)
-                {
-                    if (!v.any_focusedWidget && focusedWidget != v.focusedWidget)
-                        continue;
-
-                    if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
-                        continue;
-
-                    if (!v.checkMatch(this, window, event.etextinput, focusedWidget, mouseWidget))
-                        continue;
-
-                    v.action(this, window, event.etextinput, focusedWidget, mouseWidget);
-                    continue;
-                }
-                break;
-        }
-
-        return true;
-    } */
 
     bool handle_event_window(EventWindow* e)
     {
         return handle_event_x_search_and_call!listWindowActions(e);
-        /* XEvent ev;
-        ev.ewindow = e;
-        return handle_event_x(ev, XEventType.window); */
     }
 
     bool handle_event_keyboard(EventKeyboard* e)
     {
         return handle_event_x_search_and_call!listKeyboardActions(e);
-        /* XEvent ev;
-        ev.ekeyboard = e;
-        return handle_event_x(ev, XEventType.keyboard); */
     }
 
     bool handle_event_mouse(EventMouse* e)
     {
         writeln("   mouse clicks:", e.button.clicks);
         return handle_event_x_search_and_call!listMouseActions(e);
-/*
-        XEvent ev;
-        ev.emouse = e;
-        return handle_event_x(ev, XEventType.mouse); */
     }
 
     bool handle_event_textinput(EventTextInput* e)
     {
         return handle_event_x_search_and_call!listTextInputActions(e);
-        /* XEvent ev;
-        ev.etextinput = e;
-        return handle_event_x(ev, XEventType.textInput); */
     }
 
     WidgetI getWidgetAtVisible(Position2D point)
