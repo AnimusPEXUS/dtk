@@ -157,7 +157,34 @@ class Chicago98Laf : LafI
 
         ds.drawArc(p, 5, P_M45, P_135, step, elementLightedColor2);
         ds.drawArc(p, 5, P_135, P_135M2, step, elementDarkedColor);
+
+
+        if (widget.getForm().getFocusedWidget() == widget)
+        {
+            ds.drawCircle(p, 4, step, Color(0));
+        } else {
+            ds.drawCircle(p, 4, step, Color(0xffffff));
+        }
+
+        ds.drawCircle(p, 3, step, Color(0xffffff));
+
+        auto fillColor = Color(0xffffff);
+
+        if (widget.getChecked())
+        {
+            fillColor= Color(0);
+        }
+
+        for (int i = 2 ; i != -1; i--)
+        {
+            ds.drawCircle(p, i, step, fillColor);
+        }
+
     }
+
+    /* void drawButtonRadio(ButtonRadio!uint widget);
+    void drawButtonRadio(ButtonRadio!int widget);
+    void drawButtonRadio(ButtonRadio!string widget); */
 
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
     void drawButtonCheck(ButtonCheck widget)
@@ -166,21 +193,22 @@ class Chicago98Laf : LafI
         auto pos = Position2D(0, 0);
         auto size = widget.getSize();
         drawBewel(ds, pos, size, true);
+
         ds.drawRectangle(
             Position2D(pos.x + 2, pos.y + 2),
             Size2D(size.width - 4, size.height - 4),
             LineStyle(Color(0xffffff)),
-            Nullable!FillStyle()
+            nullable(FillStyle(Color(0xffffff)))
         );
 
-        ds.drawRectangle(
+        /* ds.drawRectangle(
             Position2D(pos.x + 3, pos.y + 3),
             Size2D(size.width - 6, size.height - 6),
             LineStyle(Color(0xffffff)),
             Nullable!FillStyle()
-        );
+        ); */
 
-        if (widget.getForm().getFocusedWidget() == this)
+        if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawRectangle(
                 Position2D(pos.x + 3, pos.y + 3),
@@ -192,14 +220,14 @@ class Chicago98Laf : LafI
 
         auto fillColor=Color(0xffffff);
 
-        if (widget.checked)
+        if (widget.getChecked())
         {
             fillColor = Color(0);
         }
 
         ds.drawRectangle(
-            Position2D(pos.x + 4, pos.y + 4),
-            Size2D(size.width - 8, size.height - 8),
+            Position2D(pos.x + 5, pos.y + 5),
+            Size2D(size.width - 10, size.height - 10),
             LineStyle(Color(0)),
             nullable(FillStyle(fillColor))
         );

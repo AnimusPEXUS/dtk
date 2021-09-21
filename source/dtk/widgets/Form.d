@@ -143,6 +143,7 @@ class Form : Widget, FormI
 
     void focusTo(WidgetI widget)
     {
+        writeln("Form:focusTo: ", widget);
         auto x = getFocusedWidget();
         setFocusedWidget(widget);
         if (x !is null)

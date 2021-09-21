@@ -192,6 +192,17 @@ class Widget : WidgetI
         writeln("   this widget is Form?:", (cast(Form) this !is null )); */
     }
 
+    private void redraw_x(alias A1)()
+    {
+        A1 widget = cast(A1) this;
+        if (widget !is null)
+        {
+            string id = __traits(identifier, A1);
+            writeln("calling draw " ~ id);
+            __traits(getMember, theme, "draw" ~ v)(widget);
+        }
+    }
+
     /* void redraw()
     {
 

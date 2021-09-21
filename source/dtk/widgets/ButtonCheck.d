@@ -3,22 +3,29 @@ module dtk.widgets.ButtonCheck;
 import std.stdio;
 
 import dtk.types.EventMouse;
+import dtk.types.Property;
 
 import dtk.widgets;
 
 class ButtonCheck : Button
 {
+    private
+    {
+        mixin Property_gs_w_d!(bool, "checked", false);
+    }
+
+    mixin Property_forwarding!(bool, checked, "Checked");
+
     this()
     {
         setFocusable(true);
     }
 
-    public bool checked;
 
     override bool on_mouse_click_internal(EventMouse* event)
     {
         writeln("ButtonCheck click");
-        checked = !checked;
+        setChecked(!getChecked());
         redraw();
         return false;
     }

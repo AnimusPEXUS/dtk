@@ -14,7 +14,6 @@ import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 
-import dtk.types.ButtonTypeE;
 import dtk.types.Size2D;
 import dtk.types.EventMouse;
 
@@ -24,20 +23,6 @@ import dtk.widgets.mixins;
 /// Button class
 class Button : Widget, ContainerableWidgetI
 {
-    private
-    {
-        RadioGroup _radio_group;
-
-        // this is used when button participates in RadioGroup,
-        // so you could use RadioGroup's getValue() function and get selected
-        // value easily
-        // TODO: replace this with propery and name it RadioValue
-        string _value;
-
-        bool _switchable;
-        ButtonTypeE _button_type;
-    }
-
     bool button_is_down;
 
     this()
