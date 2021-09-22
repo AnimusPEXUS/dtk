@@ -99,7 +99,7 @@ class Widget : WidgetI
         this.connectToParent_onAfterChanged(&onParentChanged);
     }
 
-    void onParentChanged() nothrow
+    void onParentChanged(WidgetI old_v, WidgetI new_v) nothrow
     {
         try
         {

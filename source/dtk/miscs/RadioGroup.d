@@ -2,6 +2,7 @@
 
 module dtk.miscs.RadioGroup;
 
+import std.stdio;
 import std.typecons;
 
 import dtk.widgets;
@@ -14,10 +15,13 @@ class RadioGroup
 
     void add(ButtonRadio b)
     {
-        foreach (v;buttons)
-            if (v == b)
-                return;
-        buttons ~= b;
+        if (!isIn(b))
+            buttons ~= b;
+
+        auto old_rg = b.getRadioGroup();
+        if (old_rg != this) {
+            b.setRadioGroup(this);
+        }
     }
 
     void remove(ButtonRadio b)
@@ -25,12 +29,29 @@ class RadioGroup
         for (int i = cast(int)buttons.length-1; i != -1; i += -1)
             if (buttons[i] == b)
                 buttons = buttons[0 .. i] ~ buttons[i+1 .. $];
+
+        if (b.getRadioGroup() == this)
+            b.unsetRadioGroup();
+    }
+
+    bool isIn(ButtonRadio b)
+    {
+        foreach (v;buttons)
+            if (v == b)
+                return true;
+        return false;
     }
 
     void selectButton(ButtonRadio b)
     {
-        foreach (v;buttons)
-            v.setChecked(v == b);
+        foreach (v;buttons) {
+            auto x = v == b;
+
+            writeln("ButtonRadio Checked?: ", b, " ", x);
+
+            v.setChecked(x);
+            v.redraw();
+        }
     }
 
     ButtonRadio getSelectedButton()

@@ -50,7 +50,7 @@ class Form : Widget, FormI
         connectToChild_onAfterChanged(&onChildChanged);
     }
 
-    void onChildChanged() nothrow
+    void onChildChanged(ContainerableWidgetI old_v, ContainerableWidgetI new_v) nothrow
     {
         try
         {

@@ -25,6 +25,34 @@ class ButtonRadio : Button
     this()
     {
         setFocusable(true);
+        connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged);
+        connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged);
+    }
+
+    private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
+    {
+        try {
+            writeln("handleRadioGroup_onBeforeChanged: ", old_v, new_v);
+            if (old_v !is null)
+            if (old_v.isIn(this))
+                old_v.remove(this);
+        } catch (Exception e)
+        {
+
+        }
+    }
+
+    private void handleRadioGroup_onAfterChanged(RadioGroup old_v, RadioGroup new_v) nothrow
+    {
+        try{
+            writeln("handleRadioGroup_onAfterChanged: ", old_v, new_v);
+            if (new_v !is null)
+            if (!new_v.isIn(this))
+                new_v.add(this);
+        } catch (Exception e)
+        {
+
+        }
     }
 
     override bool on_mouse_click_internal(EventMouse* event)

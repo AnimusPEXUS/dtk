@@ -10,14 +10,16 @@ import observable.signal;
 
 /* import observable.signal.SignalConnection;  */
 
-enum PropertyActionInCaseIfGettingUnsetValue
+enum PropertyWhatToReturnIfValueIsUnset
 {
-    throwException,
-    returnDefault,
-    returnNull,
+    defaultValue,
+    initValue,
+    typeInitValue
 }
 
 /++
+    TODO: notes is putdated. need to update
+
     NOTE: no 'null' state - use unset for this
 
     NOTE: isDefault() function will return true only if previously reset()
@@ -28,7 +30,7 @@ enum PropertyActionInCaseIfGettingUnsetValue
     Property to default state; +/
 struct PropertySettings(T)
 {
-    // TODO: decide what to do with this
+    // TODO: decide what to do with this. needs fixing
     /* T init_value = T.init;
     T default_value = T.init; /// value, to which variable is set on reset() call */
 
@@ -38,11 +40,11 @@ struct PropertySettings(T)
     bool initially_value_is_default = true;
     bool initially_value_is_unset = true;
     bool default_is_unset = false; // if reset() called, property becomes unset
-    alias resetting_value_makes_it_unset = default_is_unset;
+    /* alias resetting_value_makes_it_unset = default_is_unset; */
 
     // TODO: complete this
-    /* bool setting_to_default_value_makes_property_reset = false;
-    bool setting_to_default_value_makes_property_unset = false; */
+    bool setting_to_default_value_makes_property_reset = false;
+    bool setting_to_default_value_makes_property_unset = false;
 
     bool on_unset_also_reset = false;
 
@@ -54,35 +56,26 @@ struct PropertySettings(T)
     bool resettable = true; /// define function to reset value to default
     bool unsettable = false; /// value can have 'unset' state. also defines unset() function.
 
-    PropertyActionInCaseIfGettingUnsetValue action_in_case_if_getting_unset_value = PropertyActionInCaseIfGettingUnsetValue
-        .throwException;
-
-    bool variable_use_on_set = true; /// actually change variable on set() call
-    bool variable_use_on_get = true; /// actually get value from variable on get() call. on false - default is returned
-    bool variable_use_on_reset = true;
-    bool variable_use_on_unset = true; /// actually change variable on unset() call
+    PropertyWhatToReturnIfValueIsUnset whatToReturnIfUnset = PropertyWhatToReturnIfValueIsUnset
+        .typeInitValue;
 }
 
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
-
-    static if (settings.action_in_case_if_getting_unset_value
-            == PropertyActionInCaseIfGettingUnsetValue.returnNull)
+    static if (settings.variable_define && !settings.variable_private)
     {
-        static assert(__traits(compiles, cast(T1) null),
-                "trying to use PropertyActionInCaseIfGettingUnsetValue.returnNull, but " ~ __traits(identifier,
-                    T1) ~ " can't be null");
+        static if(settings.variable_private)
+        {
+            private T1 variable = settings.init_value;
+        }
+        else
+        {
+            public T1 variable = settings.init_value;
+        }
     }
 
     private
     {
-        /* PropertySettings!T1 settings; */
-
-        static if (settings.variable_define && settings.variable_private)
-        {
-            T variable = settings.init_value;
-        }
-
         static if (settings.unsettable)
         {
             bool value_is_unset = settings.initially_value_is_unset;
@@ -92,85 +85,67 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         {
             bool value_is_default = settings.initially_value_is_default;
         }
-
     }
 
     public
     {
-        /* T2 settings2 = settings_ct; */
-
-        static if (settings.variable_define && !settings.variable_private)
-        {
-            T1 variable = settings.init_value;
-        }
-
         static if (settings.gettable)
         {
             Signal!() onBeforeGet;
             Signal!() onAfterGet;
         }
-
         static if (settings.settable)
         {
-            Signal!() onBeforeSet;
-            Signal!() onAfterSet;
+            Signal!(T1, T1) onBeforeSet;
+            Signal!(T1, T1) onAfterSet;
         }
-
         static if (settings.resettable)
         {
-            Signal!() onBeforeReset;
-            Signal!() onAfterReset;
+            Signal!(T1, T1) onBeforeReset;
+            Signal!(T1, T1) onAfterReset;
         }
-
         static if (settings.unsettable)
         {
-            Signal!() onBeforeUnset;
-            Signal!() onAfterUnset;
+            Signal!(T1, T1) onBeforeUnset;
+            Signal!(T1, T1) onAfterUnset;
         }
 
-        Signal!() onBeforeChanged;
-        Signal!() onAfterChanged;
+        Signal!(T1, T1) onBeforeChanged;
+        Signal!(T1, T1) onAfterChanged;
 
         SignalConnectionContainer propery_cc;
     }
 
     @disable this(this);
 
-    /* this()
-    {
-        static if (settings.variable_define)
-        {
-            variable = settings.init_value;
-        }
-        static if (settings.unsettable)
-        {
-            value_is_unset = settings.initially_value_is_unset;
-        }
-        static if (settings.resettable)
-        {
-            value_is_default = settings.initially_value_is_default;
-        }
-    } */
-
     static if (settings.resettable)
     {
         void reset()
         {
-            onBeforeChanged.emit();
-            scope (success)
-                onAfterChanged.emit();
-            onBeforeReset.emit();
-            scope (success)
-                onAfterReset.emit();
+            T1 old_value;
+            T1 new_value;
 
-            static if (settings.variable_define && settings.variable_use_on_reset)
+            static if (settings.variable_define)
             {
-                variable = settings.default_value;
+                old_value = variable;
+                new_value = getUnsetValue();
+            }
+
+            onBeforeChanged.emit(old_value, new_value);
+            scope (success)
+                onAfterChanged.emit(old_value, new_value);
+            onBeforeReset.emit(old_value, new_value);
+            scope (success)
+                onAfterReset.emit(old_value, new_value);
+
+            static if (settings.variable_define)
+            {
+                value = settings.default_value;
             }
             value_is_default = true;
             static if (settings.unsettable)
             {
-                if (settings.resetting_value_makes_it_unset)
+                if (settings.default_is_unset)
                 {
                     value_is_unset = true;
                 }
@@ -184,18 +159,46 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         }
     }
 
+    T1 getUnsetValue()
+    {
+        static if (settings.whatToReturnIfUnset
+                == PropertyWhatToReturnIfValueIsUnset.initValue)
+        {
+            return settings.init_value;
+        }
+        static if (settings.whatToReturnIfUnset
+                == PropertyWhatToReturnIfValueIsUnset.defaultValue)
+        {
+            return settings.default_value;
+        }
+        static if (settings.whatToReturnIfUnset
+                == PropertyWhatToReturnIfValueIsUnset.typeInitValue)
+        {
+            return T1.init;
+        }
+    }
+
     static if (settings.unsettable)
     {
         void unset()
         {
-            onBeforeChanged.emit();
-            scope (success)
-                onAfterChanged.emit();
-            onBeforeUnset.emit();
-            scope (success)
-                onAfterUnset.emit();
+            T1 old_value;
+            T1 new_value;
 
-            static if (settings.variable_define && settings.variable_use_on_unset)
+            static if (settings.variable_define)
+            {
+                old_value = variable;
+                new_value = getUnsetValue();
+            }
+
+            onBeforeChanged.emit(old_value, new_value);
+            scope (success)
+                onAfterChanged.emit(old_value, new_value);
+            onBeforeUnset.emit(old_value, new_value);
+            scope (success)
+                onAfterUnset.emit(old_value, new_value);
+
+            static if (settings.variable_define)
             {
                 value_is_unset = true;
             }
@@ -230,14 +233,13 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
     {
         T1 get()
         {
-
             onBeforeGet.emit();
             scope (success)
                 onAfterGet.emit();
 
             T1 ret = settings.default_value;
 
-            static if (settings.variable_define && settings.variable_use_on_get)
+            static if (settings.variable_define)
             {
                 if ({
                         static if (settings.unsettable)
@@ -250,16 +252,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
                         }
                     }())
                 {
-                    static if (settings.action_in_case_if_getting_unset_value
-                            == PropertyActionInCaseIfGettingUnsetValue.throwException)
-                    {
-                        throw new Exception("value is unset");
-                    }
-                    static if (settings.action_in_case_if_getting_unset_value
-                            == PropertyActionInCaseIfGettingUnsetValue.returnNull)
-                    {
-                        ret = cast(T1) null;
-                    }
+                    ret = getUnsetValue();
                 }
                 else
                 {
@@ -275,17 +268,25 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
     {
         void set(T1 new_value)
         {
-            onBeforeChanged.emit();
-            scope (success)
-                onAfterChanged.emit();
-            onBeforeSet.emit();
-            scope (success)
-                onAfterSet.emit();
+            T1 old_value;
 
-            static if (settings.variable_define && settings.variable_use_on_set)
+            static if (settings.variable_define)
+            {
+                old_value = variable;
+            }
+
+            onBeforeChanged.emit(old_value, new_value);
+            scope (success)
+                onAfterChanged.emit(old_value, new_value);
+            onBeforeSet.emit(old_value, new_value);
+            scope (success)
+                onAfterSet.emit(old_value, new_value);
+
+            static if (settings.variable_define)
             {
                 variable = new_value;
             }
+
             static if (settings.resettable)
             {
                 value_is_default = false;
@@ -294,11 +295,24 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
             {
                 value_is_unset = false;
             }
+
+            static if (settings.resettable)
+            {
+                if (settings.setting_to_default_value_makes_property_reset && new_value == settings.default_value) {
+                    reset();
+                }
+            }
+            static if (settings.unsettable)
+            {
+                if (settings.setting_to_default_value_makes_property_unset && new_value == settings.default_value) {
+                    unset();
+                }
+            }
         }
     }
 }
 
-mixin template Property_forwarding(T, alias property, string new_suffix,)
+mixin template Property_forwarding(T, alias property, string new_suffix)
 {
     // ["get", "set", "reset", "unset", "isDefault", "isUnset"]
 
@@ -347,9 +361,7 @@ mixin template Property_forwarding(T, alias property, string new_suffix,)
     // =========== signals ===========
 
     static foreach (v; [
-            "onBeforeGet", "onAfterGet", "onBeforeSet", "onAfterSet",
-            "onBeforeReset", "onAfterReset", "onBeforeUnset", "onAfterUnset",
-            "onBeforeChanged", "onAfterChanged",
+            "onBeforeGet", "onAfterGet",
         ])
     {
         static if (__traits(hasMember, property, v))
@@ -361,6 +373,23 @@ mixin template Property_forwarding(T, alias property, string new_suffix,)
         }
 
     }
+
+    static foreach (v; [
+            "onBeforeSet", "onAfterSet",
+            "onBeforeReset", "onAfterReset", "onBeforeUnset", "onAfterUnset",
+            "onBeforeChanged", "onAfterChanged",
+        ])
+    {
+        static if (__traits(hasMember, property, v))
+        {
+            mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate(T old_value, T new_value) nothrow  cb) { "
+                    ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
+                        property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
+                        property) ~ ".propery_cc.add(conn);" ~ "}");
+        }
+
+    }
+
 }
 
 unittest

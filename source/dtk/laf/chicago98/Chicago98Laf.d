@@ -143,14 +143,24 @@ class Chicago98Laf : LafI
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
     void drawButtonRadio(ButtonRadio widget)
     {
+        writeln("drawButtonRadio called");
+
         auto ds = widget.getDrawingSurface();
         auto pos = Position2D(0, 0);
         auto size = widget.getSize();
 
         // TODO: this have to be more flexible
-        auto step = 2 * PI / 16;
+        auto step = 2 * PI / 32;
 
         auto p = Position2D(6, 6);
+
+        ds.drawRectangle(
+            pos, /* Position2D(pos.x - 2, pos.y - 2), */
+            Size2D(size.width + 1, size.height + 1),
+            LineStyle(formBackground),
+            nullable(FillStyle(formBackground))
+        );
+
 
         ds.drawArc(p, 6, P_M45, P_135, step, elementLightedColor);
         ds.drawArc(p, 6, P_135, P_135M2, step, elementDarkedColor2);
@@ -158,7 +168,33 @@ class Chicago98Laf : LafI
         ds.drawArc(p, 5, P_M45, P_135, step, elementLightedColor2);
         ds.drawArc(p, 5, P_135, P_135M2, step, elementDarkedColor);
 
+        ds.drawCircle(p, 4, step, Color(0xffffff));
 
+        auto fillColor = Color(0xffffff);
+        if (widget.getChecked())
+        {
+            fillColor= Color(0);
+        }
+
+        for (int i = 3 ; i != 0 ; i--)
+        {
+            ds.drawCircle(p, i, step, fillColor);
+        }
+
+        ds.drawDot(Position2D(6,6), fillColor);
+
+        if (widget.getForm().getFocusedWidget() == widget)
+        {
+            ds.drawRectangle(
+                pos, /* Position2D(pos.x - 2, pos.y - 2), */
+                size, /* Size2D(size.width + 4, size.height + 4), */
+                LineStyle(Color(0), [true, false]),
+                Nullable!FillStyle()
+            );
+        }
+
+        ds.present();
+/*
         if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawCircle(p, 4, step, Color(0));
@@ -178,7 +214,7 @@ class Chicago98Laf : LafI
         for (int i = 2 ; i != -1; i--)
         {
             ds.drawCircle(p, i, step, fillColor);
-        }
+        } */
 
     }
 
@@ -192,6 +228,7 @@ class Chicago98Laf : LafI
         auto ds = widget.getDrawingSurface();
         auto pos = Position2D(0, 0);
         auto size = widget.getSize();
+
         drawBewel(ds, pos, size, true);
 
         ds.drawRectangle(
@@ -211,8 +248,8 @@ class Chicago98Laf : LafI
         if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawRectangle(
-                Position2D(pos.x + 3, pos.y + 3),
-                Size2D(size.width - 6, size.height - 6),
+                pos, /* Position2D(pos.x - 2, pos.y - 2), */
+                size, /* Size2D(size.width + 4, size.height + 4), */
                 LineStyle(Color(0), [true, false]),
                 Nullable!FillStyle()
             );
@@ -226,8 +263,8 @@ class Chicago98Laf : LafI
         }
 
         ds.drawRectangle(
-            Position2D(pos.x + 5, pos.y + 5),
-            Size2D(size.width - 10, size.height - 10),
+            Position2D(pos.x + 3, pos.y + 3),
+            Size2D(size.width - 6, size.height - 6),
             LineStyle(Color(0)),
             nullable(FillStyle(fillColor))
         );
