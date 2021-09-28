@@ -2,12 +2,13 @@ module dtk.interfaces.DrawingSurfaceI;
 
 import std.typecons;
 
+import dtk.interfaces.FontI;
+
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Color;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
-import dtk.types.Font;
 import dtk.types.FontStyle;
 import dtk.types.TextStyle;
 
@@ -32,7 +33,8 @@ interface DrawingSurfaceI
         drawRectangle(pos, size, top_left, top_left, bottom_right, bottom_right, fill_style);
     }
 
-    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style);
+    void drawText(string text, Position2D pos, FontI font,
+            FontStyle font_style, TextStyle text_style);
 
     void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle,
             real turn_step, Color color);

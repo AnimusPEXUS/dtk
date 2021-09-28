@@ -15,7 +15,6 @@ import dtk.types.Property;
 import dtk.types.Property_mixins;
 import dtk.types.MoveT;
 
-
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
@@ -82,7 +81,6 @@ class Widget : WidgetI
     mixin Property_forwarding!(bool, focus_kb_capture, "FocusKeyboardCapture");
     mixin Property_forwarding!(bool, uses_text_input, "UsesTextInput");
     mixin Property_forwarding!(MoveT, move_type, "MoveType");
-
 
     // =====^===^===^===== [info] =====^===^===^===== end
 
@@ -151,10 +149,10 @@ class Widget : WidgetI
         return _ds;
     }
 
-    void redraw()
-    {
+    /* void redraw()
+    { */
 
-        writeln("Widget::draw() <---------------------------- ", this);
+    /* writeln("Widget::draw() <---------------------------- ", this);
 
         Form form = this.getForm();
         if (form is null)
@@ -171,12 +169,11 @@ class Widget : WidgetI
         }
 
         static foreach (v; [
-                "Form", "ButtonCheck", "ButtonRadio", "Button", "Layout"
+                "Form", "ButtonCheck", "ButtonRadio", "Button", "Layout", "Label"
             ])
         {
             {
                 mixin(v ~ " widget = cast(" ~ v ~ ") this;");
-                /* __traits(toType, v) widget = cast(__traits(toType, v)) this; */
                 if (widget !is null)
                 {
                     writeln("calling draw" ~ v);
@@ -186,20 +183,59 @@ class Widget : WidgetI
             }
         }
 
-    exit:
+    exit: */
 
-        /* writeln("Widget::draw() <----------------------------");
-        writeln("   this widget is Form?:", (cast(Form) this !is null )); */
+    /* } */
+
+    void redraw()
+    {
+        this.redraw_x(this);
     }
 
-    private void redraw_x(alias A1)()
+    void redraw_x(T)(T new_this)
     {
-        A1 widget = cast(A1) this;
-        if (widget !is null)
+
+        /* alias A1 = typeof(new_this); */
+
+        const id = __traits(identifier, new_this);
+        const id_t = __traits(identifier, T);
+
+        pragma(msg, "generating redraw_x for ", id_t);
+
+        static if (!is(T == Widget))
         {
-            string id = __traits(identifier, A1);
-            writeln("calling draw " ~ id);
-            __traits(getMember, theme, "draw" ~ v)(widget);
+            const drawid = "draw" ~ id_t;
+            writeln("Widget::draw() <------------------ drawid = ", drawid);
+
+            Form form = new_this.getForm();
+            if (form is null)
+            {
+                writeln("error: redraw() function couldn't get Form. this is: ", this);
+                return;
+            }
+
+            auto theme = form.getLaf();
+
+            if (theme is null)
+            {
+                throw new Exception("theme not set");
+            }
+
+            static if (!__traits(hasMember, theme, drawid))
+            {
+                pragma(msg, "theme doesn't have " ~ drawid ~ " function");
+                writeln("theme doesn't have " ~ drawid ~ " function");
+                return;
+            }
+            else
+            {
+                writeln("calling " ~ drawid);
+                __traits(getMember, theme, drawid)(new_this);
+            }
+        }
+        else
+        {
+            writeln("xxxxxxxxxxxxxxxxx Widget doesn't uses themes for drawing");
         }
     }
 
@@ -264,10 +300,12 @@ class Widget : WidgetI
     {
         return false;
     }
+
     bool on_mouse_down_internal(EventMouse* event)
     {
         return false;
     }
+
     bool on_mouse_up_internal(EventMouse* event)
     {
         return false;
@@ -277,6 +315,7 @@ class Widget : WidgetI
     {
         return false;
     }
+
     bool on_mouse_leave_internal(EventMouse* event)
     {
         return false;
@@ -287,15 +326,16 @@ class Widget : WidgetI
         return false;
     }
 
-
     bool on_keyboard_click_internal(EventKeyboard* event)
     {
         return false;
     }
+
     bool on_keyboard_down_internal(EventKeyboard* event)
     {
         return false;
     }
+
     bool on_keyboard_up_internal(EventKeyboard* event)
     {
         return false;
@@ -305,6 +345,7 @@ class Widget : WidgetI
     {
         return false;
     }
+
     bool on_keyboard_leave_internal(EventKeyboard* event)
     {
         return false;

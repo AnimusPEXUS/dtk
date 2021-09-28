@@ -12,7 +12,7 @@ interface EventReceiverWidgetI
     bool handle_event_textinput(EventTextInput* e);
 }
 
-interface EventReceiverWindowI: EventReceiverWidgetI
+interface EventReceiverWindowI : EventReceiverWidgetI
 {
     bool handle_event_window(EventWindow* e);
 }

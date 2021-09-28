@@ -9,7 +9,8 @@ import dtk.widgets;
 
 class RadioGroup
 {
-    public {
+    public
+    {
         ButtonRadio[] buttons;
     }
 
@@ -19,16 +20,17 @@ class RadioGroup
             buttons ~= b;
 
         auto old_rg = b.getRadioGroup();
-        if (old_rg != this) {
+        if (old_rg != this)
+        {
             b.setRadioGroup(this);
         }
     }
 
     void remove(ButtonRadio b)
     {
-        for (int i = cast(int)buttons.length-1; i != -1; i += -1)
+        for (int i = cast(int) buttons.length - 1; i != -1; i += -1)
             if (buttons[i] == b)
-                buttons = buttons[0 .. i] ~ buttons[i+1 .. $];
+                buttons = buttons[0 .. i] ~ buttons[i + 1 .. $];
 
         if (b.getRadioGroup() == this)
             b.unsetRadioGroup();
@@ -36,7 +38,7 @@ class RadioGroup
 
     bool isIn(ButtonRadio b)
     {
-        foreach (v;buttons)
+        foreach (v; buttons)
             if (v == b)
                 return true;
         return false;
@@ -44,7 +46,8 @@ class RadioGroup
 
     void selectButton(ButtonRadio b)
     {
-        foreach (v;buttons) {
+        foreach (v; buttons)
+        {
             auto x = v == b;
 
             writeln("ButtonRadio Checked?: ", b, " ", x);
@@ -56,10 +59,10 @@ class RadioGroup
 
     ButtonRadio getSelectedButton()
     {
-        foreach (v;buttons)
+        foreach (v; buttons)
             if (v.getChecked())
                 return v;
-        return cast(ButtonRadio)null;
+        return cast(ButtonRadio) null;
     }
 
 }

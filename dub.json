@@ -5,11 +5,13 @@
 	"configurations": [
 		{
 			"dependencies": {
-			    "bindbc-sdl": "~>1.0.0"
+				"bindbc-freetype": "~>1.0.2",
+				"bindbc-sdl": "~>1.0.0"
 			},
 			"libs": [
 				"SDL2",
-				"SDL2_image"
+				"SDL2_image",
+				"freetype"
 			],
 			"name": "platform-sdl-desktop",
 			"targetType": "library",
@@ -17,6 +19,7 @@
 				"SDL_204",
 				"BindSDL_Static",
 				"SDL_Image",
+				"BindFT_Static",
 				"DTK_PLATFORM_SDL_DESKTOP"
 			]
 		}

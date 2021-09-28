@@ -5,6 +5,7 @@ import std.typecons;
 
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.FontI;
 
 import dtk.widgets.Widget;
 
@@ -13,7 +14,6 @@ import dtk.types.Size2D;
 import dtk.types.Color;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
-import dtk.types.Font;
 import dtk.types.FontStyle;
 import dtk.types.TextStyle;
 
@@ -138,7 +138,8 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
                     right_style, fill_style);
     }
 
-    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style)
+    void drawText(string text, Position2D pos, FontI font,
+            FontStyle font_style, TextStyle text_style)
     {
         Position2D npos;
         npos.x = pos.x + x;

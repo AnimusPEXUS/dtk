@@ -64,7 +64,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
     static if (settings.variable_define && !settings.variable_private)
     {
-        static if(settings.variable_private)
+        static if (settings.variable_private)
         {
             private T1 variable = settings.init_value;
         }
@@ -161,18 +161,15 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 
     T1 getUnsetValue()
     {
-        static if (settings.whatToReturnIfUnset
-                == PropertyWhatToReturnIfValueIsUnset.initValue)
+        static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.initValue)
         {
             return settings.init_value;
         }
-        static if (settings.whatToReturnIfUnset
-                == PropertyWhatToReturnIfValueIsUnset.defaultValue)
+        static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.defaultValue)
         {
             return settings.default_value;
         }
-        static if (settings.whatToReturnIfUnset
-                == PropertyWhatToReturnIfValueIsUnset.typeInitValue)
+        static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.typeInitValue)
         {
             return T1.init;
         }
@@ -298,13 +295,17 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 
             static if (settings.resettable)
             {
-                if (settings.setting_to_default_value_makes_property_reset && new_value == settings.default_value) {
+                if (settings.setting_to_default_value_makes_property_reset
+                        && new_value == settings.default_value)
+                {
                     reset();
                 }
             }
             static if (settings.unsettable)
             {
-                if (settings.setting_to_default_value_makes_property_unset && new_value == settings.default_value) {
+                if (settings.setting_to_default_value_makes_property_unset
+                        && new_value == settings.default_value)
+                {
                     unset();
                 }
             }
@@ -360,9 +361,7 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
 
     // =========== signals ===========
 
-    static foreach (v; [
-            "onBeforeGet", "onAfterGet",
-        ])
+    static foreach (v; ["onBeforeGet", "onAfterGet",])
     {
         static if (__traits(hasMember, property, v))
         {
@@ -375,9 +374,8 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
     }
 
     static foreach (v; [
-            "onBeforeSet", "onAfterSet",
-            "onBeforeReset", "onAfterReset", "onBeforeUnset", "onAfterUnset",
-            "onBeforeChanged", "onAfterChanged",
+            "onBeforeSet", "onAfterSet", "onBeforeReset", "onAfterReset",
+            "onBeforeUnset", "onAfterUnset", "onBeforeChanged", "onAfterChanged",
         ])
     {
         static if (__traits(hasMember, property, v))

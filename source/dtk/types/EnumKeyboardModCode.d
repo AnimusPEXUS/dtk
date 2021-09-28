@@ -10,7 +10,7 @@ module dtk.types.EnumKeyboardModCode;
 
 enum EnumKeyboardModCode : ushort
 {
-None          =  0,
+    None = 0,
     LeftShift = 0b1,
     LeftControl = 0b10,
     LeftMenu = 0b100,
@@ -28,27 +28,31 @@ None          =  0,
     ScrollLock = 0b100000000000000,
 };
 
-
-
-    enum EnumKeyboardModCodeNOT : ushort
-    {
-        None          =  cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.None,
-        LeftShift     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftShift,
-        LeftControl   = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftControl,
-        LeftMenu      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftMenu,
-        LeftSuper     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftSuper,
-        LeftAlt       = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftAlt,
-        LeftMode      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.LeftMode,
-        RightShift    = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightShift,
-        RightControl  = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightControl,
-        RightMenu     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightMenu,
-        RightSuper    = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightSuper,
-        RightAlt      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightAlt,
-        RightMode     = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.RightMode,
-        CapsLock      = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.CapsLock,
-        NumLock       = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.NumLock,
-        ScrollLock    = cast(EnumKeyboardModCodeNOT)~cast(uint)EnumKeyboardModCode.ScrollLock,
-        Locks = ScrollLock & NumLock & CapsLock
-    };
-
-    
+enum EnumKeyboardModCodeNOT : ushort
+{
+    None = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.None,
+    LeftShift = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.LeftShift,
+    LeftControl = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.LeftControl,
+    LeftMenu = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.LeftMenu,
+    LeftSuper = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.LeftSuper,
+    LeftAlt = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.LeftAlt,
+    LeftMode = cast(
+            EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.LeftMode,
+    RightShift = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.RightShift,
+    RightControl = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.RightControl,
+    RightMenu = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.RightMenu,
+    RightSuper = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.RightSuper,
+    RightAlt = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.RightAlt,
+    RightMode = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.RightMode,
+    CapsLock = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.CapsLock,
+    NumLock = cast(EnumKeyboardModCodeNOT)~cast(
+            uint) EnumKeyboardModCode.NumLock,
+    ScrollLock = cast(EnumKeyboardModCodeNOT)~cast(uint) EnumKeyboardModCode.ScrollLock,
+    Locks = ScrollLock & NumLock & CapsLock
+};

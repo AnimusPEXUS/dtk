@@ -66,7 +66,6 @@ mixin template Property_gsun(T, string variable)
     ");
 }
 
-
 /// getter and setter only
 mixin template Property_gs(T, string variable)
 {

@@ -1,7 +1,5 @@
 module dtk.types.EventXAction;
 
-
-
 mixin template mixin_EventXAction(string subject)
 {
     mixin("
@@ -9,9 +7,9 @@ import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.WindowI;
 
-import dtk.types.Event"~subject~";
+import dtk.types.Event" ~ subject ~ ";
 
-struct Event"~subject~"Action
+struct Event" ~ subject ~ "Action
 {
     // if not matched prefilter - checkMatch call will not happen
     // ------- prefilter start -------
@@ -27,21 +25,21 @@ struct Event"~subject~"Action
 
     /// if true is not returned - action will not be called.  checkMatch is not
     /// called (and it's return assumed to be false) if prefilter isn't matched
-    bool delegate(WindowEventMgrI mgr, WindowI window, Event"~subject~"* e, WidgetI focusedWidget, WidgetI mouseWidget) checkMatch;
+    bool delegate(WindowEventMgrI mgr, WindowI window, Event" ~ subject
+            ~ "* e, WidgetI focusedWidget, WidgetI mouseWidget) checkMatch;
 
     /// this is called then all filters successfully passed.
     /// if false returned - event manager shoud continue to search for action handler.
     /// if true returned - event manager should not continue search for action handler.
-    bool delegate(WindowEventMgrI mgr, WindowI window, Event"~subject~"* e, WidgetI focusedWidget, WidgetI mouseWidget) action;
-}"
-);
+    bool delegate(WindowEventMgrI mgr, WindowI window, Event" ~ subject
+            ~ "* e, WidgetI focusedWidget, WidgetI mouseWidget) action;
+}");
 }
 
-static foreach(v;["Window", "Keyboard", "Mouse", "TextInput"])
+static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
 {
     mixin mixin_EventXAction!v;
 }
-
 
 // TODO: remove this?
 union EventXAction

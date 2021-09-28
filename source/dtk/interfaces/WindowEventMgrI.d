@@ -12,8 +12,8 @@ interface WindowEventMgrI : EventReceiverWindowI
 
     void removeAllActions();
 
-    static foreach(v;["Window", "Keyboard", "Mouse", "TextInput"])
+    static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
-        mixin("void add"~v~"Action(Event"~v~"Action eva);");
+        mixin("void add" ~ v ~ "Action(Event" ~ v ~ "Action eva);");
     }
 }

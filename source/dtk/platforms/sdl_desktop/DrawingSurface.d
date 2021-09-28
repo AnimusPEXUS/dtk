@@ -12,11 +12,11 @@ import dtk.types.Size2D;
 import dtk.types.Color;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
-import dtk.types.Font;
 import dtk.types.FontStyle;
 import dtk.types.TextStyle;
 
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.FontI;
 
 import dtk.platforms.sdl_desktop.Window;
 
@@ -157,9 +157,14 @@ class DrawingSurface : DrawingSurfaceI
         SDL_UpdateWindowSurface(w._sdl_window); */
     }
 
-    void drawText(string text, Position2D pos, Font font, FontStyle font_style, TextStyle text_style)
+    void drawText(string text, Position2D pos, FontI font,
+            FontStyle font_style, TextStyle text_style)
     {
-
+        if (text.length > 0)
+        {
+            assert(font !is null);
+            font.drawChar(text[0], this);
+        }
     }
 
     // TODO: performance check required. probably functions which use it, have

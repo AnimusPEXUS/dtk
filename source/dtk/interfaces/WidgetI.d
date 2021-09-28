@@ -56,7 +56,6 @@ interface WidgetI : EventReceiverWidgetI
 
     bool on_mouse_over_internal(EventMouse* event);
 
-
     bool on_keyboard_click_internal(EventKeyboard* event);
     bool on_keyboard_down_internal(EventKeyboard* event);
     bool on_keyboard_up_internal(EventKeyboard* event);

@@ -9,6 +9,8 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
+import dtk.types.FontStyle;
+import dtk.types.TextStyle;
 import dtk.types.EventXAction;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
@@ -73,30 +75,24 @@ class Chicago98Laf : LafI
 
         auto pos = widget.getPosition();
         auto size = widget.getSize();
-        ds.drawRectangle(
-            pos,
-            size,
-            LineStyle(formBackground),
-            LineStyle(formBackground),
-            LineStyle(formBackground),
-            LineStyle(formBackground),
-            nullable(FillStyle(formBackground))
-        );
+        ds.drawRectangle(pos, size, LineStyle(formBackground), LineStyle(formBackground),
+                LineStyle(formBackground), LineStyle(formBackground),
+                nullable(FillStyle(formBackground)));
     }
 
     void drawButton(Button widget)
     {
         writeln("drawButton called");
 
-        bool is_default = delegate bool () {
-            auto f = widget.getForm() ;
+        bool is_default = delegate bool() {
+            auto f = widget.getForm();
             if (f is null)
                 return false;
             auto def = f.getDefaultWidget();
             return widget == def;
         }();
-        bool is_focused = delegate bool () {
-            auto f = widget.getForm() ;
+        bool is_focused = delegate bool() {
+            auto f = widget.getForm();
             if (f is null)
                 return false;
             auto curvid = f.getFocusedWidget();
@@ -120,21 +116,14 @@ class Chicago98Laf : LafI
 
         drawBewel(ds, pos, size, is_down);
 
-        ds.drawRectangle(
-            Position2D(pos.x + 2, pos.y + 2),
-            Size2D(size.width - 4, size.height - 4),
-            LineStyle(buttonColor),
-            nullable(FillStyle(buttonColor))
-        );
+        ds.drawRectangle(Position2D(pos.x + 2, pos.y + 2), Size2D(size.width - 4,
+                size.height - 4), LineStyle(buttonColor), nullable(FillStyle(buttonColor)));
 
         if (is_focused)
         {
-            ds.drawRectangle(
-                Position2D(pos.x + 4, pos.y + 4),
-                Size2D(size.width - 8, size.height - 8),
-                LineStyle(Color(0), [true, false]),
-                Nullable!FillStyle()
-            );
+            ds.drawRectangle(Position2D(pos.x + 4, pos.y + 4),
+                    Size2D(size.width - 8, size.height - 8), LineStyle(Color(0),
+                        [true, false]), Nullable!FillStyle());
         }
 
         ds.present();
@@ -154,13 +143,9 @@ class Chicago98Laf : LafI
 
         auto p = Position2D(6, 6);
 
-        ds.drawRectangle(
-            pos, /* Position2D(pos.x - 2, pos.y - 2), */
-            Size2D(size.width + 1, size.height + 1),
-            LineStyle(formBackground),
-            nullable(FillStyle(formBackground))
-        );
-
+        ds.drawRectangle(pos, /* Position2D(pos.x - 2, pos.y - 2), */
+                Size2D(size.width + 1, size.height + 1),
+                LineStyle(formBackground), nullable(FillStyle(formBackground)));
 
         ds.drawArc(p, 6, P_M45, P_135, step, elementLightedColor);
         ds.drawArc(p, 6, P_135, P_135M2, step, elementDarkedColor2);
@@ -173,28 +158,25 @@ class Chicago98Laf : LafI
         auto fillColor = Color(0xffffff);
         if (widget.getChecked())
         {
-            fillColor= Color(0);
+            fillColor = Color(0);
         }
 
-        for (int i = 3 ; i != 0 ; i--)
+        for (int i = 3; i != 0; i--)
         {
             ds.drawCircle(p, i, step, fillColor);
         }
 
-        ds.drawDot(Position2D(6,6), fillColor);
+        ds.drawDot(Position2D(6, 6), fillColor);
 
         if (widget.getForm().getFocusedWidget() == widget)
         {
-            ds.drawRectangle(
-                pos, /* Position2D(pos.x - 2, pos.y - 2), */
-                size, /* Size2D(size.width + 4, size.height + 4), */
-                LineStyle(Color(0), [true, false]),
-                Nullable!FillStyle()
-            );
+            ds.drawRectangle(pos, /* Position2D(pos.x - 2, pos.y - 2), */
+                    size, /* Size2D(size.width + 4, size.height + 4), */
+                    LineStyle(Color(0), [true, false]), Nullable!FillStyle());
         }
 
         ds.present();
-/*
+        /*
         if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawCircle(p, 4, step, Color(0));
@@ -231,12 +213,9 @@ class Chicago98Laf : LafI
 
         drawBewel(ds, pos, size, true);
 
-        ds.drawRectangle(
-            Position2D(pos.x + 2, pos.y + 2),
-            Size2D(size.width - 4, size.height - 4),
-            LineStyle(Color(0xffffff)),
-            nullable(FillStyle(Color(0xffffff)))
-        );
+        ds.drawRectangle(Position2D(pos.x + 2, pos.y + 2), Size2D(size.width - 4,
+                size.height - 4), LineStyle(Color(0xffffff)),
+                nullable(FillStyle(Color(0xffffff))));
 
         /* ds.drawRectangle(
             Position2D(pos.x + 3, pos.y + 3),
@@ -247,27 +226,20 @@ class Chicago98Laf : LafI
 
         if (widget.getForm().getFocusedWidget() == widget)
         {
-            ds.drawRectangle(
-                pos, /* Position2D(pos.x - 2, pos.y - 2), */
-                size, /* Size2D(size.width + 4, size.height + 4), */
-                LineStyle(Color(0), [true, false]),
-                Nullable!FillStyle()
-            );
+            ds.drawRectangle(pos, /* Position2D(pos.x - 2, pos.y - 2), */
+                    size, /* Size2D(size.width + 4, size.height + 4), */
+                    LineStyle(Color(0), [true, false]), Nullable!FillStyle());
         }
 
-        auto fillColor=Color(0xffffff);
+        auto fillColor = Color(0xffffff);
 
         if (widget.getChecked())
         {
             fillColor = Color(0);
         }
 
-        ds.drawRectangle(
-            Position2D(pos.x + 3, pos.y + 3),
-            Size2D(size.width - 6, size.height - 6),
-            LineStyle(Color(0)),
-            nullable(FillStyle(fillColor))
-        );
+        ds.drawRectangle(Position2D(pos.x + 3, pos.y + 3), Size2D(size.width - 6,
+                size.height - 6), LineStyle(Color(0)), nullable(FillStyle(fillColor)));
 
         ds.present();
     }
@@ -280,6 +252,16 @@ class Chicago98Laf : LafI
     void drawLabel(Label widget)
     {
         writeln("drawLabel called");
+
+        auto txt = widget.getText();
+        auto pos = Position2D(0, 0);
+
+        auto font = widget.getForm().getWindow().getPlatform().getFontManager()
+            .loadFont("/usr/share/fonts/go/Go-Regular.ttf");
+
+        auto ds = widget.getDrawingSurface();
+        ds.drawText(txt, pos, font, FontStyle(), TextStyle());
+        ds.present();
     }
 
     void drawLayout(Layout widget)
@@ -321,155 +303,112 @@ class Chicago98Laf : LafI
     {
         {
             EventKeyboardAction ea = {
-                any_focusedWidget: true,
-                any_mouseWidget:true,
-                checkMatch: delegate bool(
-                    WindowEventMgrI mgr,
-                    WindowI window,
-                    EventKeyboard* e,
-                    WidgetI focusedWidget,
-                    WidgetI mouseWidget,
-                    )
-                    {
-                        auto mc = e.keysym.modcode;
-                        writeln("caps:", (mc & EnumKeyboardModCode.CapsLock) != 0);
-                        writeln("num:", (mc & EnumKeyboardModCode.NumLock) != 0);
-                        writeln("scroll:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
-                        mc &= EnumKeyboardModCodeNOT.Locks;
-                        writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
-                        writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
-                        writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
-                        if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation && (mc == 0 || mc == EnumKeyboardModCode.LeftShift ))
-                            return true;
-                        return false;
-                    },
-                action: delegate bool(
-                    WindowEventMgrI mgr,
-                    WindowI window,
-                    EventKeyboard* e,
-                    WidgetI focusedWidget,
-                    WidgetI mouseWidget,
-                    )
-                    {
-                        auto mc = e.keysym.modcode;
-                        mc &= EnumKeyboardModCodeNOT.Locks;
-                        writeln("tab pressed");
-                        if (mc == EnumKeyboardModCode.LeftShift)
-                        {
-                            writeln("with shift");
-                        }
+                any_focusedWidget: true, any_mouseWidget: true, checkMatch: delegate bool(WindowEventMgrI mgr, WindowI window,
+                        EventKeyboard* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
+                    auto mc = e.keysym.modcode;
+                    writeln("caps:", (mc & EnumKeyboardModCode.CapsLock) != 0);
+                    writeln("num:", (mc & EnumKeyboardModCode.NumLock) != 0);
+                    writeln("scroll:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
+                    mc &= EnumKeyboardModCodeNOT.Locks;
+                    writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
+                    writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
+                    writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
+                    if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation
+                            && (mc == 0 || mc == EnumKeyboardModCode.LeftShift))
                         return true;
-                    },
-            };
-
-            mgr.addKeyboardAction(ea);
-        }
-
-        {
-            EventMouseAction ea = {
-                any_focusedWidget: true,
-                any_mouseWidget:true,
-                checkMatch: delegate bool(
-                    WindowEventMgrI mgr,
-                    WindowI window,
-                    EventMouse* e,
-                    WidgetI focusedWidget,
-                    WidgetI mouseWidget,
-                    )
+                    return false;
+                }, action: delegate bool(WindowEventMgrI mgr, WindowI window,
+                        EventKeyboard* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
+                    auto mc = e.keysym.modcode;
+                    mc &= EnumKeyboardModCodeNOT.Locks;
+                    writeln("tab pressed");
+                    if (mc == EnumKeyboardModCode.LeftShift)
                     {
+                        writeln("with shift");
+                    }
+                    return true;
+                },};
+
+                mgr.addKeyboardAction(ea);
+            }
+
+            {
+                EventMouseAction ea = {
+                    any_focusedWidget: true, any_mouseWidget: true, checkMatch: delegate bool(WindowEventMgrI mgr, WindowI window,
+                            EventMouse* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
                         return e.type == EventMouseType.button;
-                    },
-                action: delegate bool(
-                    WindowEventMgrI mgr,
-                    WindowI window,
-                    EventMouse* e,
-                    WidgetI focusedWidget,
-                    WidgetI mouseWidget,
-                    )
-                    {
+                    }, action: delegate bool(WindowEventMgrI mgr, WindowI window,
+                            EventMouse* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
                         if (mouseWidget is null)
                         {
                             writeln("error: got mouse event, but mouseWidget is null");
                             return false;
                         }
 
-                        if (e.button.buttonState == EnumMouseButtonState.pressed) {
+                        if (e.button.buttonState == EnumMouseButtonState.pressed)
+                        {
                             mouseWidget.on_mouse_down_internal(e);
                         }
 
-                        if (e.button.buttonState == EnumMouseButtonState.released) {
+                        if (e.button.buttonState == EnumMouseButtonState.released)
+                        {
                             mouseWidget.on_mouse_up_internal(e);
 
-                            if (e.button.clicks != 0) {
+                            if (e.button.clicks != 0)
+                            {
                                 mouseWidget.on_mouse_click_internal(e);
                             }
                         }
 
                         return true;
-                    },
-            };
+                    },};
 
-            mgr.addMouseAction(ea);
-        }
+                    mgr.addMouseAction(ea);
+                }
 
-        {
-            EventWindowAction ea = {
-                any_focusedWidget: true,
-                any_mouseWidget:true,
-                checkMatch: delegate bool(
-                    WindowEventMgrI mgr,
-                    WindowI window,
-                    EventWindow* e,
-                    WidgetI focusedWidget,
-                    WidgetI mouseWidget,
-                    )
-                    {
-                        writeln("checkMatch 1 called");
-                        return true;
-                    },
-                action: delegate bool(
-                    WindowEventMgrI mgr,
-                    WindowI window,
-                    EventWindow* e,
-                    WidgetI focusedWidget,
-                    WidgetI mouseWidget,
-                    )
-                    {
-                        bool needs_resize = false;
-                        bool needs_redraw = false;
+                {
+                    EventWindowAction ea = {
+                        any_focusedWidget: true, any_mouseWidget: true, checkMatch: delegate bool(WindowEventMgrI mgr, WindowI window,
+                                EventWindow* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
+                            writeln("checkMatch 1 called");
+                            return true;
+                        }, action: delegate bool(WindowEventMgrI mgr, WindowI window,
+                                EventWindow* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
+                            bool needs_resize = false;
+                            bool needs_redraw = false;
 
-                        switch (e.eventId)
-                        {
-                        default:
-                            return false;
-                            /* case EnumWindowEvent.show:
-                                break; */
-                        case EnumWindowEvent.show:
-                        case EnumWindowEvent.resize:
-                            needs_resize = true;
-                            needs_redraw = true;
-                            break;
-                        }
-
-                        if (needs_resize)
-                        {
-                            FormI _form = window.getForm() ;
-                            if (_form !is null)
+                            switch (e.eventId)
                             {
-                                _form.positionAndSizeRequest(Position2D(0, 0), Size2D(e.size.width, e.size.height));
+                            default:
+                                return false;
+                                /* case EnumWindowEvent.show:
+                                break; */
+                            case EnumWindowEvent.show:
+                            case EnumWindowEvent.resize:
+                                needs_resize = true;
                                 needs_redraw = true;
+                                break;
                             }
-                        }
 
-                        if (needs_redraw)
-                        {
-                            window.redraw();
-                        }
-                        return true;
-                    },
-            };
+                            if (needs_resize)
+                            {
+                                FormI _form = window.getForm();
+                                if (_form !is null)
+                                {
+                                    _form.positionAndSizeRequest(Position2D(0,
+                                            0), Size2D(e.size.width, e.size.height));
+                                    needs_redraw = true;
+                                }
+                            }
 
-            mgr.addWindowAction(ea);
-        }
-    }
-}
+                            if (needs_redraw)
+                            {
+                                window.redraw();
+                            }
+                            return true;
+                        },};
+
+                        mgr.addWindowAction(ea);
+                    }
+                }
+            }

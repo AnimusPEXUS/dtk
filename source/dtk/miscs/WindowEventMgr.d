@@ -16,12 +16,11 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.EventXAction;
 
-
 union XEvent
 {
     EventWindow* ewindow;
     EventKeyboard* ekeyboard;
-    EventMouse *emouse;
+    EventMouse* emouse;
     EventTextInput* etextinput;
 }
 
@@ -34,8 +33,7 @@ enum XEventType : ubyte
     textInput
 }
 
-
-class WindowEventMgr: WindowEventMgrI
+class WindowEventMgr : WindowEventMgrI
 {
 
     private
@@ -45,7 +43,7 @@ class WindowEventMgr: WindowEventMgrI
 
     this(WindowI window)
     {
-        this.window=window;
+        this.window = window;
     }
 
     WindowI getWindow()
@@ -53,57 +51,51 @@ class WindowEventMgr: WindowEventMgrI
         return window;
     }
 
+    private bool handle_event_x_search_and_call(alias listXActions, T1,)(T1 event)
+    {
+        WidgetI focusedWidget;
+        WidgetI mouseWidget;
 
-    private bool handle_event_x_search_and_call
-        (
-            alias listXActions,
-            T1,
-            )
-        (T1 event)
+        auto form = window.getForm();
+        if (form !is null)
         {
-            WidgetI focusedWidget;
-            WidgetI mouseWidget;
+            focusedWidget = form.getFocusedWidget();
+        }
 
-            auto form = window.getForm();
-            if (form !is null)
-            {
-                focusedWidget = form.getFocusedWidget();
-            }
+        // TODO: if mouse info isn't available - get is using platform
 
-            // TODO: if mouse info isn't available - get is using platform
+        static if (is(T1 == EventMouse*))
+        {
+            mouseWidget = getWidgetAtVisible(Position2D(event.x, event.y));
+        }
 
-            static if (is (T1 == EventMouse*)) {
-                mouseWidget=getWidgetAtVisible(Position2D(event.x, event.y));
-            }
-
-            /* if (type == XEventType.mouse)
+        /* if (type == XEventType.mouse)
             {
                 mouseWidget=getWidgetAtVisible(Position2D(event.emouse.x, event.emouse.y));
             } */
 
-            bool processed;
+        bool processed;
 
-            foreach (ref v; listXActions)
-            {
-                if (!v.any_focusedWidget && focusedWidget != v.focusedWidget)
-                    continue;
-
-                if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
-                    continue;
-
-                if (v.checkMatch !is null)
-                    if (!v.checkMatch(this, window, event, focusedWidget, mouseWidget))
-                        continue;
-
-                if (v.action !is null)
-                    processed = v.action(this, window, event, focusedWidget, mouseWidget);
-
+        foreach (ref v; listXActions)
+        {
+            if (!v.any_focusedWidget && focusedWidget != v.focusedWidget)
                 continue;
-            }
+
+            if (!v.any_mouseWidget && mouseWidget != v.mouseWidget)
+                continue;
+
+            if (v.checkMatch !is null)
+                if (!v.checkMatch(this, window, event, focusedWidget, mouseWidget))
+                    continue;
+
+            if (v.action !is null)
+                processed = v.action(this, window, event, focusedWidget, mouseWidget);
+
+            continue;
+        }
 
         return processed;
     }
-
 
     bool handle_event_window(EventWindow* e)
     {
@@ -129,7 +121,7 @@ class WindowEventMgr: WindowEventMgrI
     WidgetI getWidgetAtVisible(Position2D point)
     {
         WidgetI ret = null;
-        FormI _form = window.getForm() ;
+        FormI _form = window.getForm();
         if (_form !is null)
         {
             ret = _form.getWidgetAtVisible(point);
@@ -137,17 +129,17 @@ class WindowEventMgr: WindowEventMgrI
         return ret;
     }
 
-    static foreach(v;["Window", "Keyboard", "Mouse", "TextInput"])
+    static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
-        mixin("private Event"~v~"Action[] list"~v~"Actions;");
-        mixin("void add"~v~"Action(Event"~v~"Action eva) { list"~v~"Actions ~= eva; }");
+        mixin("private Event" ~ v ~ "Action[] list" ~ v ~ "Actions;");
+        mixin("void add" ~ v ~ "Action(Event" ~ v ~ "Action eva) { list" ~ v ~ "Actions ~= eva; }");
     }
 
     void removeAllActions()
     {
-        static foreach(v;["Window", "Keyboard", "Mouse", "TextInput"])
+        static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
         {
-            mixin("list"~v~"Actions = []; ");
+            mixin("list" ~ v ~ "Actions = []; ");
         }
     }
 

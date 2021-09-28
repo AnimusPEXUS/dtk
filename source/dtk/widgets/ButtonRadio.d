@@ -31,12 +31,14 @@ class ButtonRadio : Button
 
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
-        try {
+        try
+        {
             writeln("handleRadioGroup_onBeforeChanged: ", old_v, new_v);
             if (old_v !is null)
-            if (old_v.isIn(this))
-                old_v.remove(this);
-        } catch (Exception e)
+                if (old_v.isIn(this))
+                    old_v.remove(this);
+        }
+        catch (Exception e)
         {
 
         }
@@ -44,12 +46,14 @@ class ButtonRadio : Button
 
     private void handleRadioGroup_onAfterChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
-        try{
+        try
+        {
             writeln("handleRadioGroup_onAfterChanged: ", old_v, new_v);
             if (new_v !is null)
-            if (!new_v.isIn(this))
-                new_v.add(this);
-        } catch (Exception e)
+                if (!new_v.isIn(this))
+                    new_v.add(this);
+        }
+        catch (Exception e)
         {
 
         }
@@ -70,7 +74,8 @@ class ButtonRadio : Button
     override bool on_mouse_down_internal(EventMouse* event)
     {
         auto f = getForm();
-        if (f !is null){
+        if (f !is null)
+        {
             f.focusTo(this);
         }
 
@@ -85,6 +90,9 @@ class ButtonRadio : Button
         return false;
     }
 
-
+    override void redraw()
+    {
+        this.redraw_x(this);
+    }
 
 }

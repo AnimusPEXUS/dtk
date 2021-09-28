@@ -28,7 +28,6 @@ import dtk.types.EventTextInput;
 
 import dtk.miscs.WindowEventMgr;
 
-
 class Window : WindowI
 {
 
@@ -121,7 +120,8 @@ class Window : WindowI
         setEventManager(new WindowEventMgr(this));
         if (window_settings.laf !is null)
             setLaf(window_settings.laf);
-        else {
+        else
+        {
             auto plaf = _platform.getLaf();
             assert(plaf !is null, "platform doesn't have Laf defined. this is not ok");
             setLaf(plaf);
@@ -200,8 +200,9 @@ class Window : WindowI
         writeln("Window::handle_SDL_KeyboardEvent");
         // TODO: ensure event consistency
         auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
-        if (res[1] !is null) {
-            writeln("couldn't convert SDL keyboard event to Dtk keyboard event: "~res[1].msg);
+        if (res[1]!is null)
+        {
+            writeln("couldn't convert SDL keyboard event to Dtk keyboard event: " ~ res[1].msg);
             return;
         }
         handle_event_keyboard(res[0]);
@@ -385,6 +386,5 @@ class Window : WindowI
     {
         _title = value;
     }
-
 
 }

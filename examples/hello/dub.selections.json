@@ -1,6 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"bindbc-freetype": "1.0.2",
 		"bindbc-loader": "1.0.1",
 		"bindbc-sdl": "1.0.1",
 		"dtk": "~master",

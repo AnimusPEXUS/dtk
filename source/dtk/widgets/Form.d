@@ -44,7 +44,6 @@ class Form : Widget, FormI
     mixin Property_forwarding!(WidgetI, focused_widget, "FocusedWidget");
     mixin Property_forwarding!(WidgetI, default_widget, "DefaultWidget");
 
-
     this()
     {
         connectToChild_onAfterChanged(&onChildChanged);
@@ -127,7 +126,7 @@ class Form : Widget, FormI
     override void redraw()
     {
 
-        super.redraw();
+        this.redraw_x(this);
 
         if (isSetChild())
         {

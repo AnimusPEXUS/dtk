@@ -8,6 +8,7 @@ import bindbc.sdl;
 import dtk.interfaces.LafI;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
+import dtk.interfaces.FontMgrI;
 
 import dtk.types.WindowCreationSettings;
 
@@ -30,6 +31,7 @@ class SDLDesktopPlatform : PlatformI
         bool exit;
         Window[] windows;
         LafI laf;
+        FontMgrI font_mgr;
     }
 
     string getName()
@@ -94,11 +96,28 @@ class SDLDesktopPlatform : PlatformI
         SDL_version v;
         SDL_GetVersion(&v);
         writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
+        version (linux)
+        {
+            pragma(msg, "using freetype font manager");
+            import dtk.platforms.sdl_desktop.FontMgrLinux;
+
+            font_mgr = cast(FontMgrI) new FontMgrLinux;
+        }
+        else
+        {
+            pragma(msg, "Font Manager error");
+            static assert(false, "Couldn't select Font Manager for platform");
+        }
     }
 
     void destroy()
     {
         SDL_Quit();
+    }
+
+    FontMgrI getFontManager()
+    {
+        return font_mgr;
     }
 
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)

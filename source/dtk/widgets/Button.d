@@ -40,7 +40,8 @@ class Button : Widget, ContainerableWidgetI
     {
         button_is_down = true;
         auto f = getForm();
-        if (f !is null){
+        if (f !is null)
+        {
             f.focusTo(this);
         }
         writeln("button down");
@@ -56,5 +57,14 @@ class Button : Widget, ContainerableWidgetI
         return false;
     }
 
+    override void redraw()
+    {
+        this.redraw_x(this);
+    }
+
+    /* void redraw(alias A1)()
+    {
+        super.redraw!(A1)();
+    } */
 
 }

@@ -105,18 +105,18 @@ Tuple!(EventKeyboard*, Exception) convertSDLKeyboardEventToDtkEventKeyboard(SDL_
 
     {
         auto res = convertSDLKeycodeToEnumKeyboardKeyCode(e.keysym.sym);
-        if (res[1] !is null)
+        if (res[1]!is null)
         {
-            return tuple(cast(EventKeyboard*)null, res[1]);
+            return tuple(cast(EventKeyboard*) null, res[1]);
         }
         sk.keycode = res[0];
     }
 
     {
         auto res = convertCombinationSDLKeymodToEnumKeyboardModCode(cast(SDL_Keymod) e.keysym.mod);
-        if (res[1] !is null)
+        if (res[1]!is null)
         {
-            return tuple(cast(EventKeyboard*)null, res[1]);
+            return tuple(cast(EventKeyboard*) null, res[1]);
         }
         sk.modcode = res[0];
     }

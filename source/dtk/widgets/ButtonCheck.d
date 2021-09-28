@@ -21,7 +21,6 @@ class ButtonCheck : Button
         setFocusable(true);
     }
 
-
     override bool on_mouse_click_internal(EventMouse* event)
     {
         writeln("ButtonCheck click");
@@ -33,7 +32,8 @@ class ButtonCheck : Button
     override bool on_mouse_down_internal(EventMouse* event)
     {
         auto f = getForm();
-        if (f !is null){
+        if (f !is null)
+        {
             f.focusTo(this);
         }
 
@@ -46,6 +46,11 @@ class ButtonCheck : Button
     {
         writeln("ButtonCheck up");
         return false;
+    }
+
+    override void redraw()
+    {
+        this.redraw_x(this);
     }
 
 }

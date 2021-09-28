@@ -1,6 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"bindbc-freetype": "1.0.2",
 		"bindbc-loader": "0.3.2",
 		"bindbc-sdl": "0.21.4",
 		"eventcore": "0.9.17",
