@@ -1,5 +1,6 @@
 module dtk.platforms.sdl_desktop.FontMgrLinux;
 
+import std.conv;
 import std.stdio;
 import std.path;
 import std.file;
@@ -114,6 +115,19 @@ class Font : FontI
         {
             throw new Exception("Can't load file as font: unknown error");
         }
+
+        err = FT_Set_Pixel_Sizes(face, 0, 20);
+        if (err != 0)
+        {
+            throw new Exception("Can't set pixel size");
+        }
+
+        err = FT_Set_Char_Size(face, 20, 20, 97, 97);
+        if (err != 0)
+        {
+            throw new Exception("Can't set char size");
+        }
+
     }
 
     FontInfo* getFontInfo()
@@ -123,7 +137,7 @@ class Font : FontI
 
     void drawChar(char chr, DrawingSurfaceI ds)
     {
-        FT_GlyphSlot slot = face.glyph; /* a small shortcut */
+        /* FT_GlyphSlot slot = face.glyph; /* a small shortcut * / */
 
         /* ... initialize library ...
            ... create face object ...
@@ -132,40 +146,41 @@ class Font : FontI
         FT_UInt glyph_index;
 
         /* retrieve glyph index from character code */
-        auto error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-        if (error != 0)
+        auto err = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+        if (err != 0)
         {
             writeln("error: FT_Select_Charmap: no unicode");
             return;
         }
 
-        glyph_index = FT_Get_Char_Index(face, cast(ulong) chr);
+        glyph_index = FT_Get_Char_Index(face, cast(FT_ULong)(chr));
         /* glyph_index=100; */
+        writeln(" glyph_index == ", glyph_index);
         if (glyph_index == 0)
         {
-            writeln("error: FT_Get_Char_Index: glyph_index == ", glyph_index);
+            writeln("error: FT_Get_Char_Index");
             return;
         }
 
         /* load glyph image into the slot (erase previous one) */
-        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-        if (error)
+        err = FT_Load_Glyph(face, glyph_index, FT_LOAD_TARGET_NORMAL );
+        if (err != 0)
         {
-            writeln("error: FT_Load_Glyph: ", error);
+            writeln("error: FT_Load_Glyph: ", err);
             return; /* ignore errors */
         }
 
         /* convert to an anti-aliased bitmap */
-        error = FT_Render_Glyph(face.glyph, FT_RENDER_MODE_NORMAL);
-        if (error)
+        err = FT_Render_Glyph(face.glyph, FT_RENDER_MODE_NORMAL);
+        if (err != 0)
         {
-            writeln("error: FT_Render_Glyph: ", error);
+            writeln("error: FT_Render_Glyph: ", err);
             return;
         }
 
         /* now, draw to our target surface */
         /* my_draw_bitmap(&slot.bitmap, pen_x + slot.bitmap_left, pen_y - slot.bitmap_top); */
-        writeln("pixel mode: ", slot.bitmap.pixel_mode);
+        writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode);
 
         /* increment pen position */
         /* pen_x += slot.advance.x >> 6;
