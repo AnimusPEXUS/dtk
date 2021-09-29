@@ -14,6 +14,8 @@ import dtk.interfaces.FontI;
 import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.types.FontInfo;
+import dtk.types.Color;
+import dtk.types.Position2D;
 
 class FontMgrLinux : FontMgrI
 {
@@ -116,13 +118,13 @@ class Font : FontI
             throw new Exception("Can't load file as font: unknown error");
         }
 
-        err = FT_Set_Pixel_Sizes(face, 0, 20);
+        err = FT_Set_Pixel_Sizes(face, 1, 1);
         if (err != 0)
         {
             throw new Exception("Can't set pixel size");
         }
 
-        err = FT_Set_Char_Size(face, 20, 20, 97, 97);
+        err = FT_Set_Char_Size(face, 2000, 2000, 200, 200);
         if (err != 0)
         {
             throw new Exception("Can't set char size");
@@ -153,7 +155,7 @@ class Font : FontI
             return;
         }
 
-        glyph_index = FT_Get_Char_Index(face, cast(FT_ULong)(chr));
+        glyph_index = FT_Get_Char_Index(face, chr);
         /* glyph_index=100; */
         writeln(" glyph_index == ", glyph_index);
         if (glyph_index == 0)
@@ -181,6 +183,28 @@ class Font : FontI
         /* now, draw to our target surface */
         /* my_draw_bitmap(&slot.bitmap, pen_x + slot.bitmap_left, pen_y - slot.bitmap_top); */
         writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode);
+
+        auto b = face.glyph.bitmap;
+
+        assert(b.pixel_mode == FT_PIXEL_MODE_GRAY);
+
+
+        for (int y = 0; y != b.rows; y++)
+        {
+            for (int x = 0; x != b.width; x++)
+            {
+                ubyte c;
+                c = b.buffer[y*b.width+x];
+                c = ubyte.max - c;
+                if (c == 255)
+                {
+                    continue;
+                }
+                auto color = Color(cast(ubyte[])[c,c,c]);
+                writeln("drawing pixel ",x,":",y," ",color);
+                ds.drawDot(Position2D(x,y), color);
+            }
+        }
 
         /* increment pen position */
         /* pen_x += slot.advance.x >> 6;

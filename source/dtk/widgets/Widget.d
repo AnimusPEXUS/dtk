@@ -94,6 +94,7 @@ class Widget : WidgetI
     this()
     {
         writeln("Widget:init() is called for ", this);
+        _ds = new WidgetDrawingSurfaceShifted(this);
         this.connectToParent_onAfterChanged(&onParentChanged);
     }
 
@@ -142,10 +143,6 @@ class Widget : WidgetI
 
     DrawingSurfaceI getDrawingSurface()
     {
-        if (_ds is null || !_ds.isValid())
-        {
-            _ds = new WidgetDrawingSurfaceShifted(this);
-        }
         return _ds;
     }
 

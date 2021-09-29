@@ -47,7 +47,7 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new Label();
-    lbl1.setText("text test");
+    lbl1.setText("t👍ext test");
 
     /* DS ds = new DS(); */
 

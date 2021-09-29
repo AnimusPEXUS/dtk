@@ -260,7 +260,7 @@ class Chicago98Laf : LafI
             .loadFont("/usr/share/fonts/go/Go-Regular.ttf");
 
         auto ds = widget.getDrawingSurface();
-        ds.drawText(txt, pos, font, FontStyle(), TextStyle());
+        ds.drawText(txt, pos, font, FontStyle()); // , TextStyle()
         ds.present();
     }
 

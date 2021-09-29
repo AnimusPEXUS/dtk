@@ -101,4 +101,40 @@ struct Color
         return ret;
     }
 
+    Color add(Color other)
+    {
+        Color ret;
+        ret.r = cast(ubyte)(this.r+other.r);
+        ret.g = cast(ubyte)(this.g+other.g);
+        ret.b = cast(ubyte)(this.b+other.b);
+        return ret;
+    }
+
+    Color sub(Color other)
+    {
+        Color ret;
+        ret.r = cast(ubyte)(this.r-other.r);
+        ret.g = cast(ubyte)(this.g-other.g);
+        ret.b = cast(ubyte)(this.b-other.b);
+        return ret;
+    }
+
+    Color mul(Color other)
+    {
+        Color ret;
+        ret.r = cast(ubyte)(this.r*other.r);
+        ret.g = cast(ubyte)(this.g*other.g);
+        ret.b = cast(ubyte)(this.b*other.b);
+        return ret;
+    }
+
+    Color div(Color other)
+    {
+        Color ret;
+        ret.r = cast(ubyte)(this.r/other.r);
+        ret.g = cast(ubyte)(this.g/other.g);
+        ret.b = cast(ubyte)(this.b/other.b);
+        return ret;
+    }
+
 }

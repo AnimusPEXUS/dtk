@@ -139,14 +139,14 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
     }
 
     void drawText(string text, Position2D pos, FontI font,
-            FontStyle font_style, TextStyle text_style)
+            FontStyle font_style) // , TextStyle text_style
     {
         Position2D npos;
         npos.x = pos.x + x;
         npos.y = pos.y + y;
         auto pds = getParentDS();
         if (pds)
-            pds.drawText(text, npos, font, font_style, text_style);
+            pds.drawText(text, npos, font, font_style); // , text_style
     }
 
     void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle,

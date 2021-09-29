@@ -18,6 +18,8 @@ import dtk.types.TextStyle;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FontI;
 
+import dtk.miscs.DrawingSurfaceShifted;
+
 import dtk.platforms.sdl_desktop.Window;
 
 class DrawingSurface : DrawingSurfaceI
@@ -158,12 +160,12 @@ class DrawingSurface : DrawingSurfaceI
     }
 
     void drawText(string text, Position2D pos, FontI font,
-            FontStyle font_style, TextStyle text_style)
+            FontStyle font_style) // , TextStyle text_style
     {
         if (text.length > 0)
         {
-            assert(font !is null);
-            font.drawChar(text[0], this);
+            auto nds = new DrawingSurfaceShifted(this, pos.x, pos.y);
+            font.drawChar(text[0], nds);
         }
     }
 
