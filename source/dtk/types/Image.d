@@ -1,5 +1,7 @@
 module dtk.types.Image;
 
+import dtk.interfaces.DrawingSurfaceI;
+
 import dtk.types.Color;
 
 struct ImageDot
@@ -7,7 +9,7 @@ struct ImageDot
     Color color;
 }
 
-struct Image
+class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 {
     uint width;
     uint height;
@@ -17,15 +19,12 @@ struct Image
     {
         this.width = width;
         this.height = height;
-        for (uint i = 0; i != width*height+1; i++)
-        {
-            data ~= ImageDot();
-        }
+        this.data = new ImageDot[](width*height);
     }
 
     typeof(this) setEach(ImageDot new_value)
     {
-        for (uint i = 0; i != width*height+1; i++)
+        for (uint i = 0; i != data.length; i++)
         {
             data[i] = new_value;
         }
@@ -39,6 +38,11 @@ struct Image
     }
 
     ImageDot getDot(uint x, uint y)
+    {
+        return this.data[y*width+x];
+    }
+
+    ref ImageDot getDotRef(uint x, uint y)
     {
         return this.data[y*width+x];
     }

@@ -253,15 +253,13 @@ class Chicago98Laf : LafI
     {
         writeln("drawLabel called");
 
-        auto txt = widget.getText();
-        auto pos = Position2D(0, 0);
-
-        auto font = widget.getForm().getWindow().getPlatform().getFontManager()
-            .loadFont("/usr/share/fonts/go/Go-Regular.ttf");
-
-        auto ds = widget.getDrawingSurface();
-        ds.drawText(txt, pos, font, FontStyle()); // , TextStyle()
-        ds.present();
+        if (widget.textImage !is null)
+        {
+            auto pos = Position2D(0, 0);
+            auto ds = widget.getDrawingSurface();
+            ds.drawImage(pos, widget.textImage); // , TextStyle()
+            ds.present();
+        }
     }
 
     void drawLayout(Layout widget)

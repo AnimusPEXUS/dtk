@@ -14,6 +14,7 @@ import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 import dtk.types.FontStyle;
 import dtk.types.TextStyle;
+import dtk.types.Image;
 
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FontI;
@@ -159,7 +160,7 @@ class DrawingSurface : DrawingSurfaceI
         SDL_UpdateWindowSurface(w._sdl_window); */
     }
 
-    void drawText(string text, Position2D pos, FontI font,
+    /* void drawText(string text, Position2D pos, FontI font,
             FontStyle font_style) // , TextStyle text_style
     {
         if (text.length > 0)
@@ -167,7 +168,7 @@ class DrawingSurface : DrawingSurfaceI
             auto nds = new DrawingSurfaceShifted(this, pos.x, pos.y);
             font.drawChar(text[0], nds);
         }
-    }
+    } */
 
     // TODO: performance check required. probably functions which use it, have
     //       to use catching
@@ -205,13 +206,24 @@ class DrawingSurface : DrawingSurfaceI
 
     }
 
-    final void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
+    void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
     {
         if (turn_step < 0)
         {
             turn_step = -turn_step;
         }
         drawArc(pos, radius, 0, 2 * PI, turn_step, color);
+    }
+
+    void drawImage(Position2D pos, Image image)
+    {
+        for (uint y = 0 ; y != image.height; y++)
+        {
+            for (uint x = 0 ; x != image.width; x++)
+            {
+                drawDot(Position2D(pos.x+x, pos.y+y), image.getDot(x,y).color);
+            }
+        }
     }
 
     void present()

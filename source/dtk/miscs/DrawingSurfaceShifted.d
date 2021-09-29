@@ -14,6 +14,7 @@ import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 import dtk.types.FontStyle;
 import dtk.types.TextStyle;
+import dtk.types.Image;
 
 class DrawingSurfaceShifted : DrawingSurfaceI
 {
@@ -57,14 +58,14 @@ class DrawingSurfaceShifted : DrawingSurfaceI
                     right_style, fill_style);
     }
 
-    void drawText(string text, Position2D pos, FontI font,
+    /* void drawText(string text, Position2D pos, FontI font,
             FontStyle font_style) // , TextStyle text_style
     {
         Position2D npos;
         npos.x = pos.x + x_shift;
         npos.y = pos.y + y_shift;
         ds.drawText(text, npos, font, font_style); // , text_style
-    }
+    } */
 
     void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle,
             real turn_step, Color color)
@@ -81,6 +82,14 @@ class DrawingSurfaceShifted : DrawingSurfaceI
         npos.x = pos.x + x_shift;
         npos.y = pos.y + y_shift;
         ds.drawCircle(npos, radius, turn_step, color);
+    }
+
+    void drawImage(Position2D pos, Image image)
+    {
+        Position2D npos;
+        npos.x = pos.x + x_shift;
+        npos.y = pos.y + y_shift;
+        ds.drawImage(npos, image);
     }
 
     void present()

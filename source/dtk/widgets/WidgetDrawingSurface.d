@@ -16,6 +16,7 @@ import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 import dtk.types.FontStyle;
 import dtk.types.TextStyle;
+import dtk.types.Image;
 
 class WidgetDrawingSurfaceShifted : DrawingSurfaceI
 {
@@ -138,7 +139,7 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
                     right_style, fill_style);
     }
 
-    void drawText(string text, Position2D pos, FontI font,
+    /* void drawText(string text, Position2D pos, FontI font,
             FontStyle font_style) // , TextStyle text_style
     {
         Position2D npos;
@@ -147,7 +148,7 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         auto pds = getParentDS();
         if (pds)
             pds.drawText(text, npos, font, font_style); // , text_style
-    }
+    } */
 
     void drawArc(Position2D pos, uint radius, real start_angle, real stop_angle,
             real turn_step, Color color)
@@ -168,6 +169,16 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         auto pds = getParentDS();
         if (pds)
             pds.drawCircle(npos, radius, turn_step, color);
+    }
+
+    void drawImage(Position2D pos, Image image)
+    {
+        Position2D npos;
+        npos.x = pos.x + x;
+        npos.y = pos.y + y;
+        auto pds = getParentDS();
+        if (pds)
+            pds.drawImage(npos, image);
     }
 
     void present()

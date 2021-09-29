@@ -1,9 +1,11 @@
 module dtk.widgets.Label;
 
+import std.stdio;
 import std.typecons;
 
 import dtk.types.Property;
 import dtk.types.Size2D;
+import dtk.types.Image;
 
 import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
@@ -14,6 +16,8 @@ import dtk.widgets.mixins;
 
 class Label : Widget, ContainerableWidgetI
 {
+    Image textImage;
+
     private
     {
         mixin Property_gs!(string, "text");
@@ -26,6 +30,75 @@ class Label : Widget, ContainerableWidgetI
     mixin Property_forwarding!(ushort, font_size, "FontSize");
     mixin Property_forwarding!(bool, font_italic, "FontItalic");
     mixin Property_forwarding!(bool, font_bold, "FontBold");
+
+    this()
+    {
+        connectToText_onAfterChanged(&afterTextChanged);
+        connectToFontSize_onAfterChanged(&afterFontSizeChanged);
+        connectToFontItalic_onAfterChanged(&afterFontItalicChanged);
+        connectToFontBold_onAfterChanged(&afterFontBoldChanged);
+        connectToSize_onAfterChanged(&afterSizeChanged);
+    }
+
+    private void afterTextChanged(string old_val, string new_val) nothrow
+    {
+        try {
+            rerenderTextImage();
+        } catch (Exception e)
+        {
+
+        }
+    }
+
+    private void afterFontSizeChanged(ushort, ushort) nothrow
+    {
+        try {
+            rerenderTextImage();
+        } catch (Exception e)
+        {
+
+        }
+    }
+
+    private void afterFontItalicChanged(bool, bool) nothrow
+    {
+        try {
+            rerenderTextImage();
+        } catch (Exception e)
+        {
+
+        }
+    }
+
+    private void afterFontBoldChanged(bool, bool) nothrow
+    {
+        try {
+            rerenderTextImage();
+        } catch (Exception e)
+        {
+
+        }
+    }
+
+    private void afterSizeChanged(Size2D, Size2D) nothrow
+    {
+        try {
+            rerenderTextImage();
+        } catch (Exception e)
+        {
+
+        }
+    }
+
+    void rerenderTextImage()
+    {
+        writeln("Label rerenderTextImage triggered");
+    }
+
+    /* auto font = widget.getForm().getWindow().getPlatform().getFontManager()
+        .loadFont("/usr/share/fonts/go/Go-Regular.ttf"); */
+
+
 
     override void redraw()
     {
