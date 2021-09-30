@@ -31,15 +31,17 @@ void main()
     WindowCreationSettings wcs = {
         title: "123",
         position: Position2D(500, 500),
-        size: Size2D(200, 200),
+        size: Size2D(300, 300),
         resizable: true,
     };
 
     auto w = pl.createWindow(wcs);
 
     Form form = new Form();
+    w.installForm(form);
 
     Layout lo = new Layout();
+    form.setChild(lo);
 
     auto btn = new Button();
     auto btn2 = new Button();
@@ -47,7 +49,13 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new Label();
-    lbl1.setText("t👍ext test");
+    auto lbl2 = new Label();
+    auto lbl3 = new Label();
+    auto lbl4 = new Label();
+    lbl1.setText("12345678"); // 👍
+    lbl2.setText("abcABC"); // 👍
+    lbl3.setText("абв"); // 👍
+    lbl4.setText("א‎בג"); // 👍
 
     /* DS ds = new DS(); */
 
@@ -64,6 +72,9 @@ void main()
     btn4.setPosition(Position2D(10, 100)).setSize(Size2D(12, 12));
     btn5.setPosition(Position2D(10, 120)).setSize(Size2D(12, 12));
     lbl1.setPosition(Position2D(10, 140)).setSize(Size2D(100, 12));
+    lbl2.setPosition(Position2D(10, 160)).setSize(Size2D(100, 12));
+    lbl3.setPosition(Position2D(10, 180)).setSize(Size2D(100, 12));
+    lbl4.setPosition(Position2D(10, 200)).setSize(Size2D(100, 12));
     /* ds.setPosition(Position2D(50, 50)).setSize(Size2D(50, 50)); */
 
     lo.packStart(btn, true, true);
@@ -72,10 +83,10 @@ void main()
     lo.packStart(btn4, false, true);
     lo.packStart(btn5, false, true);
     lo.packStart(lbl1, false, true);
+    lo.packStart(lbl2, false, true);
+    lo.packStart(lbl3, false, true);
+    lo.packStart(lbl4, false, true);
 
-    form.setChild(lo);
-
-    w.installForm(form);
 
     /* auto fm = pl.getFontManager();
     auto fi = fm.getFontInfoList();

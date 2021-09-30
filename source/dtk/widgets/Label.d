@@ -14,6 +14,8 @@ import dtk.interfaces.FormI;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
+import dtk.miscs.textrendering;
+
 class Label : Widget, ContainerableWidgetI
 {
     Image textImage;
@@ -93,15 +95,46 @@ class Label : Widget, ContainerableWidgetI
     void rerenderTextImage()
     {
         writeln("Label rerenderTextImage triggered");
+
+        auto settings = renderTextSettings();
+        settings.font_mgr = {
+            auto f = getForm();
+            if (f is null)
+            {
+                throw new Exception("can't get form");
+            }
+            auto w = f.getWindow();
+            if (w is null)
+            {
+                throw new Exception("can't get window");
+            }
+            auto p = w.getPlatform();
+            if (p is null)
+            {
+                throw new Exception("can't get platform");
+            }
+            auto fm = p.getFontManager();
+            if (fm is null)
+            {
+                throw new Exception("can't get font manager");
+            }
+            return fm;
+        }();
+        settings.text = getText();
+        settings.defaultFontSize = 9;
+        settings.defaultFontResolution=97;
+
+        auto img = renderText(settings);
+        textImage = img;
     }
-
-    /* auto font = widget.getForm().getWindow().getPlatform().getFontManager()
-        .loadFont("/usr/share/fonts/go/Go-Regular.ttf"); */
-
-
 
     override void redraw()
     {
+        if (textImage is null)
+        {
+            rerenderTextImage();
+        }
+
         this.redraw_x(this);
     }
 }

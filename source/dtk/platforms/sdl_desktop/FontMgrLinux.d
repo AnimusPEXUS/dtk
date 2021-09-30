@@ -16,10 +16,13 @@ import dtk.interfaces.DrawingSurfaceI;
 import dtk.types.FontInfo;
 import dtk.types.Color;
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 class FontMgrLinux : FontMgrI
 {
     FT_Library ft_library;
+
+    FontI[FontInfo] font_cache;
 
     this()
     {
@@ -87,7 +90,12 @@ class FontMgrLinux : FontMgrI
 
     FontI loadFont(FontInfo* font_info)
     {
-        return new Font(this, font_info);
+        auto x = *font_info;
+        if (x !in font_cache)
+        {
+            font_cache[x]=new Font(this, font_info);
+        }
+        return font_cache[x];
     }
 }
 
@@ -97,6 +105,11 @@ class Font : FontI
     {
         FontMgrLinux fnt_mgr;
         FontInfo* font_info;
+
+        uint charSizeW;
+        uint charSizeH;
+        uint charResH;
+        uint charResV;
     }
 
     FT_Face face;
@@ -118,18 +131,11 @@ class Font : FontI
             throw new Exception("Can't load file as font: unknown error");
         }
 
-        err = FT_Set_Pixel_Sizes(face, 1, 1);
+        err = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
         if (err != 0)
         {
-            throw new Exception("Can't set pixel size");
+            throw new Exception("FT_Select_Charmap: can't select unicode");
         }
-
-        err = FT_Set_Char_Size(face, 2000, 2000, 200, 200);
-        if (err != 0)
-        {
-            throw new Exception("Can't set char size");
-        }
-
     }
 
     FontInfo* getFontInfo()
@@ -137,57 +143,70 @@ class Font : FontI
         return font_info;
     }
 
-    void drawChar(char chr, DrawingSurfaceI ds)
+    void setPixelSize(uint width, uint height)
     {
-        /* FT_GlyphSlot slot = face.glyph; /* a small shortcut * / */
+        auto err = FT_Set_Pixel_Sizes(face, width, height);
+        if (err != 0)
+        {
+            throw new Exception("Can't set pixel size");
+        }
+    }
 
-        /* ... initialize library ...
-           ... create face object ...
-           ... set character size ... */
+    void setCharSize(uint width, uint height)
+    {
+        charSizeW = width;
+        charSizeH = height;
+        auto err = FT_Set_Char_Size(face, charSizeW, charSizeH, charResH, charResV);
+        if (err != 0)
+        {
+            throw new Exception("Can't set char size");
+        }
+    }
 
+    void setCharResolution(uint horizontal, uint vertical)
+    {
+        charResH=horizontal;
+        charResV=vertical;
+        auto err = FT_Set_Char_Size(face, charSizeW, charSizeH, charResH, charResV);
+        if (err != 0)
+        {
+            throw new Exception("Can't set char size");
+        }
+    }
+
+    Image drawChar(dchar chr)
+    {
         FT_UInt glyph_index;
 
-        /* retrieve glyph index from character code */
-        auto err = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-        if (err != 0)
-        {
-            writeln("error: FT_Select_Charmap: no unicode");
-            return;
-        }
-
         glyph_index = FT_Get_Char_Index(face, chr);
-        /* glyph_index=100; */
-        writeln(" glyph_index == ", glyph_index);
+
         if (glyph_index == 0)
         {
-            writeln("error: FT_Get_Char_Index");
-            return;
+            throw new Exception("FT_Get_Char_Index error");
         }
 
-        /* load glyph image into the slot (erase previous one) */
-        err = FT_Load_Glyph(face, glyph_index, FT_LOAD_TARGET_NORMAL );
+        auto err = FT_Load_Glyph(face, glyph_index, FT_LOAD_TARGET_NORMAL );
         if (err != 0)
         {
-            writeln("error: FT_Load_Glyph: ", err);
-            return; /* ignore errors */
+            throw new Exception("FT_Load_Glyph error");
         }
 
-        /* convert to an anti-aliased bitmap */
         err = FT_Render_Glyph(face.glyph, FT_RENDER_MODE_NORMAL);
         if (err != 0)
         {
-            writeln("error: FT_Render_Glyph: ", err);
-            return;
+            throw new Exception("FT_Render_Glyph error");
         }
 
-        /* now, draw to our target surface */
-        /* my_draw_bitmap(&slot.bitmap, pen_x + slot.bitmap_left, pen_y - slot.bitmap_top); */
-        writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode);
+        /* writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode); */
 
         auto b = face.glyph.bitmap;
 
-        assert(b.pixel_mode == FT_PIXEL_MODE_GRAY);
+        if (b.pixel_mode != FT_PIXEL_MODE_GRAY)
+        {
+            throw new Exception("pixel mode isn't FT_PIXEL_MODE_GRAY");
+        }
 
+        auto ret = new Image(b.width, b.rows);
 
         for (int y = 0; y != b.rows; y++)
         {
@@ -195,20 +214,11 @@ class Font : FontI
             {
                 ubyte c;
                 c = b.buffer[y*b.width+x];
-                c = ubyte.max - c;
-                if (c == 255)
-                {
-                    continue;
-                }
                 auto color = Color(cast(ubyte[])[c,c,c]);
-                writeln("drawing pixel ",x,":",y," ",color);
-                ds.drawDot(Position2D(x,y), color);
+                ret.setDot(x,y, ImageDot(color));
             }
         }
 
-        /* increment pen position */
-        /* pen_x += slot.advance.x >> 6;
-            pen_y += slot.advance.y >> 6; /* not useful for now * / */
-
+        return ret;
     }
 }
