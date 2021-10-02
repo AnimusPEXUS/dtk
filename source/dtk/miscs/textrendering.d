@@ -7,6 +7,8 @@ import std.utf;
 import dtk.interfaces.FontMgrI;
 
 import dtk.types.Image;
+import dtk.types.fontinfo;
+
 
 enum RenderTextType
 {
@@ -36,9 +38,9 @@ struct renderTextSettings
 
     string text;
     RenderTextType type;
-    string defaultFontFamily;
-    ushort defaultFontSize;
-    ushort defaultFontResolution;
+    string defaultFaceFamily;
+    ushort defaultFaceSize;
+    ushort defaultFaceResolution;
     bool defaultBold;
     bool defaultItalic;
     bool defaultUnderline;
@@ -58,16 +60,16 @@ Image renderText(renderTextSettings settings)
 {
     Image ret;
 
-    auto font = settings.font_mgr.loadFont("/usr/share/fonts/go/Go-Regular.ttf");
+    auto face = settings.font_mgr.loadFace("/usr/share/fonts/go/Go-Regular.ttf");
 
-    font.setPixelSize(1,1);
+    /* font.setPixelSize(1,1); */
     {
-        auto x = settings.defaultFontSize * 10;
-        font.setCharSize(x,x);
+        auto x = settings.defaultFaceSize;
+        face.setCharSize(x,x);
     }
     {
-        auto x = settings.defaultFontResolution * 10;
-        font.setCharResolution(x,x);
+        auto x = settings.defaultFaceResolution;
+        face.setCharResolution(x,x);
     }
 
     while (!settings.text.empty())
@@ -76,24 +78,26 @@ Image renderText(renderTextSettings settings)
 
         writeln("rendering char: ", c);
 
+        GlyphRenderResult* grr;
+
         try
         {
         if (ret is null)
         {
-            ret = font.drawChar(c);
+            grr = face.renderGlyphByChar(c);
         }
         else
         {
-            Image new_img = font.drawChar(c);
+            grr = face.renderGlyphByChar(c);
 
             uint old_w = ret.width;
             uint old_h = ret.height;
 
-            uint new_w = ret.width + new_img.width;
-            uint new_h = (ret.height > new_img.height ? ret.height : new_img.height);
+            uint new_w = ret.width + grr.bitmap.width;
+            uint new_h = (ret.height > grr.bitmap.height ? ret.height : grr.bitmap.height);
             ret.resize(new_w, new_h);
             /* ret.printImage(); */
-            ret.putImage(old_w, 0, new_img);
+            ret.putImage(old_w, 0, grr.bitmap);
             /* ret.printImage(); */
         }
         } catch (Exception e)

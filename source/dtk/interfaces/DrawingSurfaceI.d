@@ -2,14 +2,14 @@ module dtk.interfaces.DrawingSurfaceI;
 
 import std.typecons;
 
-import dtk.interfaces.FontI;
+import dtk.interfaces.FaceI;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Color;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
-import dtk.types.FontStyle;
+import dtk.types.fontinfo;
 import dtk.types.TextStyle;
 import dtk.types.Image;
 

@@ -9,7 +9,7 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.LineStyle;
 import dtk.types.FillStyle;
-import dtk.types.FontStyle;
+import dtk.types.fontinfo;
 import dtk.types.TextStyle;
 import dtk.types.EventXAction;
 import dtk.types.EventWindow;

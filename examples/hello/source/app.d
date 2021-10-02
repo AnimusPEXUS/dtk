@@ -49,13 +49,7 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new Label();
-    auto lbl2 = new Label();
-    auto lbl3 = new Label();
-    auto lbl4 = new Label();
-    lbl1.setText("12345678"); // 👍
-    lbl2.setText("abcABC"); // 👍
-    lbl3.setText("абв"); // 👍
-    lbl4.setText("א‎בג"); // 👍
+    lbl1.setText(r"1234567👍8abcABCgqp|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑"); // 👍
 
     /* DS ds = new DS(); */
 
@@ -72,9 +66,6 @@ void main()
     btn4.setPosition(Position2D(10, 100)).setSize(Size2D(12, 12));
     btn5.setPosition(Position2D(10, 120)).setSize(Size2D(12, 12));
     lbl1.setPosition(Position2D(10, 140)).setSize(Size2D(100, 12));
-    lbl2.setPosition(Position2D(10, 160)).setSize(Size2D(100, 12));
-    lbl3.setPosition(Position2D(10, 180)).setSize(Size2D(100, 12));
-    lbl4.setPosition(Position2D(10, 200)).setSize(Size2D(100, 12));
     /* ds.setPosition(Position2D(50, 50)).setSize(Size2D(50, 50)); */
 
     lo.packStart(btn, true, true);
@@ -83,9 +74,6 @@ void main()
     lo.packStart(btn4, false, true);
     lo.packStart(btn5, false, true);
     lo.packStart(lbl1, false, true);
-    lo.packStart(lbl2, false, true);
-    lo.packStart(lbl3, false, true);
-    lo.packStart(lbl4, false, true);
 
 
     /* auto fm = pl.getFontManager();

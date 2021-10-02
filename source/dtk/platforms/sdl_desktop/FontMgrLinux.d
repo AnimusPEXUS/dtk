@@ -10,10 +10,10 @@ import std.string;
 import bindbc.freetype;
 
 import dtk.interfaces.FontMgrI;
-import dtk.interfaces.FontI;
+import dtk.interfaces.FaceI;
 import dtk.interfaces.DrawingSurfaceI;
 
-import dtk.types.FontInfo;
+import dtk.types.fontinfo;
 import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Image;
@@ -22,7 +22,7 @@ class FontMgrLinux : FontMgrI
 {
     FT_Library ft_library;
 
-    FontI[FontInfo] font_cache;
+    FaceI[FaceInfo] face_cache;
 
     this()
     {
@@ -68,9 +68,9 @@ class FontMgrLinux : FontMgrI
         return ret;
     }
 
-    FontInfo*[] getFontInfoList()
+    FaceInfo*[] getFaceInfoList()
     {
-        FontInfo*[] ret;
+        FaceInfo*[] ret;
 
         auto paths = getFontPaths();
         foreach (v; paths)
@@ -78,7 +78,7 @@ class FontMgrLinux : FontMgrI
             auto files = getFontFileList(v);
             foreach (v2; files)
             {
-                auto fi = new FontInfo;
+                auto fi = new FaceInfo;
                 fi.on_fs = true;
                 fi.on_fs_filename = v2;
 
@@ -88,23 +88,23 @@ class FontMgrLinux : FontMgrI
         return ret;
     }
 
-    FontI loadFont(FontInfo* font_info)
+    FaceI loadFace(FaceInfo* face_info)
     {
-        auto x = *font_info;
-        if (x !in font_cache)
+        auto x = *face_info;
+        if (x !in face_cache)
         {
-            font_cache[x]=new Font(this, font_info);
+            face_cache[x]=new Face(this, face_info);
         }
-        return font_cache[x];
+        return face_cache[x];
     }
 }
 
-class Font : FontI
+class Face : FaceI
 {
     private
     {
         FontMgrLinux fnt_mgr;
-        FontInfo* font_info;
+        FaceInfo* face_info;
 
         uint charSizeW;
         uint charSizeH;
@@ -114,17 +114,17 @@ class Font : FontI
 
     FT_Face face;
 
-    this(FontMgrLinux fnt_mgr, FontInfo* font_info)
+    this(FontMgrLinux fnt_mgr, FaceInfo* face_info)
     {
         this.fnt_mgr = fnt_mgr;
-        this.font_info = font_info;
+        this.face_info = face_info;
 
-        char[] o_fs_fn = cast(char[]) font_info.on_fs_filename;
+        char[] o_fs_fn = cast(char[]) face_info.on_fs_filename;
 
         auto err = FT_New_Face(fnt_mgr.ft_library, &o_fs_fn[0], 0, &face);
         if (err == FT_Err_Unknown_File_Format)
         {
-            throw new Exception("Can't load file as font: ", font_info.on_fs_filename);
+            throw new Exception("Can't load file as font: ", face_info.on_fs_filename);
         }
         else if (err)
         {
@@ -136,11 +136,35 @@ class Font : FontI
         {
             throw new Exception("FT_Select_Charmap: can't select unicode");
         }
+
+        populateFaceInfo(this.face_info);
     }
 
-    FontInfo* getFontInfo()
+    private void populateFaceInfo(FaceInfo* face_info)
     {
-        return font_info;
+        if (face_info.family_name != "")
+            return;
+
+        face_info.family_name = fromStringz(this.face.family_name).dup;
+        face_info.style_name = fromStringz(this.face.style_name).dup;
+        face_info.num_faces=this.face.num_faces;
+        face_info.face_index=this.face.face_index;
+
+        // TODO: complete face_info population
+
+        auto bb = BoundingBox();
+
+        bb.min = Position2D(cast(int)face.bbox.xMin, cast(int)face.bbox.yMin);
+        bb.max = Position2D(cast(int)face.bbox.xMax, cast(int)face.bbox.yMax);
+
+        face_info.bounding_box = bb;
+
+        return;
+    }
+
+    FaceInfo* getFaceInfo()
+    {
+        return face_info;
     }
 
     void setPixelSize(uint width, uint height)
@@ -152,7 +176,7 @@ class Font : FontI
         }
     }
 
-    void setCharSize(uint width, uint height)
+    void setCharSize(uint width, uint height) // TODO: rename to setGlyphSize ?
     {
         charSizeW = width;
         charSizeH = height;
@@ -174,7 +198,7 @@ class Font : FontI
         }
     }
 
-    Image drawChar(dchar chr)
+    GlyphRenderResult* renderGlyphByChar(dchar chr)
     {
         FT_UInt glyph_index;
 
@@ -206,7 +230,14 @@ class Font : FontI
             throw new Exception("pixel mode isn't FT_PIXEL_MODE_GRAY");
         }
 
-        auto ret = new Image(b.width, b.rows);
+        writeln(" b_left: ", face.glyph.bitmap_left);
+        writeln("  b_top: ", face.glyph.bitmap_top);
+        writeln("  pitch: ", b.pitch);
+        writeln("   rows: ", b.rows);
+        writeln("  width: ", b.width);
+        writeln("  pitch: ", b.pitch);
+
+        auto ret_i = new Image(b.width, b.rows);
 
         for (int y = 0; y != b.rows; y++)
         {
@@ -215,10 +246,26 @@ class Font : FontI
                 ubyte c;
                 c = b.buffer[y*b.width+x];
                 auto color = Color(cast(ubyte[])[c,c,c]);
-                ret.setDot(x,y, ImageDot(color));
+                ret_i.setDot(x,y, ImageDot(color));
             }
         }
 
+        ret_i.printImage();
+
+        auto ret = new GlyphRenderResult();
+
+        ret.bitmap = ret_i;
+        ret.bitmap_top = face.glyph.bitmap_top;
+        ret.bitmap_left = face.glyph.bitmap_left;
+
+        ret.glyph_info = generateGlyphInfo();
+
+        return ret;
+    }
+
+    private GlyphInfo* generateGlyphInfo()
+    {
+        auto ret = new GlyphInfo();
         return ret;
     }
 }

@@ -121,8 +121,8 @@ class Label : Widget, ContainerableWidgetI
             return fm;
         }();
         settings.text = getText();
-        settings.defaultFontSize = 9;
-        settings.defaultFontResolution=97;
+        settings.defaultFaceSize = 1500;
+        settings.defaultFaceResolution=100;
 
         auto img = renderText(settings);
         textImage = img;

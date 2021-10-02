@@ -1,15 +1,15 @@
-module dtk.interfaces.FontI;
+module dtk.interfaces.FaceI;
 
-import dtk.types.FontInfo;
+import dtk.types.fontinfo;
 import dtk.types.Image;
 
 import dtk.interfaces.DrawingSurfaceI;
 
-interface FontI
+interface FaceI
 {
-    FontInfo* getFontInfo();
+    FaceInfo* getFaceInfo();
     void setPixelSize(uint width, uint height);
     void setCharSize(uint width, uint height);
     void setCharResolution(uint horizontal, uint vertical);
-    Image drawChar(dchar chr);
+    GlyphRenderResult* renderGlyphByChar(dchar chr);
 }
