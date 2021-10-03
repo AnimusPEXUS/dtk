@@ -4,8 +4,17 @@ import dtk.types.Image;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
+/* struct FaceCacheKey
+{
+    string face_name;
+    string style_name;
+} */
+
 struct FaceInfo
 {
+
+    /* FaceCacheKey* face_cache_key; */
+
     bool on_fs;
     string on_fs_filename;
 

@@ -19,11 +19,12 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Image;
 
+
 class FontMgrLinux : FontMgrI
 {
     FT_Library ft_library;
 
-    FaceI[FaceInfo] face_cache;
+    FaceI[] face_cache;
 
     this()
     {
@@ -91,12 +92,17 @@ class FontMgrLinux : FontMgrI
 
     FaceI loadFace(FaceInfo* face_info)
     {
-        auto x = *face_info;
-        if (x !in face_cache)
+        foreach (v; face_cache)
         {
-            face_cache[x]=new Face(this, face_info);
+            auto i = v.getFaceInfo();
+            if (i.on_fs == face_info.on_fs
+                && i.on_fs_filename == face_info.on_fs_filename
+                && i.face_index == face_info.face_index)
+                return v;
         }
-        return face_cache[x];
+        auto ret = new Face(this, face_info);
+        face_cache ~= ret;
+        return ret;
     }
 }
 
@@ -122,7 +128,7 @@ class Face : FaceI
 
         char[] o_fs_fn = cast(char[]) face_info.on_fs_filename;
 
-        auto err = FT_New_Face(fnt_mgr.ft_library, &o_fs_fn[0], 0, &face);
+        auto err = FT_New_Face(fnt_mgr.ft_library, &o_fs_fn[0], face_info.face_index, &face);
         if (err == FT_Err_Unknown_File_Format)
         {
             throw new Exception("Can't load file as font: ", face_info.on_fs_filename);
@@ -146,10 +152,10 @@ class Face : FaceI
         if (face_info.family_name != "")
             return;
 
-        face_info.family_name = fromStringz(this.face.family_name).dup;
-        face_info.style_name = fromStringz(this.face.style_name).dup;
-        face_info.num_faces=this.face.num_faces;
-        face_info.face_index=this.face.face_index;
+        face_info.family_name = fromStringz(face.family_name).dup;
+        face_info.style_name = fromStringz(face.style_name).dup;
+        face_info.num_faces=face.num_faces;
+        face_info.face_index=face.face_index;
 
         face_info.ascender = face.ascender;
         face_info.descender = face.descender;
@@ -180,6 +186,7 @@ class Face : FaceI
         {
             throw new Exception("Can't set pixel size");
         }
+        populateFaceInfo(this.face_info);
     }
 
     void setCharSize(uint width, uint height) // TODO: rename to setGlyphSize ?
@@ -191,6 +198,7 @@ class Face : FaceI
         {
             throw new Exception("Can't set char size");
         }
+        populateFaceInfo(this.face_info);
     }
 
     void setCharResolution(uint horizontal, uint vertical)
