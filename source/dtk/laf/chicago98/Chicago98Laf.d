@@ -271,6 +271,7 @@ class Chicago98Laf : LafI
                 {
                     Color new_color = formBackground;
                     auto dot = image.getDot(x,y);
+
                     if (dot.enabled)
                     {
                         auto part = dot.intensivity;

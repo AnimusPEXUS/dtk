@@ -49,7 +49,7 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new Label();
-    lbl1.setText(r"1234567👍8abcABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑"); // 👍
+    lbl1.setText(r"1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑"); // 👍
 
     /* DS ds = new DS(); */
 

@@ -12,7 +12,6 @@ struct ImageDot
     real intensivity;
     Color color;
 
-
     invariant
     {
         assert(intensivity >= 0 && intensivity<= 1);

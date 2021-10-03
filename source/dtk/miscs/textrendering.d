@@ -76,13 +76,12 @@ Image renderText(renderTextSettings settings)
     if (settings.line_height_px == -1)
     {
         settings.line_height_px = settings.defaultFaceSize / 64;
-        settings.line_height_px += 15;
+        settings.line_height_px += 10; // TODO: this is incorrect and needs fixing
     }
 
     if (settings.linespace_px == -1)
     {
         settings.linespace_px = settings.line_height_px / 3 * 2;
-        /* settings.linespace_px; */
     }
 
     Image ret = new Image(0,0);
@@ -114,12 +113,26 @@ Image renderText(renderTextSettings settings)
         {
             auto old_w = ret.width;
             grr = face.renderGlyphByChar(c);
-            ret.resize(ret.width+(grr.glyph_info.advance.x/64), settings.line_height_px * line_count);
+            // TODO: probably this resize isn't correct
+            ret.resize(ret.width+grr.bitmap.width, settings.line_height_px * line_count);
             ret.putImage(old_w, settings.linespace_px-grr.bitmap_top, grr.bitmap);
         }
         catch(Exception e)
         {
             writeln("error: ", e);
+        }
+    }
+
+    for (uint y = 0 ; y != ret.height; y++)
+    {
+        for (uint x = 0 ; x != ret.width; x++)
+        {
+            auto dot = ret.getDotRef(x,y);
+            if (!dot.enabled)
+            {
+                dot.enabled=true;
+                dot.intensivity = 1;
+            }
         }
     }
 
