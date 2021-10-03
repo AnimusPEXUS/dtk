@@ -7,6 +7,7 @@ import std.utf;
 import dtk.interfaces.FontMgrI;
 
 import dtk.types.Image;
+import dtk.types.Color;
 import dtk.types.fontinfo;
 
 
@@ -32,33 +33,59 @@ enum RenderTextJustification
     end,
 }
 
+enum WrapType
+{
+    none,
+    byChar,
+    byWord,
+}
+
 struct renderTextSettings
 {
     FontMgrI font_mgr;
 
     string text;
     RenderTextType type;
+
     string defaultFaceFamily;
     ushort defaultFaceSize;
     ushort defaultFaceResolution;
+
     bool defaultBold;
     bool defaultItalic;
     bool defaultUnderline;
 
+    bool defaultFGColorEnabled;
+    Color defaultFGColor;
+    bool defaultBGColorEnabled;
+    Color defaultBGColor;
+
     bool hasMaxWidth;
-    uint maxWidth;
+    uint maxWidth_px;
     bool hasMaxHeight;
-    uint maxHeight;
+    uint maxHeight_px;
 
-    bool wordWrap;
+    WrapType wrap_type;
 
-    uint initialImageWidth;
-    uint initialImageHeight;
+    int linespace_px = -1; // -1 means auto
+    int line_height_px=-1;
 }
 
 Image renderText(renderTextSettings settings)
 {
-    Image ret;
+    if (settings.line_height_px == -1)
+    {
+        settings.line_height_px = settings.defaultFaceSize / 64;
+        settings.line_height_px += 15;
+    }
+
+    if (settings.linespace_px == -1)
+    {
+        settings.linespace_px = settings.line_height_px / 3 * 2;
+        /* settings.linespace_px; */
+    }
+
+    Image ret = new Image(0,0);
 
     auto face = settings.font_mgr.loadFace("/usr/share/fonts/go/Go-Regular.ttf");
 
@@ -72,6 +99,9 @@ Image renderText(renderTextSettings settings)
         face.setCharResolution(x,x);
     }
 
+    uint current_line = 0;
+    uint line_count = 1;
+
     while (!settings.text.empty())
     {
         auto c = decodeFront(settings.text);
@@ -82,27 +112,14 @@ Image renderText(renderTextSettings settings)
 
         try
         {
-        if (ret is null)
-        {
+            auto old_w = ret.width;
             grr = face.renderGlyphByChar(c);
+            ret.resize(ret.width+(grr.glyph_info.advance.x/64), settings.line_height_px * line_count);
+            ret.putImage(old_w, settings.linespace_px-grr.bitmap_top, grr.bitmap);
         }
-        else
+        catch(Exception e)
         {
-            grr = face.renderGlyphByChar(c);
-
-            uint old_w = ret.width;
-            uint old_h = ret.height;
-
-            uint new_w = ret.width + grr.bitmap.width;
-            uint new_h = (ret.height > grr.bitmap.height ? ret.height : grr.bitmap.height);
-            ret.resize(new_w, new_h);
-            /* ret.printImage(); */
-            ret.putImage(old_w, 0, grr.bitmap);
-            /* ret.printImage(); */
-        }
-        } catch (Exception e)
-        {
-            writeln("error:", e);
+            writeln("error: ", e);
         }
     }
 

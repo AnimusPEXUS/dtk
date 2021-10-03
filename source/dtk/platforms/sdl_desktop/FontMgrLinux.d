@@ -16,6 +16,7 @@ import dtk.interfaces.DrawingSurfaceI;
 import dtk.types.fontinfo;
 import dtk.types.Color;
 import dtk.types.Position2D;
+import dtk.types.Size2D;
 import dtk.types.Image;
 
 class FontMgrLinux : FontMgrI
@@ -150,7 +151,12 @@ class Face : FaceI
         face_info.num_faces=this.face.num_faces;
         face_info.face_index=this.face.face_index;
 
-        // TODO: complete face_info population
+        face_info.ascender = face.ascender;
+        face_info.descender = face.descender;
+        face_info.height = face.height;
+
+        face_info.max_advance_width = face.max_advance_width;
+        face_info.max_advance_height = face.max_advance_height;
 
         auto bb = BoundingBox();
 
@@ -230,13 +236,6 @@ class Face : FaceI
             throw new Exception("pixel mode isn't FT_PIXEL_MODE_GRAY");
         }
 
-        writeln(" b_left: ", face.glyph.bitmap_left);
-        writeln("  b_top: ", face.glyph.bitmap_top);
-        writeln("  pitch: ", b.pitch);
-        writeln("   rows: ", b.rows);
-        writeln("  width: ", b.width);
-        writeln("  pitch: ", b.pitch);
-
         auto ret_i = new Image(b.width, b.rows);
 
         for (int y = 0; y != b.rows; y++)
@@ -245,8 +244,17 @@ class Face : FaceI
             {
                 ubyte c;
                 c = b.buffer[y*b.width+x];
-                auto color = Color(cast(ubyte[])[c,c,c]);
-                ret_i.setDot(x,y, ImageDot(color));
+
+                real intens = 0;
+                if (c != 0)
+                {
+                    intens = cast(real) 1 / (cast(real)255 / c);
+                    /* writeln("renderGlyphByChar ", x, " ", y, " intens ", intens); */
+                }
+                auto dot = ImageDot();
+                dot.intensivity = intens;
+                dot.enabled=true;
+                ret_i.setDot(x,y, dot);
             }
         }
 
@@ -260,12 +268,81 @@ class Face : FaceI
 
         ret.glyph_info = generateGlyphInfo();
 
+        writeln("                     b_left: ", ret.bitmap_left);
+        writeln("                      b_top: ", ret.bitmap_top);
+        writeln("                    b_width: ", ret.bitmap.width);
+        writeln("                   b_height: ", ret.bitmap.height);
+        writeln("              metrics.width: ", ret.glyph_info.metrics.size.width);
+        writeln("             metrics.height: ", ret.glyph_info.metrics.size.height);
+        writeln("              horiBearing.x: ", ret.glyph_info.metrics.horiBearing.x);
+        writeln("              horiBearing.y: ", ret.glyph_info.metrics.horiBearing.y);
+        writeln("              vertBearing.x: ", ret.glyph_info.metrics.vertBearing.x);
+        writeln("              vertBearing.y: ", ret.glyph_info.metrics.vertBearing.y);
+
+        writeln("              advance.width: ", ret.glyph_info.metrics.advance.width);
+        writeln("             advance.height: ", ret.glyph_info.metrics.advance.height);
+        writeln("  linear_horizontal_advance: ", ret.glyph_info.linear_horizontal_advance);
+        writeln("    linear_vertical_advance: ", ret.glyph_info.linear_vertical_advance);
+        writeln("                  advance.x: ", ret.glyph_info.advance.x);
+        writeln("                  advance.y: ", ret.glyph_info.advance.y);
+        writeln("                  lsb_delta: ", ret.glyph_info.lsb_delta);
+        writeln("                  rsb_delta: ", ret.glyph_info.rsb_delta);
+
+        writeln("              face ascender: ", ret.glyph_info.face_info.ascender);
+        writeln("             face descender: ", ret.glyph_info.face_info.descender);
+        writeln("                     height: ", ret.glyph_info.face_info.height);
+        writeln("          max_advance_width: ", ret.glyph_info.face_info.max_advance_width);
+        writeln("         max_advance_height: ", ret.glyph_info.face_info.max_advance_height);
+
+        writeln("                   bb min x: ", ret.glyph_info.face_info.bounding_box.min.x);
+        writeln("                   bb min y: ", ret.glyph_info.face_info.bounding_box.min.y);
+        writeln("                   bb max x: ", ret.glyph_info.face_info.bounding_box.max.x);
+        writeln("                   bb max y: ", ret.glyph_info.face_info.bounding_box.max.y);
+
+
         return ret;
     }
 
     private GlyphInfo* generateGlyphInfo()
     {
+        auto slot = face.glyph;
+
         auto ret = new GlyphInfo();
+        ret.face_info=this.face_info;
+        ret.glyph_index = slot.glyph_index;
+
+        ret.metrics = GlyphMetrics();
+
+        ret.metrics.size = Size2D(
+            cast(int)slot.metrics.width,
+            cast(int)slot.metrics.height
+            );
+
+        ret.metrics.horiBearing = Position2D(
+            cast(int)slot.metrics.horiBearingX,
+            cast(int)slot.metrics.horiBearingY
+            );
+        ret.metrics.vertBearing = Position2D(
+            cast(int)slot.metrics.vertBearingX,
+            cast(int)slot.metrics.vertBearingY
+            );
+
+        ret.metrics.advance = Size2D(
+            cast(int)slot.metrics.horiAdvance,
+            cast(int)slot.metrics.vertAdvance
+            );
+
+        ret.linear_horizontal_advance = slot.linearHoriAdvance;
+        ret.linear_vertical_advance = slot.linearVertAdvance;
+
+        ret.advance = Position2D(
+            cast(int)slot.advance.x,
+            cast(int)slot.advance.y
+            );
+
+        ret.lsb_delta = cast(int)slot.lsb_delta;
+        ret.rsb_delta =  cast(int)slot.rsb_delta;
+
         return ret;
     }
 }

@@ -40,6 +40,11 @@ class DrawingSurface : DrawingSurfaceI
         SDL_RenderDrawPoint(rndr, pos.x, pos.y);
     }
 
+    /* Color getDot(Position2D pos)
+    {
+        auto rndr = SDL_GetRenderer(w._sdl_window);
+    } */
+
     private Position2D[] calculateDotsInLine(Position2D pos, Position2D pos2)
     {
 
@@ -215,7 +220,7 @@ class DrawingSurface : DrawingSurfaceI
         drawArc(pos, radius, 0, 2 * PI, turn_step, color);
     }
 
-    void drawImage(Position2D pos, Image image)
+    void drawImage(Position2D pos, Image image) // add support for various image modes
     {
         for (uint y = 0 ; y != image.height; y++)
         {

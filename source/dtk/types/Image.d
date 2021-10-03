@@ -8,7 +8,15 @@ import dtk.types.Color;
 
 struct ImageDot
 {
+    bool enabled;
+    real intensivity;
     Color color;
+
+
+    invariant
+    {
+        assert(intensivity >= 0 && intensivity<= 1);
+    }
 }
 
 class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
@@ -108,7 +116,7 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         {
             for (uint x = 0; x != width; x++)
             {
-                if (getDot(x,y).color.r == 0)
+                if (getDot(x,y).intensivity == 0)
                 {
                     write(" ");
                 }
