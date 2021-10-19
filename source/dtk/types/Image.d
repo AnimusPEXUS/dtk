@@ -20,11 +20,11 @@ struct ImageDot
 
 class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 {
-    uint width;
-    uint height;
+    ulong width;
+    ulong height;
     ImageDot[] data;
 
-    this(uint width, uint height)
+    this(ulong width, ulong height)
     {
         this.width = width;
         this.height = height;
@@ -40,7 +40,7 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         return this;
     }
 
-    typeof(this) setDot(uint x, uint y, ImageDot new_value)
+    typeof(this) setDot(ulong x, ulong y, ImageDot new_value)
     {
         if (x > width)
             throw new Exception("invalid x");
@@ -50,29 +50,29 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         return this;
     }
 
-    ImageDot getDot(uint x, uint y)
+    ImageDot getDot(ulong x, ulong y)
     {
         return this.data[y*width+x];
     }
 
-    ref ImageDot getDotRef(uint x, uint y)
+    ref ImageDot getDotRef(ulong x, ulong y)
     {
         return this.data[y*width+x];
     }
 
-    void resize(uint width, uint height)
+    void resize(ulong width, ulong height)
     {
         auto new_data = new ImageDot[](width*height);
 
         auto this_width = this.width;
         auto this_height = this.height;
 
-        uint copy_width = (this_width > width ? width : this_width);
-        uint copy_height = (this_height > height ? height : this_height);
+        ulong copy_width = (this_width > width ? width : this_width);
+        ulong copy_height = (this_height > height ? height : this_height);
 
-        for (uint y = 0 ; y != copy_height; y++)
+        for (ulong y = 0 ; y != copy_height; y++)
         {
-            for (uint x = 0 ; x != copy_width; x++)
+            for (ulong x = 0 ; x != copy_width; x++)
             {
                 new_data[y*width+x] = this.data[y*this_width+x];
             }
@@ -83,15 +83,15 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         this.height = height;
     }
 
-    void putImage(uint x, uint y, Image new_image)
+    void putImage(ulong x, ulong y, Image new_image)
     {
         if (x > width)
             return;
         if (y > height)
             return;
 
-        uint horizontal_copy_count = new_image.width;
-        uint vertical_copy_count = new_image.height;
+        ulong horizontal_copy_count = new_image.width;
+        ulong vertical_copy_count = new_image.height;
 
         if ((x+horizontal_copy_count) > width)
             horizontal_copy_count -= width - x;
@@ -99,9 +99,9 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         if ((y+vertical_copy_count) > height)
             vertical_copy_count -= height - y;
 
-        for (uint y2 = 0; y2 != vertical_copy_count; y2++)
+        for (ulong y2 = 0; y2 != vertical_copy_count; y2++)
         {
-            for (uint x2 = 0; x2 != horizontal_copy_count; x2++)
+            for (ulong x2 = 0; x2 != horizontal_copy_count; x2++)
             {
                 auto dot = new_image.getDot(x2,y2);
                 setDot(x+x2,y+y2,dot);
@@ -109,11 +109,33 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         }
     }
 
+    Image getImage(ulong x, ulong y, ulong width, ulong height)
+    {
+        Image ret = new Image(width, height);
+
+        if (x > this.width || y > this.height)
+            return ret;
+
+        ulong actual_width = ( x + width > this.width ? this.width - x : width );
+        ulong actual_height = ( y + height > this.height ? this.height -y : height );
+
+        for (ulong x2 = 0; x2 != actual_width; x2++)
+        {
+            for (ulong y2 = 0; y2 != actual_height; y2++)
+            {
+                auto dot = getDot(x+x2,y+y2);
+                ret.setDot(x2,y2,dot);
+            }
+        }
+
+        return ret;
+    }
+
     void printImage()
     {
-        for (uint y = 0; y != height; y++)
+        for (ulong y = 0; y != height; y++)
         {
-            for (uint x = 0; x != width; x++)
+            for (ulong x = 0; x != width; x++)
             {
                 if (getDot(x,y).intensivity == 0)
                 {

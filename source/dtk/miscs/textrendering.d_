@@ -73,17 +73,6 @@ struct renderTextSettings
 
 Image renderText(renderTextSettings settings)
 {
-    if (settings.line_height_px == -1)
-    {
-        settings.line_height_px = settings.defaultFaceSize / 64;
-        settings.line_height_px += 10; // TODO: this is incorrect and needs fixing
-    }
-
-    if (settings.linespace_px == -1)
-    {
-        settings.linespace_px = settings.line_height_px / 3 * 2;
-    }
-
     Image ret = new Image(0,0);
 
     auto face = settings.font_mgr.loadFace("/usr/share/fonts/go/Go-Regular.ttf");
@@ -97,6 +86,21 @@ Image renderText(renderTextSettings settings)
         auto x = settings.defaultFaceResolution;
         face.setCharResolution(x,x);
     }
+
+    if (settings.line_height_px == -1)
+    {
+        auto fi = face.getFaceInfo();
+        settings.line_height_px = fi.size.height/64;
+        settings.line_height_px += 5;
+        /* settings.line_height_px = settings.defaultFaceSize / 64;
+        settings.line_height_px += 10; // TODO: this is incorrect and needs fixing */
+    }
+
+    if (settings.linespace_px == -1)
+    {
+        settings.linespace_px = settings.line_height_px / 3 * 2;
+    }
+
 
     uint current_line = 0;
     uint line_count = 1;
@@ -114,7 +118,13 @@ Image renderText(renderTextSettings settings)
             auto old_w = ret.width;
             grr = face.renderGlyphByChar(c);
             // TODO: probably this resize isn't correct
-            ret.resize(ret.width+grr.bitmap.width, settings.line_height_px * line_count);
+            int w = ret.width+grr.bitmap.width+1;
+            /* {
+                auto w1 = ret.width+(grr.glyph_info.advance.x/64);
+                if (w1 > w)
+                    w = w1;
+            } */
+            ret.resize(w, settings.line_height_px * line_count);
             ret.putImage(old_w, settings.linespace_px-grr.bitmap_top, grr.bitmap);
         }
         catch(Exception e)

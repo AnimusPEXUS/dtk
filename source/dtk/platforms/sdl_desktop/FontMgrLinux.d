@@ -35,6 +35,12 @@ class FontMgrLinux : FontMgrI
         }
     }
 
+    ~this()
+    {
+        /* FT_Done_Library(ft_library); */
+        /* ft_library = null; */
+    }
+
     string[] getFontPaths()
     {
         string[] ret;
@@ -147,11 +153,14 @@ class Face : FaceI
         populateFaceInfo(this.face_info);
     }
 
+    ~this()
+    {
+        /* FT_Done_Face(face); */
+        /* face=null; */
+    }
+
     private void populateFaceInfo(FaceInfo* face_info)
     {
-        if (face_info.family_name != "")
-            return;
-
         face_info.family_name = fromStringz(face.family_name).dup;
         face_info.style_name = fromStringz(face.style_name).dup;
         face_info.num_faces=face.num_faces;
@@ -164,12 +173,25 @@ class Face : FaceI
         face_info.max_advance_width = face.max_advance_width;
         face_info.max_advance_height = face.max_advance_height;
 
-        auto bb = BoundingBox();
+        face_info.bounding_box = BoundingBox();
 
-        bb.min = Position2D(cast(int)face.bbox.xMin, cast(int)face.bbox.yMin);
-        bb.max = Position2D(cast(int)face.bbox.xMax, cast(int)face.bbox.yMax);
+        face_info.bounding_box.min = Position2D(cast(int)face.bbox.xMin, cast(int)face.bbox.yMin);
+        face_info.bounding_box.max = Position2D(cast(int)face.bbox.xMax, cast(int)face.bbox.yMax);
 
-        face_info.bounding_box = bb;
+        face_info.size = FaceSizeMetrics();
+
+        face_info.size.x_PPEM = face.size.metrics.x_ppem;
+        face_info.size.y_PPEM = face.size.metrics.y_ppem;
+
+        face_info.size.x_scale = cast(int) face.size.metrics.x_scale;
+        face_info.size.y_scale = cast(int) face.size.metrics.y_scale;
+
+        face_info.size.ascender = cast(int) face.size.metrics.ascender;
+        face_info.size.descender = cast(int) face.size.metrics.descender;
+        face_info.size.height = cast(int) face.size.metrics.height;
+
+        face_info.size.max_advance = cast(int) face.size.metrics.max_advance;
+
 
         return;
     }
@@ -307,6 +329,18 @@ class Face : FaceI
         writeln("                   bb max x: ", ret.glyph_info.face_info.bounding_box.max.x);
         writeln("                   bb max y: ", ret.glyph_info.face_info.bounding_box.max.y);
 
+
+        writeln("                size.x_PPEM: ", ret.glyph_info.face_info.size.x_PPEM);
+        writeln("                size.y_PPEM: ", ret.glyph_info.face_info.size.y_PPEM);
+
+        writeln("               size.x_scale: ", ret.glyph_info.face_info.size.x_scale);
+        writeln("               size.y_scale: ", ret.glyph_info.face_info.size.y_scale);
+
+        writeln("              size.ascender: ", ret.glyph_info.face_info.size.ascender);
+        writeln("             size.descender: ", ret.glyph_info.face_info.size.descender);
+        writeln("                size.height: ", ret.glyph_info.face_info.size.height);
+
+        writeln("           size.max_advance: ", ret.glyph_info.face_info.size.max_advance);
 
         return ret;
     }

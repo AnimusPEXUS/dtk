@@ -194,6 +194,8 @@ class Widget : WidgetI
 
         /* alias A1 = typeof(new_this); */
 
+        writeln("redraw_x called at ", this);
+
         const id = __traits(identifier, new_this);
         const id_t = __traits(identifier, T);
 

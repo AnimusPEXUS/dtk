@@ -10,6 +10,20 @@ import dtk.types.Position2D;
     string style_name;
 } */
 
+struct FaceSizeMetrics
+{
+    ushort x_PPEM;
+    ushort y_PPEM;
+
+    int x_scale;
+    int y_scale;
+
+    int ascender;
+    int descender;
+    int height;
+    int max_advance;
+}
+
 struct FaceInfo
 {
 
@@ -36,6 +50,8 @@ struct FaceInfo
 
     int max_advance_width;
     int max_advance_height;
+
+    FaceSizeMetrics size;
 }
 
 /* struct FontStyle // NOTE: this probably will be needed in future
