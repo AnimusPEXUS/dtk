@@ -208,10 +208,15 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
 
         for (ulong i = 0; i <= items_count; i++)
         {
-            ret.putImage(calc_loop_target_x(i), calc_loop_target_y(i), getSubimage(i,
+            ret.putImage(
+                calc_loop_target_x(i),
+                calc_loop_target_y(i),
+                getSubimage(
+                    i,
                     calc_loop_source_x(i), calc_loop_source_y(i),
-                    calc_loop_source_width(i), calc_loop_source_height(i)));
-            /* processed_size += calc_loop_processed_size_advance(i); */
+                    calc_loop_source_width(i), calc_loop_source_height(i)
+                    )
+                );
         }
     }
 
@@ -323,16 +328,41 @@ struct TextLineSubline
 
         auto state = getState(processor_context);
 
-        Image ret = genImageFromSubimages(state.width, state.height, x, y,
-                width, height, parent_line.parent_text.chars_layout, delegate ulong() {
-            return state.units.length;
-        }, delegate ulong(ulong subimage_index) {
-            return state.units[subimage_index].width;
-        }, delegate ulong(ulong subimage_index) {
-            return state.units[subimage_index].height;
-        }, delegate Image(ulong subimage_index, ulong x, ulong y, ulong width, ulong height,) {
-            return state.units[subimage_index].glyph.bitmap.getImage(x, y, width, height,);
-        },);
+        Image ret = genImageFromSubimages(
+            state.width, state.height,
+
+            x, y,
+            width, height,
+
+            parent_line.parent_text.chars_layout,
+
+            delegate ulong()
+            {
+                return state.units.length;
+            },
+
+            delegate ulong(ulong subimage_index)
+            {
+                return state.units[subimage_index].width;
+            },
+
+            delegate ulong(ulong subimage_index)
+            {
+                return state.units[subimage_index].height;
+            },
+
+            delegate Image(
+                ulong subimage_index,
+                ulong x, ulong y,
+                ulong width, ulong height
+                )
+            {
+                return state.units[subimage_index].glyph.bitmap.getImage(
+                    x, y,
+                    width, height
+                    );
+            }
+            );
         return ret;
     }
 }
@@ -357,7 +387,7 @@ class TextLine
         this.parent_text = parent;
     }
 
-    mixin getState!("processor_context.text_line_states", ContextTextLineState,);
+    mixin getState!("processor_context.text_line_states", ContextTextLineState);
 
     void setText(dstring txt)
     {
@@ -370,7 +400,9 @@ class TextLine
         {
             if (c == cast(dchar) '\n')
             {
-                throw new Exception("TextLine.setText() does not accepts strings with new lines");
+                throw new Exception(
+                    "TextLine.setText() does not accepts strings with new lines"
+                    );
             }
         }
 
@@ -411,8 +443,10 @@ class TextLine
                 switch (parent_text.lines_layout)
                 {
                 default:
-                    throw new Exception("parent_text.lines_layout ",
-                            to!string(parent_text.lines_layout));
+                    throw new Exception(
+                        "parent_text.lines_layout ",
+                        to!string(parent_text.lines_layout)
+                        );
                 case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
                 case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
                     required_size = processor_context.width;
@@ -435,8 +469,10 @@ class TextLine
                 switch (parent_text.lines_layout)
                 {
                 default:
-                    throw new Exception("parent_text.lines_layout ",
-                            to!string(parent_text.lines_layout));
+                    throw new Exception(
+                        "parent_text.lines_layout ",
+                        to!string(parent_text.lines_layout)
+                        );
                 case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
                 case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
                     s = u.width;
@@ -535,43 +571,45 @@ class TextLine
 
         auto state = getState(processor_context);
 
-        Image ret = genImageFromSubimages(state.width, state.height, x, y,
-                width, height, parent_text.lines_layout, delegate ulong() {
-            return units.length;
-        }, delegate ulong(ulong subimage_index) {
-            return units[subimage_index].width;
-        }, delegate ulong(ulong subimage_index) {
-            return units[subimage_index].height;
-        }, delegate Image(ulong subimage_index, ulong x, ulong y, ulong width, ulong height,) {
-            return units[subimage_index].glyph.bitmap.getImage(x, y, width, height,);
-        },);
+        Image ret = genImageFromSubimages(
+            state.width, state.height,
+
+            x, y,
+            width, height,
+
+            parent_text.lines_layout,
+
+            delegate ulong()
+            {
+                return units.length;
+            },
+
+            delegate ulong(ulong subimage_index)
+            {
+                return units[subimage_index].width;
+            },
+
+            delegate ulong(ulong subimage_index)
+            {
+                return units[subimage_index].height;
+            },
+            delegate Image(
+                ulong subimage_index,
+                ulong x, ulong y,
+                ulong width, ulong height
+                )
+            {
+                return units[subimage_index].glyph.bitmap.getImage(
+                    x, y,
+                    width, height
+                    );
+            }
+            );
         return ret;
     }
 
-    /* ulong getWidth()
-    {
-        return width;
-    }
-
-    ulong getHeight()
-    {
-        return height;
-    }
-
-    ulong getLength()
-    {
-        return units.length;
-    } */
-    // implement more handy methods
 
 }
-
-/* enum OnLineOverflow
-{
-    cutoff,
-    wrapByWord,
-    wrapByChar,
-} */
 
 enum TextMarkup
 {
@@ -797,23 +835,48 @@ class Text
         return ret;
     }
 
-    Image genImage(ulong x, ulong y, ulong width, ulong height,
-
-            TextProcessorContext processor_context)
+    Image genImage(
+        ulong x, ulong y,
+        ulong width, ulong height,
+        TextProcessorContext processor_context
+        )
     {
 
         auto state = getState(processor_context);
 
-        Image ret = genImageFromSubimages(state.width, state.height, x, y,
-                width, height, lines_layout, delegate ulong() {
-            return lines.length;
-        }, delegate ulong(ulong subimage_index) {
-            return lines[subimage_index].getState(processor_context).width;
-        }, delegate ulong(ulong subimage_index) {
-            return lines[subimage_index].getState(processor_context).height;
-        }, delegate Image(ulong subimage_index, ulong x, ulong y, ulong width, ulong height,) {
-            return lines[subimage_index].genImage(x, y, width, height, processor_context,);
-        },);
+        Image ret = genImageFromSubimages(
+            state.width, state.height,
+
+            x, y,
+            width, height,
+
+            lines_layout,
+
+            delegate ulong()
+            {
+                return lines.length;
+            },
+            delegate ulong(ulong subimage_index)
+            {
+                return lines[subimage_index].getState(processor_context).width;
+            },
+            delegate ulong(ulong subimage_index)
+            {
+                return lines[subimage_index].getState(processor_context).height;
+            },
+            delegate Image(
+                ulong subimage_index,
+                ulong x, ulong y,
+                ulong width, ulong height
+                )
+            {
+                return lines[subimage_index].genImage(
+                    x, y,
+                    width, height,
+                    processor_context
+                    );
+            }
+            );
         return ret;
     }
 
@@ -841,8 +904,6 @@ class TextProcessorContext
     ulong x;
     ulong y;
 
-    // if text wraping, width is used to wrap. else width or height is used for
-    // scroll, depending on text direction settings
     ulong width;
     ulong height;
 
@@ -925,7 +986,7 @@ class TextProcessorContext
         if (text is null)
             throw new Exception("text object is not set");
 
-        auto ret = text.genImage(x, y, width, height, this,);
+        auto ret = text.genImage(x, y, width, height, this);
 
         return ret;
     }
@@ -953,6 +1014,7 @@ mixin template getState(string context_s_container, alias state_type)
 
                 return state;
             }
-        }.format(context_s_container));
+        }.format(context_s_container)
+        );
 
 }
