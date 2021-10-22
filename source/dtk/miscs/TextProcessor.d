@@ -223,7 +223,7 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
     return ret;
 }
 
-class TextUnit
+class TextChar
 {
     TextLine parent_line;
 
@@ -239,18 +239,18 @@ class TextUnit
         this.parent_line = parent_line;
     }
 
-    void rerender(TextProcessorContext processor_context)
+    void rerender(TextView text_view)
     {
-        loadGlyph(processor_context);
+        loadGlyph(text_view);
     }
 
-    alias reporcess = rerender;
+    alias reprocess = rerender;
 
-    void loadGlyph(TextProcessorContext processor_context)
+    void loadGlyph(TextView text_view)
     {
         writeln("rendering char: ", chr);
 
-        auto font_mgr = processor_context.font_mgr;
+        auto font_mgr = text_view.font_mgr;
         auto face = font_mgr.loadFace("/usr/share/fonts/go/Go-Regular.ttf");
 
         {
@@ -281,9 +281,9 @@ class TextUnit
     } */
 }
 
-class ContextTextLineSublineState
+class TextLineSublineViewState
 {
-    TextUnit[] units;
+    TextChar[] textchars;
     ulong width;
     ulong height;
 }
@@ -293,17 +293,17 @@ struct TextLineSubline
 {
     TextLine parent_line;
 
-    mixin getState!("processor_context.text_line_subline_states", ContextTextLineSublineState,);
+    mixin getState!("text_view.text_line_subline_states", TextLineSublineViewState,);
 
-    void recalculateWidthAndHeight(TextProcessorContext processor_context)
+    void recalculateWidthAndHeight(TextView text_view)
     {
 
-        auto state = getState(processor_context);
+        auto state = getState(text_view);
 
         state.width = 0;
         state.height = 0;
 
-        foreach (u; state.units)
+        foreach (u; state.textchars)
         {
             state.width += u.width;
 
@@ -315,18 +315,13 @@ struct TextLineSubline
         }
     }
 
-    /* Image genImage(TextProcessorContext processor_context)
-    {
-        auto state = getState(processor_context);
-        return genImage(0,0,state.width,state.height);
-    } */
-
-    Image genImage(ulong x, ulong y, ulong width, ulong height,
-
-            TextProcessorContext processor_context)
+    Image genImage(
+        ulong x, ulong y, ulong width, ulong height,
+        TextView text_view
+        )
     {
 
-        auto state = getState(processor_context);
+        auto state = getState(text_view);
 
         Image ret = genImageFromSubimages(
             state.width, state.height,
@@ -338,17 +333,17 @@ struct TextLineSubline
 
             delegate ulong()
             {
-                return state.units.length;
+                return state.textchars.length;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return state.units[subimage_index].width;
+                return state.textchars[subimage_index].width;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return state.units[subimage_index].height;
+                return state.textchars[subimage_index].height;
             },
 
             delegate Image(
@@ -357,7 +352,7 @@ struct TextLineSubline
                 ulong width, ulong height
                 )
             {
-                return state.units[subimage_index].glyph.bitmap.getImage(
+                return state.textchars[subimage_index].glyph.bitmap.getImage(
                     x, y,
                     width, height
                     );
@@ -369,7 +364,7 @@ struct TextLineSubline
 
 // NOTE: TextLine have it's own contextual status, because in text wrap mode
 //       line size depends on context's size
-class ContextTextLineState
+class TextLineViewState
 {
     TextLineSubline[] sublines;
     ulong width;
@@ -380,20 +375,20 @@ class TextLine
 {
     Text parent_text;
 
-    TextUnit[] units;
+    TextChar[] textchars;
 
     this(Text parent)
     {
         this.parent_text = parent;
     }
 
-    mixin getState!("processor_context.text_line_states", ContextTextLineState);
+    mixin getState!("text_view.text_line_states", TextLineViewState);
 
     void setText(dstring txt)
     {
         /* auto state = getState(); */
 
-        units = units[0 .. 0];
+        textchars = textchars[0 .. 0];
         /* sublines = sublines[0 .. 0]; */
 
         foreach (c; txt)
@@ -408,37 +403,37 @@ class TextLine
 
         foreach (c; txt)
         {
-            auto tu = new TextUnit(this);
+            auto tu = new TextChar(this);
             tu.chr = c;
-            units ~= tu;
+            textchars ~= tu;
         }
     }
 
-    void reprocessUnits(TextProcessorContext processor_context)
+    void reprocessUnits(TextView text_view)
     {
-        foreach (u; units)
+        foreach (u; textchars)
         {
-            u.reporcess(processor_context);
+            u.reprocess(text_view);
         }
     }
 
-    void reprocessSublines(TextProcessorContext processor_context)
+    void reprocessSublines(TextView text_view)
     {
-        auto state = getState(processor_context);
+        auto state = getState(text_view);
 
         state.sublines = state.sublines[0 .. 0];
 
-        if (units.length != 0)
+        if (textchars.length != 0)
         {
             state.sublines ~= TextLineSubline();
 
             // TODO: comment this out?
-            reprocessUnits(processor_context);
+            reprocessUnits(text_view);
 
             // TODO: optimization required
             ulong required_size;
-            if (processor_context.virtualwrap_allow_by_space
-                    || processor_context.virtualwrap_allow_by_char)
+            if (text_view.virtualwrap_allow_by_space
+                    || text_view.virtualwrap_allow_by_char)
             {
                 switch (parent_text.lines_layout)
                 {
@@ -449,11 +444,11 @@ class TextLine
                         );
                 case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
                 case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
-                    required_size = processor_context.width;
+                    required_size = text_view.width;
                     break;
                 case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
                 case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
-                    required_size = processor_context.height;
+                    required_size = text_view.height;
                     break;
                 }
 
@@ -462,7 +457,7 @@ class TextLine
             ulong current_line = 0;
             ulong current_size = 0;
 
-            foreach (u; units)
+            foreach (u; textchars)
             {
                 ulong s;
 
@@ -499,17 +494,17 @@ class TextLine
                     current_size += s;
                 }
 
-                state.sublines[$ - 1].getState(processor_context).units ~= u;
+                state.sublines[$ - 1].getState(text_view).textchars ~= u;
             }
 
         }
 
-        recalculateWidthAndHeight(processor_context);
+        recalculateWidthAndHeight(text_view);
     }
 
-    void recalculateWidthAndHeight(TextProcessorContext processor_context)
+    void recalculateWidthAndHeight(TextView text_view)
     {
-        auto state = getState(processor_context);
+        auto state = getState(text_view);
 
         state.width = 0;
         state.height = 0;
@@ -520,12 +515,12 @@ class TextLine
 
             foreach (sl; state.sublines)
             {
-                sl.recalculateWidthAndHeight(processor_context);
+                sl.recalculateWidthAndHeight(text_view);
             }
 
             foreach (sl; state.sublines)
             {
-                auto sl_state = sl.getState(processor_context);
+                auto sl_state = sl.getState(text_view);
                 {
                     auto w = sl_state.width;
                     if (w > state.width)
@@ -540,7 +535,7 @@ class TextLine
     dstring getText()
     {
         dstring ret;
-        foreach (u; units)
+        foreach (u; textchars)
         {
             ret ~= u.chr;
         }
@@ -553,7 +548,7 @@ class TextLine
 
         for (ulong i = start; i != stop; i++)
         {
-            ret ~= units[i].chr;
+            ret ~= textchars[i].chr;
         }
 
         return ret;
@@ -566,10 +561,10 @@ class TextLine
 
     Image genImage(ulong x, ulong y, ulong width, ulong height,
 
-            TextProcessorContext processor_context)
+            TextView text_view)
     {
 
-        auto state = getState(processor_context);
+        auto state = getState(text_view);
 
         Image ret = genImageFromSubimages(
             state.width, state.height,
@@ -581,17 +576,17 @@ class TextLine
 
             delegate ulong()
             {
-                return units.length;
+                return textchars.length;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return units[subimage_index].width;
+                return textchars[subimage_index].width;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return units[subimage_index].height;
+                return textchars[subimage_index].height;
             },
             delegate Image(
                 ulong subimage_index,
@@ -599,7 +594,7 @@ class TextLine
                 ulong width, ulong height
                 )
             {
-                return units[subimage_index].glyph.bitmap.getImage(
+                return textchars[subimage_index].glyph.bitmap.getImage(
                     x, y,
                     width, height
                     );
@@ -623,7 +618,7 @@ enum TextMarkup
     podPlain,
 }
 
-class ContextTextState
+class TextViewState
 {
     ulong width;
     ulong height;
@@ -657,7 +652,7 @@ class Text
 
     }
 
-    mixin getState!("processor_context.text_states", ContextTextState,);
+    mixin getState!("text_view.text_states", TextViewState,);
 
     void setText(dstring txt)
     {
@@ -707,30 +702,30 @@ class Text
         }
     }
 
-    void reprocess(TextProcessorContext processor_context)
+    void reprocess(TextView text_view)
     {
-        reprocessUnits(processor_context);
-        reprocessSublines(processor_context);
-        /* reprocessLines(processor_context); */
+        reprocessUnits(text_view);
+        reprocessSublines(text_view);
+        /* reprocessLines(text_view); */
     }
 
-    void reprocessUnits(TextProcessorContext processor_context)
-    {
-        foreach (l; lines)
-        {
-            l.reprocessUnits(processor_context);
-        }
-    }
-
-    void reprocessSublines(TextProcessorContext processor_context)
+    void reprocessUnits(TextView text_view)
     {
         foreach (l; lines)
         {
-            l.reprocessSublines(processor_context);
+            l.reprocessUnits(text_view);
         }
     }
 
-    /* void reprocessLines(TextProcessorContext processor_context)
+    void reprocessSublines(TextView text_view)
+    {
+        foreach (l; lines)
+        {
+            l.reprocessSublines(text_view);
+        }
+    }
+
+    /* void reprocessLines(TextView text_view)
     {
 
     } */
@@ -763,12 +758,12 @@ class Text
     dstring getText(ulong start, ulong stop)
     {
         bool first_found = false;
-        ulong first_text_unit;
-        ulong first_text_unit_unit_index;
+        ulong first_text_textchar;
+        ulong first_text_textchar_index;
 
         bool last_found = false;
-        ulong last_text_unit;
-        ulong last_text_unit_unit_index;
+        ulong last_text_textchar;
+        ulong last_text_textchar_index;
 
         bool searching_first = true;
 
@@ -787,22 +782,22 @@ class Text
 
         foreach (i, l; lines)
         {
-            auto l_l = l.units.length;
+            auto l_l = l.textchars.length;
             if (i < lines.length)
                 l_l += 1; // add new line
 
             if (start < calc_length + l_l)
             {
                 first_found = true;
-                first_text_unit = i;
-                first_text_unit_unit_index = start - calc_length;
+                first_text_textchar = i;
+                first_text_textchar_index = start - calc_length;
             }
 
             if (stop < calc_length + l_l)
             {
                 last_found = true;
-                last_text_unit = i;
-                last_text_unit_unit_index = stop - calc_length;
+                last_text_textchar = i;
+                last_text_textchar_index = stop - calc_length;
             }
 
             if (first_found && last_found)
@@ -811,26 +806,26 @@ class Text
             calc_length += l_l;
         }
 
-        if (first_text_unit == last_text_unit)
+        if (first_text_textchar == last_text_textchar)
         {
-            return lines[first_text_unit].getText(first_text_unit_unit_index,
-                    last_text_unit_unit_index + 1);
+            return lines[first_text_textchar].getText(first_text_textchar_index,
+                    last_text_textchar_index + 1);
         }
 
         dstring ret;
 
-        ret ~= lines[first_text_unit].getText(first_text_unit_unit_index,
-                lines[first_text_unit].units.length);
+        ret ~= lines[first_text_textchar].getText(first_text_textchar_index,
+                lines[first_text_textchar].textchars.length);
 
-        if (last_text_unit - first_text_unit > 1)
+        if (last_text_textchar - first_text_textchar > 1)
         {
-            for (ulong i = first_text_unit + 1; i < last_text_unit; i++)
+            for (ulong i = first_text_textchar + 1; i < last_text_textchar; i++)
             {
                 ret ~= "\n" ~ lines[i].getText();
             }
         }
 
-        ret ~= "\n" ~ lines[last_text_unit].getText(0, last_text_unit_unit_index);
+        ret ~= "\n" ~ lines[last_text_textchar].getText(0, last_text_textchar_index);
 
         return ret;
     }
@@ -838,11 +833,11 @@ class Text
     Image genImage(
         ulong x, ulong y,
         ulong width, ulong height,
-        TextProcessorContext processor_context
+        TextView text_view
         )
     {
 
-        auto state = getState(processor_context);
+        auto state = getState(text_view);
 
         Image ret = genImageFromSubimages(
             state.width, state.height,
@@ -858,11 +853,11 @@ class Text
             },
             delegate ulong(ulong subimage_index)
             {
-                return lines[subimage_index].getState(processor_context).width;
+                return lines[subimage_index].getState(text_view).width;
             },
             delegate ulong(ulong subimage_index)
             {
-                return lines[subimage_index].getState(processor_context).height;
+                return lines[subimage_index].getState(text_view).height;
             },
             delegate Image(
                 ulong subimage_index,
@@ -873,7 +868,7 @@ class Text
                 return lines[subimage_index].genImage(
                     x, y,
                     width, height,
-                    processor_context
+                    text_view
                     );
             }
             );
@@ -885,7 +880,7 @@ class Text
         ulong ret;
         foreach (i, l; lines)
         {
-            ret += l.units.length;
+            ret += l.textchars.length;
         }
         ret += lines.length - 1; // new line symbol count
         return ret;
@@ -899,7 +894,7 @@ enum Mode
     codeEditor,
 }
 
-class TextProcessorContext
+class TextView
 {
     ulong x;
     ulong y;
@@ -923,9 +918,9 @@ class TextProcessorContext
 
     FontMgrI font_mgr;
 
-    ContextTextLineSublineState[TextLineSubline] text_line_subline_states;
-    ContextTextLineState[TextLine] text_line_states;
-    ContextTextState[Text] text_states;
+    TextLineSublineViewState[TextLineSubline] text_line_subline_states;
+    TextLineViewState[TextLine] text_line_states;
+    TextViewState[Text] text_states;
 
     this()
     {
@@ -998,10 +993,10 @@ class TextProcessorContext
 
 }
 
-mixin template getState(string context_s_container, alias state_type)
+mixin template getState(string state_container, alias state_type)
 {
     mixin(q{
-            state_type getState(TextProcessorContext processor_context)
+            state_type getState(TextView text_view)
             {
                 state_type state;
 
@@ -1014,7 +1009,7 @@ mixin template getState(string context_s_container, alias state_type)
 
                 return state;
             }
-        }.format(context_s_container)
+        }.format(state_container)
         );
 
 }

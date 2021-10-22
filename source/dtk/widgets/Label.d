@@ -22,7 +22,7 @@ class Label : Widget, ContainerableWidgetI
 {
     Image textImage;
 
-    TextProcessorContext txtProcCtx;
+    TextView text_view;
 
     private
     {
@@ -39,7 +39,7 @@ class Label : Widget, ContainerableWidgetI
 
     this()
     {
-        txtProcCtx = new TextProcessorContext();
+        text_view = new TextView();
 
         connectToText_onAfterChanged(&afterTextChanged);
         connectToFontSize_onAfterChanged(&afterFontSizeChanged);
@@ -53,8 +53,8 @@ class Label : Widget, ContainerableWidgetI
         try
         {
             auto x = getText();
-            txtProcCtx.setText(x);
-            auto y = txtProcCtx.getTextString();
+            text_view.setText(x);
+            auto y = text_view.getTextString();
             writefln("
 afterTextChanged
     x: %s
@@ -74,7 +74,7 @@ afterTextChanged
         try
         {
             writeln("afterFontSizeChanged is called");
-            txtProcCtx.getText().faceSize = getFontSize() * 64;
+            text_view.getText().faceSize = getFontSize() * 64;
             rerenderTextImage();
         }
         catch (Exception e)
@@ -88,7 +88,7 @@ afterTextChanged
         try
         {
             writeln("afterFontItalicChanged is called");
-            txtProcCtx.getText().italic = getFontItalic();
+            text_view.getText().italic = getFontItalic();
             rerenderTextImage();
         }
         catch (Exception e)
@@ -102,7 +102,7 @@ afterTextChanged
         try
         {
             writeln("afterFontBoldChanged is called");
-            txtProcCtx.getText().bold = getFontBold();
+            text_view.getText().bold = getFontBold();
             rerenderTextImage();
         }
         catch (Exception e)
@@ -129,9 +129,9 @@ afterTextChanged
         writeln("Label rerenderTextImage triggered");
 
         /* auto settings = renderTextSettings(); */
-        if (txtProcCtx.font_mgr is null)
+        if (text_view.font_mgr is null)
         {
-            txtProcCtx.font_mgr = {
+            text_view.font_mgr = {
                 auto f = getForm();
                 if (f is null)
                 {
@@ -156,11 +156,11 @@ afterTextChanged
             }();
         }
         /* textProcessor.defaultFaceSize = getFontSize()*64; */
-        txtProcCtx.getText().faceResolution = 72;
+        text_view.getText().faceResolution = 72;
 
-        txtProcCtx.reprocess();
+        text_view.reprocess();
 
-        textImage = txtProcCtx.genImage();
+        textImage = text_view.genImage();
     }
 
     override void redraw()
