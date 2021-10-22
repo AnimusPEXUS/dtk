@@ -223,31 +223,45 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
     return ret;
 }
 
+class TextCharViewState
+{
+    ulong width;
+    ulong height;
+
+    GlyphRenderResult* glyph;
+}
+
 class TextChar
 {
     TextLine parent_line;
 
     dchar chr;
 
-    ulong width;
-    ulong height;
-
-    GlyphRenderResult* glyph;
-
     this(TextLine parent_line)
     {
         this.parent_line = parent_line;
     }
 
-    void rerender(TextView text_view)
+    mixin getState!("text_view.text_char_states", TextCharViewState);
+
+    void reprocess(TextView text_view)
     {
-        loadGlyph(text_view);
+        auto state = getState(text_view);
+        if (state.glyph is null)
+        {
+            loadGlyph(text_view);
+        }
     }
 
-    alias reprocess = rerender;
+    /* alias reprocess = rerender; */
 
     void loadGlyph(TextView text_view)
     {
+        auto state = getState(text_view);
+
+        state.width = 0;
+        state.height = 0;
+
         writeln("rendering char: ", chr);
 
         auto font_mgr = text_view.font_mgr;
@@ -264,9 +278,9 @@ class TextChar
 
         try
         {
-            glyph = face.renderGlyphByChar(chr);
-            width = glyph.bitmap.width;
-            height = glyph.bitmap.height;
+            state.glyph = face.renderGlyphByChar(chr);
+            state.width = state.glyph.bitmap.width;
+            state.height = state.glyph.bitmap.height;
         }
         catch (Exception e)
         {
@@ -303,16 +317,45 @@ struct TextLineSubline
         state.width = 0;
         state.height = 0;
 
-        foreach (u; state.textchars)
+        switch (parent_line.parent_text.chars_layout)
         {
-            state.width += u.width;
-
+        default:
+            throw new Exception(
+                "parent_text.lines_layout ",
+                to!string(parent_line.parent_text.lines_layout)
+                );
+        case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+        case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+            foreach (tc; state.textchars)
             {
-                auto h = u.height;
-                if (h > state.height)
-                    state.height = h;
+                auto tc_state = tc.getState(text_view);
+
+                state.width += tc_state.width;
+
+                {
+                    auto h = tc_state.height;
+                    if (h > state.height)
+                        state.height = h;
+                }
             }
+            break;
+        case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+        case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+            foreach (tc; state.textchars)
+            {
+                auto tc_state = tc.getState(text_view);
+
+                state.height += tc_state.height;
+
+                {
+                    auto w = tc_state.width;
+                    if (w > state.width)
+                        state.width = w;
+                }
+            }
+            break;
         }
+
     }
 
     Image genImage(
@@ -338,12 +381,12 @@ struct TextLineSubline
 
             delegate ulong(ulong subimage_index)
             {
-                return state.textchars[subimage_index].width;
+                return state.textchars[subimage_index].getState(text_view).width;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return state.textchars[subimage_index].height;
+                return state.textchars[subimage_index].getState(text_view).height;
             },
 
             delegate Image(
@@ -352,7 +395,7 @@ struct TextLineSubline
                 ulong width, ulong height
                 )
             {
-                return state.textchars[subimage_index].glyph.bitmap.getImage(
+                return state.textchars[subimage_index].getState(text_view).glyph.bitmap.getImage(
                     x, y,
                     width, height
                     );
@@ -403,17 +446,17 @@ class TextLine
 
         foreach (c; txt)
         {
-            auto tu = new TextChar(this);
-            tu.chr = c;
-            textchars ~= tu;
+            auto tc = new TextChar(this);
+            tc.chr = c;
+            textchars ~= tc;
         }
     }
 
     void reprocessUnits(TextView text_view)
     {
-        foreach (u; textchars)
+        foreach (tc; textchars)
         {
-            u.reprocess(text_view);
+            tc.reprocess(text_view);
         }
     }
 
@@ -428,7 +471,7 @@ class TextLine
             state.sublines ~= TextLineSubline();
 
             // TODO: comment this out?
-            reprocessUnits(text_view);
+            /* reprocessUnits(text_view); */
 
             // TODO: optimization required
             ulong required_size;
@@ -457,9 +500,11 @@ class TextLine
             ulong current_line = 0;
             ulong current_size = 0;
 
-            foreach (u; textchars)
+            foreach (tc; textchars)
             {
                 ulong s;
+
+                auto tc_state = tc.getState(text_view);
 
                 switch (parent_text.lines_layout)
                 {
@@ -470,11 +515,11 @@ class TextLine
                         );
                 case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
                 case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
-                    s = u.width;
+                    s = tc_state.width;
                     break;
                 case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
                 case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
-                    s = u.height;
+                    s = tc_state.height;
                     break;
                 }
 
@@ -494,11 +539,16 @@ class TextLine
                     current_size += s;
                 }
 
-                state.sublines[$ - 1].getState(text_view).textchars ~= u;
+                state.sublines[$ - 1].getState(text_view).textchars ~= tc;
             }
 
         }
 
+        recalculateWidthAndHeight(text_view);
+    }
+
+    void reprocess(TextView text_view)
+    {
         recalculateWidthAndHeight(text_view);
     }
 
@@ -511,33 +561,57 @@ class TextLine
 
         if (state.sublines.length != 0)
         {
-            // TODO: add cases for different layouts
 
-            foreach (sl; state.sublines)
+            switch (parent_text.lines_layout)
             {
-                sl.recalculateWidthAndHeight(text_view);
-            }
+            default:
+                throw new Exception(
+                    "parent_text.lines_layout ",
+                    to!string(parent_text.lines_layout)
+                    );
+            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+            case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+                foreach (sl; state.sublines)
+                {
+                    auto sl_state = sl.getState(text_view);
 
+                    {
+                        auto w = sl_state.width;
+                        if (w > state.width)
+                            state.width = w;
+                    }
+
+                    state.height += sl_state.height;
+                }
+                break;
+            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+            case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
             foreach (sl; state.sublines)
             {
                 auto sl_state = sl.getState(text_view);
-                {
-                    auto w = sl_state.width;
-                    if (w > state.width)
-                        state.width = w;
-                }
 
-                state.height += sl_state.height;
+                state.width += sl_state.width;
+
+                {
+                    auto w = sl_state.height;
+                    if (w > state.height)
+                        state.height = w;
+                }
             }
+                break;
+            }
+
+
+
         }
     }
 
     dstring getText()
     {
         dstring ret;
-        foreach (u; textchars)
+        foreach (tc; textchars)
         {
-            ret ~= u.chr;
+            ret ~= tc.chr;
         }
         return ret;
     }
@@ -581,12 +655,12 @@ class TextLine
 
             delegate ulong(ulong subimage_index)
             {
-                return textchars[subimage_index].width;
+                return textchars[subimage_index].getState(text_view).width;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return textchars[subimage_index].height;
+                return textchars[subimage_index].getState(text_view).height;
             },
             delegate Image(
                 ulong subimage_index,
@@ -594,7 +668,7 @@ class TextLine
                 ulong width, ulong height
                 )
             {
-                return textchars[subimage_index].glyph.bitmap.getImage(
+                return textchars[subimage_index].getState(text_view).glyph.bitmap.getImage(
                     x, y,
                     width, height
                     );
@@ -706,7 +780,7 @@ class Text
     {
         reprocessUnits(text_view);
         reprocessSublines(text_view);
-        /* reprocessLines(text_view); */
+        reprocessLines(text_view);
     }
 
     void reprocessUnits(TextView text_view)
@@ -725,10 +799,14 @@ class Text
         }
     }
 
-    /* void reprocessLines(TextView text_view)
+    void reprocessLines(TextView text_view)
     {
+        foreach (l; lines)
+        {
+            l.reprocess(text_view);
+        }
 
-    } */
+    }
 
     dstring getText()
     {
@@ -918,6 +996,7 @@ class TextView
 
     FontMgrI font_mgr;
 
+    TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
     TextLineViewState[TextLine] text_line_states;
     TextViewState[Text] text_states;
@@ -1011,5 +1090,4 @@ mixin template getState(string state_container, alias state_type)
             }
         }.format(state_container)
         );
-
 }
