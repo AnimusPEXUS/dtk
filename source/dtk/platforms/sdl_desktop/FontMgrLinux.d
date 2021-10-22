@@ -19,7 +19,6 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Image;
 
-
 class FontMgrLinux : FontMgrI
 {
     FT_Library ft_library;
@@ -101,9 +100,8 @@ class FontMgrLinux : FontMgrI
         foreach (v; face_cache)
         {
             auto i = v.getFaceInfo();
-            if (i.on_fs == face_info.on_fs
-                && i.on_fs_filename == face_info.on_fs_filename
-                && i.face_index == face_info.face_index)
+            if (i.on_fs == face_info.on_fs && i.on_fs_filename == face_info.on_fs_filename
+                    && i.face_index == face_info.face_index)
                 return v;
         }
         auto ret = new Face(this, face_info);
@@ -163,8 +161,8 @@ class Face : FaceI
     {
         face_info.family_name = fromStringz(face.family_name).dup;
         face_info.style_name = fromStringz(face.style_name).dup;
-        face_info.num_faces=face.num_faces;
-        face_info.face_index=face.face_index;
+        face_info.num_faces = face.num_faces;
+        face_info.face_index = face.face_index;
 
         face_info.ascender = face.ascender;
         face_info.descender = face.descender;
@@ -175,8 +173,8 @@ class Face : FaceI
 
         face_info.bounding_box = BoundingBox();
 
-        face_info.bounding_box.min = Position2D(cast(int)face.bbox.xMin, cast(int)face.bbox.yMin);
-        face_info.bounding_box.max = Position2D(cast(int)face.bbox.xMax, cast(int)face.bbox.yMax);
+        face_info.bounding_box.min = Position2D(cast(int) face.bbox.xMin, cast(int) face.bbox.yMin);
+        face_info.bounding_box.max = Position2D(cast(int) face.bbox.xMax, cast(int) face.bbox.yMax);
 
         face_info.size = FaceSizeMetrics();
 
@@ -191,7 +189,6 @@ class Face : FaceI
         face_info.size.height = cast(int) face.size.metrics.height;
 
         face_info.size.max_advance = cast(int) face.size.metrics.max_advance;
-
 
         return;
     }
@@ -225,8 +222,8 @@ class Face : FaceI
 
     void setCharResolution(uint horizontal, uint vertical)
     {
-        charResH=horizontal;
-        charResV=vertical;
+        charResH = horizontal;
+        charResV = vertical;
         auto err = FT_Set_Char_Size(face, charSizeW, charSizeH, charResH, charResV);
         if (err != 0)
         {
@@ -245,7 +242,7 @@ class Face : FaceI
             throw new Exception("FT_Get_Char_Index error");
         }
 
-        auto err = FT_Load_Glyph(face, glyph_index, FT_LOAD_TARGET_NORMAL );
+        auto err = FT_Load_Glyph(face, glyph_index, FT_LOAD_TARGET_NORMAL);
         if (err != 0)
         {
             throw new Exception("FT_Load_Glyph error");
@@ -273,18 +270,18 @@ class Face : FaceI
             for (int x = 0; x != b.width; x++)
             {
                 ubyte c;
-                c = b.buffer[y*b.width+x];
+                c = b.buffer[y * b.width + x];
 
                 real intens = 0;
                 if (c != 0)
                 {
-                    intens = cast(real) 1 / (cast(real)255 / c);
+                    intens = cast(real) 1 / (cast(real) 255 / c);
                     /* writeln("renderGlyphByChar ", x, " ", y, " intens ", intens); */
                 }
                 auto dot = ImageDot();
                 dot.intensivity = intens;
-                dot.enabled=true;
-                ret_i.setDot(x,y, dot);
+                dot.enabled = true;
+                ret_i.setDot(x, y, dot);
             }
         }
 
@@ -329,7 +326,6 @@ class Face : FaceI
         writeln("                   bb max x: ", ret.glyph_info.face_info.bounding_box.max.x);
         writeln("                   bb max y: ", ret.glyph_info.face_info.bounding_box.max.y);
 
-
         writeln("                size.x_PPEM: ", ret.glyph_info.face_info.size.x_PPEM);
         writeln("                size.y_PPEM: ", ret.glyph_info.face_info.size.y_PPEM);
 
@@ -350,40 +346,28 @@ class Face : FaceI
         auto slot = face.glyph;
 
         auto ret = new GlyphInfo();
-        ret.face_info=this.face_info;
+        ret.face_info = this.face_info;
         ret.glyph_index = slot.glyph_index;
 
         ret.metrics = GlyphMetrics();
 
-        ret.metrics.size = Size2D(
-            cast(int)slot.metrics.width,
-            cast(int)slot.metrics.height
-            );
+        ret.metrics.size = Size2D(cast(int) slot.metrics.width, cast(int) slot.metrics.height);
 
-        ret.metrics.horiBearing = Position2D(
-            cast(int)slot.metrics.horiBearingX,
-            cast(int)slot.metrics.horiBearingY
-            );
-        ret.metrics.vertBearing = Position2D(
-            cast(int)slot.metrics.vertBearingX,
-            cast(int)slot.metrics.vertBearingY
-            );
+        ret.metrics.horiBearing = Position2D(cast(int) slot.metrics.horiBearingX,
+                cast(int) slot.metrics.horiBearingY);
+        ret.metrics.vertBearing = Position2D(cast(int) slot.metrics.vertBearingX,
+                cast(int) slot.metrics.vertBearingY);
 
-        ret.metrics.advance = Size2D(
-            cast(int)slot.metrics.horiAdvance,
-            cast(int)slot.metrics.vertAdvance
-            );
+        ret.metrics.advance = Size2D(cast(int) slot.metrics.horiAdvance,
+                cast(int) slot.metrics.vertAdvance);
 
         ret.linear_horizontal_advance = slot.linearHoriAdvance;
         ret.linear_vertical_advance = slot.linearVertAdvance;
 
-        ret.advance = Position2D(
-            cast(int)slot.advance.x,
-            cast(int)slot.advance.y
-            );
+        ret.advance = Position2D(cast(int) slot.advance.x, cast(int) slot.advance.y);
 
-        ret.lsb_delta = cast(int)slot.lsb_delta;
-        ret.rsb_delta =  cast(int)slot.rsb_delta;
+        ret.lsb_delta = cast(int) slot.lsb_delta;
+        ret.rsb_delta = cast(int) slot.rsb_delta;
 
         return ret;
     }

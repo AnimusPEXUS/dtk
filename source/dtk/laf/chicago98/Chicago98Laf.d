@@ -251,7 +251,7 @@ class Chicago98Laf : LafI
 
     private ubyte chanBlend(ubyte lower, ubyte higher, real part)
     {
-        return cast(ubyte)(lower + ((higher - lower) * part) );
+        return cast(ubyte)(lower + ((higher - lower) * part));
     }
 
     void drawLabel(Label widget)
@@ -265,22 +265,22 @@ class Chicago98Laf : LafI
 
             auto image = widget.textImage;
 
-            for (uint y = 0 ; y != image.height; y++)
+            for (uint y = 0; y != image.height; y++)
             {
-                for (uint x = 0 ; x != image.width; x++)
+                for (uint x = 0; x != image.width; x++)
                 {
                     Color new_color = formBackground;
-                    auto dot = image.getDot(x,y);
+                    auto dot = image.getDot(x, y);
 
                     if (dot.enabled)
                     {
                         auto part = dot.intensivity;
-                        new_color.r =chanBlend(formBackground.r, elementDarkedColor.r, part);
-                        new_color.g =chanBlend(formBackground.g, elementDarkedColor.g, part);
-                        new_color.b =chanBlend(formBackground.b, elementDarkedColor.b, part);
+                        new_color.r = chanBlend(formBackground.r, elementDarkedColor.r, part);
+                        new_color.g = chanBlend(formBackground.g, elementDarkedColor.g, part);
+                        new_color.b = chanBlend(formBackground.b, elementDarkedColor.b, part);
                     }
 
-                    ds.drawDot(Position2D(pos.x+x, pos.y+y), new_color);
+                    ds.drawDot(Position2D(pos.x + x, pos.y + y), new_color);
                 }
             }
             ds.present();

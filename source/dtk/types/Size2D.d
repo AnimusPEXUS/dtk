@@ -6,7 +6,8 @@ struct Size2D
     int height;
     /* int depth; */
 
-    invariant {
+    invariant
+    {
         assert(width >= 0);
         assert(height >= 0);
     }

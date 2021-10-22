@@ -6,7 +6,6 @@ import std.typecons;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FaceI;
 
-
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Color;
@@ -24,9 +23,9 @@ class DrawingSurfaceShifted : DrawingSurfaceI
 
     this(DrawingSurfaceI ds, int x_shift, int y_shift)
     {
-        this.x_shift=x_shift;
-        this.y_shift=y_shift;
-        this.ds=ds;
+        this.x_shift = x_shift;
+        this.y_shift = y_shift;
+        this.ds = ds;
     }
 
     void drawDot(Position2D pos, Color color)
@@ -54,8 +53,7 @@ class DrawingSurfaceShifted : DrawingSurfaceI
         Position2D npos;
         npos.x = pos.x + x_shift;
         npos.y = pos.y + y_shift;
-        ds.drawRectangle(npos, size, top_style, left_style, bottom_style,
-                    right_style, fill_style);
+        ds.drawRectangle(npos, size, top_style, left_style, bottom_style, right_style, fill_style);
     }
 
     /* void drawText(string text, Position2D pos, FontI font,

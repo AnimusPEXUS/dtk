@@ -27,9 +27,9 @@ class Label : Widget, ContainerableWidgetI
     private
     {
         mixin Property_gs!(dstring, "text");
-        mixin Property_gs_w_d!(ushort, "font_size",9);
-        mixin Property_gs_w_d!(bool, "font_italic",false);
-        mixin Property_gs_w_d!(bool, "font_bold",false);
+        mixin Property_gs_w_d!(ushort, "font_size", 9);
+        mixin Property_gs_w_d!(bool, "font_italic", false);
+        mixin Property_gs_w_d!(bool, "font_bold", false);
     }
 
     mixin Property_forwarding!(dstring, text, "Text");
@@ -50,7 +50,8 @@ class Label : Widget, ContainerableWidgetI
 
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow
     {
-        try {
+        try
+        {
             auto x = getText();
             txtProcCtx.setText(x);
             auto y = txtProcCtx.getTextString();
@@ -59,9 +60,10 @@ afterTextChanged
     x: %s
     y: %s
   ==?: %s
-", x, y, x==y);
+", x, y, x == y);
             rerenderTextImage();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
 
         }
@@ -69,11 +71,13 @@ afterTextChanged
 
     private void afterFontSizeChanged(ushort, ushort) nothrow
     {
-        try {
+        try
+        {
             writeln("afterFontSizeChanged is called");
             txtProcCtx.getText().faceSize = getFontSize() * 64;
             rerenderTextImage();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
 
         }
@@ -81,11 +85,13 @@ afterTextChanged
 
     private void afterFontItalicChanged(bool, bool) nothrow
     {
-        try {
+        try
+        {
             writeln("afterFontItalicChanged is called");
             txtProcCtx.getText().italic = getFontItalic();
             rerenderTextImage();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
 
         }
@@ -93,11 +99,13 @@ afterTextChanged
 
     private void afterFontBoldChanged(bool, bool) nothrow
     {
-        try {
+        try
+        {
             writeln("afterFontBoldChanged is called");
             txtProcCtx.getText().bold = getFontBold();
             rerenderTextImage();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
 
         }
@@ -105,10 +113,12 @@ afterTextChanged
 
     private void afterSizeChanged(Size2D, Size2D) nothrow
     {
-        try {
+        try
+        {
             writeln("afterSizeChanged is called");
             rerenderTextImage();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
 
         }
@@ -119,7 +129,8 @@ afterTextChanged
         writeln("Label rerenderTextImage triggered");
 
         /* auto settings = renderTextSettings(); */
-        if (txtProcCtx.font_mgr is null){
+        if (txtProcCtx.font_mgr is null)
+        {
             txtProcCtx.font_mgr = {
                 auto f = getForm();
                 if (f is null)
@@ -145,11 +156,11 @@ afterTextChanged
             }();
         }
         /* textProcessor.defaultFaceSize = getFontSize()*64; */
-        txtProcCtx.getText().faceResolution=72;
+        txtProcCtx.getText().faceResolution = 72;
 
         txtProcCtx.reprocess();
 
-        textImage =txtProcCtx.genImage();
+        textImage = txtProcCtx.genImage();
     }
 
     override void redraw()

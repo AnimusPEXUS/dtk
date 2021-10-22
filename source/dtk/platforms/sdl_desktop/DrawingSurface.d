@@ -222,11 +222,11 @@ class DrawingSurface : DrawingSurfaceI
 
     void drawImage(Position2D pos, Image image) // add support for various image modes
     {
-        for (uint y = 0 ; y != image.height; y++)
+        for (uint y = 0; y != image.height; y++)
         {
-            for (uint x = 0 ; x != image.width; x++)
+            for (uint x = 0; x != image.width; x++)
             {
-                drawDot(Position2D(pos.x+x, pos.y+y), image.getDot(x,y).color);
+                drawDot(Position2D(pos.x + x, pos.y + y), image.getDot(x, y).color);
             }
         }
     }

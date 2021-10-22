@@ -1,6 +1,5 @@
 module dtk.types.Property_mixins;
 
-
 /// with getter, setter and unsetter
 mixin template Property_gsu(T, string variable)
 {
