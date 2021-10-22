@@ -21,7 +21,8 @@ import dtk.miscs.TextProcessor;
 class Label : Widget, ContainerableWidgetI
 {
     Image textImage;
-    TextProcessor textProcessor;
+
+    TextProcessorContext txtProcCtx;
 
     private
     {
@@ -38,7 +39,7 @@ class Label : Widget, ContainerableWidgetI
 
     this()
     {
-        textProcessor = new TextProcessor();
+        txtProcCtx = new TextProcessorContext();
 
         connectToText_onAfterChanged(&afterTextChanged);
         connectToFontSize_onAfterChanged(&afterFontSizeChanged);
@@ -50,9 +51,9 @@ class Label : Widget, ContainerableWidgetI
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow
     {
         try {
-            auto x = to!dstring(getText());
-            textProcessor.setText(x);
-            auto y = textProcessor.getText();
+            auto x = getText();
+            txtProcCtx.setText(x);
+            auto y = txtProcCtx.getTextString();
             writefln("
 afterTextChanged
     x: %s
@@ -70,7 +71,7 @@ afterTextChanged
     {
         try {
             writeln("afterFontSizeChanged is called");
-            textProcessor.defaultFaceSize = getFontSize() * 64;
+            txtProcCtx.getText().faceSize = getFontSize() * 64;
             rerenderTextImage();
         } catch (Exception e)
         {
@@ -82,7 +83,7 @@ afterTextChanged
     {
         try {
             writeln("afterFontItalicChanged is called");
-            textProcessor.defaultItalic = getFontItalic();
+            txtProcCtx.getText().italic = getFontItalic();
             rerenderTextImage();
         } catch (Exception e)
         {
@@ -94,7 +95,7 @@ afterTextChanged
     {
         try {
             writeln("afterFontBoldChanged is called");
-            textProcessor.defaultBold = getFontBold();
+            txtProcCtx.getText().bold = getFontBold();
             rerenderTextImage();
         } catch (Exception e)
         {
@@ -118,8 +119,8 @@ afterTextChanged
         writeln("Label rerenderTextImage triggered");
 
         /* auto settings = renderTextSettings(); */
-        if (textProcessor.font_mgr is null){
-            textProcessor.font_mgr = {
+        if (txtProcCtx.font_mgr is null){
+            txtProcCtx.font_mgr = {
                 auto f = getForm();
                 if (f is null)
                 {
@@ -144,11 +145,11 @@ afterTextChanged
             }();
         }
         /* textProcessor.defaultFaceSize = getFontSize()*64; */
-        textProcessor.defaultFaceResolution=72;
+        txtProcCtx.getText().faceResolution=72;
 
-        textProcessor.reprocess();
+        txtProcCtx.reprocess();
 
-        textImage =textProcessor.genImage();
+        textImage =txtProcCtx.genImage();
     }
 
     override void redraw()

@@ -1,9 +1,14 @@
 module dtk.types.Property_mixins;
 
+
 /// with getter, setter and unsetter
 mixin template Property_gsu(T, string variable)
 {
-    mixin("
+    import std.format;
+
+    /* pragma(msg, "creating property \"", variable, "\""); */
+
+    mixin(q{
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
             init_value : T.init, // note: here must be T.init, not cast(T) null
@@ -28,14 +33,18 @@ mixin template Property_gsu(T, string variable)
         }
         x.default_value = x.init_value;
         return x;
-    }()) " ~ variable ~ ";
-    ");
+    }()) %1$s;
+    }.format(variable));
 }
 
 /// with getter, setter and unsetter. get after unset returns null
 mixin template Property_gsun(T, string variable)
 {
-    mixin("
+    import std.format;
+
+    /* pragma(msg, "creating property \"", variable, "\""); */
+
+    mixin(q{
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
             init_value : cast(T) null,
@@ -62,14 +71,18 @@ mixin template Property_gsun(T, string variable)
         }
         x.default_value = x.init_value;
         return x;
-    }()) " ~ variable ~ ";
-    ");
+    }()) %1$s;
+    }.format(variable));
 }
 
 /// getter and setter only
 mixin template Property_gs(T, string variable)
 {
-    mixin("
+    import std.format;
+
+    pragma(msg, "creating property \"", variable, "\"");
+
+    mixin(q{
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
             init_value : T.init,
@@ -94,14 +107,18 @@ mixin template Property_gs(T, string variable)
         }
         x.default_value = x.init_value;
         return x;
-    }()) " ~ variable ~ ";
-    ");
+    }()) %1$s ;
+    }.format(variable));
 }
 
 /// getter and setter only, but with default specifier
 mixin template Property_gs_w_d(T, string variable, alias defaultValue)
 {
-    mixin("
+    import std.format;
+
+    /* pragma(msg, "creating property \"", variable, "\""); */
+
+    mixin(q{
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
             init_value : defaultValue,
@@ -118,6 +135,6 @@ mixin template Property_gs_w_d(T, string variable, alias defaultValue)
             variable_private: false,
         };
         return x;
-    }()) " ~ variable ~ ";
-    ");
+    }()) %1$s ;
+    }.format(variable));
 }

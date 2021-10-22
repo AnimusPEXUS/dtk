@@ -62,7 +62,7 @@ struct PropertySettings(T)
 
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
-    static if (settings.variable_define && !settings.variable_private)
+    static if (settings.variable_define)
     {
         static if (settings.variable_private)
         {

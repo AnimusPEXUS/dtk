@@ -1,5 +1,7 @@
 module dtk.miscs.TextProcessor;
 
+import std.conv;
+import std.format;
 import std.container;
 import std.range.primitives;
 import std.stdio;
@@ -59,10 +61,10 @@ Image genImageFromSubimages(
         bool last_visible_item_found;
         ulong last_visible_item_offset;
 
+        ulong subimage_count = getSubimageCount();
+
         {
             ulong processed_size;
-
-            ulong count = getSubimageCount();
 
             {
                 ulong z;
@@ -73,27 +75,27 @@ Image genImageFromSubimages(
                 switch (layout){
                     default:
                         throw new Exception("unknown layout");
-                    case horizontalLeftToRightAlignTop:
+                    case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
                         z = x;
                         z2 = x2;
                         break;
-                    case verticalTopToBottomAlignLeft:
+                    case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
                         z = y;
                         z2 = y2;
                         break;
                 }
 
-                for ( ulong i = 0; i != count ; i++)
+                for ( ulong i = 0; i != subimage_count ; i++)
                 {
 
                     switch (layout){
                         default:
                             throw new Exception("unknown layout");
-                        case horizontalLeftToRightAlignTop:
-                            current_size = getSubimageWidth(i)
+                        case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+                            current_size = getSubimageWidth(i);
                             break;
-                        case verticalTopToBottomAlignLeft:
-                            current_size = getSubimageHeight(i)
+                        case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+                            current_size = getSubimageHeight(i);
                             break;
                     }
 
@@ -106,7 +108,7 @@ Image genImageFromSubimages(
                     if (!last_visible_item_found && z2>=processed_size && z2 < processed_size+current_size) {
                         last_visible_item = i;
                         last_visible_item_found = true;
-                        last_visible_item_offset = processed_size+current_size-z2
+                        last_visible_item_offset = processed_size+current_size-z2;
                     }
 
                     if (first_visible_item_found && last_visible_item_found)
@@ -122,7 +124,7 @@ Image genImageFromSubimages(
 
         if (!last_visible_item_found)
         {
-            last_visible_item = count-1;
+            last_visible_item = subimage_count-1;
         }
 
         {
@@ -139,14 +141,14 @@ Image genImageFromSubimages(
             {
                 default:
                     throw new Exception("unknown layout");
-                case horizontalLeftToRightAlignTop:
+                case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
                     calc_loop_target_x = delegate ulong(ulong i) {
                         if (i == 0)
                             return 0;
                         ulong width;
-                        for (ulong i = 0; i <= i; i++)
+                        for (ulong j = 0; j <= i; j++)
                         {
-                            width += getSubimageWidth(first_visible_item+i);
+                            width += getSubimageWidth(first_visible_item+j);
                         }
                         return width-first_visible_item_offset;
                     };
@@ -175,7 +177,7 @@ Image genImageFromSubimages(
                         return getSubimageHeight(first_visible_item+i);
                     };
                     break;
-                case verticalTopToBottomAlignLeft:
+                case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
                     calc_loop_target_x = delegate ulong(ulong i) {
                         return 0;
                     };
@@ -184,9 +186,9 @@ Image genImageFromSubimages(
                         if (i == 0)
                             return 0;
                         ulong height;
-                        for (ulong i = 0; i <= i; i++)
+                        for (ulong j = 0; j <= i; j++)
                         {
-                            height += getSubimageHeight(first_visible_item+i);
+                            height += getSubimageHeight(first_visible_item+j);
                         }
                         return height-first_visible_item_offset;
                     };
@@ -226,7 +228,7 @@ Image genImageFromSubimages(
                         calc_loop_source_height(i)
                         )
                     );
-                processed_size += calc_loop_processed_size_advance(i);
+                /* processed_size += calc_loop_processed_size_advance(i); */
             }
         }
 
@@ -254,6 +256,8 @@ class TextUnit
         loadGlyph(processor_context);
     }
 
+    alias reporcess = rerender;
+
     void loadGlyph(TextProcessorContext processor_context)
     {
         writeln("rendering char: ", chr);
@@ -262,11 +266,11 @@ class TextUnit
         auto face = font_mgr.loadFace("/usr/share/fonts/go/Go-Regular.ttf");
 
         {
-            auto x = processor_context.defaultFaceSize;
+            auto x = parent_line.parent_text.faceSize;
             face.setCharSize(x,x);
         }
         {
-            auto x = processor_context.defaultFaceResolution;
+            auto x = parent_line.parent_text.faceResolution;
             face.setCharResolution(x,x);
         }
 
@@ -302,36 +306,50 @@ struct TextLineSubline
 {
     TextLine parent_line;
 
+    mixin getState!(
+            "processor_context.text_line_subline_states",
+            ContextTextLineSublineState,
+            );
+
     void recalculateWidthAndHeight(TextProcessorContext processor_context)
     {
-        width = 0;
-        height = 0;
 
-        foreach (u; units)
+        auto state = getState(processor_context);
+
+        state.width = 0;
+        state.height = 0;
+
+        foreach (u; state.units)
         {
-            width += u.getWidth();
+            state.width += u.width;
 
             {
-                auto h = u.getHeight();
-                if (h > height)
-                    height = h;
+                auto h = u.height;
+                if (h > state.height)
+                    state.height = h;
             }
         }
     }
 
-    Image genImage()
+    /* Image genImage(TextProcessorContext processor_context)
     {
-        return genImage(0,0,width,height);
-    }
+        auto state = getState(processor_context);
+        return genImage(0,0,state.width,state.height);
+    } */
 
     Image genImage(
         ulong x, ulong y,
-        ulong width, ulong height
+        ulong width, ulong height,
+
+        TextProcessorContext processor_context
         )
     {
+
+        auto state = getState(processor_context);
+
         Image ret = genImageFromSubimages(
-            this.width,
-            this.height,
+            state.width,
+            state.height,
 
             x,y,
             width,height,
@@ -340,15 +358,15 @@ struct TextLineSubline
 
             delegate ulong()
                 {
-                    return units.length;
+                    return state.units.length;
                 },
-            delegate Size2D  (ulong subimage_index)
+            delegate ulong  (ulong subimage_index)
                 {
-                    return units[subimage_index].width;
+                    return state.units[subimage_index].width;
                 },
-            delegate Size2D  (ulong subimage_index)
+            delegate ulong  (ulong subimage_index)
                 {
-                    return units[subimage_index].height;
+                    return state.units[subimage_index].height;
                 },
             delegate Image(
                 ulong subimage_index,
@@ -356,7 +374,7 @@ struct TextLineSubline
                 ulong width, ulong height,
                 )
                 {
-                    return units[subimage_index].genImage(
+                    return state.units[subimage_index].glyph.bitmap.getImage(
                     x,y,
                     width, height,
                     );
@@ -386,10 +404,17 @@ class TextLine
         this.parent_text=parent;
     }
 
+    mixin getState!(
+            "processor_context.text_line_states",
+            ContextTextLineState,
+            );
+
     void setText(dstring txt)
     {
+        /* auto state = getState(); */
+
         units = units[0 .. 0];
-        sublines = sublines[0 .. 0];
+        /* sublines = sublines[0 .. 0]; */
 
         foreach(c;txt)
         {
@@ -402,7 +427,7 @@ class TextLine
         foreach(c;txt)
         {
             auto tu = new TextUnit(this);
-            tu.setChar(c);
+            tu.chr=c;
             units ~= tu;
         }
     }
@@ -417,43 +442,58 @@ class TextLine
 
     void reprocessSublines(TextProcessorContext processor_context)
     {
-        foreach (l;lines)
-        {
-            l.reprocessSublines();
-        }
-    }
+        auto state = getState(processor_context);
 
-
-    void rerenderUnits(TextProcessorContext processor_context)
-    {
-        foreach (u;units)
-        {
-            l.rerender(TextProcessorContext processor_context);
-        }
-    }
-
-    void recalculateSublines(TextProcessorContext processor_context)
-    {
-        sublines = sublines[0 .. 0];
+        state.sublines = state.sublines[0 .. 0];
 
         if (units.length != 0)
         {
-            sublines ~= TextLineSubline();
+            state.sublines ~= TextLineSubline();
 
-            foreach (u;units)
-            {
-                u.reprocess();
-            }
+            // TODO: comment this out?
+            reprocessUnits(processor_context);
 
             // TODO: optimization required
-            auto required_size = required_length();
+            ulong required_size;
+            if (processor_context.virtualwrap_allow_by_space
+                || processor_context.virtualwrap_allow_by_char)
+            {
+                switch (parent_text.lines_layout)
+                {
+                    default:
+                        throw new Exception("parent_text.lines_layout ", to!string(parent_text.lines_layout));
+                    case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+                    case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+                        required_size=processor_context.width;
+                        break;
+                    case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+                    case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+                        required_size=processor_context.height;
+                        break;
+                }
+
+            }
 
             ulong current_line = 0;
-            ulong current_width = 0;
+            ulong current_size = 0;
 
             foreach(u;units)
             {
-                auto s = u.width;
+                ulong s;
+
+                switch (parent_text.lines_layout)
+                {
+                    default:
+                        throw new Exception("parent_text.lines_layout ", to!string(parent_text.lines_layout));
+                    case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+                    case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+                        s=u.width;
+                        break;
+                    case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+                    case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+                        s=u.height;
+                        break;
+                }
 
                 if (s > required_size)
                 {
@@ -461,15 +501,15 @@ class TextLine
                     return;
                 }
 
-                if (required_size <= current_width + s)
+                if (required_size <= current_size + s)
                 {
-                    sublines ~= TextLineSubline();
-                    current_width = s;
+                    state.sublines ~= TextLineSubline();
+                    current_size = s;
                 } else {
-                    current_width+=s;
+                    current_size+=s;
                 }
 
-                sublines[$-1].units ~= u;
+                state.sublines[$-1].getState(processor_context).units ~= u;
             }
 
         }
@@ -479,25 +519,30 @@ class TextLine
 
     void recalculateWidthAndHeight(TextProcessorContext processor_context)
     {
-        width = 0;
-        height = 0;
+        auto state = getState(processor_context);
 
-        if (sublines.length != 0)
+        state.width = 0;
+        state.height = 0;
+
+        if (state.sublines.length != 0)
         {
-            foreach (sl;sublines)
+            // TODO: add cases for different layouts
+
+            foreach (sl;state.sublines)
             {
-                sl.recalculateWidthAndHeight();
+                sl.recalculateWidthAndHeight(processor_context);
             }
 
-            foreach (sl; sublines)
+            foreach (sl; state.sublines)
             {
+                auto sl_state = sl.getState(processor_context);
                 {
-                    auto w = sl.getWidth();
-                    if (w > width)
-                        width = w;
+                    auto w = sl_state.width;
+                    if (w > state.width)
+                        state.width = w;
                 }
 
-                height += sl.getHeight();
+                state.height += sl_state.height;
             }
         }
     }
@@ -508,7 +553,7 @@ class TextLine
         dstring ret;
         foreach(u;units)
         {
-            ret ~= u.getChar();
+            ret ~= u.chr;
         }
         return ret;
     }
@@ -519,16 +564,16 @@ class TextLine
 
         for (ulong i = start; i != stop; i++)
         {
-            ret ~= units[i].getChar();
+            ret ~= units[i].chr;
         }
 
         return ret;
     }
 
-    Image genImage()
+    /* Image genImage()
     {
         return genImage(0,0,width,height);
-    }
+    } */
 
     Image genImage(
         ulong x, ulong y,
@@ -537,30 +582,27 @@ class TextLine
         TextProcessorContext processor_context
         )
     {
-        ContextTextLineState state;
-        if (this !in processor_context.text_line_state) {
-            state = new ContextTextLineState();
-            processor_context.text_line_state ~= state;
-        }
+
+        auto state = getState(processor_context);
 
         Image ret = genImageFromSubimages(
-            this.width,
-            this.height,
+            state.width,
+            state.height,
 
             x,y,
             width,height,
 
-            parent_line.parent_text.lines_layout,
+            parent_text.lines_layout,
 
             delegate ulong()
                 {
                     return units.length;
                 },
-            delegate Size2D  (ulong subimage_index)
+            delegate ulong  (ulong subimage_index)
                 {
                     return units[subimage_index].width;
                 },
-            delegate Size2D  (ulong subimage_index)
+            delegate ulong  (ulong subimage_index)
                 {
                     return units[subimage_index].height;
                 },
@@ -570,7 +612,7 @@ class TextLine
                 ulong width, ulong height,
                 )
                 {
-                    return units[subimage_index].genImage(
+                    return units[subimage_index].glyph.bitmap.getImage(
                     x,y,
                     width, height,
                     );
@@ -579,7 +621,7 @@ class TextLine
         return ret;
     }
 
-    ulong getWidth()
+    /* ulong getWidth()
     {
         return width;
     }
@@ -592,16 +634,9 @@ class TextLine
     ulong getLength()
     {
         return units.length;
-    }
+    } */
     // implement more handy methods
 
-}
-
-enum Mode
-{
-    singleLine,
-    multiLine,
-    codeEditor,
 }
 
 /* enum OnLineOverflow
@@ -623,15 +658,15 @@ enum TextMarkup
     podPlain,
 }
 
+class ContextTextState
+{
+    ulong width;
+    ulong height;
+}
 
 class Text
 {
     TextMarkup markup;
-
-    Mode mode;
-
-    bool wrap_allow_by_space;
-    bool wrap_allow_by_char;
 
     GenImageFromSubimagesLayout lines_layout;
     GenImageFromSubimagesLayout chars_layout;
@@ -650,14 +685,17 @@ class Text
     bool defaultBGColorEnabled;
     Color defaultBGColor;
 
-    FontMgrI font_mgr;
-
     TextLine[] lines;
 
     this()
     {
 
     }
+
+    mixin getState!(
+            "processor_context.text_states",
+            ContextTextState,
+            );
 
     void setText(dstring txt)
     {
@@ -710,14 +748,14 @@ class Text
     {
         reprocessUnits(processor_context);
         reprocessSublines(processor_context);
-        reprocessLines(processor_context);
+        /* reprocessLines(processor_context); */
     }
 
     void reprocessUnits(TextProcessorContext processor_context)
     {
         foreach (l;lines)
         {
-            l.reprocessUnits();
+            l.reprocessUnits(processor_context);
         }
     }
 
@@ -725,14 +763,14 @@ class Text
     {
         foreach (l;lines)
         {
-            l.reprocessSublines();
+            l.reprocessSublines(processor_context);
         }
     }
 
-    void reprocessLines(TextProcessorContext processor_context)
+    /* void reprocessLines(TextProcessorContext processor_context)
     {
 
-    }
+    } */
 
     dstring getText()
     {
@@ -787,7 +825,7 @@ class Text
 
         foreach (i, l;lines)
         {
-            auto l_l = l.getLength();
+            auto l_l = l.units.length;
             if (i < lines.length)
                 l_l += 1; // add new line
 
@@ -818,7 +856,7 @@ class Text
 
         dstring ret;
 
-        ret ~= lines[first_text_unit].getText(first_text_unit_unit_index, lines[first_text_unit].getLength());
+        ret ~= lines[first_text_unit].getText(first_text_unit_unit_index, lines[first_text_unit].units.length);
 
         if (last_text_unit - first_text_unit > 1)
         {
@@ -833,52 +871,72 @@ class Text
         return ret;
     }
 
-    Image genImage()
+    Image genImage(
+        ulong x, ulong y,
+        ulong width, ulong height,
+
+        TextProcessorContext processor_context
+        )
     {
-        ulong width;
-        ulong height;
 
-        foreach (l;lines)
-        {
-            auto w = l.getWidth();
-            auto h = l.getHeight();
+        auto state = getState(processor_context);
 
-            if (w > width)
-            {
-                width = w;
-            }
+        Image ret = genImageFromSubimages(
+            state.width,
+            state.height,
 
-            height += h;
-        }
+            x,y,
+            width,height,
 
-        Image ret = new Image(width, height);
+            lines_layout,
 
-        {
-            ulong current_line_height=0;
-
-            foreach (l;lines)
-            {
-                auto img = l.genImage();
-                ret.putImage(0UL, current_line_height, img);
-                current_line_height += img.height;
-            }
-        }
-
+            delegate ulong()
+                {
+                    return lines.length;
+                },
+            delegate ulong  (ulong subimage_index)
+                {
+                    return lines[subimage_index].getState(processor_context).width;
+                },
+            delegate ulong  (ulong subimage_index)
+                {
+                    return lines[subimage_index].getState(processor_context).height;
+                },
+            delegate Image(
+                ulong subimage_index,
+                ulong x, ulong y,
+                ulong width, ulong height,
+                )
+                {
+                    return lines[subimage_index].genImage(
+                        x,y,
+                        width, height,
+                        processor_context,
+                        );
+                },
+            );
         return ret;
     }
+
 
     ulong getLength()
     {
         ulong ret;
         foreach(i,l;lines)
         {
-            ret += l.getLength();
+            ret += l.units.length;
         }
         ret += lines.length - 1; // new line symbol count
         return ret;
     }
 }
 
+enum Mode
+{
+    singleLine,
+    multiLine,
+    codeEditor,
+}
 
 class TextProcessorContext
 {
@@ -897,10 +955,113 @@ class TextProcessorContext
     ulong cursor_position_line;
     ulong cursor_position_column;
 
+    Mode mode;
+
+    bool virtualwrap_allow_by_space;
+    bool virtualwrap_allow_by_char;
+
     Text text;
 
-    (TextSubline[])[TextLine] sublines_memory;
+    FontMgrI font_mgr;
 
-    ContextTextLineSublineState[TextLineSubline] text_line_subline_state;
-    ContextTextLineState[TextLine] text_line_state;
+    ContextTextLineSublineState[TextLineSubline] text_line_subline_states;
+    ContextTextLineState[TextLine] text_line_states;
+    ContextTextState[Text] text_states;
+
+    this()
+    {
+        setTextString("");
+    }
+
+    this(dstring txt)
+    {
+        setTextString(txt);
+    }
+
+    this(Text txt)
+    {
+        setText(txt);
+    }
+
+
+    void setTextString(dstring txt="")
+    {
+        if (text is null)
+        {
+            text = new Text();
+        }
+
+        text.setText(txt);
+    }
+
+    dstring getTextString()
+    {
+        dstring ret;
+
+        if (text !is null)
+        {
+            ret = text.getText();
+        }
+
+        return ret;
+    }
+
+    void setText(dstring txt)
+    {
+        setTextString(txt);
+    }
+
+    void setText(Text txt)
+    {
+        text = txt;
+    }
+
+    Text getText()
+    {
+        if (text is null)
+            setTextString();
+        return text;
+    }
+
+    Image genImage()
+    {
+        if (text is null)
+            throw new Exception("text object is not set");
+
+        auto ret = text.genImage(
+            x,y,
+            width,height,
+            this,
+            );
+
+        return ret;
+    }
+
+    void reprocess()
+    {
+        getText().reprocess(this);
+    }
+
+}
+
+mixin template getState(string context_s_container, alias state_type)
+{
+    mixin(
+        q{
+            state_type getState(TextProcessorContext processor_context)
+            {
+                state_type state;
+
+                if (this !in %1$s) {
+                    state = new state_type();
+                    %1$s[this] = state;
+                } else {
+                    state = %1$s[this];
+                }
+
+                return state;
+            }
+        }.format(context_s_container)
+        );
+
 }
