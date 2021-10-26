@@ -1,4 +1,4 @@
-module dtk.widgets.Image;
+module dtk.widgets.Picture;
 
 import std.typecons;
 
@@ -11,7 +11,7 @@ import dtk.types.Size2D;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class Image : Widget, ContainerableWidgetI
+class Picture : Widget, ContainerableWidgetI
 {
 
 }

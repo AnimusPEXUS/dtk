@@ -3,6 +3,8 @@ module dtk.interfaces.LafI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.WindowEventMgrI;
 
+import dtk.types.Image;
+
 import dtk.widgets;
 
 interface LafI

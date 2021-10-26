@@ -310,7 +310,7 @@ class TextChar
         writeln("rendering char: ", chr);
 
         auto font_mgr = text_view.font_mgr;
-        auto face = font_mgr.loadFace("/usr/share/fonts/go/Go-Regular.ttf");
+        auto face = font_mgr.loadFace("/usr/share/fonts/google-droid-sans-fonts/DroidSans.ttf");
 
         {
             auto x = parent_line.parent_text.faceSize;
@@ -1161,7 +1161,7 @@ class TextView
     ulong width;
     ulong height;
 
-    ulong text_selected;
+    bool text_selected;
     ulong selection_start;
     ulong selection_end;
 

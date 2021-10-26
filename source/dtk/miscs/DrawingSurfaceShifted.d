@@ -1,5 +1,8 @@
 module dtk.miscs.DrawingSurfaceShifted;
 
+// TODO: dtk.miscs.DrawingSurfaceShifted and dtk.widgets.WidgetDrawingSurface
+//       have many similaritys and have to be merged somehow;
+
 import std.stdio;
 import std.typecons;
 
@@ -28,13 +31,27 @@ class DrawingSurfaceShifted : DrawingSurfaceI
         this.ds = ds;
     }
 
-    void drawDot(Position2D pos, Color color)
+    void drawDot(Position2D pos, ImageDot dot)
     {
         Position2D npos;
         npos.x = pos.x + x_shift;
         npos.y = pos.y + y_shift;
-        ds.drawDot(npos, color);
+        ds.drawDot(npos, dot);
     }
+
+    bool canGetDot()
+    {
+        return ds.canGetDot();
+    }
+
+    ImageDot getDot(Position2D pos)
+    {
+        Position2D npos;
+        npos.x = pos.x + x_shift;
+        npos.y = pos.y + y_shift;
+        return ds.getDot(npos);
+    }
+
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
@@ -88,6 +105,24 @@ class DrawingSurfaceShifted : DrawingSurfaceI
         npos.x = pos.x + x_shift;
         npos.y = pos.y + y_shift;
         ds.drawImage(npos, image);
+    }
+
+    bool canGetImage()
+    {
+        return ds.canGetImage();
+    }
+
+    Image getImage(Position2D pos, Size2D size)
+    {
+        Position2D npos;
+        npos.x = pos.x + x_shift;
+        npos.y = pos.y + y_shift;
+        return ds.getImage(npos, size);
+    }
+
+    bool canPresent()
+    {
+        return ds.canPresent();
     }
 
     void present()

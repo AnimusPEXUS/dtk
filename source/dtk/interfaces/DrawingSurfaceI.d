@@ -16,8 +16,9 @@ import dtk.types.Image;
 interface DrawingSurfaceI
 {
 
-    void drawDot(Position2D pos, Color color);
-    /* Color getDot(Position2D pos); // TODO: enable this */
+    void drawDot(Position2D pos, ImageDot dot);
+    bool canGetDot();
+    ImageDot getDot(Position2D pos);
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style);
 
@@ -45,7 +46,9 @@ interface DrawingSurfaceI
     void drawCircle(Position2D pos, uint radius, real turn_step, Color color);
 
     void drawImage(Position2D pos, Image image);
-    /* Image getImage(Position2D pos, Size2D size); // TODO: enable this */
+    bool canGetImage();
+    Image getImage(Position2D pos, Size2D size);
 
+    bool canPresent();
     void present();
 }

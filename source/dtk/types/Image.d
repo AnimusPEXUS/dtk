@@ -1,10 +1,18 @@
 module dtk.types.Image;
 
 import std.stdio;
+import std.typecons;
+import std.math;
+
 
 import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.types.Color;
+import dtk.types.Position2D;
+import dtk.types.Size2D;
+import dtk.types.LineStyle;
+import dtk.types.FillStyle;
+
 
 struct ImageDot
 {
@@ -18,11 +26,14 @@ struct ImageDot
     }
 }
 
-class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
+class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 {
     ulong width;
     ulong height;
     ImageDot[] data;
+
+    bool baseColorEnabled;
+    Color baseColor;
 
     this(ulong width, ulong height)
     {
@@ -156,4 +167,117 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         writeln();
     }
 
+    // ------------------ DrawingSurface
+
+    void drawDot(Position2D pos, ImageDot dot)
+    {
+        setDot(pos.x, pos.y, dot);
+    }
+
+    bool canGetDot()
+    {
+        return true;
+    }
+
+    ImageDot getDot(Position2D pos)
+    {
+        return getDot(pos.x, pos.y);
+    }
+
+    void drawLine(Position2D pos, Position2D pos2, LineStyle style)
+    {
+        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+    }
+
+    void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle top_style,
+        LineStyle left_style,
+        LineStyle bottom_style,
+        LineStyle right_style,
+        Nullable!(FillStyle) fill_style
+        )
+    {
+        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+    }
+
+    void drawArc(
+        Position2D pos,
+        uint radius,
+        real start_angle,
+        real stop_angle,
+        real turn_step,
+        Color color)
+    {
+        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+    }
+
+    void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
+    {
+        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+    }
+
+    void drawImage(Position2D pos, Image image)
+    {
+        putImage(pos.x, pos.y, image);
+    }
+
+    bool canGetImage()
+    {
+        return true;
+    }
+
+    Image getImage(Position2D pos, Size2D size)
+    {
+        return getImage(pos.x, pos.y, size.width, size.height);
+    }
+
+    bool canPresent()
+    {
+        return false;
+    }
+
+    void present()
+    {
+        throw new Exception("present() not supported");
+    }
+
+}
+
+Position2D[] calculateDotsInLine(Position2D pos, Position2D pos2)
+{
+
+    int calc_y(int x_high, int x_low, int y_high, int y_low, int x)
+    {
+        auto x_razn = x_high - x_high;
+        auto a = x_high - x;
+        auto b = x_razn - a;
+        auto c = (b != 0 ? x_razn / b : 0);
+        auto d = y_high - y_low;
+        auto e = (c != 0 ? d / c : 0);
+        auto f = d - e;
+        auto y = cast(int) lround(y_high - f);
+        return y;
+    }
+
+    Position2D[] ret;
+    bool is_x = ((pos2.x - pos.x) > (pos2.y - pos.y));
+    if (is_x)
+    {
+        for (int x = pos.x; x != pos2.x + 1; x++)
+        {
+            auto y = calc_y(pos2.x, pos.x, pos2.y, pos.y, x);
+            ret ~= Position2D(x, y);
+        }
+    }
+    else
+    {
+        for (int y = pos.y; y != pos2.y + 1; y++)
+        {
+            auto x = calc_y(pos2.y, pos.y, pos2.x, pos.x, y);
+            ret ~= Position2D(x, y);
+        }
+    }
+    return ret;
 }

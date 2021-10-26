@@ -33,53 +33,27 @@ class DrawingSurface : DrawingSurfaceI
         this.w = w;
     }
 
-    void drawDot(Position2D pos, Color color)
+    void drawDot(Position2D pos, ImageDot dot)
     {
         auto rndr = SDL_GetRenderer(w._sdl_window);
-        SDL_SetRenderDrawColor(rndr, color.r, color.g, color.b, color.a);
+        SDL_SetRenderDrawColor(
+            rndr,
+            dot.color.r,
+            dot.color.g,
+            dot.color.b,
+            dot.color.a
+            );
         SDL_RenderDrawPoint(rndr, pos.x, pos.y);
     }
 
-    /* Color getDot(Position2D pos)
+    bool canGetDot()
     {
-        auto rndr = SDL_GetRenderer(w._sdl_window);
-    } */
+        return false;
+    }
 
-    private Position2D[] calculateDotsInLine(Position2D pos, Position2D pos2)
+    ImageDot getDot(Position2D pos)
     {
-
-        int calc_y(int x_high, int x_low, int y_high, int y_low, int x)
-        {
-            auto x_razn = x_high - x_high;
-            auto a = x_high - x;
-            auto b = x_razn - a;
-            auto c = (b != 0 ? x_razn / b : 0);
-            auto d = y_high - y_low;
-            auto e = (c != 0 ? d / c : 0);
-            auto f = d - e;
-            auto y = cast(int) lround(y_high - f);
-            return y;
-        }
-
-        Position2D[] ret;
-        bool is_x = ((pos2.x - pos.x) > (pos2.y - pos.y));
-        if (is_x)
-        {
-            for (int x = pos.x; x != pos2.x + 1; x++)
-            {
-                auto y = calc_y(pos2.x, pos.x, pos2.y, pos.y, x);
-                ret ~= Position2D(x, y);
-            }
-        }
-        else
-        {
-            for (int y = pos.y; y != pos2.y + 1; y++)
-            {
-                auto x = calc_y(pos2.y, pos.y, pos2.x, pos.x, y);
-                ret ~= Position2D(x, y);
-            }
-        }
-        return ret;
+        throw new Exception("getDot() not supported");
     }
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
@@ -104,7 +78,13 @@ class DrawingSurface : DrawingSurfaceI
                 write("  dot[", v.x, ":", v.y, "], ");
                 if (style_dup[0])
                 {
-                    drawDot(v, style.color);
+                    {
+                        auto id = ImageDot();
+                        id.color = style.color;
+                        id.enabled=true;
+                        id.intensivity=1;
+                        drawDot(v, id);
+                    }
                 }
                 style_dup = style_dup[1 .. $] ~ style_dup[0];
             }
@@ -226,9 +206,27 @@ class DrawingSurface : DrawingSurfaceI
         {
             for (uint x = 0; x != image.width; x++)
             {
-                drawDot(Position2D(pos.x + x, pos.y + y), image.getDot(x, y).color);
+                drawDot(
+                    Position2D(pos.x + x, pos.y + y),
+                    image.getDot(x, y)
+                    );
             }
         }
+    }
+
+    bool canGetImage()
+    {
+        return false;
+    }
+
+    Image getImage(Position2D pos, Size2D size)
+    {
+        throw new Exception("getImage() not supported");
+    }
+
+    bool canPresent()
+    {
+        return true;
     }
 
     void present()

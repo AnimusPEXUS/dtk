@@ -16,6 +16,7 @@ import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
+import dtk.types.Image;
 
 import dtk.interfaces.LafI;
 import dtk.interfaces.WindowI;
@@ -166,7 +167,13 @@ class Chicago98Laf : LafI
             ds.drawCircle(p, i, step, fillColor);
         }
 
-        ds.drawDot(Position2D(6, 6), fillColor);
+        {
+            auto id = ImageDot();
+            id.color = fillColor;
+            id.enabled=true;
+            id.intensivity=1;
+            ds.drawDot(Position2D(6, 6), id);
+        }
 
         if (widget.getForm().getFocusedWidget() == widget)
         {
@@ -280,7 +287,14 @@ class Chicago98Laf : LafI
                         new_color.b = chanBlend(formBackground.b, elementDarkedColor.b, part);
                     }
 
-                    ds.drawDot(Position2D(pos.x + x, pos.y + y), new_color);
+                    {
+                        auto id = ImageDot();
+                        id.color = new_color;
+                        id.enabled=true;
+                        id.intensivity=1;
+                        ds.drawDot(Position2D(pos.x + x, pos.y + y), id);
+                    }
+
                 }
             }
             ds.present();

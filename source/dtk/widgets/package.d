@@ -14,7 +14,7 @@ public import dtk.widgets.ButtonRadio;
 public import dtk.widgets.ButtonCheck;
 
 public import dtk.widgets.Label;
-public import dtk.widgets.Image;
+public import dtk.widgets.Picture;
 
 public import dtk.widgets.Menu;
 public import dtk.widgets.MenuItem;
