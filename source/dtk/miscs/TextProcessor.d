@@ -23,9 +23,14 @@ enum GenImageFromSubimagesLayout
     verticalTopToBottomAlignRight, // japanese chars
 }
 
-Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y, ulong width, ulong height,
+Image genImageFromSubimages(
+        ulong max_width, ulong max_height,
+
+        ulong x, ulong y,
+        ulong width, ulong height,
 
         GenImageFromSubimagesLayout layout,
+
         ulong delegate() getSubimageCount,
         ulong delegate(ulong subimage_index) getSubimageWidth,
         ulong delegate(ulong subimage_index) getSubimageHeight,
@@ -35,6 +40,28 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
             ulong width, ulong height
         ) getSubimage,)
 {
+    {
+        try {
+            throw new Exception("debugging genImageFromSubimages");
+        } catch (Exception e)
+        {
+            writeln(e);
+        }
+    }
+    writeln(
+        "genImageFromSubimages \n",
+        "  max_width: ", max_width, "\n",
+        "  max_height: ", max_height, "\n",
+
+        "  layout: ", layout, "\n",
+
+        /* "  subimage_index: ", subimage_index, "\n",
+        "  x: ", x, "\n",
+        "  y: ", y, "\n",
+        "  width: ", width, "\n",
+        "  height: ", height, "\n" */
+        );
+
     Image ret = new Image(width, height);
 
     if (x > width || y > height)
@@ -145,7 +172,7 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
                 if (i == 0)
                     return 0;
                 ulong width;
-                for (ulong j = 0; j <= i; j++)
+                for (ulong j = 0; j < i; j++)
                 {
                     width += getSubimageWidth(first_visible_item + j);
                 }
@@ -165,7 +192,7 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
             calc_loop_source_width = delegate ulong(ulong i) {
                 if (i == 0)
                     return getSubimageWidth(first_visible_item + i) - first_visible_item_offset;
-                return 0;
+                return getSubimageWidth(first_visible_item + i);
             };
 
             calc_loop_source_height = delegate ulong(ulong i) {
@@ -179,7 +206,7 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
                 if (i == 0)
                     return 0;
                 ulong height;
-                for (ulong j = 0; j <= i; j++)
+                for (ulong j = 0; j < i; j++)
                 {
                     height += getSubimageHeight(first_visible_item + j);
                 }
@@ -201,20 +228,36 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
             calc_loop_source_height = delegate ulong(ulong i) {
                 if (i == 0)
                     return getSubimageHeight(first_visible_item + i) - first_visible_item_offset;
-                return 0;
+                return getSubimageHeight(first_visible_item + i);
             };
             break;
         }
 
         for (ulong i = 0; i <= items_count; i++)
         {
+            auto tx= calc_loop_target_x(i)     ;
+            auto ty=calc_loop_target_y(i)     ;
+            auto sx=calc_loop_source_x(i)     ;
+            auto sy=calc_loop_source_y(i)     ;
+            auto sw=calc_loop_source_width(i) ;
+            auto sh=calc_loop_source_height(i);
+
+            writeln("
+    i                         : %d
+    calc_loop_target_x(i)     : %d
+    calc_loop_target_y(i)     : %d
+    calc_loop_source_x(i)     : %d
+    calc_loop_source_y(i)     : %d
+    calc_loop_source_width(i) : %d
+    calc_loop_source_height(i): %d
+".format(i,tx,ty,sx,sy,sw,sh));
             ret.putImage(
-                calc_loop_target_x(i),
-                calc_loop_target_y(i),
+                tx,
+                ty,
                 getSubimage(
                     i,
-                    calc_loop_source_x(i), calc_loop_source_y(i),
-                    calc_loop_source_width(i), calc_loop_source_height(i)
+                    sx, sy,
+                    sw, sh
                     )
                 );
         }
@@ -225,10 +268,11 @@ Image genImageFromSubimages(ulong max_width, ulong max_height, ulong x, ulong y,
 
 class TextCharViewState
 {
-    ulong width;
+    /* ulong width;
     ulong height;
-
+ */
     GlyphRenderResult* glyph;
+    Image resImg;
 }
 
 class TextChar
@@ -250,17 +294,18 @@ class TextChar
         if (state.glyph is null)
         {
             loadGlyph(text_view);
+            state.resImg = genImage(text_view);
         }
     }
 
     /* alias reprocess = rerender; */
 
-    void loadGlyph(TextView text_view)
+    private void loadGlyph(TextView text_view)
     {
         auto state = getState(text_view);
 
-        state.width = 0;
-        state.height = 0;
+        /* state.width = 0;
+        state.height = 0; */
 
         writeln("rendering char: ", chr);
 
@@ -269,26 +314,82 @@ class TextChar
 
         {
             auto x = parent_line.parent_text.faceSize;
+            writeln("setting size to ", x);
             face.setCharSize(x, x);
         }
         {
             auto x = parent_line.parent_text.faceResolution;
+            writeln("setting resolution to ", x);
             face.setCharResolution(x, x);
         }
 
         try
         {
             state.glyph = face.renderGlyphByChar(chr);
-            state.width = state.glyph.bitmap.width;
-            state.height = state.glyph.bitmap.height;
+            /* state.width = state.glyph.bitmap.width;
+            state.height = state.glyph.bitmap.height; */
         }
         catch (Exception e)
         {
             // TODO: replace with dummy glyph
             writeln("error: ", e);
+            state.glyph = face.renderGlyphByChar(cast(dchar)'?');
+            /* state.width = state.glyph.bitmap.width;
+            state.height = state.glyph.bitmap.height; */
         }
     }
 
+    private Image genImage(TextView text_view) {
+
+        auto layout = parent_line.parent_text.chars_layout;
+
+        auto state = getState(text_view);
+
+        if (state.glyph is null)
+        {
+            loadGlyph(text_view);
+        }
+
+        auto gi = state.glyph.glyph_info;
+
+        auto width = gi.advance.x / 64;
+        auto bearing_x = gi.metrics.horiBearing.x / 64;
+        auto bearing_y = gi.metrics.horiBearing.y;
+        if (bearing_y < 0)
+            bearing_y = -bearing_y;
+        bearing_y /= 64;
+
+        auto ascend =gi.face_info.size.ascender;
+        if (ascend < 0)
+            ascend = -ascend;
+        ascend /= 64;
+
+        auto descend =gi.face_info.size.descender;
+        if (descend < 0)
+            descend = -descend;
+        descend /= 64;
+
+        auto height = ascend + descend;
+
+        auto ret = new Image(width,height);
+
+        for (ulong x= 0 ; x != state.glyph.bitmap.width; x++)
+        {
+            auto tx = x+bearing_x;
+            for (ulong y= 0 ; y != state.glyph.bitmap.height; y++)
+            {
+                auto ty = y+ascend-bearing_y;
+                auto dot = state.glyph.bitmap.getDot(x,y);
+                ret.setDot(tx,ty,dot);
+            }
+        }
+
+        writeln("TextChar.genImage");
+        ret.printImage();
+
+        return ret;
+
+    }
     /* private bool isSelected()
     {
         return false;
@@ -303,9 +404,14 @@ class TextLineSublineViewState
 }
 
 // NOTE: this is needed, because each subline can have it's own perpendicular size
-struct TextLineSubline
+class TextLineSubline
 {
     TextLine parent_line;
+
+    this(TextLine parent_line)
+    {
+        this.parent_line=parent_line;
+    }
 
     mixin getState!("text_view.text_line_subline_states", TextLineSublineViewState,);
 
@@ -330,10 +436,10 @@ struct TextLineSubline
             {
                 auto tc_state = tc.getState(text_view);
 
-                state.width += tc_state.width;
+                state.width += tc_state.resImg.width;
 
                 {
-                    auto h = tc_state.height;
+                    auto h = tc_state.resImg.height;
                     if (h > state.height)
                         state.height = h;
                 }
@@ -345,10 +451,10 @@ struct TextLineSubline
             {
                 auto tc_state = tc.getState(text_view);
 
-                state.height += tc_state.height;
+                state.height += tc_state.resImg.height;
 
                 {
-                    auto w = tc_state.width;
+                    auto w = tc_state.resImg.width;
                     if (w > state.width)
                         state.width = w;
                 }
@@ -363,6 +469,9 @@ struct TextLineSubline
         TextView text_view
         )
     {
+
+        writeln("genImage at ", __LINE__);
+        writeln(" chars layout ", parent_line.parent_text.chars_layout);
 
         auto state = getState(text_view);
 
@@ -381,12 +490,12 @@ struct TextLineSubline
 
             delegate ulong(ulong subimage_index)
             {
-                return state.textchars[subimage_index].getState(text_view).width;
+                return state.textchars[subimage_index].getState(text_view).resImg.width;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return state.textchars[subimage_index].getState(text_view).height;
+                return state.textchars[subimage_index].getState(text_view).resImg.height;
             },
 
             delegate Image(
@@ -395,7 +504,7 @@ struct TextLineSubline
                 ulong width, ulong height
                 )
             {
-                return state.textchars[subimage_index].getState(text_view).glyph.bitmap.getImage(
+                return state.textchars[subimage_index].getState(text_view).resImg.getImage(
                     x, y,
                     width, height
                     );
@@ -466,82 +575,95 @@ class TextLine
 
         state.sublines = state.sublines[0 .. 0];
 
-        if (textchars.length != 0)
+        state.sublines ~= new TextLineSubline(this);
+        ulong current_line = 0;
+
+        // TODO: comment this out?
+        /* reprocessUnits(text_view); */
+
+        // TODO: optimization required
+        ulong required_size;
+
+        if (text_view.virtualwrap_allow_by_space
+                || text_view.virtualwrap_allow_by_char)
         {
-            state.sublines ~= TextLineSubline();
+            switch (parent_text.lines_layout)
+            {
+            default:
+                throw new Exception(
+                    "parent_text.lines_layout ",
+                    to!string(parent_text.lines_layout)
+                    );
+            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+            case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+                required_size = text_view.width;
+                break;
+            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+            case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+                required_size = text_view.height;
+                break;
+            }
 
-            // TODO: comment this out?
-            /* reprocessUnits(text_view); */
+        }
 
-            // TODO: optimization required
-            ulong required_size;
+        ulong current_size = 0;
+
+        auto sl = state.sublines[current_line];
+        auto sl_state = sl.getState(text_view);
+
+        sl_state.textchars=sl_state.textchars[0 .. 0];
+
+        writeln("reprocessSublines textchars.length ", textchars.length);
+
+        foreach (tc; textchars)
+        {
+            ulong s;
+
+            auto tc_state = tc.getState(text_view);
+
+            switch (parent_text.lines_layout)
+            {
+            default:
+                throw new Exception(
+                    "parent_text.lines_layout ",
+                    to!string(parent_text.lines_layout)
+                    );
+            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+            case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+                s = tc_state.resImg.width;
+                break;
+            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+            case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+                s = tc_state.resImg.height;
+                break;
+            }
+
             if (text_view.virtualwrap_allow_by_space
                     || text_view.virtualwrap_allow_by_char)
             {
-                switch (parent_text.lines_layout)
-                {
-                default:
-                    throw new Exception(
-                        "parent_text.lines_layout ",
-                        to!string(parent_text.lines_layout)
-                        );
-                case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-                case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
-                    required_size = text_view.width;
-                    break;
-                case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-                case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
-                    required_size = text_view.height;
-                    break;
-                }
-
-            }
-
-            ulong current_line = 0;
-            ulong current_size = 0;
-
-            foreach (tc; textchars)
-            {
-                ulong s;
-
-                auto tc_state = tc.getState(text_view);
-
-                switch (parent_text.lines_layout)
-                {
-                default:
-                    throw new Exception(
-                        "parent_text.lines_layout ",
-                        to!string(parent_text.lines_layout)
-                        );
-                case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-                case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
-                    s = tc_state.width;
-                    break;
-                case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-                case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
-                    s = tc_state.height;
-                    break;
-                }
-
                 if (s > required_size)
                 {
                     // NOTE: not error
                     return;
                 }
-
-                if (required_size <= current_size + s)
-                {
-                    state.sublines ~= TextLineSubline();
-                    current_size = s;
-                }
-                else
-                {
-                    current_size += s;
-                }
-
-                state.sublines[$ - 1].getState(text_view).textchars ~= tc;
             }
 
+            if ((text_view.virtualwrap_allow_by_space
+                    || text_view.virtualwrap_allow_by_char)
+                    && required_size <= current_size + s)
+            {
+                state.sublines ~= new TextLineSubline(this);
+                current_line++;
+                sl = state.sublines[current_line];
+                sl_state = sl.getState(text_view);
+                current_size = s;
+            }
+            else
+            {
+                current_size += s;
+            }
+
+            sl_state.textchars ~= tc;
         }
 
         recalculateWidthAndHeight(text_view);
@@ -554,7 +676,13 @@ class TextLine
 
     void recalculateWidthAndHeight(TextView text_view)
     {
+
         auto state = getState(text_view);
+
+        foreach (sl; state.sublines)
+        {
+            sl.recalculateWidthAndHeight(text_view);
+        }
 
         state.width = 0;
         state.height = 0;
@@ -600,9 +728,6 @@ class TextLine
             }
                 break;
             }
-
-
-
         }
     }
 
@@ -633,10 +758,13 @@ class TextLine
         return genImage(0,0,width,height);
     } */
 
-    Image genImage(ulong x, ulong y, ulong width, ulong height,
-
-            TextView text_view)
+    Image genImage(
+        ulong x, ulong y, ulong width, ulong height,
+        TextView text_view
+        )
     {
+
+        writeln("genImage at ", __LINE__);
 
         auto state = getState(text_view);
 
@@ -650,17 +778,17 @@ class TextLine
 
             delegate ulong()
             {
-                return textchars.length;
+                return state.sublines.length;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return textchars[subimage_index].getState(text_view).width;
+                return state.sublines[subimage_index].getState(text_view).width;
             },
 
             delegate ulong(ulong subimage_index)
             {
-                return textchars[subimage_index].getState(text_view).height;
+                return state.sublines[subimage_index].getState(text_view).height;
             },
             delegate Image(
                 ulong subimage_index,
@@ -668,9 +796,10 @@ class TextLine
                 ulong width, ulong height
                 )
             {
-                return textchars[subimage_index].getState(text_view).glyph.bitmap.getImage(
+                return state.sublines[subimage_index].genImage(
                     x, y,
-                    width, height
+                    width, height,
+                    text_view
                     );
             }
             );
@@ -732,48 +861,47 @@ class Text
     {
         lines = lines[0 .. 0];
 
-        writeln("setText entering parsing loop");
+        writeln("setText entering slicing loop");
+        scope(exit) writeln("setText exited slicing loop");
 
         auto line_ended = false;
 
-        while (!line_ended)
+        /* int length */
+
+        main_loop:
+        while (true)
         {
-            dstring line;
-
-            auto txt_len = txt.length;
-
-            foreach (i, c; txt)
+            foreach (i,c; txt)
             {
-                writef("%d ", i);
+                if (c == '\r')
+                {
+                    if (i == 0)
+                    {
+                        txt = txt[i+1 .. $];
+                        continue main_loop;
+                    }
+                    if (i == txt.length -1)
+                    {
+                        break;
+                    }
+                }
                 if (c == '\n')
                 {
-                    writeln(r"c == '\n'");
-                    if (txt[i + 1] == '\r')
-                    {
-                        i++;
-                    }
-                    line = txt[0 .. i];
-                    txt = txt[i .. $];
-
-                    if (line[$ - 1] == '\r')
-                    {
-                        line = line[0 .. $ - 1];
-                    }
-                    break;
-                }
-
-                if (i == txt_len - 1)
-                {
-                    line = txt;
-                    line_ended = true;
-                    break;
+                    auto line = txt[0 .. i];
+                    txt = txt[i+1 .. $];
+                    auto tl = new TextLine(this);
+                    tl.setText(line);
+                    lines ~= tl;
+                    continue main_loop;
                 }
             }
 
             auto tl = new TextLine(this);
-            tl.setText(line);
+            tl.setText(txt);
             lines ~= tl;
+            break;
         }
+
     }
 
     void reprocess(TextView text_view)
@@ -915,6 +1043,8 @@ class Text
         )
     {
 
+        writeln("genImage at ", __LINE__);
+
         auto state = getState(text_view);
 
         Image ret = genImageFromSubimages(
@@ -962,6 +1092,57 @@ class Text
         }
         ret += lines.length - 1; // new line symbol count
         return ret;
+    }
+
+    void printInfo(TextView text_view)
+    {
+        auto t_st = getState(text_view);
+        writeln("
+Text:
+ width : %d
+ height: %d
+ lines : %d
+".format(
+    t_st.width,
+    t_st.height,
+    lines.length
+    )
+    );
+    foreach (li, l;lines)
+    {
+        auto l_state = l.getState(text_view);
+        writeln("
+  Line #%04d:
+   width    : %d
+   height   : %d
+   sublines : %d
+   textchars: %d
+        ".format(
+            li,
+            l_state.width,
+            l_state.height,
+            l_state.sublines.length,
+            l.textchars.length
+            )
+            );
+        foreach (sli,sl;l_state.sublines)
+        {
+            auto sl_state = sl.getState(text_view);
+            writeln("
+   Subline #%04d:
+    width    : %d
+    height   : %d
+    textchars: %d
+            ".format(
+                sli,
+                sl_state.width,
+                sl_state.height,
+                sl_state.textchars.length
+                )
+                );
+        }
+    }
+
     }
 }
 
@@ -1068,6 +1249,11 @@ class TextView
     void reprocess()
     {
         getText().reprocess(this);
+    }
+
+    void printInfo()
+    {
+        getText().printInfo(this);
     }
 
 }

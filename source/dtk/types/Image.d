@@ -43,10 +43,15 @@ class Image // : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     typeof(this) setDot(ulong x, ulong y, ImageDot new_value)
     {
         if (x > width)
-            throw new Exception("invalid x");
+            /* throw new Exception("invalid x"); */
+            return this;
         if (y > height)
-            throw new Exception("invalid y");
-        this.data[y * width + x] = new_value;
+            /* throw new Exception("invalid y"); */
+            return this;
+        auto z = y * width + x;
+        if (z < 0 || z >= this.data.length)
+            return this;
+        this.data[z] = new_value;
         return this;
     }
 

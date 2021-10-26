@@ -27,15 +27,27 @@ class Label : Widget, ContainerableWidgetI
     private
     {
         mixin Property_gs!(dstring, "text");
-        mixin Property_gs_w_d!(ushort, "font_size", 9);
+        mixin Property_gs_w_d!(ushort, "font_size", 15);
         mixin Property_gs_w_d!(bool, "font_italic", false);
         mixin Property_gs_w_d!(bool, "font_bold", false);
+        mixin Property_gs_w_d!(
+            GenImageFromSubimagesLayout,
+            "layout_lines",
+            GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft
+            );
+        mixin Property_gs_w_d!(
+            GenImageFromSubimagesLayout,
+            "layout_line_chars",
+            GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop
+            );
     }
 
     mixin Property_forwarding!(dstring, text, "Text");
     mixin Property_forwarding!(ushort, font_size, "FontSize");
     mixin Property_forwarding!(bool, font_italic, "FontItalic");
     mixin Property_forwarding!(bool, font_bold, "FontBold");
+    mixin Property_forwarding!(GenImageFromSubimagesLayout, layout_lines, "LayoutLines");
+    mixin Property_forwarding!(GenImageFromSubimagesLayout, layout_line_chars, "LayoutChars");
 
     this()
     {
@@ -74,7 +86,6 @@ afterTextChanged
         try
         {
             writeln("afterFontSizeChanged is called");
-            text_view.getText().faceSize = getFontSize() * 64;
             rerenderTextImage();
         }
         catch (Exception e)
@@ -88,7 +99,6 @@ afterTextChanged
         try
         {
             writeln("afterFontItalicChanged is called");
-            text_view.getText().italic = getFontItalic();
             rerenderTextImage();
         }
         catch (Exception e)
@@ -102,7 +112,6 @@ afterTextChanged
         try
         {
             writeln("afterFontBoldChanged is called");
-            text_view.getText().bold = getFontBold();
             rerenderTextImage();
         }
         catch (Exception e)
@@ -155,10 +164,22 @@ afterTextChanged
                 return fm;
             }();
         }
-        /* textProcessor.defaultFaceSize = getFontSize()*64; */
-        text_view.getText().faceResolution = 72;
+
+        auto tvt = text_view.getText();
+
+        tvt.faceSize = getFontSize() * 64;
+        tvt.faceResolution = 72;
+        tvt.bold = getFontBold();
+        tvt.italic = getFontItalic();
+        tvt.lines_layout = getLayoutLines();
+        tvt.chars_layout = getLayoutChars();
+
+        auto size = getSize();
+        text_view.width = size.width;
+        text_view.height = size.height;
 
         text_view.reprocess();
+        text_view.printInfo();
 
         textImage = text_view.genImage();
     }

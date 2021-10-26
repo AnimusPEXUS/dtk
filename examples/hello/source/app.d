@@ -49,7 +49,10 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new Label();
-    lbl1.setText(r"1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑"); // 👍
+    lbl1.setText(
+        "1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑\n"
+        ~"вторая строка\n"
+        ~"третья строка\n"); // 👍
 
     /* DS ds = new DS(); */
 
@@ -65,7 +68,7 @@ void main()
     btn3.setPosition(Position2D(10, 80)).setSize(Size2D(12, 12));
     btn4.setPosition(Position2D(10, 100)).setSize(Size2D(12, 12));
     btn5.setPosition(Position2D(10, 120)).setSize(Size2D(12, 12));
-    lbl1.setPosition(Position2D(10, 140)).setSize(Size2D(100, 12));
+    lbl1.setPosition(Position2D(10, 140)).setSize(Size2D(500, 200));
     /* ds.setPosition(Position2D(50, 50)).setSize(Size2D(50, 50)); */
 
     lo.packStart(btn, true, true);

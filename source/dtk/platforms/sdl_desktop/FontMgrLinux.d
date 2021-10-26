@@ -151,12 +151,6 @@ class Face : FaceI
         populateFaceInfo(this.face_info);
     }
 
-    ~this()
-    {
-        /* FT_Done_Face(face); */
-        /* face=null; */
-    }
-
     private void populateFaceInfo(FaceInfo* face_info)
     {
         face_info.family_name = fromStringz(face.family_name).dup;
@@ -264,6 +258,7 @@ class Face : FaceI
         }
 
         auto ret_i = new Image(b.width, b.rows);
+        /* auto ret_i = new Image(b.width, face_info.height / 64); */
 
         for (int y = 0; y != b.rows; y++)
         {
@@ -290,8 +285,8 @@ class Face : FaceI
         auto ret = new GlyphRenderResult();
 
         ret.bitmap = ret_i;
-        ret.bitmap_top = face.glyph.bitmap_top;
         ret.bitmap_left = face.glyph.bitmap_left;
+        ret.bitmap_top = face.glyph.bitmap_top;
 
         ret.glyph_info = generateGlyphInfo();
 
@@ -299,15 +294,16 @@ class Face : FaceI
         writeln("                      b_top: ", ret.bitmap_top);
         writeln("                    b_width: ", ret.bitmap.width);
         writeln("                   b_height: ", ret.bitmap.height);
-        writeln("              metrics.width: ", ret.glyph_info.metrics.size.width);
-        writeln("             metrics.height: ", ret.glyph_info.metrics.size.height);
-        writeln("              horiBearing.x: ", ret.glyph_info.metrics.horiBearing.x);
-        writeln("              horiBearing.y: ", ret.glyph_info.metrics.horiBearing.y);
-        writeln("              vertBearing.x: ", ret.glyph_info.metrics.vertBearing.x);
-        writeln("              vertBearing.y: ", ret.glyph_info.metrics.vertBearing.y);
 
-        writeln("              advance.width: ", ret.glyph_info.metrics.advance.width);
-        writeln("             advance.height: ", ret.glyph_info.metrics.advance.height);
+        writeln("         metrics.size.width: ", ret.glyph_info.metrics.size.width);
+        writeln("        metrics.size.height: ", ret.glyph_info.metrics.size.height);
+        writeln("      metrics.horiBearing.x: ", ret.glyph_info.metrics.horiBearing.x);
+        writeln("      metrics.horiBearing.y: ", ret.glyph_info.metrics.horiBearing.y);
+        writeln("      metrics.vertBearing.x: ", ret.glyph_info.metrics.vertBearing.x);
+        writeln("      metrics.vertBearing.y: ", ret.glyph_info.metrics.vertBearing.y);
+        writeln("      metrics.advance.width: ", ret.glyph_info.metrics.advance.width);
+        writeln("     metrics.advance.height: ", ret.glyph_info.metrics.advance.height);
+
         writeln("  linear_horizontal_advance: ", ret.glyph_info.linear_horizontal_advance);
         writeln("    linear_vertical_advance: ", ret.glyph_info.linear_vertical_advance);
         writeln("                  advance.x: ", ret.glyph_info.advance.x);
@@ -321,10 +317,10 @@ class Face : FaceI
         writeln("          max_advance_width: ", ret.glyph_info.face_info.max_advance_width);
         writeln("         max_advance_height: ", ret.glyph_info.face_info.max_advance_height);
 
-        writeln("                   bb min x: ", ret.glyph_info.face_info.bounding_box.min.x);
-        writeln("                   bb min y: ", ret.glyph_info.face_info.bounding_box.min.y);
-        writeln("                   bb max x: ", ret.glyph_info.face_info.bounding_box.max.x);
-        writeln("                   bb max y: ", ret.glyph_info.face_info.bounding_box.max.y);
+        writeln("         bounding_box min x: ", ret.glyph_info.face_info.bounding_box.min.x);
+        writeln("         bounding_box min y: ", ret.glyph_info.face_info.bounding_box.min.y);
+        writeln("         bounding_box max x: ", ret.glyph_info.face_info.bounding_box.max.x);
+        writeln("         bounding_box max y: ", ret.glyph_info.face_info.bounding_box.max.y);
 
         writeln("                size.x_PPEM: ", ret.glyph_info.face_info.size.x_PPEM);
         writeln("                size.y_PPEM: ", ret.glyph_info.face_info.size.y_PPEM);
