@@ -261,46 +261,6 @@ class Chicago98Laf : LafI
         return cast(ubyte)(lower + ((higher - lower) * part));
     }
 
-    void drawLabel(Label widget)
-    {
-        writeln("drawLabel called");
-
-        if (widget.textImage !is null)
-        {
-            auto pos = Position2D(0, 0);
-            auto ds = widget.getDrawingSurface();
-
-            auto image = widget.textImage;
-
-            for (uint y = 0; y != image.height; y++)
-            {
-                for (uint x = 0; x != image.width; x++)
-                {
-                    Color new_color = formBackground;
-                    auto dot = image.getDot(x, y);
-
-                    if (dot.enabled)
-                    {
-                        auto part = dot.intensivity;
-                        new_color.r = chanBlend(formBackground.r, elementDarkedColor.r, part);
-                        new_color.g = chanBlend(formBackground.g, elementDarkedColor.g, part);
-                        new_color.b = chanBlend(formBackground.b, elementDarkedColor.b, part);
-                    }
-
-                    {
-                        auto id = ImageDot();
-                        id.color = new_color;
-                        id.enabled=true;
-                        id.intensivity=1;
-                        ds.drawDot(Position2D(pos.x + x, pos.y + y), id);
-                    }
-
-                }
-            }
-            ds.present();
-        }
-    }
-
     void drawLayout(Layout widget)
     {
         writeln("drawLayout called");
@@ -329,11 +289,42 @@ class Chicago98Laf : LafI
     void drawTextEntry(TextEntry widget)
     {
         writeln("drawTextEntry called");
-    }
 
-    void drawTextArea(TextArea widget)
-    {
-        writeln("drawTextArea called");
+        if (widget.textImage !is null)
+        {
+            auto pos = Position2D(0, 0);
+            auto ds = widget.getDrawingSurface();
+
+            auto image = widget.textImage;
+
+            for (uint y = 0; y != image.height; y++)
+            {
+                for (uint x = 0; x != image.width; x++)
+                {
+                    Color new_color = formBackground;
+                    auto dot = image.getDot(x, y);
+
+                    if (dot.enabled)
+                    {
+                        // TODO: take background color from already existing dot
+                        auto part = dot.intensivity;
+                        new_color.r = chanBlend(formBackground.r, elementDarkedColor.r, part);
+                        new_color.g = chanBlend(formBackground.g, elementDarkedColor.g, part);
+                        new_color.b = chanBlend(formBackground.b, elementDarkedColor.b, part);
+                    }
+
+                    {
+                        auto id = ImageDot();
+                        id.color = new_color;
+                        id.enabled=true;
+                        id.intensivity=1;
+                        ds.drawDot(Position2D(pos.x + x, pos.y + y), id);
+                    }
+
+                }
+            }
+            ds.present();
+        }
     }
 
     void addEventHandling(WindowEventMgrI mgr)

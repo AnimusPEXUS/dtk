@@ -13,7 +13,7 @@ public import dtk.widgets.Button;
 public import dtk.widgets.ButtonRadio;
 public import dtk.widgets.ButtonCheck;
 
-public import dtk.widgets.Label;
+/* public import dtk.widgets.Label; */
 public import dtk.widgets.Picture;
 
 public import dtk.widgets.Menu;
@@ -23,4 +23,4 @@ public import dtk.widgets.Bar;
 public import dtk.widgets.ScrollBar;
 
 public import dtk.widgets.TextEntry;
-public import dtk.widgets.TextArea;
+/* public import dtk.widgets.TextArea; */

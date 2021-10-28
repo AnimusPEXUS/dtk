@@ -14,14 +14,14 @@ interface LafI
     void drawButtonRadio(ButtonRadio widget);
     void drawButtonCheck(ButtonCheck widget);
     void drawImage(Image widget);
-    void drawLabel(Label widget);
+    /* void drawLabel(Label widget); */
     void drawLayout(Layout widget);
     void drawMenu(Menu widget);
     void drawMenuItem(MenuItem widget);
     void drawBar(Bar widget);
     void drawScrollBar(ScrollBar widget);
     void drawTextEntry(TextEntry widget);
-    void drawTextArea(TextArea widget);
+    /* void drawTextArea(TextArea widget); */
 
     void addEventHandling(WindowEventMgrI mgr);
 }
