@@ -12,6 +12,7 @@ import dtk.types.WindowCreationSettings;
 import dtk.types.EnumKeyboardModCode;
 
 import dtk.miscs.RadioGroup;
+import dtk.miscs.TextProcessor;
 
 import dtk.laf.chicago98.Chicago98Laf;
 
@@ -55,15 +56,31 @@ void main()
         "1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑\n"
         ~"вторая строка\n"
         ~"третья строка\n");
+    lbl1.setFontFile("/usr/share/fonts/go/Go-Regular.ttf");
+    /* lbl1.setLayoutLines(GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop);
+    lbl1.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); */
+    lbl1.setFontSize(10);
+    lbl1.setVirtualWrapByWord(true);
 
     lbl2.setText(
         "ぁぃぅぇぁぃぅぇぁぃぅぇ\n"
         ~"ぁぃぅぇぁぃぅぇぁぃぅぇぁぃぅぇ\n"
         );
+    lbl2.setFontFile("/usr/share/fonts/google-droid-sans-fonts/DroidSans.ttf");
+    lbl2.setVirtualWrapByWord(true);
+
+    /* lbl2.setLayoutLines(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop);
+    lbl2.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); */
+    lbl2.setFontSize(15);
 
     lbl3.setText(
         "אבגדהאבגדהאבגדהאבגד\nבגדהאבגדהאבגדהאבגדה\n"
         );
+    lbl3.setFontFile("/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf");
+    /* lbl3.setLayoutLines(GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft);
+    lbl3.setLayoutChars(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop); */
+    lbl3.setFontSize(20);
+    lbl3.setVirtualWrapByWord(true);
 
     /* DS ds = new DS(); */
 
