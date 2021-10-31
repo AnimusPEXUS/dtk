@@ -71,11 +71,11 @@ class DrawingSurface : DrawingSurfaceI
 
             auto dots = calculateDotsInLine(pos, pos2);
 
-            writeln("dots");
+            debug writeln("dots");
 
             foreach (v; dots)
             {
-                write("  dot[", v.x, ":", v.y, "], ");
+                debug write("  dot[", v.x, ":", v.y, "], ");
                 if (style_dup[0])
                 {
                     {
@@ -88,7 +88,7 @@ class DrawingSurface : DrawingSurfaceI
                 }
                 style_dup = style_dup[1 .. $] ~ style_dup[0];
             }
-            writeln();
+            debug writeln();
         }
     }
 
@@ -140,7 +140,7 @@ class DrawingSurface : DrawingSurfaceI
         /* auto surf = SDL_GetWindowSurface(w._sdl_window);
         assert(surf !is null);
         auto r = SDL_Rect(pos.x, pos.y, size.width, size.height);
-        writeln("drawing rect ", r);
+        debug writeln("drawing rect ", r);
         SDL_FillRect( surf, &r, SDL_MapRGB( surf.format, 0xdd, 0xdd, 0xdd ) );
         SDL_UpdateWindowSurface(w._sdl_window); */
     }

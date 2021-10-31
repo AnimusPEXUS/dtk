@@ -33,7 +33,7 @@ class ButtonRadio : Button
     {
         try
         {
-            writeln("handleRadioGroup_onBeforeChanged: ", old_v, new_v);
+            debug writeln("handleRadioGroup_onBeforeChanged: ", old_v, new_v);
             if (old_v !is null)
                 if (old_v.isIn(this))
                     old_v.remove(this);
@@ -48,7 +48,7 @@ class ButtonRadio : Button
     {
         try
         {
-            writeln("handleRadioGroup_onAfterChanged: ", old_v, new_v);
+            debug writeln("handleRadioGroup_onAfterChanged: ", old_v, new_v);
             if (new_v !is null)
                 if (!new_v.isIn(this))
                     new_v.add(this);
@@ -61,7 +61,7 @@ class ButtonRadio : Button
 
     override bool on_mouse_click_internal(EventMouse* event)
     {
-        writeln("ButtonRadio click");
+        debug writeln("ButtonRadio click");
         auto rg = getRadioGroup();
         if (rg !is null)
         {
@@ -79,14 +79,14 @@ class ButtonRadio : Button
             f.focusTo(this);
         }
 
-        writeln("ButtonRadio down");
+        debug writeln("ButtonRadio down");
         redraw();
         return false;
     }
 
     override bool on_mouse_up_internal(EventMouse* event)
     {
-        writeln("ButtonRadio up");
+        debug writeln("ButtonRadio up");
         return false;
     }
 

@@ -109,7 +109,7 @@ class WindowEventMgr : WindowEventMgrI
 
     bool handle_event_mouse(EventMouse* e)
     {
-        writeln("   mouse clicks:", e.button.clicks);
+        debug writeln("   mouse clicks:", e.button.clicks);
         return handle_event_x_search_and_call!listMouseActions(e);
     }
 

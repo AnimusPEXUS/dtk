@@ -248,7 +248,7 @@ class Face : FaceI
             throw new Exception("FT_Render_Glyph error");
         }
 
-        /* writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode); */
+        /* debug writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode); */
 
         auto b = face.glyph.bitmap;
 
@@ -271,7 +271,7 @@ class Face : FaceI
                 if (c != 0)
                 {
                     intens = cast(real) 1 / (cast(real) 255 / c);
-                    /* writeln("renderGlyphByChar ", x, " ", y, " intens ", intens); */
+                    /* debug writeln("renderGlyphByChar ", x, " ", y, " intens ", intens); */
                 }
                 auto dot = ImageDot();
                 dot.intensivity = intens;
@@ -280,7 +280,7 @@ class Face : FaceI
             }
         }
 
-        ret_i.printImage();
+        debug ret_i.printImage();
 
         auto ret = new GlyphRenderResult();
 
@@ -290,6 +290,7 @@ class Face : FaceI
 
         ret.glyph_info = generateGlyphInfo();
 
+        debug {
         writeln("                     b_left: ", ret.bitmap_left);
         writeln("                      b_top: ", ret.bitmap_top);
         writeln("                    b_width: ", ret.bitmap.width);
@@ -333,6 +334,7 @@ class Face : FaceI
         writeln("                size.height: ", ret.glyph_info.face_info.size.height);
 
         writeln("           size.max_advance: ", ret.glyph_info.face_info.size.max_advance);
+        }
 
         return ret;
     }

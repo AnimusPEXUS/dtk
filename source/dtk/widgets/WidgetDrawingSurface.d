@@ -81,30 +81,6 @@ class WidgetDrawingSurfaceShifted : DrawingSurfaceI
         return widget.getSize().height;
     }
 
-    /* void onWidgetPosChange() nothrow
-    {
-        try {
-        writeln("WidgetDrawingSurfaceShifted:onWidgetPosChange");
-        auto pos = widget.getPosition();
-        x = pos.x;
-        y = pos.y;
-        } catch (Exception e) {
-
-        }
-    }
-
-    void onWidgetSizeChange() nothrow
-    {
-        try {
-        writeln("WidgetDrawingSurfaceShifted:onWidgetSizeChange");
-        auto size = widget.getSize();
-        w = size.width;
-        h = size.height;
-        } catch (Exception e) {
-
-        }
-    } */
-
     // =============== implimentation ===============
 
     bool canGetDot()

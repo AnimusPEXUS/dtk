@@ -95,7 +95,7 @@ class SDLDesktopPlatform : PlatformI
         SDL_Init(SDL_INIT_VIDEO);
         SDL_version v;
         SDL_GetVersion(&v);
-        writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
+        debug writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
         version (linux)
         {
             pragma(msg, "using freetype font manager");
@@ -151,13 +151,13 @@ class SDLDesktopPlatform : PlatformI
 
             if (res == 0) // TODO: use GetError()
             {
-                writeln("TODO: got error on SDL_WaitEvent");
+                debug writeln("TODO: got error on SDL_WaitEvent");
                 return;
             }
 
             // TODO: probably, at this point, things have to become asynchronous
 
-            writeln(event.type);
+            debug writeln(event.type);
 
             typeof(SDL_WindowEvent.windowID) windowID;
 
@@ -170,7 +170,7 @@ class SDLDesktopPlatform : PlatformI
                 windowID = event.window.windowID;
                 if (ignoredSDLWindowEvents.canFind(event.window.event))
                 {
-                    writeln("warning: ignored SDL_WINDOWEVENT::", event.window.event, " just now");
+                    debug writeln("warning: ignored SDL_WINDOWEVENT::", event.window.event, " just now");
                     continue main_loop;
                 }
                 break;

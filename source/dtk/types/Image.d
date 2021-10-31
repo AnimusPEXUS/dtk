@@ -186,7 +186,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
     }
 
     void drawRectangle(
@@ -199,7 +199,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         Nullable!(FillStyle) fill_style
         )
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
     }
 
     void drawArc(
@@ -210,12 +210,12 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         real turn_step,
         Color color)
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
     }
 
     void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {writeln(e);}
+        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
     }
 
     void drawImage(Position2D pos, Image image)

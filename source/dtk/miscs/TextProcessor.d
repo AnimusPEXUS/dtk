@@ -45,10 +45,10 @@ Image genImageFromSubimages(
             throw new Exception("debugging genImageFromSubimages");
         } catch (Exception e)
         {
-            writeln(e);
+            debug writeln(e);
         }
     }
-    writeln(
+    debug writeln(
         "genImageFromSubimages \n",
         "  max_width: ", max_width, "\n",
         "  max_height: ", max_height, "\n",
@@ -242,7 +242,7 @@ Image genImageFromSubimages(
             auto sw=calc_loop_source_width(i) ;
             auto sh=calc_loop_source_height(i);
 
-            writeln("
+            debug writeln("
     i                         : %d
     calc_loop_target_x(i)     : %d
     calc_loop_target_y(i)     : %d
@@ -307,19 +307,19 @@ class TextChar
         /* state.width = 0;
         state.height = 0; */
 
-        writeln("rendering char: ", chr);
+        debug writeln("rendering char: ", chr);
 
         auto font_mgr = text_view.font_mgr;
         auto face = font_mgr.loadFace("/usr/share/fonts/google-droid-sans-fonts/DroidSans.ttf");
 
         {
             auto x = parent_line.parent_text.faceSize;
-            writeln("setting size to ", x);
+            debug writeln("setting size to ", x);
             face.setCharSize(x, x);
         }
         {
             auto x = parent_line.parent_text.faceResolution;
-            writeln("setting resolution to ", x);
+            debug writeln("setting resolution to ", x);
             face.setCharResolution(x, x);
         }
 
@@ -332,7 +332,7 @@ class TextChar
         catch (Exception e)
         {
             // TODO: replace with dummy glyph
-            writeln("error: ", e);
+            debug writeln("error: ", e);
             state.glyph = face.renderGlyphByChar(cast(dchar)'?');
             /* state.width = state.glyph.bitmap.width;
             state.height = state.glyph.bitmap.height; */
@@ -384,8 +384,8 @@ class TextChar
             }
         }
 
-        writeln("TextChar.genImage");
-        ret.printImage();
+        debug writeln("TextChar.genImage");
+        debug ret.printImage();
 
         return ret;
 
@@ -470,8 +470,8 @@ class TextLineSubline
         )
     {
 
-        writeln("genImage at ", __LINE__);
-        writeln(" chars layout ", parent_line.parent_text.chars_layout);
+        debug writeln("genImage at ", __LINE__);
+        debug writeln(" chars layout ", parent_line.parent_text.chars_layout);
 
         auto state = getState(text_view);
 
@@ -613,7 +613,7 @@ class TextLine
 
         sl_state.textchars=sl_state.textchars[0 .. 0];
 
-        writeln("reprocessSublines textchars.length ", textchars.length);
+        debug writeln("reprocessSublines textchars.length ", textchars.length);
 
         foreach (tc; textchars)
         {
@@ -764,7 +764,7 @@ class TextLine
         )
     {
 
-        writeln("genImage at ", __LINE__);
+        debug writeln("genImage at ", __LINE__);
 
         auto state = getState(text_view);
 
@@ -861,8 +861,8 @@ class Text
     {
         lines = lines[0 .. 0];
 
-        writeln("setText entering slicing loop");
-        scope(exit) writeln("setText exited slicing loop");
+        debug writeln("setText entering slicing loop");
+        debug scope(exit) writeln("setText exited slicing loop");
 
         auto line_ended = false;
 
@@ -938,7 +938,7 @@ class Text
 
     dstring getText()
     {
-        writeln("dstring getText() ", this, " ", lines.length);
+        debug writeln("dstring getText() ", this, " ", lines.length);
         dstring ret;
 
         if (lines.length == 0)
@@ -1043,7 +1043,7 @@ class Text
         )
     {
 
-        writeln("genImage at ", __LINE__);
+        debug writeln("genImage at ", __LINE__);
 
         auto state = getState(text_view);
 
@@ -1097,7 +1097,7 @@ class Text
     void printInfo(TextView text_view)
     {
         auto t_st = getState(text_view);
-        writeln("
+        debug writeln("
 Text:
  width : %d
  height: %d
@@ -1111,7 +1111,7 @@ Text:
     foreach (li, l;lines)
     {
         auto l_state = l.getState(text_view);
-        writeln("
+        debug writeln("
   Line #%04d:
    width    : %d
    height   : %d
@@ -1128,7 +1128,7 @@ Text:
         foreach (sli,sl;l_state.sublines)
         {
             auto sl_state = sl.getState(text_view);
-            writeln("
+            debug writeln("
    Subline #%04d:
     width    : %d
     height   : %d

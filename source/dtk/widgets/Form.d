@@ -53,7 +53,7 @@ class Form : Widget, FormI
     {
         try
         {
-            writeln("Form child changed");
+            debug writeln("Form child changed");
             auto c = getChild();
             c.setParent(this);
             /* c.setPosition(Position2D(5,5));
@@ -79,7 +79,7 @@ class Form : Widget, FormI
     /* private nothrow void onwindowchanged()
     {
         try {
-            writeln("onwindowchanged()");
+            debug writeln("onwindowchanged()");
         } catch (Exception e) {
             // TODO:
         }
@@ -130,7 +130,7 @@ class Form : Widget, FormI
 
         if (isSetChild())
         {
-            writeln("getChild().redraw();");
+            debug writeln("getChild().redraw();");
             getChild().redraw();
         }
 
@@ -142,7 +142,7 @@ class Form : Widget, FormI
 
     void focusTo(WidgetI widget)
     {
-        writeln("Form:focusTo: ", widget);
+        debug writeln("Form:focusTo: ", widget);
         auto x = getFocusedWidget();
         setFocusedWidget(widget);
         if (x !is null)

@@ -70,7 +70,7 @@ class Chicago98Laf : LafI
     void drawForm(Form widget)
     {
 
-        writeln("drawForm called");
+        debug writeln("drawForm called");
 
         auto ds = widget.getDrawingSurface();
 
@@ -83,7 +83,7 @@ class Chicago98Laf : LafI
 
     void drawButton(Button widget)
     {
-        writeln("drawButton called");
+        debug writeln("drawButton called");
 
         bool is_default = delegate bool() {
             auto f = widget.getForm();
@@ -133,7 +133,7 @@ class Chicago98Laf : LafI
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
     void drawButtonRadio(ButtonRadio widget)
     {
-        writeln("drawButtonRadio called");
+        debug writeln("drawButtonRadio called");
 
         auto ds = widget.getDrawingSurface();
         auto pos = Position2D(0, 0);
@@ -253,7 +253,7 @@ class Chicago98Laf : LafI
 
     void drawImage(Image widget)
     {
-        writeln("drawImage called");
+        debug writeln("drawImage called");
     }
 
     private ubyte chanBlend(ubyte lower, ubyte higher, real part)
@@ -263,32 +263,32 @@ class Chicago98Laf : LafI
 
     void drawLayout(Layout widget)
     {
-        writeln("drawLayout called");
+        debug writeln("drawLayout called");
     }
 
     void drawMenu(Menu widget)
     {
-        writeln("drawMenu called");
+        debug writeln("drawMenu called");
     }
 
     void drawMenuItem(MenuItem widget)
     {
-        writeln("drawMenuItem called");
+        debug writeln("drawMenuItem called");
     }
 
     void drawBar(Bar widget)
     {
-        writeln("drawBar called");
+        debug writeln("drawBar called");
     }
 
     void drawScrollBar(ScrollBar widget)
     {
-        writeln("drawScrollBar called");
+        debug writeln("drawScrollBar called");
     }
 
     void drawTextEntry(TextEntry widget)
     {
-        writeln("drawTextEntry called");
+        debug writeln("drawTextEntry called");
 
         if (widget.textImage !is null)
         {
@@ -334,13 +334,13 @@ class Chicago98Laf : LafI
                 any_focusedWidget: true, any_mouseWidget: true, checkMatch: delegate bool(WindowEventMgrI mgr, WindowI window,
                         EventKeyboard* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
                     auto mc = e.keysym.modcode;
-                    writeln("caps:", (mc & EnumKeyboardModCode.CapsLock) != 0);
-                    writeln("num:", (mc & EnumKeyboardModCode.NumLock) != 0);
-                    writeln("scroll:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
+                    debug writeln("caps:", (mc & EnumKeyboardModCode.CapsLock) != 0);
+                    debug writeln("num:", (mc & EnumKeyboardModCode.NumLock) != 0);
+                    debug writeln("scroll:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
                     mc &= EnumKeyboardModCodeNOT.Locks;
-                    writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
-                    writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
-                    writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
+                    debug writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
+                    debug writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
+                    debug writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
                     if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation
                             && (mc == 0 || mc == EnumKeyboardModCode.LeftShift))
                         return true;
@@ -349,10 +349,10 @@ class Chicago98Laf : LafI
                         EventKeyboard* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
                     auto mc = e.keysym.modcode;
                     mc &= EnumKeyboardModCodeNOT.Locks;
-                    writeln("tab pressed");
+                    debug writeln("tab pressed");
                     if (mc == EnumKeyboardModCode.LeftShift)
                     {
-                        writeln("with shift");
+                        debug writeln("with shift");
                     }
                     return true;
                 },};
@@ -369,7 +369,7 @@ class Chicago98Laf : LafI
                             EventMouse* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
                         if (mouseWidget is null)
                         {
-                            writeln("error: got mouse event, but mouseWidget is null");
+                            debug writeln("error: got mouse event, but mouseWidget is null");
                             return false;
                         }
 
@@ -398,7 +398,7 @@ class Chicago98Laf : LafI
                     EventWindowAction ea = {
                         any_focusedWidget: true, any_mouseWidget: true, checkMatch: delegate bool(WindowEventMgrI mgr, WindowI window,
                                 EventWindow* e, WidgetI focusedWidget, WidgetI mouseWidget,) {
-                            writeln("checkMatch 1 called");
+                            debug writeln("checkMatch 1 called");
                             return true;
                         }, action: delegate bool(WindowEventMgrI mgr, WindowI window,
                                 EventWindow* e, WidgetI focusedWidget, WidgetI mouseWidget,) {

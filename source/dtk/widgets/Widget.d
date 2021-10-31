@@ -33,54 +33,39 @@ class Widget : WidgetI
 
     // =====v===v===v===== [locator] =====v===v===v===== start
 
-    private
-    {
-        mixin Property_gs_w_d!(bool, "vertical_expand", false);
-        mixin Property_gs_w_d!(bool, "horizontal_expand", false);
-        mixin Property_gs_w_d!(bool, "vertical_fill", false);
-        mixin Property_gs_w_d!(bool, "horizontal_fill", false);
-
-        mixin Property_gsu!(Position2D, "position");
-        mixin Property_gsu!(Size2D, "size");
-        mixin Property_gsu!(Size2D, "minimal_size");
-        mixin Property_gsu!(Size2D, "maximal_size");
-    }
+    mixin mixin_widget_set_multiple_properties!(
+        cast(PropSetting[])[
+            PropSetting("gs_w_d", "bool", "vertical_expand", "VerticalExpand", "false"),
+            PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
+            PropSetting("gs_w_d", "bool", "vertical_fill", "VerticalFill", "false"),
+            PropSetting("gs_w_d", "bool", "horizontal_fill", "HorizontalFill", "false"),
+            PropSetting("gsu", "Position2D", "position", "Position", ""),
+            PropSetting("gsu", "Size2D", "size", "Size", ""),
+            PropSetting("gsu", "Size2D", "minimal_size", "MinimalSize", ""),
+            PropSetting("gsu", "Size2D", "maximal_size", "MaximalSize", ""),
+        ]
+        );
 
     // NOTE: those two properties are really a synonym for their //Horizontal//
     //       analogs
     mixin Property_forwarding!(bool, horizontal_expand, "Expand");
     mixin Property_forwarding!(bool, horizontal_fill, "Fill");
 
-    mixin Property_forwarding!(bool, vertical_expand, "VerticalExpand");
-    mixin Property_forwarding!(bool, horizontal_expand, "HorizontalExpand");
-    mixin Property_forwarding!(bool, vertical_fill, "VerticalFill");
-    mixin Property_forwarding!(bool, horizontal_fill, "HorizontalFill");
-
-    mixin Property_forwarding!(Position2D, position, "Position");
-    mixin Property_forwarding!(Size2D, size, "Size");
-    mixin Property_forwarding!(Size2D, minimal_size, "MinimalSize");
-    mixin Property_forwarding!(Size2D, maximal_size, "MaximalSize");
 
     // =====^===^===^===== [locator] =====^===^===^===== end
 
     // =====v===v===v===== [info] =====v===v===v===== start
 
-    private
-    {
-        mixin Property_gs_w_d!(bool, "visible", false);
-        mixin Property_gs_w_d!(bool, "enabled", false);
-        mixin Property_gs_w_d!(bool, "focusable", false);
-        mixin Property_gs_w_d!(bool, "focus_kb_capture", false);
-        mixin Property_gs_w_d!(bool, "uses_text_input", false);
-        mixin Property_gs_w_d!(MoveT, "move_type", MoveT.none);
-    }
-
-    mixin Property_forwarding!(bool, visible, "Visible");
-    mixin Property_forwarding!(bool, enabled, "Enabled");
-    mixin Property_forwarding!(bool, focusable, "Focusable");
-    mixin Property_forwarding!(bool, focus_kb_capture, "FocusKeyboardCapture");
-    mixin Property_forwarding!(bool, uses_text_input, "UsesTextInput");
-    mixin Property_forwarding!(MoveT, move_type, "MoveType");
+    mixin mixin_widget_set_multiple_properties!(
+        cast(PropSetting[])[
+            PropSetting("gs_w_d", "bool", "visible", "Visible", "false"),
+            PropSetting("gs_w_d", "bool", "enabled", "Enabled", "false"),
+            PropSetting("gs_w_d", "bool", "focusable", "Focusable", "false"),
+            PropSetting("gs_w_d", "bool", "focus_kb_capture", "FocusKeyboardCapture", "false"),
+            PropSetting("gs_w_d", "bool", "uses_text_input", "UsesTextInput", "false"),
+            PropSetting("gs_w_d", "MoveT", "move_type", "MoveType", "MoveT.none"),
+        ]
+        );
 
     // =====^===^===^===== [info] =====^===^===^===== end
 
@@ -93,7 +78,7 @@ class Widget : WidgetI
     // NOTE: ensured. init called implicitly by dlang
     this()
     {
-        writeln("Widget:init() is called for ", this);
+        debug writeln("Widget:init() is called for ", this);
         _ds = new WidgetDrawingSurfaceShifted(this);
         this.connectToParent_onAfterChanged(&onParentChanged);
     }
@@ -102,7 +87,7 @@ class Widget : WidgetI
     {
         try
         {
-            writeln(this, " parent changed");
+            debug writeln(this, " parent changed");
         }
         catch (Exception e)
         {
@@ -146,43 +131,7 @@ class Widget : WidgetI
         return _ds;
     }
 
-    /* void redraw()
-    { */
 
-    /* writeln("Widget::draw() <---------------------------- ", this);
-
-        Form form = this.getForm();
-        if (form is null)
-        {
-            writeln("error: redraw() function couldn't get Form. this is: ", this);
-            return;
-        }
-
-        auto theme = form.getLaf();
-
-        if (theme is null)
-        {
-            throw new Exception("theme not set");
-        }
-
-        static foreach (v; [
-                "Form", "ButtonCheck", "ButtonRadio", "Button", "Layout", "Label"
-            ])
-        {
-            {
-                mixin(v ~ " widget = cast(" ~ v ~ ") this;");
-                if (widget !is null)
-                {
-                    writeln("calling draw" ~ v);
-                    __traits(getMember, theme, "draw" ~ v)(widget);
-                    goto exit;
-                }
-            }
-        }
-
-    exit: */
-
-    /* } */
 
     void redraw()
     {
@@ -194,7 +143,7 @@ class Widget : WidgetI
 
         /* alias A1 = typeof(new_this); */
 
-        writeln("redraw_x called at ", this);
+        debug writeln("redraw_x called at ", this);
 
         const id = __traits(identifier, new_this);
         const id_t = __traits(identifier, T);
@@ -204,12 +153,12 @@ class Widget : WidgetI
         static if (!is(T == Widget))
         {
             const drawid = "draw" ~ id_t;
-            writeln("Widget::draw() <------------------ drawid = ", drawid);
+            debug writeln("Widget::draw() <------------------ drawid = ", drawid);
 
             Form form = new_this.getForm();
             if (form is null)
             {
-                writeln("error: redraw() function couldn't get Form. this is: ", this);
+                debug writeln("error: redraw() function couldn't get Form. this is: ", this);
                 return;
             }
 
@@ -223,18 +172,18 @@ class Widget : WidgetI
             static if (!__traits(hasMember, theme, drawid))
             {
                 pragma(msg, "theme doesn't have " ~ drawid ~ " function");
-                writeln("theme doesn't have " ~ drawid ~ " function");
+                debug writeln("theme doesn't have " ~ drawid ~ " function");
                 return;
             }
             else
             {
-                writeln("calling " ~ drawid);
+                debug writeln("calling " ~ drawid);
                 __traits(getMember, theme, drawid)(new_this);
             }
         }
         else
         {
-            writeln("xxxxxxxxxxxxxxxxx Widget doesn't uses themes for drawing");
+            debug writeln("xxxxxxxxxxxxxxxxx Widget doesn't uses themes for drawing");
         }
     }
 
@@ -245,7 +194,7 @@ class Widget : WidgetI
 
     void positionAndSizeRequest(Position2D position, Size2D size)
     {
-        writeln("setting ", this, " position to ", position.x, ",", position.y);
+        debug writeln("setting ", this, " position to ", position.x, ",", position.y);
         setPosition(position);
         setSize(size);
     }
@@ -257,19 +206,19 @@ class Widget : WidgetI
 
     bool handle_event_keyboard(EventKeyboard* e)
     {
-        writeln("handle_event_keyboard() called ", this);
+        debug writeln("handle_event_keyboard() called ", this);
         return false;
     }
 
     bool handle_event_mouse(EventMouse* e)
     {
-        writeln("handle_event_mouse() called ", this);
+        debug writeln("handle_event_mouse() called ", this);
         return false;
     }
 
     bool handle_event_textinput(EventTextInput* e)
     {
-        writeln("handle_event_textinput() called ", this);
+        debug writeln("handle_event_textinput() called ", this);
         return false;
     }
 

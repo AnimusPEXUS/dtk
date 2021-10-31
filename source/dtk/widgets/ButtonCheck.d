@@ -23,7 +23,7 @@ class ButtonCheck : Button
 
     override bool on_mouse_click_internal(EventMouse* event)
     {
-        writeln("ButtonCheck click");
+        debug writeln("ButtonCheck click");
         setChecked(!getChecked());
         redraw();
         return false;
@@ -37,14 +37,14 @@ class ButtonCheck : Button
             f.focusTo(this);
         }
 
-        writeln("ButtonCheck down");
+        debug writeln("ButtonCheck down");
         redraw();
         return false;
     }
 
     override bool on_mouse_up_internal(EventMouse* event)
     {
-        writeln("ButtonCheck up");
+        debug writeln("ButtonCheck up");
         return false;
     }
 

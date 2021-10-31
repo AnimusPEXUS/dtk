@@ -108,7 +108,7 @@ class Window : WindowI
             auto r = SDL_GetRenderer(_sdl_window);
             SDL_RendererInfo ri;
             SDL_GetRendererInfo(r, &ri);
-            writeln(ri.name);
+            debug writeln(ri.name);
         }
 
         _sdl_window_id = SDL_GetWindowID(_sdl_window);
@@ -158,7 +158,7 @@ class Window : WindowI
 
     void handle_SDL_Event(SDL_Event* event)
     {
-        writeln("Window::handle_SDL_Event");
+        debug writeln("Window::handle_SDL_Event");
 
         switch (event.type)
         {
@@ -188,7 +188,7 @@ class Window : WindowI
     // ? status: started. fast checked ok.
     void handle_SDL_WindowEvent(SDL_WindowEvent* event)
     {
-        writeln("Window::handle_SDL_WindowEvent");
+        debug writeln("Window::handle_SDL_WindowEvent");
         // TODO: ensure event consistency
         auto res = convertSDLWindowEventToDtkEventWindow(event);
         handle_event_window(res);
@@ -197,12 +197,12 @@ class Window : WindowI
     // ? status: started. fast checked ok.
     void handle_SDL_KeyboardEvent(SDL_KeyboardEvent* event)
     {
-        writeln("Window::handle_SDL_KeyboardEvent");
+        debug writeln("Window::handle_SDL_KeyboardEvent");
         // TODO: ensure event consistency
         auto res = convertSDLKeyboardEventToDtkEventKeyboard(event);
         if (res[1]!is null)
         {
-            writeln("couldn't convert SDL keyboard event to Dtk keyboard event: " ~ res[1].msg);
+            debug writeln("couldn't convert SDL keyboard event to Dtk keyboard event: " ~ res[1].msg);
             return;
         }
         handle_event_keyboard(res[0]);
@@ -211,7 +211,7 @@ class Window : WindowI
     // ? status: started.  fast checked ok.
     void handle_SDL_MouseMotionEvent(SDL_MouseMotionEvent* event)
     {
-        writeln("Window::handle_SDL_MouseMotionEvent");
+        debug writeln("Window::handle_SDL_MouseMotionEvent");
         // TODO: ensure event consistency
         auto res = convertSDLMouseMotionEventToDtkEventMouse(event);
         handle_event_mouse(res);
@@ -220,7 +220,7 @@ class Window : WindowI
     // ? status: started. fast checked ok.
     void handle_SDL_MouseButtonEvent(SDL_MouseButtonEvent* event)
     {
-        writeln("Window::handle_SDL_MouseButtonEvent");
+        debug writeln("Window::handle_SDL_MouseButtonEvent");
         // TODO: ensure event consistency
         auto res = convertSDLMouseButtonEventToDtkEventMouse(event);
         handle_event_mouse(res);
@@ -229,7 +229,7 @@ class Window : WindowI
     // ? status: needs completion
     void handle_SDL_MouseWheelEvent(SDL_MouseWheelEvent* event)
     {
-        writeln("Window::handle_SDL_MouseWheelEvent");
+        debug writeln("Window::handle_SDL_MouseWheelEvent");
         // TODO: ensure event consistency
         auto res = convertSDLMouseWheelEventToDtkEventMouse(event);
         handle_event_mouse(res);
@@ -238,7 +238,7 @@ class Window : WindowI
     // ? status: fast checked ok.
     void handle_SDL_TextInputEvent(SDL_TextInputEvent* event)
     {
-        writeln("Window::handle_SDL_TextInputEvent");
+        debug writeln("Window::handle_SDL_TextInputEvent");
         // TODO: ensure event consistency
         auto res = convertSDLTextInputEventToDtkEventMouse(event);
         handle_event_textinput(res);
@@ -246,7 +246,7 @@ class Window : WindowI
 
     bool handle_event_window(EventWindow* e)
     {
-        writeln("Window::handle_event_window ", e.eventId);
+        debug writeln("Window::handle_event_window ", e.eventId);
         auto emgr = getEventManager();
         if (!emgr)
             return false;
@@ -255,7 +255,7 @@ class Window : WindowI
 
     bool handle_event_keyboard(EventKeyboard* e)
     {
-        writeln("Window::handle_event_keyboard");
+        debug writeln("Window::handle_event_keyboard");
         auto emgr = getEventManager();
         if (!emgr)
             return false;
@@ -264,7 +264,7 @@ class Window : WindowI
 
     bool handle_event_mouse(EventMouse* e)
     {
-        writeln("Window::handle_event_mouse");
+        debug writeln("Window::handle_event_mouse");
         auto emgr = getEventManager();
         if (!emgr)
             return false;
@@ -273,7 +273,7 @@ class Window : WindowI
 
     bool handle_event_textinput(EventTextInput* e)
     {
-        writeln("Window::handle_event_textinput");
+        debug writeln("Window::handle_event_textinput");
         auto emgr = getEventManager();
         if (!emgr)
             return false;
@@ -290,7 +290,7 @@ class Window : WindowI
 
     void printParams()
     {
-        writeln(_title, " : ", this._point.x, " ", this._point.y, " ",
+        debug writeln(_title, " : ", this._point.x, " ", this._point.y, " ",
                 this._size.width, " ", this._size.height);
     }
 

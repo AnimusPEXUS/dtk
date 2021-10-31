@@ -12,7 +12,7 @@ PlatformI instantiatePlatform()
 
         auto ret = new SDLDesktopPlatform();
 
-        writeln("SDLDesktopPlatform instantiated");
+        debug writeln("SDLDesktopPlatform instantiated");
 
         return ret;
     }

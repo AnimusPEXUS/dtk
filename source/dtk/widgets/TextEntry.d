@@ -26,51 +26,27 @@ class TextEntry : Widget, ContainerableWidgetI
 
     TextView text_view;
 
-    private
-    {
-        mixin Property_gs!(dstring, "text");
-        mixin Property_gs_w_d!(string, "font_file", ""); // TODO: use fontconfig instead of this
-        mixin Property_gs_w_d!(string, "font_face", "Go Regular");
-        mixin Property_gs_w_d!(ushort, "font_size", 9);
-        mixin Property_gs_w_d!(bool, "font_italic", false);
-        mixin Property_gs_w_d!(bool, "font_bold", false);
-        mixin Property_gs_w_d!(
-            GenImageFromSubimagesLayout,
-            "layout_lines",
-            GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft
-            );
-        mixin Property_gs_w_d!(
-            GenImageFromSubimagesLayout,
-            "layout_line_chars",
-            GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop
-            );
-        mixin Property_gs_w_d!(bool, "draw_bewel_and_background", false);
-        mixin Property_gs_w_d!(Color, "bewel_background_color", Color(cast(ubyte[3])[255,255,255]));
-        mixin Property_gs_w_d!(bool, "multiline", false);
-        mixin Property_gs_w_d!(bool, "virtual_wrap_by_char", false);
-        mixin Property_gs_w_d!(bool, "virtual_wrap_by_word", false);
-        mixin Property_gs_w_d!(bool, "enforce_mono_width", false);
-        mixin Property_gs_w_d!(bool, "text_selectable", false);
-        mixin Property_gs_w_d!(bool, "text_editable", false);
-    }
-
-    mixin Property_forwarding!(dstring, text, "Text");
-    mixin Property_forwarding!(string, font_file, "FontFile");
-    mixin Property_forwarding!(string, font_face, "FontFace");
-    mixin Property_forwarding!(ushort, font_size, "FontSize");
-    mixin Property_forwarding!(bool, font_italic, "FontItalic");
-    mixin Property_forwarding!(bool, font_bold, "FontBold");
-    mixin Property_forwarding!(GenImageFromSubimagesLayout, layout_lines, "LayoutLines");
-    mixin Property_forwarding!(GenImageFromSubimagesLayout, layout_line_chars, "LayoutChars");
-
-    mixin Property_forwarding!(bool, draw_bewel_and_background, "DrawBewelAndBackground");
-    mixin Property_forwarding!(Color, bewel_background_color, "BewelBackgroundColor");
-    mixin Property_forwarding!(bool, multiline, "Multiline");
-    mixin Property_forwarding!(bool, virtual_wrap_by_char, "VirtualWrapByChar");
-    mixin Property_forwarding!(bool, virtual_wrap_by_word, "VirtualWrapByWord");
-    mixin Property_forwarding!(bool, enforce_mono_width, "EnforceMonowidth");
-    mixin Property_forwarding!(bool, text_selectable, "TextSelectable");
-    mixin Property_forwarding!(bool, text_editable, "TextEditable");
+    mixin mixin_widget_set_multiple_properties!(
+        cast(PropSetting[])[
+            PropSetting("gs", "dstring", "text", "Text"),
+            // TODO: use fontconfig instead of this
+            PropSetting("gs_w_d", "string", "font_file", "FontFile", "\"\""),
+            PropSetting("gs_w_d", "string", "font_face", "FontFace", "\"Go Regular\""),
+            PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
+            PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
+            PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
+            PropSetting("gs_w_d", "GenImageFromSubimagesLayout", "layout_lines", "LayoutLines", "GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft"),
+            PropSetting("gs_w_d", "GenImageFromSubimagesLayout", "layout_line_chars", "LayoutChars", "GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop"),
+            PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "false"),
+            PropSetting("gs_w_d", "Color", "bewel_background_color", "BewelBackgroundColor", q{Color(cast(ubyte[3])[255,255,255])}),
+            PropSetting("gs_w_d", "bool", "multiline", "Multiline", "false"),
+            PropSetting("gs_w_d", "bool", "virtual_wrap_by_char", "VirtualWrapByChar", "false"),
+            PropSetting("gs_w_d", "bool", "virtual_wrap_by_word", "VirtualWrapByWord", "false"),
+            PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
+            PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
+            PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
+        ]
+        );
 
     this()
     {
@@ -96,7 +72,7 @@ class TextEntry : Widget, ContainerableWidgetI
                 stname("Multiline", "bool"),
                 stname("VirtualWrapByChar", "bool"),
                 stname("VirtualWrapByWord", "bool"),
-                stname("EnforceMonowidth", "bool"),
+                stname("ForceMonowidth", "bool"),
                 stname("TextSelectable", "bool"),
                 stname("TextEditable", "bool"),
                 ]
@@ -176,7 +152,7 @@ class TextEntry : Widget, ContainerableWidgetI
             auto x = getText();
             text_view.setText(x);
             auto y = text_view.getTextString();
-            writefln("
+            debug writefln("
 afterTextChanged
     x: %s
     y: %s
@@ -188,7 +164,7 @@ afterTextChanged
 
     void rerenderTextImage()
     {
-        writeln("Label rerenderTextImage triggered");
+        debug writeln("Label rerenderTextImage triggered");
 
         /* auto settings = renderTextSettings(); */
         if (text_view.font_mgr is null)

@@ -149,11 +149,11 @@ class Layout : Widget, ContainerableWidgetI
 
         foreach (size_t i, v; children)
         {
-            writeln(i, " - Layout child redraw()");
+            debug writeln(i, " - Layout child redraw()");
             auto p = v.getPosition();
             auto s = v.getSize();
-            writeln(i, " child position is ", p.x, ",", p.y);
-            writeln(i, " child size is     ", s.width, ",", s.height);
+            debug writeln(i, " child position is ", p.x, ",", p.y);
+            debug writeln(i, " child size is     ", s.width, ",", s.height);
             v.redraw();
         }
     }

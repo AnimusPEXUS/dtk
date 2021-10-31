@@ -32,7 +32,7 @@ class Button : Widget, ContainerableWidgetI
 
     override bool on_mouse_click_internal(EventMouse* event)
     {
-        writeln("button click");
+        debug writeln("button click");
         return false;
     }
 
@@ -44,7 +44,7 @@ class Button : Widget, ContainerableWidgetI
         {
             f.focusTo(this);
         }
-        writeln("button down");
+        debug writeln("button down");
         redraw();
         return false;
     }
@@ -52,7 +52,7 @@ class Button : Widget, ContainerableWidgetI
     override bool on_mouse_up_internal(EventMouse* event)
     {
         button_is_down = false;
-        writeln("button up");
+        debug writeln("button up");
         redraw();
         return false;
     }
