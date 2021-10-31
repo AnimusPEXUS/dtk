@@ -1,4 +1,4 @@
-module dtk.miscs.DrawingSurfaceShifted;
+module dtk.miscs.DrawingSurfaceShift;
 
 // TODO: dtk.miscs.DrawingSurfaceShifted and dtk.widgets.WidgetDrawingSurface
 //       have many similaritys and have to be merged somehow;
@@ -18,7 +18,7 @@ import dtk.types.fontinfo;
 import dtk.types.TextStyle;
 import dtk.types.Image;
 
-class DrawingSurfaceShifted : DrawingSurfaceI
+class DrawingSurfaceShift : DrawingSurfaceI
 {
     int x_shift;
     int y_shift;

@@ -18,9 +18,11 @@ import dtk.types.MoveT;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
+import dtk.miscs.DrawingSurfaceShift;
+
 /* import dtk.widgets.WidgetLocator; */
 import dtk.widgets;
-import dtk.widgets.WidgetDrawingSurface;
+/* import dtk.widgets.WidgetDrawingSurface; */
 
 class Widget : WidgetI
 {
@@ -71,7 +73,7 @@ class Widget : WidgetI
 
     private
     {
-        WidgetDrawingSurfaceShifted _ds;
+        /* WidgetDrawingSurfaceShifted _ds; */
     }
 
     // TODO: ensure all subclasses calls for super();
@@ -79,11 +81,11 @@ class Widget : WidgetI
     this()
     {
         debug writeln("Widget:init() is called for ", this);
-        _ds = new WidgetDrawingSurfaceShifted(this);
-        this.connectToParent_onAfterChanged(&onParentChanged);
+        /* _ds = new WidgetDrawingSurfaceShifted(this); */
+        /* this.connectToParent_onAfterChanged(&onParentChanged); */
     }
 
-    void onParentChanged(WidgetI old_v, WidgetI new_v) nothrow
+    /* void onParentChanged(WidgetI old_v, WidgetI new_v) nothrow
     {
         try
         {
@@ -92,7 +94,7 @@ class Widget : WidgetI
         catch (Exception e)
         {
         }
-    }
+    } */
 
     /++ return FormI on which this Widget is placed. returns null in case if
     there is no attached form or if this widget is deeper than 200 levels to
@@ -128,10 +130,9 @@ class Widget : WidgetI
 
     DrawingSurfaceI getDrawingSurface()
     {
-        return _ds;
+        auto p = getPosition();
+        return new DrawingSurfaceShift(getForm().getDrawingSurface(), p.x, p.y);
     }
-
-
 
     void redraw()
     {

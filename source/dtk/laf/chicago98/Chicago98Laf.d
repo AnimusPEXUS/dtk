@@ -290,6 +290,8 @@ class Chicago98Laf : LafI
     {
         debug writeln("drawTextEntry called");
 
+
+
         if (widget.textImage !is null)
         {
             auto pos = Position2D(0, 0);

@@ -3,7 +3,7 @@ module dtk.widgets;
 public import dtk.widgets.mixins;
 public import dtk.widgets.Widget;
 
-public import dtk.widgets.DrawingSurface;
+/* public import dtk.widgets.DrawingSurface; */
 
 public import dtk.widgets.Form;
 

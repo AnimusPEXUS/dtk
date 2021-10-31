@@ -88,62 +88,6 @@ class TextEntry : Widget, ContainerableWidgetI
         }
 
         connectToText_onAfterChanged(&afterTextChanged);
-
-        /* connectToFontFile_onAfterChanged(
-            delegate void(string, string)
-            {collectException(rerenderTextImage())}
-            );
-        connectToFontFace_onAfterChanged(
-            delegate void(string, string)
-            {collectException(rerenderTextImage())}
-            );
-        connectToFontSize_onAfterChanged(
-            delegate void(ushort, ushort)
-            {collectException(rerenderTextImage())}
-            );
-        connectToFontItalic_onAfterChanged(
-            delegate void(bool, bool)
-            {collectException(rerenderTextImage())}
-            );
-        connectToFontBold_onAfterChanged(
-            delegate void(bool, bool)
-            {collectException(rerenderTextImage())}
-            );
-
-
-
-        connectToLayoutLines_onAfterChanged(
-            delegate void(GenImageFromSubimagesLayout, GenImageFromSubimagesLayout)
-            {collectException(rerenderTextImage())}
-            );
-        connectToLayoutChars_onAfterChanged(
-            delegate void(GenImageFromSubimagesLayout, GenImageFromSubimagesLayout)
-            {collectException(rerenderTextImage())}
-            );
-        connectToDrawBewelAndBackground_onAfterChanged(
-            delegate void(bool, bool)
-            {collectException(rerenderTextImage())}
-            );
-        connectToBewelBackgroundColor_onAfterChanged(
-            delegate void(Color, Color)
-            {collectException(rerenderTextImage())}
-            );
-        connectToMultiline_onAfterChanged(
-            delegate void(bool, bool)
-            {collectException(rerenderTextImage())}
-            );
-        connectToFontBold_onAfterChanged(
-            delegate void(bool, bool)
-            {collectException(rerenderTextImage())}
-            );
-
-
-
-
-        connectToSize_onAfterChanged(
-            delegate void(Size2D, Size2D)
-            {collectException(rerenderTextImage())}
-            ); */
     }
 
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow

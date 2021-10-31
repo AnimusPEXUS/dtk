@@ -19,7 +19,7 @@ import dtk.types.Image;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FaceI;
 
-import dtk.miscs.DrawingSurfaceShifted;
+/* import dtk.miscs.DrawingSurfaceShift; */
 
 import dtk.platforms.sdl_desktop.Window;
 

@@ -17,7 +17,7 @@ import dtk.miscs.TextProcessor;
 import dtk.laf.chicago98.Chicago98Laf;
 
 import dtk.widgets;
-import dtk.widgets.DrawingSurface;
+/* import dtk.widgets.DrawingSurface; */
 
 void main()
 {
