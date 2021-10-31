@@ -92,17 +92,32 @@ class DrawingSurface : DrawingSurfaceI
         }
     }
 
-    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
-            LineStyle bottom_style, LineStyle right_style, Nullable!FillStyle fill_style)
+    void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle top_style,
+        LineStyle left_style,
+        LineStyle bottom_style,
+        LineStyle right_style,
+        Nullable!FillStyle fill_style
+        )
     {
         auto rndr = SDL_GetRenderer(w._sdl_window);
         assert(rndr !is null);
 
-        if (top_style == left_style && top_style == bottom_style
-                && top_style == right_style && top_style.style == null)
+        if (top_style == left_style
+            && top_style == bottom_style
+            && top_style == right_style
+            && top_style.style == null
+            )
         {
-            SDL_SetRenderDrawColor(rndr, top_style.color.r, top_style.color.g,
-                    top_style.color.b, top_style.color.a);
+            SDL_SetRenderDrawColor(
+                rndr,
+                top_style.color.r,
+                top_style.color.g,
+                top_style.color.b,
+                top_style.color.a
+                );
             auto r = new SDL_Rect(pos.x, pos.y, size.width, size.height);
             SDL_RenderDrawRect(rndr, r);
         }
@@ -126,7 +141,6 @@ class DrawingSurface : DrawingSurfaceI
             drawLine(Position2D(p1_x, p1_y), Position2D(p4_x, p4_y), left_style);
             drawLine(Position2D(p4_x, p4_y), Position2D(p3_x, p3_y), bottom_style);
             drawLine(Position2D(p2_x, p2_y), Position2D(p3_x, p3_y), right_style);
-
         }
 
         if (!fill_style.isNull())
@@ -137,23 +151,7 @@ class DrawingSurface : DrawingSurfaceI
             SDL_RenderFillRect(rndr, r);
         }
 
-        /* auto surf = SDL_GetWindowSurface(w._sdl_window);
-        assert(surf !is null);
-        auto r = SDL_Rect(pos.x, pos.y, size.width, size.height);
-        debug writeln("drawing rect ", r);
-        SDL_FillRect( surf, &r, SDL_MapRGB( surf.format, 0xdd, 0xdd, 0xdd ) );
-        SDL_UpdateWindowSurface(w._sdl_window); */
     }
-
-    /* void drawText(string text, Position2D pos, FontI font,
-            FontStyle font_style) // , TextStyle text_style
-    {
-        if (text.length > 0)
-        {
-            auto nds = new DrawingSurfaceShifted(this, pos.x, pos.y);
-            font.drawChar(text[0], nds);
-        }
-    } */
 
     // TODO: performance check required. probably functions which use it, have
     //       to use catching

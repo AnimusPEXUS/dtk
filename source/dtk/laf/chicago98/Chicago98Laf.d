@@ -290,12 +290,33 @@ class Chicago98Laf : LafI
     {
         debug writeln("drawTextEntry called");
 
+        auto ds = widget.getDrawingSurface();
+        auto pos = Position2D(0, 0);
+        auto size = widget.getSize();
+        auto draw_bewel = widget.getDrawBewelAndBackground();
+        auto bewel_bg_color = widget.getBewelBackgroundColor();
 
+        if (draw_bewel)
+        {
+            drawBewel(ds, pos, size, true);
+            pos.x += 2;
+            pos.y += 2;
+            size.width -= 4;
+            size.height -= 4;
+            ds.drawRectangle(
+                pos,
+                size,
+                LineStyle(Color(0)),
+                nullable(FillStyle(bewel_bg_color))
+                );
+        }
 
         if (widget.textImage !is null)
         {
-            auto pos = Position2D(0, 0);
-            auto ds = widget.getDrawingSurface();
+            /* if (widget.getDrawBewelAndBackground())
+            {
+                ds = new DrawingSurfaceShifted(ds, pos.x+2, pos.y+2);
+            } */
 
             auto image = widget.textImage;
 
@@ -304,15 +325,19 @@ class Chicago98Laf : LafI
                 for (uint x = 0; x != image.width; x++)
                 {
                     Color new_color = formBackground;
+                    if (draw_bewel)
+                    {
+                        new_color = bewel_bg_color;
+                    }
                     auto dot = image.getDot(x, y);
 
                     if (dot.enabled)
                     {
                         // TODO: take background color from already existing dot
                         auto part = dot.intensivity;
-                        new_color.r = chanBlend(formBackground.r, elementDarkedColor.r, part);
-                        new_color.g = chanBlend(formBackground.g, elementDarkedColor.g, part);
-                        new_color.b = chanBlend(formBackground.b, elementDarkedColor.b, part);
+                        new_color.r = chanBlend(new_color.r, elementDarkedColor.r, part);
+                        new_color.g = chanBlend(new_color.g, elementDarkedColor.g, part);
+                        new_color.b = chanBlend(new_color.b, elementDarkedColor.b, part);
                     }
 
                     {

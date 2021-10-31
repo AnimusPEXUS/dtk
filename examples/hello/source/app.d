@@ -68,6 +68,7 @@ void main()
         );
     lbl2.setFontFile("/usr/share/fonts/google-droid-sans-fonts/DroidSans.ttf");
     lbl2.setVirtualWrapByWord(true);
+    lbl2.setDrawBewelAndBackground(true);
 
     /* lbl2.setLayoutLines(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop);
     lbl2.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); */

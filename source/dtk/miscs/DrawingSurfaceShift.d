@@ -64,8 +64,14 @@ class DrawingSurfaceShift : DrawingSurfaceI
         ds.drawLine(npos, npos2, style);
     }
 
-    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
-            LineStyle bottom_style, LineStyle right_style, Nullable!FillStyle fill_style)
+    void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle top_style,
+        LineStyle left_style,
+        LineStyle bottom_style,
+        LineStyle right_style,
+        Nullable!FillStyle fill_style)
     {
         Position2D npos;
         npos.x = pos.x + x_shift;

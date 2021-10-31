@@ -22,17 +22,33 @@ interface DrawingSurfaceI
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style);
 
-    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
-            LineStyle bottom_style, LineStyle right_style, Nullable!FillStyle fill_style);
+    void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle top_style,
+        LineStyle left_style,
+        LineStyle bottom_style,
+        LineStyle right_style,
+        Nullable!FillStyle fill_style
+        );
 
-    final void drawRectangle(Position2D pos, Size2D size, LineStyle all_style,
-            Nullable!FillStyle fill_style)
+    final void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle all_style,
+        Nullable!FillStyle fill_style
+        )
     {
         drawRectangle(pos, size, all_style, all_style, all_style, all_style, fill_style);
     }
 
-    final void drawRectangle(Position2D pos, Size2D size, LineStyle top_left,
-            LineStyle bottom_right, Nullable!FillStyle fill_style)
+    final void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle top_left,
+        LineStyle bottom_right,
+        Nullable!FillStyle fill_style
+        )
     {
         drawRectangle(pos, size, top_left, top_left, bottom_right, bottom_right, fill_style);
     }

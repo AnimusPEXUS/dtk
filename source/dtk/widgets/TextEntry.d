@@ -32,6 +32,7 @@ class TextEntry : Widget, ContainerableWidgetI
             // TODO: use fontconfig instead of this
             PropSetting("gs_w_d", "string", "font_file", "FontFile", "\"\""),
             PropSetting("gs_w_d", "string", "font_face", "FontFace", "\"Go Regular\""),
+            PropSetting("gs_w_d", "Color", "font_color", "FontColor", q{Color(0)}),
             PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
             PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
             PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
@@ -62,6 +63,7 @@ class TextEntry : Widget, ContainerableWidgetI
             [
                 stname("FontFile", "string"),
                 stname("FontFace", "string"),
+                stname("FontColor", "Color"),
                 stname("FontSize", "ushort"),
                 stname("FontItalic", "bool"),
                 stname("FontBold", "bool"),
@@ -152,6 +154,12 @@ afterTextChanged
         auto size = getSize();
         text_view.width = size.width;
         text_view.height = size.height;
+
+        if (getDrawBewelAndBackground())
+        {
+            text_view.width -= 4;
+            text_view.height -= 4;
+        }
 
         text_view.reprocess();
         text_view.printInfo();
