@@ -616,10 +616,7 @@ class TextChar
         return ret;
 
     }
-    /* private bool isSelected()
-    {
-        return false;
-    } */
+
 }
 
 class TextLineSublineViewState
@@ -695,6 +692,9 @@ class TextLineSubline
         ulong this_subline_index,
         ulong this_line_done_chars_count,
 
+        ulong sublines_target_x,
+        ulong sublines_target_y,
+
         ulong x,
         ulong y,
         ulong width,
@@ -750,10 +750,12 @@ class TextLineSubline
                 evme.line=this_line_index;
                 evme.line_char=this_line_done_chars_count + subitem_index;
 
-                evme.left=target_x+x;
-                evme.right=evme.left+width;
-                evme.top = target_y+y;
-                evme.bottom=evme.top+height;
+                evme.target_x=sublines_target_x + target_x;
+                evme.target_y=sublines_target_y+target_y;
+                evme.x=x;
+                evme.y=y;
+                evme.width=width;
+                evme.height=height;
 
                 visibility_map.elements ~= evme;
             }
@@ -1054,6 +1056,9 @@ class TextLine
         // this is passed deeper to TextChar and stored to visibility_map items
         ulong this_line_index,
 
+        ulong lines_target_x,
+        ulong lines_target_y,
+
         ulong x,
         ulong y,
         ulong width,
@@ -1097,14 +1102,17 @@ class TextLine
                 )
             {
                 ulong sum=0;
+                /* ulong width_or_height_offset=0; */
                 foreach (v;state.sublines[0 .. subitem_index])
                 {
                     sum += v.getState(text_view).textchars.length;
                 }
-                return state.sublines[subitem_index].genVisibilityMap(
+
+                state.sublines[subitem_index].genVisibilityMap(
                     this_line_index,
                     subitem_index,
                     sum,
+                    lines_target_x+target_x, lines_target_y+target_y,
                     x, y,
                     width, height,
                     text_view,
@@ -1434,6 +1442,7 @@ class Text
             {
                 lines[subitem_index].genVisibilityMap(
                     subitem_index,
+                    target_x, target_y,
                     x, y,
                     width, height,
                     text_view,
@@ -1442,20 +1451,6 @@ class Text
             }
             );
 
-    }
-
-    Image genImage(
-        ulong x, ulong y,
-        ulong width, ulong height,
-        TextView text_view
-        )
-    {
-
-        auto ret = new Image(width, height);
-
-        // TODO: todo
-
-        return ret;
     }
 
     ulong getLength()
@@ -1469,7 +1464,7 @@ class Text
         return ret;
     }
 
-    void printInfo(TextView text_view)
+    /* void printInfo(TextView text_view)
     {
         auto t_st = getState(text_view);
         debug writeln("
@@ -1518,7 +1513,7 @@ Text:
         }
     }
 
-    }
+    } */
 }
 
 enum Mode
@@ -1632,7 +1627,24 @@ class TextView
         if (text is null)
             throw new Exception("text object is not set");
 
-        auto ret = text.genImage(x, y, width, height, this);
+        auto ret = new Image(width, height);
+
+        if (visibility_map !is null)
+        {
+            foreach (v; visibility_map.elements)
+            {
+                auto chr_state = v.chr.getState(this);
+
+                ret.putImage(
+                    v.target_x,
+                    v.target_y,
+                    chr_state.resImg.getImage(
+                        x, y,
+                        width, height
+                        )
+                    );
+            }
+        }
 
         return ret;
     }
@@ -1640,12 +1652,13 @@ class TextView
     void reprocess()
     {
         getText().reprocess(this);
+        genVisibilityMap();
     }
 
-    void printInfo()
+    /* void printInfo()
     {
         getText().printInfo(this);
-    }
+    } */
 
 }
 
@@ -1677,16 +1690,12 @@ class ElementVisibilityMapElement
     ulong line;
     ulong line_char;
 
-    ulong left;
-    ulong top;
-    ulong bottom;
-    ulong right;
-
-    /* bool shifted;
-    ulong left_shift;
-    ulong top_shift;
-    ulong bottom_shift;
-    ulong right_shift; */
+    ulong target_x;
+    ulong target_y;
+    ulong x;
+    ulong y;
+    ulong width;
+    ulong height;
 }
 
 class ElementVisibilityMap

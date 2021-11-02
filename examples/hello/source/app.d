@@ -55,6 +55,7 @@ void main()
     lbl1.setText(
         "1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑\n"
         ~"вторая строка\n"
+        /* ); */
         ~"третья строка\n");
     lbl1.setFontFile("/usr/share/fonts/go/Go-Regular.ttf");
     /* lbl1.setLayoutLines(GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop);

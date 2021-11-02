@@ -162,7 +162,7 @@ afterTextChanged
         }
 
         text_view.reprocess();
-        text_view.printInfo();
+        /* text_view.printInfo(); */
 
         textImage = text_view.genImage();
     }
