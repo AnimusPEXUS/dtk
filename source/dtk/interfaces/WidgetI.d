@@ -6,7 +6,7 @@ import dtk.interfaces.FormI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.event_receivers;
 
-import dtk.types.Event;
+// import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;

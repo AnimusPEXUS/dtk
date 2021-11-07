@@ -21,7 +21,7 @@ import dtk.platforms.sdl_desktop.utils;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.WindowCreationSettings;
-import dtk.types.Event;
+// import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
