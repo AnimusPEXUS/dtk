@@ -1,5 +1,7 @@
 module dtk.interfaces.FormI;
 
+import std.typecons;
+
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LafI;
@@ -24,7 +26,7 @@ interface FormI
 
     void redraw();
 
-    WidgetI getWidgetAtVisible(Position2D point);
+    Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point);
 
     WidgetI getDefaultWidget();
     typeof(this) setDefaultWidget(WidgetI);

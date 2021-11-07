@@ -4,13 +4,26 @@ import std.stdio;
 
 import dtk.widgets;
 
-mixin template mixin_getWidgetAtVisible()
+mixin template mixin_getWidgetAtPosition()
 {
+	import std.typecons;
+	import dtk.types.Position2D;
+	
     /// Note: x/y are local to widget the function is running at
-    override WidgetI getWidgetAtVisible(Position2D point)
+    override Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point)
     {
         auto x = point.x;
         auto y = point.y;
+        
+        ulong local_x;
+        ulong local_y;
+        {
+        	// auto pos = this.getPosition();
+        	local_x=x;
+        	local_y=y;
+        }
+        
+        // if this have only single child - work with it
         static if (__traits(hasMember, this, "getChild"))
         {
             debug writeln("getting child of ", this);
@@ -19,7 +32,7 @@ mixin template mixin_getWidgetAtVisible()
             if (isunset)
             {
                 debug writeln("child of ", this, " is not set");
-                return this;
+                return tuple(cast(WidgetI)this, local_x, local_y);
             }
 
             /* WidgetI c = __traits(getMember, this, "getChild")(); */
@@ -27,24 +40,25 @@ mixin template mixin_getWidgetAtVisible()
             if (c is null)
             {
                 debug writeln("child of ", this, " is null");
-                return this;
+                return tuple(cast(WidgetI)this, local_x, local_y);
             }
 
             debug writeln("child of ", this, " is ", c);
 
             if (c.isUnsetPosition() || c.isUnsetSize())
             {
-                return this;
+                return tuple(cast(WidgetI)this, local_x, local_y);
             }
 
             auto c_pos = c.getPosition();
             auto c_size = c.getSize();
 
-            if (x >= c_pos.x && x < (c_pos.x + c_size.width) && y >= c_pos.y
-                    && y < (c_pos.y + c_size.height))
+            if (
+            	x >= c_pos.x && x <= (c_pos.x + c_size.width) && y >= c_pos.y
+                    && y <= (c_pos.y + c_size.height))
             {
                 debug writeln("x/y is in ", c);
-                return c.getWidgetAtVisible(Position2D(x - c_pos.x, y - c_pos.y));
+                return c.getWidgetAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
             }
             else
             {
@@ -52,6 +66,7 @@ mixin template mixin_getWidgetAtVisible()
             }
         }
 
+        // if this have many children - search the right one and work with it
         static if (__traits(hasMember, this, "getChildren"))
         {
 
@@ -60,7 +75,7 @@ mixin template mixin_getWidgetAtVisible()
             if (children.length == 0)
             {
                 debug writeln("children of ", this, " is not set");
-                return this;
+                return tuple(cast(WidgetI)this, local_x, local_y);
             }
 
             // TODO: optimize for visible part
@@ -68,17 +83,17 @@ mixin template mixin_getWidgetAtVisible()
             {
                 if (c.isUnsetPosition() || c.isUnsetSize())
                 {
-                    return this;
+                    return tuple(cast(WidgetI)this, local_x, local_y);
                 }
 
                 auto c_pos = c.getPosition();
                 auto c_size = c.getSize();
 
-                if (x >= c_pos.x && x < (c_pos.x + c_size.width) && y >= c_pos.y
-                        && y < (c_pos.y + c_size.height))
+                if (x >= c_pos.x && x <= (c_pos.x + c_size.width) && y >= c_pos.y
+                        && y <= (c_pos.y + c_size.height))
                 {
                     debug writeln("x/y is in ", c);
-                    return c.getWidgetAtVisible(Position2D(x - c_pos.x, y - c_pos.y));
+                    return c.getWidgetAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
                 }
                 else
                 {
@@ -89,7 +104,7 @@ mixin template mixin_getWidgetAtVisible()
         }
 
         debug writeln("returning ", this, " as a child");
-        return this;
+        return tuple(cast(WidgetI)this, local_x, local_y);
     }
 }
 
@@ -128,7 +143,7 @@ mixin template mixin_widget_set_multiple_properties(PropSetting[] settings)
                 );
         }
 
-        static if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsn")
+        static if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
         {
             mixin(
                 q{

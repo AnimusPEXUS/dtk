@@ -167,6 +167,8 @@ afterTextChanged
         textImage = text_view.genImage();
     }
 
+    mixin mixin_getWidgetAtPosition;
+
     override void redraw()
     {
         if (textImage is null)

@@ -131,7 +131,7 @@ class Widget : WidgetI
     DrawingSurfaceI getDrawingSurface()
     {
         auto p = getPosition();
-        return new DrawingSurfaceShift(getForm().getDrawingSurface(), p.x, p.y);
+        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x, p.y);
     }
 
     void redraw()
@@ -223,10 +223,12 @@ class Widget : WidgetI
         return false;
     }
 
-    WidgetI getWidgetAtVisible(Position2D point)
+    Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point)
     {
-        return this;
+        return tuple(cast(WidgetI)this, 0UL, 0UL);
     }
+    
+    // mixin mixin_getWidgetAtPosition;
 
     WidgetI getNextFocusableWidget()
     {
@@ -237,67 +239,48 @@ class Widget : WidgetI
     {
         return null;
     }
-
-    // ==============    Events   ==============
-
-    bool on_mouse_event_internal(EventMouse* event)
+    
+    static foreach(v; ["Keyboard", "Mouse", "TextInput"])
     {
-        return false;
+    	import std.format;
+    	mixin(
+    		q{
+				private void delegate(
+					Event%1$s *e,
+    				ulong mouse_widget_local_x,
+    				ulong mouse_widget_local_y,
+					)[string] handlers%1$s;     			    			
+    			void set%1$sEvent(
+    				string name, 
+    				void delegate(
+    					Event%1$s *e,
+    					ulong mouse_widget_local_x,
+    					ulong mouse_widget_local_y,
+    					) handler
+    				)
+    			{
+    				handlers%1$s[name] = handler;
+    			}
+    			void call%1$sEvent(
+    				string name, 
+    				Event%1$s* e,
+    				ulong mouse_widget_local_x,
+    				ulong mouse_widget_local_y,
+    				)
+    			{
+    				if (name in handlers%1$s)
+    				{
+    					auto ev = handlers%1$s[name];
+    					ev(e,mouse_widget_local_x,mouse_widget_local_y);
+    				}
+    			}
+    			void unset%1$sEvent(string name)
+    			{
+    				handlers%1$s.remove(name);
+    			}
+    		}.format(v)
+    		);
     }
-
-    bool on_mouse_click_internal(EventMouse* event)
-    {
-        return false;
-    }
-
-    bool on_mouse_down_internal(EventMouse* event)
-    {
-        return false;
-    }
-
-    bool on_mouse_up_internal(EventMouse* event)
-    {
-        return false;
-    }
-
-    bool on_mouse_enter_internal(EventMouse* event)
-    {
-        return false;
-    }
-
-    bool on_mouse_leave_internal(EventMouse* event)
-    {
-        return false;
-    }
-
-    bool on_mouse_over_internal(EventMouse* event)
-    {
-        return false;
-    }
-
-    bool on_keyboard_click_internal(EventKeyboard* event)
-    {
-        return false;
-    }
-
-    bool on_keyboard_down_internal(EventKeyboard* event)
-    {
-        return false;
-    }
-
-    bool on_keyboard_up_internal(EventKeyboard* event)
-    {
-        return false;
-    }
-
-    bool on_keyboard_enter_internal(EventKeyboard* event)
-    {
-        return false;
-    }
-
-    bool on_keyboard_leave_internal(EventKeyboard* event)
-    {
-        return false;
-    }
+    
 
 }

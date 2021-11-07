@@ -1660,6 +1660,11 @@ class TextView
         getText().printInfo(this);
     } */
 
+    void click(ulong x, ulong y)
+    {
+        debug writeln("clicked ", x, " ", y);
+    }
+
 }
 
 mixin template getState(string state_container, alias state_type)

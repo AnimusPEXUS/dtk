@@ -28,15 +28,21 @@ class Button : Widget, ContainerableWidgetI
     this()
     {
         setFocusable(true);
+        
+        setMouseEvent("button-click", &on_mouse_click_internal);
+        setMouseEvent("button-down", &on_mouse_down_internal);
+        setMouseEvent("button-up", &on_mouse_up_internal);
     }
+    
+    mixin mixin_getWidgetAtPosition;
 
-    override bool on_mouse_click_internal(EventMouse* event)
+    void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
-        debug writeln("button click");
-        return false;
+        debug writeln("button click x:", mouseWidget_x, " y:", mouseWidget_y);
+        return ;
     }
 
-    override bool on_mouse_down_internal(EventMouse* event)
+    void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         button_is_down = true;
         auto f = getForm();
@@ -46,15 +52,15 @@ class Button : Widget, ContainerableWidgetI
         }
         debug writeln("button down");
         redraw();
-        return false;
+        return ;
     }
 
-    override bool on_mouse_up_internal(EventMouse* event)
+    void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         button_is_down = false;
         debug writeln("button up");
         redraw();
-        return false;
+        return ;
     }
 
     override void redraw()

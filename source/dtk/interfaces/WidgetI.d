@@ -6,6 +6,8 @@ import dtk.interfaces.FormI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.event_receivers;
 
+import dtk.types.Event;
+import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
@@ -38,29 +40,34 @@ interface WidgetI : EventReceiverWidgetI
     Size2D getSize();
     bool isUnsetSize();
 
-    WidgetI getWidgetAtVisible(Position2D point);
+    Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point);
 
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
 
-    // -------------- Events --------------
+    static foreach(v; ["Keyboard", "Mouse", "TextInput"])
+    {
+    	import std.format;
+    	mixin(
+    		q{
+    			void set%1$sEvent(
+    				string name, 
+    				void delegate(
+    					Event%1$s *e,
+    					ulong mouse_widget_local_x,
+    					ulong mouse_widget_local_y,
+    					) handler
+    				);
+    			void call%1$sEvent(
+    				string name, 
+    				Event%1$s* e,
+    				ulong mouse_widget_local_x,
+    				ulong mouse_widget_local_y,
+    				);
+    			void unset%1$sEvent(string name);
+    		}.format(v)
+    		);
+    }
 
-    bool on_mouse_event_internal(EventMouse* event);
-
-    bool on_mouse_click_internal(EventMouse* event);
-    bool on_mouse_down_internal(EventMouse* event);
-    bool on_mouse_up_internal(EventMouse* event);
-
-    bool on_mouse_enter_internal(EventMouse* event);
-    bool on_mouse_leave_internal(EventMouse* event);
-
-    bool on_mouse_over_internal(EventMouse* event);
-
-    bool on_keyboard_click_internal(EventKeyboard* event);
-    bool on_keyboard_down_internal(EventKeyboard* event);
-    bool on_keyboard_up_internal(EventKeyboard* event);
-
-    bool on_keyboard_enter_internal(EventKeyboard* event);
-    bool on_keyboard_leave_internal(EventKeyboard* event);
 
 }

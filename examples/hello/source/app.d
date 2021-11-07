@@ -43,6 +43,8 @@ void main()
 
     Layout lo = new Layout();
     form.setChild(lo);
+    
+    lo.setPosition(Position2D(10, 10)).setSize(Size2D(290, 290));
 
     auto btn = new Button();
     auto btn2 = new Button();

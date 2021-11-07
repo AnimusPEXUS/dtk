@@ -19,17 +19,21 @@ class ButtonCheck : Button
     this()
     {
         setFocusable(true);
+        
+        setMouseEvent("button-click", &on_mouse_click_internal);
+        setMouseEvent("button-down", &on_mouse_down_internal);
+        setMouseEvent("button-up", &on_mouse_up_internal);
     }
 
-    override bool on_mouse_click_internal(EventMouse* event)
+    override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         debug writeln("ButtonCheck click");
         setChecked(!getChecked());
         redraw();
-        return false;
+        return ;
     }
 
-    override bool on_mouse_down_internal(EventMouse* event)
+    override void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         auto f = getForm();
         if (f !is null)
@@ -39,13 +43,13 @@ class ButtonCheck : Button
 
         debug writeln("ButtonCheck down");
         redraw();
-        return false;
+        return ;
     }
 
-    override bool on_mouse_up_internal(EventMouse* event)
+    override void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         debug writeln("ButtonCheck up");
-        return false;
+        return ;
     }
 
     override void redraw()

@@ -158,5 +158,5 @@ class Layout : Widget, ContainerableWidgetI
         }
     }
 
-    mixin mixin_getWidgetAtVisible;
+    mixin mixin_getWidgetAtPosition;
 }

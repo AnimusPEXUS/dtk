@@ -27,23 +27,18 @@ import dtk.widgets.Widget;
 
 class Form : Widget, FormI
 {
-    private
-    {
-        mixin Property_gsun!(WindowI, "window");
-        mixin Property_gsun!(LafI, "theme");
-        mixin Property_gsun!(ContainerableWidgetI, "child");
-
-        mixin Property_gsun!(WidgetI, "focused_widget");
-        mixin Property_gsun!(WidgetI, "default_widget");
-    }
-
-    mixin Property_forwarding!(WindowI, window, "Window");
-    mixin Property_forwarding!(LafI, theme, "Laf");
-    mixin Property_forwarding!(ContainerableWidgetI, child, "Child");
-
-    mixin Property_forwarding!(WidgetI, focused_widget, "FocusedWidget");
-    mixin Property_forwarding!(WidgetI, default_widget, "DefaultWidget");
-
+    
+    mixin mixin_widget_set_multiple_properties!(
+        cast(PropSetting[])[
+        PropSetting("gsun", "WindowI", "window", "Window", ""),
+        PropSetting("gsun", "LafI", "laf", "Laf", ""),
+        PropSetting("gsun", "ContainerableWidgetI", "child", "Child", ""),
+        
+        PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
+        PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
+        ]
+        );
+    
     this()
     {
         connectToChild_onAfterChanged(&onChildChanged);
@@ -63,11 +58,11 @@ class Form : Widget, FormI
         }
         catch (Exception e)
         {
-
+        	
         }
-
+        
     }
-
+    
     override DrawingSurfaceI getDrawingSurface()
     {
         DrawingSurfaceI ret = null;
@@ -75,42 +70,42 @@ class Form : Widget, FormI
             ret = getWindow().getDrawingSurface();
         return ret;
     }
-
+    
     /* private nothrow void onwindowchanged()
     {
-        try {
-            debug writeln("onwindowchanged()");
-        } catch (Exception e) {
-            // TODO:
-        }
+    try {
+    debug writeln("onwindowchanged()");
+    } catch (Exception e) {
+    // TODO:
+    }
     } */
-
+    
     override typeof(this) setParent(WidgetI widget)
     {
         return null;
     }
-
+    
     override typeof(this) unsetParent()
     {
         return null;
     }
-
+    
     override WidgetI getParent()
     {
         return null;
     }
-
+    
     override Form getForm()
     {
         return this;
     }
-
+    
     override void positionAndSizeRequest(Position2D position, Size2D size)
     {
         super.positionAndSizeRequest(position, size);
         this.recalculateChildrenPositionsAndSizes();
     }
-
+    
     override void recalculateChildrenPositionsAndSizes()
     {
         auto position = getPosition();
@@ -119,27 +114,27 @@ class Form : Widget, FormI
         {
             auto c = getChild();
             c.positionAndSizeRequest(Position2D(position.x + 5, position.y + 5),
-                    Size2D(size.width - 10, size.height - 10));
+            	Size2D(size.width - 10, size.height - 10));
         }
     }
-
+    
     override void redraw()
     {
-
+    	
         this.redraw_x(this);
-
+        
         if (isSetChild())
         {
             debug writeln("getChild().redraw();");
             getChild().redraw();
         }
-
+        
         auto ds = getDrawingSurface();
         ds.present();
     }
-
-    mixin mixin_getWidgetAtVisible;
-
+    
+    mixin mixin_getWidgetAtPosition;
+    
     void focusTo(WidgetI widget)
     {
         debug writeln("Form:focusTo: ", widget);
@@ -150,44 +145,44 @@ class Form : Widget, FormI
             x.redraw();
         }
     }
-
+    
     private WidgetI focusXWidget(WidgetI delegate() getXFocusableWidget)
     {
         WidgetI cfw;
-
+        
         if (isSetFocusedWidget())
         {
             cfw = getFocusedWidget();
         }
-
+        
         auto w = getXFocusableWidget();
         setFocusedWidget(w);
         if (w is null)
         {
             unsetFocusedWidget();
         }
-
+        
         return (isSetFocusedWidget() ? getFocusedWidget() : null);
     }
-
+    
     WidgetI focusNextWidget()
     {
         return focusXWidget(&getNextFocusableWidget);
     }
-
+    
     WidgetI focusPrevWidget()
     {
         return focusXWidget(&getPrevFocusableWidget);
     }
-
+    
     override WidgetI getNextFocusableWidget()
     {
         return null;
     }
-
+    
     override WidgetI getPrevFocusableWidget()
     {
         return null;
     }
-
+    
 }
