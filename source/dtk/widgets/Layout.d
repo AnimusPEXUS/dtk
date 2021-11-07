@@ -147,6 +147,9 @@ class Layout : Widget, ContainerableWidgetI
 
         super.redraw();
 
+        this.redraw_x(this);
+        
+
         foreach (size_t i, v; children)
         {
             debug writeln(i, " - Layout child redraw()");
