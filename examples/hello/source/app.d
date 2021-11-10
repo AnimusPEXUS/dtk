@@ -59,7 +59,8 @@ void main()
         ~"вторая строка\n"
         /* ); */
         ~"третья строка\n");
-    lbl1.setFontFile("/usr/share/fonts/go/Go-Regular.ttf");
+    lbl1.setFontFamily("Go");
+    lbl1.setFontStyle("Regular");
     /* lbl1.setLayoutLines(GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop);
     lbl1.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); */
     lbl1.setFontSize(10);
@@ -69,7 +70,8 @@ void main()
         "ぁぃぅぇぁぃぅぇぁぃぅぇ\n"
         ~"ぁぃぅぇぁぃぅぇぁぃぅぇぁぃぅぇ\n"
         );
-    lbl2.setFontFile("/usr/share/fonts/google-droid-sans-fonts/DroidSans.ttf");
+    lbl2.setFontFamily("DroidSans");
+    lbl2.setFontStyle("Regular");
     lbl2.setVirtualWrapByWord(true);
     lbl2.setDrawBewelAndBackground(true);
 
@@ -80,7 +82,8 @@ void main()
     lbl3.setText(
         "אבגדהאבגדהאבגדהאבגד\nבגדהאבגדהאבגדהאבגדה\n"
         );
-    lbl3.setFontFile("/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf");
+    //lbl3.setFontFamily("DejaVuSans");
+    //lbl3.setFontStyle("Regular");
     /* lbl3.setLayoutLines(GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft);
     lbl3.setLayoutChars(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop); */
     lbl3.setFontSize(20);

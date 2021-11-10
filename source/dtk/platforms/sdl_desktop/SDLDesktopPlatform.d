@@ -3,6 +3,7 @@ module dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 import std.stdio;
 import std.algorithm;
 
+import fontconfig.fontconfig;
 import bindbc.sdl;
 
 import dtk.interfaces.LafI;
@@ -102,6 +103,7 @@ class SDLDesktopPlatform : PlatformI
             import dtk.platforms.sdl_desktop.FontMgrLinux;
 
             font_mgr = cast(FontMgrI) new FontMgrLinux;
+ 
         }
         else
         {

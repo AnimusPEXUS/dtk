@@ -6,8 +6,10 @@ import std.path;
 import std.file;
 import std.algorithm;
 import std.string;
+import std.typecons;
 
 import bindbc.freetype;
+import fontconfig.fontconfig;
 
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.FaceI;
@@ -24,6 +26,9 @@ class FontMgrLinux : FontMgrI
     FT_Library ft_library;
 
     FaceI[] face_cache;
+    
+    FcConfig* ftconfig;
+
 
     this()
     {
@@ -32,66 +37,28 @@ class FontMgrLinux : FontMgrI
         {
             throw new Exception("FreeType library init error");
         }
+                   
+        ftconfig = FcInitLoadConfigAndFonts();
+        if (ftconfig is null)
+        	throw new Exception("couldn't load fontconfig");
+
     }
 
     ~this()
     {
         /* FT_Done_Library(ft_library); */
         /* ft_library = null; */
+        FcConfigDestroy(ftconfig);
+    	ftconfig = null; // segfaults without this
+    	FcFini();
     }
 
-    string[] getFontPaths()
-    {
-        string[] ret;
-
-        auto entries = dirEntries("/usr/share/fonts", SpanMode.shallow);
-        foreach (e; entries)
-        {
-            if (e.isDir())
-            {
-                ret ~= "/usr/share/fonts" ~ "/" ~ baseName(e.name());
-            }
-        }
-
-        return ret;
-    }
-
-    string[] getFontFileList(string pth)
-    {
-        string[] ret;
-
-        auto entries = dirEntries(pth, SpanMode.shallow);
-        foreach (e; entries)
-        {
-            if (e.isFile())
-            {
-                if ((e.name()).toLower().endsWith(".ttf"))
-                {
-                    ret ~= pth ~ "/" ~ baseName(e.name());
-                }
-            }
-        }
-
-        return ret;
-    }
 
     FaceInfo*[] getFaceInfoList()
     {
         FaceInfo*[] ret;
 
-        auto paths = getFontPaths();
-        foreach (v; paths)
-        {
-            auto files = getFontFileList(v);
-            foreach (v2; files)
-            {
-                auto fi = new FaceInfo;
-                fi.on_fs = true;
-                fi.on_fs_filename = v2;
 
-                ret ~= fi;
-            }
-        }
         return ret;
     }
 
@@ -100,14 +67,74 @@ class FontMgrLinux : FontMgrI
         foreach (v; face_cache)
         {
             auto i = v.getFaceInfo();
-            if (i.on_fs == face_info.on_fs && i.on_fs_filename == face_info.on_fs_filename
-                    && i.face_index == face_info.face_index)
-                return v;
+            if (
+            	i.on_fs == face_info.on_fs && 
+	            i.on_fs_filename == face_info.on_fs_filename && 
+	            i.face_index == face_info.face_index
+	            ) {
+            debug writeln("not calling new Face");
+            return v;
+            }
         }
+        debug writeln("calling new Face");
         auto ret = new Face(this, face_info);
         face_cache ~= ret;
         return ret;
     }
+    
+    FaceI loadFace(string filename, ulong index)
+    {
+        auto x = new FaceInfo;
+        x.on_fs = true;
+        x.on_fs_filename = filename;
+        x.face_index = index;
+        return loadFace(x);
+    }
+    
+    FaceI loadFace(string faceFamily, string faceStyle)
+    {
+    	auto res = findFaceFileAndIndex(faceFamily, faceStyle);
+    	if (res[0] is false)
+    		return null;
+    	return loadFace(res[1], res[2]);
+    }
+    
+    Tuple!(bool, string, ulong) findFaceFileAndIndex(string faceFamily, string faceStyle)
+    {
+    	import fontconfig.fontconfig;
+    	
+    	auto failureResult = tuple(false, "", 0UL);
+
+		FcPattern* pat =  FcPatternCreate();
+		scope (exit) FcPatternDestroy(pat);
+		
+		FcPatternAddString(pat, FC_FAMILY.toStringz, faceFamily.toStringz);
+		FcPatternAddString(pat, FC_STYLE.toStringz, faceStyle.toStringz);
+		
+		FcConfigSubstitute(ftconfig, pat, FcMatchKind.FcMatchPattern);
+		FcDefaultSubstitute(pat);
+		
+		FcResult res;
+		FcPattern* font = FcFontMatch(ftconfig, pat, &res);
+		if (font is null)
+		{
+			return failureResult;
+		}
+		
+		scope(exit) FcPatternDestroy(font);
+		
+		FcChar8* file = null;
+		string file_d;
+		if (FcPatternGetString(font, FC_FILE.toStringz, 0, &file) == FcResult.FcResultMatch)
+		{
+			file_d = to!string(fromStringz(file));
+		}
+		
+		int index_d;
+		FcPatternGetInteger(font, FC_INDEX.toStringz, 0, &index_d);
+	
+		return tuple(true, file_d, cast(ulong)index_d);		
+	}    
 }
 
 class Face : FaceI
@@ -369,4 +396,6 @@ class Face : FaceI
 
         return ret;
     }
+    
+
 }

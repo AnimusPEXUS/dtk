@@ -10,11 +10,6 @@ interface FontMgrI
 {
     FaceInfo*[] getFaceInfoList();
     FaceI loadFace(FaceInfo* face_info);
-    final FaceI loadFace(string filename)
-    {
-        auto x = new FaceInfo;
-        x.on_fs = true;
-        x.on_fs_filename = filename;
-        return loadFace(x);
-    }
+    FaceI loadFace(string faceFamily, string faceStyle);
+    FaceI loadFace(string filename, ulong index);
 }

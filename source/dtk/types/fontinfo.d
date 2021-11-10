@@ -31,6 +31,7 @@ struct FaceInfo
 
     bool on_fs;
     string on_fs_filename;
+    // alias on_fs_index = face_index;
 
     ulong num_faces;
     ulong face_index;

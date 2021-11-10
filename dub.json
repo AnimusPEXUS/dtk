@@ -7,6 +7,7 @@
 			"dependencies": {
 				"bindbc-freetype": "~>1.0.2",
 				"bindbc-sdl": "~>1.0.0"
+				"fontconfig": "~>2.0.0",
 			},
 			"libs": [
 				"SDL2",

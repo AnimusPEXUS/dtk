@@ -30,8 +30,8 @@ class TextEntry : Widget, ContainerableWidgetI
         cast(PropSetting[])[
             PropSetting("gs", "dstring", "text", "Text"),
             // TODO: use fontconfig instead of this
-            PropSetting("gs_w_d", "string", "font_file", "FontFile", "\"\""),
-            PropSetting("gs_w_d", "string", "font_face", "FontFace", "\"Go Regular\""),
+            PropSetting("gs_w_d", "string", "font_family", "FontFamily", "\"Go\""),
+            PropSetting("gs_w_d", "string", "font_style", "FontStyle", "\"Regular\""),
             PropSetting("gs_w_d", "Color", "font_color", "FontColor", q{Color(0)}),
             PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
             PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
@@ -61,8 +61,8 @@ class TextEntry : Widget, ContainerableWidgetI
         static foreach(
             v;
             [
-                stname("FontFile", "string"),
-                stname("FontFace", "string"),
+                stname("FontFamily", "string"),
+                stname("FontStyle", "string"),
                 stname("FontColor", "Color"),
                 stname("FontSize", "ushort"),
                 stname("FontItalic", "bool"),
@@ -144,6 +144,8 @@ afterTextChanged
 
         auto tvt = text_view.getText();
 
+        tvt.faceFamily = getFontFamily();
+        tvt.faceStyle = getFontStyle();
         tvt.faceSize = getFontSize() * 64;
         tvt.faceResolution = 72;
         tvt.bold = getFontBold();

@@ -536,7 +536,10 @@ class TextChar
         debug writeln("rendering char: ", chr);
 
         auto font_mgr = text_view.font_mgr;
-        auto face = font_mgr.loadFace("/usr/share/fonts/google-droid-sans-fonts/DroidSans.ttf");
+        auto face = font_mgr.loadFace(
+        	parent_line.parent_text.faceFamily,
+        	parent_line.parent_text.faceStyle
+        	);
 
         {
             auto x = parent_line.parent_text.faceSize;
@@ -1201,6 +1204,7 @@ class Text
     GenImageFromSubimagesLayout chars_layout;
 
     string faceFamily;
+    string faceStyle;
     uint faceSize;
     uint faceResolution;
 
