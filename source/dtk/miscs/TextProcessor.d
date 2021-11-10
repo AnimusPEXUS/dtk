@@ -1539,6 +1539,8 @@ class TextView
     ulong selection_start;
     ulong selection_end;
 
+    bool show_cursor;
+    bool show_cursor_internal;
     ulong cursor_position_line;
     ulong cursor_position_column;
 

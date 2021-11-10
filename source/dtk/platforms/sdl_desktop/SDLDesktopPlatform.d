@@ -2,6 +2,7 @@ module dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 
 import std.stdio;
 import std.algorithm;
+import std.parallelism;
 
 import fontconfig.fontconfig;
 import bindbc.sdl;
@@ -33,6 +34,7 @@ class SDLDesktopPlatform : PlatformI
         Window[] windows;
         LafI laf;
         FontMgrI font_mgr;
+        bool stop_flag;
     }
 
     string getName()
@@ -140,9 +142,20 @@ class SDLDesktopPlatform : PlatformI
         return ret;
     }
 
+    void timer500Loop()
+    {
+    	while(!stop_flag)
+    	{
+    		
+    	}
+    }
+    
     void mainLoop()
     {
         SDL_Event* event = new SDL_Event;
+        
+        // auto timer500 = Task!timer500Loop;
+        // timer500.executeInNewThread();
 
         main_loop: while (true)
         {
@@ -205,6 +218,8 @@ class SDLDesktopPlatform : PlatformI
             // current state.
             w.handle_SDL_Event(event);
         }
+        
+        // timer500.yieldForce();
 
         return;
     }

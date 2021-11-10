@@ -22,7 +22,7 @@ interface PlatformI
     WindowI createWindow(WindowCreationSettings window_settings);
 
     bool getFormCanResizeWindow();
-
+    
     void init();
     void mainLoop();
     void destroy();
