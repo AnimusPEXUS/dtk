@@ -10,6 +10,7 @@ import dtk.types.Position2D;
 import dtk.types.Property;
 import dtk.types.Image;
 import dtk.types.Color;
+import dtk.types.EventMouse;
 
 import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
@@ -90,6 +91,24 @@ class TextEntry : Widget, ContainerableWidgetI
         }
 
         connectToText_onAfterChanged(&afterTextChanged);
+        
+        setMouseEvent("button-click", &on_mouse_click_internal);
+
+    }
+
+    void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    {
+        debug writeln("textentry click x:", mouseWidget_x, " y:", mouseWidget_y);
+
+        if (getDrawBewelAndBackground())
+        {
+            mouseWidget_x += 2;
+            mouseWidget_y += 2;
+        }
+
+        text_view.click(mouseWidget_x, mouseWidget_y);
+        
+        return ;
     }
 
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow

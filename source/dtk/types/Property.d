@@ -18,7 +18,7 @@ enum PropertyWhatToReturnIfValueIsUnset
 }
 
 /++
-    TODO: notes is putdated. need to update
+    TODO: notes is outdated. need to update
 
     NOTE: no 'null' state - use unset for this
 
@@ -113,7 +113,8 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         Signal!(T1, T1) onBeforeChanged;
         Signal!(T1, T1) onAfterChanged;
 
-        SignalConnectionContainer propery_cc;
+        // TODO: probably this have to be moved to signal consumers
+        SignalConnectionContainer property_cc;
     }
 
     @disable this(this);
@@ -317,46 +318,60 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
 {
     // ["get", "set", "reset", "unset", "isDefault", "isUnset"]
 
+    // TODO: refactor this
+    import std.format;
+    
     static if (__traits(hasMember, property, "get"))
     {
-        mixin("T get" ~ new_suffix ~ "() { return this." ~ __traits(identifier,
-                property) ~ ".get(); }");
+        mixin(
+        	q{
+        		T get%1$s()
+        		{
+        			return this.%2$s.get();
+        		}
+        	}.format(new_suffix, __traits(identifier, property))
+        	);
     }
 
-    static if (__traits(hasMember, property, "set"))
+    static foreach (func; ["set", "reset", "unset"])
     {
-        mixin("typeof(this) set" ~ new_suffix ~ "(T x) { this." ~ __traits(identifier,
-                property) ~ ".set(x); return this; }");
+    	static if (__traits(hasMember, property, func)) {
+    		static if (func == "set")
+    		{
+    			mixin(
+    				q{
+    					typeof(this) %1$s%2$s(T x) { 
+    						this.%3$s.%1$s(x);
+    						return this;
+    					}
+    				}.format(func, new_suffix, __traits(identifier, property))
+    				);
+    		} 
+    		else 
+    		{
+    			mixin(
+    				q{
+    					typeof(this) %1$s%2$s() { 
+    						this.%3$s.%1$s();
+    						return this;
+    					}
+    				}.format(func, new_suffix, __traits(identifier, property))
+    				);
+    		}
+    	}
     }
-
-    static if (__traits(hasMember, property, "reset"))
+    
+    static foreach (func; ["isDefault", "isUnset", "isSet"])
     {
-        mixin("typeof(this) reset" ~ new_suffix ~ "() { this." ~ __traits(identifier,
-                property) ~ ".reset();  return this;  }");
-    }
-
-    static if (__traits(hasMember, property, "unset"))
-    {
-        mixin("typeof(this)  unset" ~ new_suffix ~ "() { this." ~ __traits(identifier,
-                property) ~ ".unset();   return this; }");
-    }
-
-    static if (__traits(hasMember, property, "isDefault"))
-    {
-        mixin("bool isDefault" ~ new_suffix ~ "() { return this." ~ __traits(identifier,
-                property) ~ ".isDefault(); }");
-    }
-
-    static if (__traits(hasMember, property, "isUnset"))
-    {
-        mixin("bool isUnset" ~ new_suffix ~ "() { return this." ~ __traits(identifier,
-                property) ~ ".isUnset(); }");
-    }
-
-    static if (__traits(hasMember, property, "isSet"))
-    {
-        mixin("bool isSet" ~ new_suffix ~ "() { return this." ~ __traits(identifier,
-                property) ~ ".isSet(); }");
+    	static if (__traits(hasMember, property, func)) {
+    		mixin(
+    			q{
+    				bool %1$s%2$s() { 
+    					return this.%3$s.%1$s();
+    				}
+    			}.format(func, new_suffix, __traits(identifier, property))
+    			);
+    	}
     }
 
     // =========== signals ===========
@@ -365,10 +380,21 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
     {
         static if (__traits(hasMember, property, v))
         {
-            mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate() nothrow  cb) { "
-                    ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
-                        property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
-                        property) ~ ".propery_cc.add(conn);" ~ "}");
+            // mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate() nothrow  cb) { "
+            // ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
+            // property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
+            // property) ~ ".property_cc.add(conn);" ~ "}");
+            mixin(
+            	q{
+            		void connectTo%2$s_%1$s(void delegate() nothrow cb)
+            		{
+            			import observable.signal;
+            			SignalConnection conn;
+            			this.%3$s.%1$s.socket.connect(conn, cb);
+            			this.%3$s.property_cc.add(conn);
+            		}
+            	}.format(v,new_suffix, __traits(identifier, property))
+            	);
         }
 
     }
@@ -383,7 +409,7 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
             mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate(T old_value, T new_value) nothrow  cb) { "
                     ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
                         property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
-                        property) ~ ".propery_cc.add(conn);" ~ "}");
+                        property) ~ ".property_cc.add(conn);" ~ "}");
         }
 
     }
