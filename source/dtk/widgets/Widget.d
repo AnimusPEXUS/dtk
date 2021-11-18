@@ -4,6 +4,7 @@ import std.stdio;
 import std.conv;
 import std.typecons;
 
+import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 
@@ -99,12 +100,12 @@ class Widget : WidgetI
     /++ return FormI on which this Widget is placed. returns null in case if
     there is no attached form or if this widget is deeper than 200 levels to
     FormI instance (too deep); +/
-    Form getForm()
+    FormI getForm()
     {
         WidgetI w = this;
         Form ret;
 
-        for (byte failure_countdown = cast(byte) 200; failure_countdown != -1; failure_countdown--)
+        for (auto failure_countdown = cast(byte) 200; failure_countdown != -1; failure_countdown--)
         {
 
             ret = cast(Form) w;
@@ -156,11 +157,10 @@ class Widget : WidgetI
             const drawid = "draw" ~ id_t;
             debug writeln("Widget::draw() <------------------ drawid = ", drawid);
 
-            Form form = new_this.getForm();
+            FormI form = new_this.getForm();
             if (form is null)
             {
-                debug writeln("error: redraw() function couldn't get Form. this is: ", this);
-                return;
+                throw new Exception("error: redraw() function couldn't get Form");
             }
 
             auto theme = form.getLaf();

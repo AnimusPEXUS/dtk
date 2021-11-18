@@ -12,6 +12,7 @@ import dtk.types.Position2D;
 
 interface FormI
 {
+    WindowI getWindow();
     typeof(this) setWindow(WindowI window);
     typeof(this) unsetWindow();
 

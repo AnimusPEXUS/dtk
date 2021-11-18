@@ -10,6 +10,7 @@ mixin template installSignal(
 	)
 {
 	import std.format;
+	import observable.signal;
 	
 	private {
 		mixin(
@@ -20,5 +21,15 @@ mixin template installSignal(
 		
 	}
 	
+	mixin(
+		q{
+			SignalConnection connectTo_%1$s( void delegate(P) nothrow cb)
+			{
+				SignalConnection conn;
+				this.%2$s.socket.connect(conn, cb);
+				return conn;
+			}
+		}.format(name,var_name)
+		);
 	
 }

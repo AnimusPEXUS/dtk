@@ -5,6 +5,8 @@ import std.typecons;
 import std.exception;
 import std.format;
 
+import observable.signal;
+
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 import dtk.types.Property;
@@ -49,6 +51,11 @@ class TextEntry : Widget, ContainerableWidgetI
             PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
         ]
         );
+    
+    private {
+    	SignalConnectionContainer con_cont;
+    }
+    
 
     this()
     {
@@ -83,14 +90,14 @@ class TextEntry : Widget, ContainerableWidgetI
         {
             mixin(q{
                 pragma(msg, "connectTo%1$s_onAfterChanged");
-                connectTo%1$s_onAfterChanged(
+                con_cont.add(connectTo%1$s_onAfterChanged(
                      delegate void (%2$s v1, %2$s v2)
                     {collectException(rerenderTextImage());}
-                    );
+                    ));
                 }.format(v.sname, v.tname));
         }
 
-        connectToText_onAfterChanged(&afterTextChanged);
+        con_cont.add(connectToText_onAfterChanged(&afterTextChanged));
         
         setMouseEvent("button-click", &on_mouse_click_internal);
 
@@ -140,6 +147,7 @@ afterTextChanged
                 {
                     throw new Exception("can't get form");
                 }
+                // auto w = (cast(Form)f).getWindow();
                 auto w = f.getWindow();
                 if (w is null)
                 {

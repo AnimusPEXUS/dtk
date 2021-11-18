@@ -511,6 +511,8 @@ class Chicago98Laf : LafI
         			bool needs_resize = false;
         			bool needs_redraw = false;
         			
+        			debug writeln("action 1 called");
+        			
         			switch (e.eventId)
         			{
         			default:

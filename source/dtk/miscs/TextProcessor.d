@@ -1668,7 +1668,7 @@ class TextView
 
     void click(ulong x, ulong y)
     {
-        debug writeln("clicked ", x, " ", y);
+        debug writeln("processor clicked ", x, " ", y);
     }
 
 }

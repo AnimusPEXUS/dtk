@@ -39,9 +39,13 @@ class Form : Widget, FormI
         ]
         );
     
+    private {
+    	SignalConnectionContainer con_cont;
+    }
+    
     this()
     {
-        connectToChild_onAfterChanged(&onChildChanged);
+        con_cont.add(connectToChild_onAfterChanged(&onChildChanged));
     }
 
     void onChildChanged(ContainerableWidgetI old_v, ContainerableWidgetI new_v) nothrow

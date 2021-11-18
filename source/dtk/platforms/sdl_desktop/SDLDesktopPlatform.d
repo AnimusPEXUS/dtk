@@ -13,6 +13,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
 
 import dtk.types.WindowCreationSettings;
+import dtk.types.Signal;
 
 import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
@@ -31,11 +32,13 @@ class SDLDesktopPlatform : PlatformI
 	
     private
     {
-        bool exit;
         Window[] windows;
         LafI laf;
         FontMgrI font_mgr;
+
+        // bool exit;
         bool stop_flag;
+        // alias exit = stop_flag;
         
         SDL_EventType timer500_event_id;
     }
@@ -109,7 +112,7 @@ class SDLDesktopPlatform : PlatformI
         		throw new Exception("Couldn't register 500 ms timer event");
         	
         }
-        
+                
         version (linux)
         {
             pragma(msg, "using freetype font manager");
@@ -128,6 +131,8 @@ class SDLDesktopPlatform : PlatformI
     {
         SDL_Quit();
     }
+    
+    mixin installSignal!("Timer500", "signal_timer500");
     
     FontMgrI getFontManager()
     {
@@ -178,11 +183,15 @@ class SDLDesktopPlatform : PlatformI
         
         auto timer500 = task(&timer500Loop);
         timer500.executeInNewThread();
+        scope(exit) {
+        	writeln("mainLoop exiting..");
+        	stop_flag=true;
+        	timer500.workForce();
+        	writeln("mainLoop exited.");
+        }
         
-        main_loop: while (true)
+        main_loop: while (!stop_flag)
         {
-            if (exit)
-                break;
             
             auto res = SDL_WaitEvent(event);
             
@@ -194,9 +203,7 @@ class SDLDesktopPlatform : PlatformI
             
             // TODO: probably, at this point, things have to become asynchronous
             
-            debug writeln(event.type);
-            
-            typeof(SDL_WindowEvent.windowID) windowID;
+            debug writeln("mainLoop event type: " ,event.type);
             
             if (event.type == SDL_USEREVENT)
             {
@@ -204,14 +211,16 @@ class SDLDesktopPlatform : PlatformI
             		== timer500_event_id)
             	{
             		writeln("500ms event");
-            		foreach (w;windows)
-            		{
-            			w.handle_SDL_Event(event);
-            		}    
+            		// foreach (w;windows)
+            		// {
+            			// w.handle_SDL_Event(event);
+            		// }    
             	}
             } 
             else
             {
+            	typeof(SDL_WindowEvent.windowID) windowID;
+            
             	event_type_switch:
             	switch (event.type)
             	{
@@ -246,20 +255,23 @@ class SDLDesktopPlatform : PlatformI
             		break main_loop;
             	}
             	
+            	// writeln(1);
             	auto w = getWindowByWindowID(event.window.windowID);
+            	// writeln(2);
             	
             	// NOTE: window have to recieve all events, because not all
             	// platforms have same set of events, and so, Window may be required
             	// to emitate event emission in some curcumstances based on it's
             	// current state.
             	w.handle_SDL_Event(event); 	
+            	// writeln(3);
             }
         }
         
-        stop_flag=true;
-        
-        timer500.workForce();
-        
+        // TODO: try to place this to scope exit
+        // stop_flag=true;
+        // timer500.workForce();
+                
         return;
     }
     

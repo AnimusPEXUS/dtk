@@ -1,5 +1,7 @@
 module dtk.interfaces.PlatformI;
 
+import observable.signal;
+
 import dtk.interfaces.WindowI;
 import dtk.interfaces.LafI;
 import dtk.interfaces.FontMgrI;
@@ -26,4 +28,6 @@ interface PlatformI
     void init();
     void mainLoop();
     void destroy();
+    
+    SignalConnection connectTo_Timer500( void delegate() nothrow );
 }

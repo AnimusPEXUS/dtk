@@ -6,6 +6,8 @@ module dtk.types.Property;
 
 public import dtk.types.Property_mixins;
 
+import dtk.types.Signal;
+
 import observable.signal;
 
 /* import observable.signal.SignalConnection;  */
@@ -62,6 +64,8 @@ struct PropertySettings(T)
 
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
+	import observable.signal;
+	
     static if (settings.variable_define)
     {
         static if (settings.variable_private)
@@ -114,7 +118,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         Signal!(T1, T1) onAfterChanged;
 
         // TODO: probably this have to be moved to signal consumers
-        SignalConnectionContainer property_cc;
+        // SignalConnectionContainer property_cc;
     }
 
     @disable this(this);
@@ -320,6 +324,9 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
 
     // TODO: refactor this
     import std.format;
+
+   	import observable.signal;
+
     
     static if (__traits(hasMember, property, "get"))
     {
@@ -380,18 +387,16 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
     {
         static if (__traits(hasMember, property, v))
         {
-            // mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate() nothrow  cb) { "
-            // ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
-            // property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
-            // property) ~ ".property_cc.add(conn);" ~ "}");
+        	
             mixin(
             	q{
-            		void connectTo%2$s_%1$s(void delegate() nothrow cb)
+            		SignalConnection connectTo%2$s_%1$s(void delegate() nothrow cb)
             		{
             			import observable.signal;
             			SignalConnection conn;
             			this.%3$s.%1$s.socket.connect(conn, cb);
-            			this.%3$s.property_cc.add(conn);
+            			// this.%3$s.property_cc.add(conn);
+            			return conn;
             		}
             	}.format(v,new_suffix, __traits(identifier, property))
             	);
@@ -406,10 +411,23 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
     {
         static if (__traits(hasMember, property, v))
         {
-            mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate(T old_value, T new_value) nothrow  cb) { "
-                    ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
-                        property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
-                        property) ~ ".property_cc.add(conn);" ~ "}");
+        	 mixin(
+            	q{
+            		SignalConnection connectTo%2$s_%1$s(void delegate(T old_value, T new_value) nothrow cb)
+            		{
+            			import observable.signal;
+            			SignalConnection conn;
+            			this.%3$s.%1$s.socket.connect(conn, cb);
+            			// this.%3$s.property_cc.add(conn);
+            			return conn;
+            		}
+            	}.format(v,new_suffix, __traits(identifier, property))
+            	);
+        	
+             // mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate(T old_value, T new_value) nothrow  cb) { "
+             // ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
+             // property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
+             // property) ~ ".property_cc.add(conn);" ~ "}");
         }
 
     }

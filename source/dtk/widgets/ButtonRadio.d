@@ -1,6 +1,9 @@
 module dtk.widgets.ButtonRadio;
 
 import std.stdio;
+import std.exception;
+
+import observable.signal;
 
 import dtk.types.EventMouse;
 import dtk.types.Property;
@@ -11,6 +14,10 @@ import dtk.widgets;
 
 class ButtonRadio : Button
 {
+	private {
+    	SignalConnectionContainer con_cont;
+    }
+    
     private
     {
         mixin Property_gsun!(RadioGroup, "radio_group");
@@ -30,38 +37,31 @@ class ButtonRadio : Button
         setMouseEvent("button-down", &on_mouse_down_internal);
         setMouseEvent("button-up", &on_mouse_up_internal);
         
-        connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged);
-        connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged);
+        con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
+        con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
     }
 
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
-        try
-        {
+        
+        collectException({
             debug writeln("handleRadioGroup_onBeforeChanged: ", old_v, new_v);
             if (old_v !is null)
                 if (old_v.isIn(this))
                     old_v.remove(this);
-        }
-        catch (Exception e)
-        {
-
-        }
+        });
+        
     }
 
     private void handleRadioGroup_onAfterChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
-        try
-        {
+        
+        collectException({
             debug writeln("handleRadioGroup_onAfterChanged: ", old_v, new_v);
             if (new_v !is null)
                 if (!new_v.isIn(this))
                     new_v.add(this);
-        }
-        catch (Exception e)
-        {
-
-        }
+        });
     }
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
