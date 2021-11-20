@@ -182,11 +182,11 @@ class SDLDesktopPlatform : PlatformI
         SDL_Event* event = new SDL_Event;
         
         auto timer500 = task(&timer500Loop);
-        timer500.executeInNewThread();
+        //timer500.executeInNewThread();
         scope(exit) {
         	writeln("mainLoop exiting..");
         	stop_flag=true;
-        	timer500.workForce();
+        	//timer500.workForce();
         	writeln("mainLoop exited.");
         }
         

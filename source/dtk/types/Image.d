@@ -37,8 +37,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 
     this(ulong width, ulong height)
     {
-    	if (width > 10000)
-    		throw new Exception("image width suspitiously big");
+    	assert(width < 10000, "image width suspitiously big");
         this.width = width;
         this.height = height;
         this.data = new ImageDot[](width * height);
@@ -71,14 +70,14 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     ImageDot getDot(ulong x, ulong y)
     {
     	import std.format;
-    	debug writeln(
-    		q{
-width:  %d
-height: %d
-x:      %d
-y:      %d
-    		}.format(width, height, x, y)
-    		);
+    	// debug writeln(
+    	// q{
+    	// width:  %d
+    	// height: %d
+    	// x:      %d
+    	// y:      %d
+    	// }.format(width, height, x, y)
+    	// );
         return this.data[y * width + x];
     }
 

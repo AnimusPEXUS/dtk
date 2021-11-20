@@ -171,7 +171,7 @@ class TextEntry : Widget, ContainerableWidgetI
     					}
     					
     					ds.present();
-    				}
+    				}()
     				);
     			if (err !is null)
     				debug writeln(err);
@@ -220,7 +220,7 @@ class TextEntry : Widget, ContainerableWidgetI
     						==?: %s
     						", x, y, x == y);
     						applySettingsToTextProcessor();
-    			});
+    			}());
     					if (err !is null)
     						debug writeln(err);
     		}()
@@ -246,6 +246,7 @@ class TextEntry : Widget, ContainerableWidgetI
 
         auto size = getSize();
         text_view.width = size.width;
+        debug writeln("text_view.width = ", text_view.width);
         text_view.height = size.height;
 
         if (getDrawBewelAndBackground())

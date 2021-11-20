@@ -220,32 +220,32 @@ void genVisibilityMapForSubitems(
             break;
         }
 
-        for (ulong i = 0; i <= items_count; i++)
-        {
-            auto tx= calc_loop_target_x(i)     ;
-            auto ty=calc_loop_target_y(i)     ;
-            auto sx=calc_loop_source_x(i)     ;
-            auto sy=calc_loop_source_y(i)     ;
-            auto sw=calc_loop_source_width(i) ;
-            auto sh=calc_loop_source_height(i);
-
-            debug writeln("
-    i                         : %d
-    calc_loop_target_x(i)     : %d
-    calc_loop_target_y(i)     : %d
-    calc_loop_source_x(i)     : %d
-    calc_loop_source_y(i)     : %d
-    calc_loop_source_width(i) : %d
-    calc_loop_source_height(i): %d
-".format(i,tx,ty,sx,sy,sw,sh));
-        genVisibilityMapForSubitem(
-            i,
-            tx,
-            ty,
-            sx, sy,
-            sw, sh
-            );
-        }
+        // debug for (ulong i = 0; i <= items_count; i++)
+        // {
+            // auto tx= calc_loop_target_x(i)     ;
+            // auto ty=calc_loop_target_y(i)     ;
+            // auto sx=calc_loop_source_x(i)     ;
+            // auto sy=calc_loop_source_y(i)     ;
+            // auto sw=calc_loop_source_width(i) ;
+            // auto sh=calc_loop_source_height(i);
+// 
+             // writeln("
+    // i                         : %d
+    // calc_loop_target_x(i)     : %d
+    // calc_loop_target_y(i)     : %d
+    // calc_loop_source_x(i)     : %d
+    // calc_loop_source_y(i)     : %d
+    // calc_loop_source_width(i) : %d
+    // calc_loop_source_height(i): %d
+// ".format(i,tx,ty,sx,sy,sw,sh));
+        // genVisibilityMapForSubitem(
+            // i,
+            // tx,
+            // ty,
+            // sx, sy,
+            // sw, sh
+            // );
+        // }
     }
 
     return;
