@@ -6,6 +6,9 @@ import std.container;
 import std.range.primitives;
 import std.stdio;
 import std.utf;
+import std.typecons;
+
+import observable.signal;
 
 import dtk.interfaces.FontMgrI;
 
@@ -14,8 +17,10 @@ import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.fontinfo;
+import dtk.types.Signal;
 
-enum GenImageFromSubimagesLayout
+
+enum GenVisibilityMapForSubitemsLayout
 {
     horizontalLeftToRightAlignTop, // russian, english chars
     verticalTopToBottomAlignLeft, // russian, english, hebrew lines
@@ -25,259 +30,13 @@ enum GenImageFromSubimagesLayout
 
 // max_width, max_height - defines page size
 // x,y,width,height - selects visible frame form the page
-/*
-Image genImageFromSubimages(
-        ulong max_width, ulong max_height,
-
-        ulong x, ulong y,
-        ulong width, ulong height,
-
-        GenImageFromSubimagesLayout layout,
-
-        ulong delegate() getSubimageCount,
-        ulong delegate(ulong subimage_index) getSubimageWidth,
-        ulong delegate(ulong subimage_index) getSubimageHeight,
-        Image delegate(
-            ulong subimage_index,
-            ulong x, ulong y,
-            ulong width, ulong height
-        ) getSubimage,)
-{
-    {
-        try {
-            throw new Exception("debugging genImageFromSubimages");
-        } catch (Exception e)
-        {
-            debug writeln(e);
-        }
-    }
-    debug writeln(
-        "genImageFromSubimages \n",
-        "  max_width: ", max_width, "\n",
-        "  max_height: ", max_height, "\n",
-
-        "  layout: ", layout, "\n",
-
-        /* "  subimage_index: ", subimage_index, "\n",
-        "  x: ", x, "\n",
-        "  y: ", y, "\n",
-        "  width: ", width, "\n",
-        "  height: ", height, "\n" * /
-        );
-
-    Image ret = new Image(width, height);
-
-    if (x > width || y > height)
-        return ret;
-
-    auto actual_width = (x + width > max_width ? max_width - x : width);
-    auto actual_height = (y + height > max_height ? max_height - y : height);
-
-    auto x2 = x + width;
-    auto y2 = y + height;
-
-    ulong first_visible_item;
-    bool first_visible_item_found;
-    ulong first_visible_item_offset;
-
-    ulong last_visible_item;
-    bool last_visible_item_found;
-    ulong last_visible_item_offset;
-
-    ulong subimage_count = getSubimageCount();
-
-    {
-        ulong processed_size;
-
-        {
-            ulong z;
-            ulong z2;
-
-            ulong current_size;
-
-            switch (layout)
-            {
-            default:
-                throw new Exception("unknown layout");
-            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-                z = x;
-                z2 = x2;
-                break;
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-                z = y;
-                z2 = y2;
-                break;
-            }
-
-            for (ulong i = 0; i != subimage_count; i++)
-            {
-
-                switch (layout)
-                {
-                default:
-                    throw new Exception("unknown layout");
-                case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-                    current_size = getSubimageWidth(i);
-                    break;
-                case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-                    current_size = getSubimageHeight(i);
-                    break;
-                }
-
-                if (!first_visible_item_found && z >= processed_size
-                        && z < processed_size + current_size)
-                {
-                    first_visible_item = i;
-                    first_visible_item_found = true;
-                    first_visible_item_offset = z - processed_size;
-                }
-
-                if (!last_visible_item_found && z2 >= processed_size
-                        && z2 < processed_size + current_size)
-                {
-                    last_visible_item = i;
-                    last_visible_item_found = true;
-                    last_visible_item_offset = processed_size + current_size - z2;
-                }
-
-                if (first_visible_item_found && last_visible_item_found)
-                    break;
-
-                processed_size += current_size;
-            }
-        }
-    }
-
-    if (!first_visible_item_found)
-        return ret;
-
-    if (!last_visible_item_found)
-    {
-        last_visible_item = subimage_count - 1;
-    }
-
-    {
-        ulong items_count = last_visible_item - first_visible_item;
-
-        ulong delegate(ulong i) calc_loop_target_x;
-        ulong delegate(ulong i) calc_loop_target_y;
-        ulong delegate(ulong i) calc_loop_source_x;
-        ulong delegate(ulong i) calc_loop_source_y;
-        ulong delegate(ulong i) calc_loop_source_width;
-        ulong delegate(ulong i) calc_loop_source_height;
-
-        switch (layout)
-        {
-        default:
-            throw new Exception("unknown layout");
-        case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-            calc_loop_target_x = delegate ulong(ulong i) {
-                if (i == 0)
-                    return 0;
-                ulong width;
-                for (ulong j = 0; j < i; j++)
-                {
-                    width += getSubimageWidth(first_visible_item + j);
-                }
-                return width - first_visible_item_offset;
-            };
-
-            calc_loop_target_y = delegate ulong(ulong i) { return 0; };
-
-            calc_loop_source_x = delegate ulong(ulong i) {
-                if (i == 0)
-                    return first_visible_item_offset;
-                return 0;
-            };
-
-            calc_loop_source_y = delegate ulong(ulong i) { return 0; };
-
-            calc_loop_source_width = delegate ulong(ulong i) {
-                if (i == 0)
-                    return getSubimageWidth(first_visible_item + i) - first_visible_item_offset;
-                return getSubimageWidth(first_visible_item + i);
-            };
-
-            calc_loop_source_height = delegate ulong(ulong i) {
-                return getSubimageHeight(first_visible_item + i);
-            };
-            break;
-        case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-            calc_loop_target_x = delegate ulong(ulong i) { return 0; };
-
-            calc_loop_target_y = delegate ulong(ulong i) {
-                if (i == 0)
-                    return 0;
-                ulong height;
-                for (ulong j = 0; j < i; j++)
-                {
-                    height += getSubimageHeight(first_visible_item + j);
-                }
-                return height - first_visible_item_offset;
-            };
-
-            calc_loop_source_x = delegate ulong(ulong i) { return 0; };
-
-            calc_loop_source_y = delegate ulong(ulong i) {
-                if (i == 0)
-                    return first_visible_item_offset;
-                return 0;
-            };
-
-            calc_loop_source_width = delegate ulong(ulong i) {
-                return getSubimageWidth(first_visible_item + i);
-            };
-
-            calc_loop_source_height = delegate ulong(ulong i) {
-                if (i == 0)
-                    return getSubimageHeight(first_visible_item + i) - first_visible_item_offset;
-                return getSubimageHeight(first_visible_item + i);
-            };
-            break;
-        }
-
-        for (ulong i = 0; i <= items_count; i++)
-        {
-            auto tx= calc_loop_target_x(i)     ;
-            auto ty=calc_loop_target_y(i)     ;
-            auto sx=calc_loop_source_x(i)     ;
-            auto sy=calc_loop_source_y(i)     ;
-            auto sw=calc_loop_source_width(i) ;
-            auto sh=calc_loop_source_height(i);
-
-            debug writeln("
-    i                         : %d
-    calc_loop_target_x(i)     : %d
-    calc_loop_target_y(i)     : %d
-    calc_loop_source_x(i)     : %d
-    calc_loop_source_y(i)     : %d
-    calc_loop_source_width(i) : %d
-    calc_loop_source_height(i): %d
-".format(i,tx,ty,sx,sy,sw,sh));
-            ret.putImage(
-                tx,
-                ty,
-                getSubimage(
-                    i,
-                    sx, sy,
-                    sw, sh
-                    )
-                );
-        }
-    }
-
-    return ret;
-} */
-
-// max_width, max_height - defines page size
-// x,y,width,height - selects visible frame form the page
 void genVisibilityMapForSubitems(
         ulong max_width, ulong max_height,
 
         ulong x, ulong y,
         ulong width, ulong height,
 
-        GenImageFromSubimagesLayout layout,
+        GenVisibilityMapForSubitemsLayout layout,
 
         ulong delegate() getSubitemCount,
         ulong delegate(ulong subitem_index) getSubitemWidth,
@@ -324,11 +83,11 @@ void genVisibilityMapForSubitems(
             {
             default:
                 throw new Exception("unknown layout");
-            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 z = x;
                 z2 = x2;
                 break;
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 z = y;
                 z2 = y2;
                 break;
@@ -341,10 +100,10 @@ void genVisibilityMapForSubitems(
                 {
                 default:
                     throw new Exception("unknown layout");
-                case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                     current_size = getSubitemWidth(i);
                     break;
-                case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                     current_size = getSubitemHeight(i);
                     break;
                 }
@@ -395,7 +154,7 @@ void genVisibilityMapForSubitems(
         {
         default:
             throw new Exception("unknown layout");
-        case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
+        case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
             calc_loop_target_x = delegate ulong(ulong i) {
                 if (i == 0)
                     return 0;
@@ -427,7 +186,7 @@ void genVisibilityMapForSubitems(
                 return getSubitemHeight(first_visible_item + i);
             };
             break;
-        case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
+        case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
             calc_loop_target_x = delegate ulong(ulong i) { return 0; };
 
             calc_loop_target_y = delegate ulong(ulong i) {
@@ -535,7 +294,7 @@ class TextChar
 
         debug writeln("rendering char: ", chr);
 
-        auto font_mgr = text_view.font_mgr;
+        auto font_mgr = text_view.getFontManager();
         auto face = font_mgr.loadFace(
         	parent_line.parent_text.faceFamily,
         	parent_line.parent_text.faceStyle
@@ -629,7 +388,8 @@ class TextLineSublineViewState
     ulong height;
 }
 
-// NOTE: this is needed, because each subline can have it's own perpendicular size
+// NOTE: this is needed, because each subline can have it's own perpendicular 
+//       size
 class TextLineSubline
 {
     TextLine parent_line;
@@ -639,7 +399,10 @@ class TextLineSubline
         this.parent_line=parent_line;
     }
 
-    mixin getState!("text_view.text_line_subline_states", TextLineSublineViewState,);
+    mixin getState!(
+    	"text_view.text_line_subline_states", 
+    	TextLineSublineViewState
+    	);
 
     void recalculateWidthAndHeight(TextView text_view)
     {
@@ -656,8 +419,8 @@ class TextLineSubline
                 "parent_text.lines_layout ",
                 to!string(parent_line.parent_text.lines_layout)
                 );
-        case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-        case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+        case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+        case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
             foreach (tc; state.textchars)
             {
                 auto tc_state = tc.getState(text_view);
@@ -671,8 +434,8 @@ class TextLineSubline
                 }
             }
             break;
-        case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-        case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+        case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+        case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
             foreach (tc; state.textchars)
             {
                 auto tc_state = tc.getState(text_view);
@@ -728,12 +491,16 @@ class TextLineSubline
 
             delegate ulong(ulong subitem_index)
             {
-                return state.textchars[subitem_index].getState(text_view).resImg.width;
+                return state.textchars[subitem_index].getState(
+                	text_view
+                	).resImg.width;
             },
 
             delegate ulong(ulong subitem_index)
             {
-                return state.textchars[subitem_index].getState(text_view).resImg.height;
+                return state.textchars[subitem_index].getState(
+                	text_view
+                	).resImg.height;
             },
 
             delegate void(
@@ -743,8 +510,6 @@ class TextLineSubline
                 ulong width, ulong height
                 )
             {
-                /* auto chr_state = state.textchars[subitem_index].getState(text_view); */
-
                 auto evme = new ElementVisibilityMapElement();
 
                 evme.map = visibility_map;
@@ -766,54 +531,6 @@ class TextLineSubline
         return ;
     }
 
-    /* Image genImage(
-        ulong x, ulong y, ulong width, ulong height,
-        TextView text_view
-        )
-    {
-
-        debug writeln("genImage at ", __LINE__);
-        debug writeln(" chars layout ", parent_line.parent_text.chars_layout);
-
-        auto state = getState(text_view);
-
-        Image ret = genImageFromSubimages(
-            state.width, state.height,
-
-            x, y,
-            width, height,
-
-            parent_line.parent_text.chars_layout,
-
-            delegate ulong()
-            {
-                return state.textchars.length;
-            },
-
-            delegate ulong(ulong subimage_index)
-            {
-                return state.textchars[subimage_index].getState(text_view).resImg.width;
-            },
-
-            delegate ulong(ulong subimage_index)
-            {
-                return state.textchars[subimage_index].getState(text_view).resImg.height;
-            },
-
-            delegate Image(
-                ulong subimage_index,
-                ulong x, ulong y,
-                ulong width, ulong height
-                )
-            {
-                return state.textchars[subimage_index].getState(text_view).resImg.getImage(
-                    x, y,
-                    width, height
-                    );
-            }
-            );
-        return ret;
-    } */
 }
 
 // NOTE: TextLine have it's own contextual status, because in text wrap mode
@@ -896,16 +613,15 @@ class TextLine
                     "parent_text.lines_layout ",
                     to!string(parent_text.lines_layout)
                     );
-            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-            case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
                 required_size = text_view.width;
                 break;
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
                 required_size = text_view.height;
                 break;
             }
-
         }
 
         ulong current_size = 0;
@@ -930,12 +646,12 @@ class TextLine
                     "parent_text.lines_layout ",
                     to!string(parent_text.lines_layout)
                     );
-            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-            case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
                 s = tc_state.resImg.width;
                 break;
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
                 s = tc_state.resImg.height;
                 break;
             }
@@ -999,8 +715,8 @@ class TextLine
                     "parent_text.lines_layout ",
                     to!string(parent_text.lines_layout)
                     );
-            case GenImageFromSubimagesLayout.horizontalLeftToRightAlignTop:
-            case GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
                 foreach (sl; state.sublines)
                 {
                     auto sl_state = sl.getState(text_view);
@@ -1014,8 +730,8 @@ class TextLine
                     state.height += sl_state.height;
                 }
                 break;
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft:
-            case GenImageFromSubimagesLayout.verticalTopToBottomAlignRight:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
             foreach (sl; state.sublines)
             {
                 auto sl_state = sl.getState(text_view);
@@ -1126,56 +842,6 @@ class TextLine
 
     }
 
-
-    /* Image genImage(
-        ulong x, ulong y, ulong width, ulong height,
-        TextView text_view
-        )
-    {
-
-        debug writeln("genImage at ", __LINE__);
-
-        auto state = getState(text_view);
-
-        Image ret = genImageFromSubimages(
-            state.width, state.height,
-
-            x, y,
-            width, height,
-
-            parent_text.lines_layout,
-
-            delegate ulong()
-            {
-                return state.sublines.length;
-            },
-
-            delegate ulong(ulong subimage_index)
-            {
-                return state.sublines[subimage_index].getState(text_view).width;
-            },
-
-            delegate ulong(ulong subimage_index)
-            {
-                return state.sublines[subimage_index].getState(text_view).height;
-            },
-            delegate Image(
-                ulong subimage_index,
-                ulong x, ulong y,
-                ulong width, ulong height
-                )
-            {
-                return state.sublines[subimage_index].genImage(
-                    x, y,
-                    width, height,
-                    text_view
-                    );
-            }
-            );
-        return ret;
-    } */
-
-
 }
 
 enum TextMarkup
@@ -1200,8 +866,8 @@ class Text
 {
     TextMarkup markup;
 
-    GenImageFromSubimagesLayout lines_layout;
-    GenImageFromSubimagesLayout chars_layout;
+    GenVisibilityMapForSubitemsLayout lines_layout;
+    GenVisibilityMapForSubitemsLayout chars_layout;
 
     string faceFamily;
     string faceStyle;
@@ -1384,8 +1050,10 @@ class Text
 
         if (first_text_textchar == last_text_textchar)
         {
-            return lines[first_text_textchar].getText(first_text_textchar_index,
-                    last_text_textchar_index + 1);
+            return lines[first_text_textchar].getText(
+            	first_text_textchar_index,
+                last_text_textchar_index + 1
+                );
         }
 
         dstring ret;
@@ -1401,7 +1069,10 @@ class Text
             }
         }
 
-        ret ~= "\n" ~ lines[last_text_textchar].getText(0, last_text_textchar_index);
+        ret ~= "\n" ~ lines[last_text_textchar].getText(
+        	0, 
+        	last_text_textchar_index
+        	);
 
         return ret;
     }
@@ -1467,57 +1138,6 @@ class Text
         ret += lines.length - 1; // new line symbol count
         return ret;
     }
-
-    /* void printInfo(TextView text_view)
-    {
-        auto t_st = getState(text_view);
-        debug writeln("
-Text:
- width : %d
- height: %d
- lines : %d
-".format(
-    t_st.width,
-    t_st.height,
-    lines.length
-    )
-    );
-    foreach (li, l;lines)
-    {
-        auto l_state = l.getState(text_view);
-        debug writeln("
-  Line #%04d:
-   width    : %d
-   height   : %d
-   sublines : %d
-   textchars: %d
-        ".format(
-            li,
-            l_state.width,
-            l_state.height,
-            l_state.sublines.length,
-            l.textchars.length
-            )
-            );
-        foreach (sli,sl;l_state.sublines)
-        {
-            auto sl_state = sl.getState(text_view);
-            debug writeln("
-   Subline #%04d:
-    width    : %d
-    height   : %d
-    textchars: %d
-            ".format(
-                sli,
-                sl_state.width,
-                sl_state.height,
-                sl_state.textchars.length
-                )
-                );
-        }
-    }
-
-    } */
 }
 
 enum Mode
@@ -1543,6 +1163,8 @@ class TextView
     bool show_cursor_internal;
     ulong cursor_position_line;
     ulong cursor_position_column;
+    ElementVisibilityMapElement cursor_after;
+    ElementVisibilityMapElement cursor_before;
 
     Mode mode;
 
@@ -1551,15 +1173,34 @@ class TextView
 
     Text text;
 
-    FontMgrI font_mgr;
-
+    FontMgrI delegate() getFontManager;    
+    
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
     TextLineViewState[TextLine] text_line_states;
     TextViewState[Text] text_states;
 
     ElementVisibilityMap visibility_map;
-
+    
+    Image _rendered_image;    
+    Image rendered_image() @property // TODO: get read off @property
+    {
+    	if (redrawRequired)
+    	{
+    		reprocess();
+    		genImage();
+    	}
+    	return _rendered_image;
+    }
+    
+    bool redrawRequired=true;
+    
+    // Signal!(ulong, ulong, ulong, ulong) redrawRequest;
+    mixin installSignal!(
+    	"PerformRedraw", "signal_perform_redraw",
+    	ulong,ulong, ulong, ulong,  
+    	);
+    
     this()
     {
         setTextString("");
@@ -1574,7 +1215,7 @@ class TextView
     {
         setText(txt);
     }
-
+    
     void setTextString(dstring txt = "")
     {
         if (text is null)
@@ -1627,32 +1268,41 @@ class TextView
 
         this.visibility_map=visibility_map;
     }
-
-    Image genImage()
+    
+    void drawElementVisibilityMapElement(ElementVisibilityMapElement e)
+    {
+    	auto chr_state = e.chr.getState(this);
+    	
+    	_rendered_image.putImage(
+    		e.target_x,
+    		e.target_y,
+    		chr_state.resImg.getImage(
+    			x, y,
+    			e.width, e.height
+    			)
+    		);
+    	
+    	signal_perform_redraw.emit(e.target_x, e.target_y, e.width,  e.height);
+    }
+    
+    void genImage()
     {
         if (text is null)
             throw new Exception("text object is not set");
-
-        auto ret = new Image(width, height);
-
+        
+        _rendered_image = new Image(width, height);
+        
         if (visibility_map !is null)
         {
             foreach (v; visibility_map.elements)
             {
-                auto chr_state = v.chr.getState(this);
-
-                ret.putImage(
-                    v.target_x,
-                    v.target_y,
-                    chr_state.resImg.getImage(
-                        x, y,
-                        width, height
-                        )
-                    );
+            	drawElementVisibilityMapElement(v);
             }
         }
-
-        return ret;
+        
+        redrawRequired = false;
+        
+        signal_perform_redraw.emit(0, 0, width,  height);
     }
 
     void reprocess()
@@ -1669,9 +1319,210 @@ class TextView
     void click(ulong x, ulong y)
     {
         debug writeln("processor clicked ", x, " ", y);
+        if (show_cursor)
+        	changeCursorPosition(x, y);
+    }
+    
+    void timer500ms_handle()
+    {
+    	timer500ms_handle_cursor();
+    }
+
+    void timer500ms_handle_cursor_draw()
+    {
+    	
+    	ulong x;
+    	ulong y;
+    	ulong width;
+    	ulong height;
+    	
+    	const ulong cursor_width = 2;
+    	
+    	if (cursor_after is null && cursor_before is null)
+    		return;
+    	
+    	if (cursor_after !is null)
+    	{
+    		final switch(text.chars_layout)
+    		{
+    		case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+    			x = cursor_after.target_x+cursor_after.width;
+    			y = cursor_after.target_y;
+    			width = cursor_width;
+    			height = cursor_after.height;
+    			break;
+    		case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+    			x = cursor_after.target_x;
+    			y = cursor_after.target_y;
+    			width = cursor_width;
+    			height = cursor_after.height;
+    			break;
+    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+    			x = cursor_after.target_x;
+    			y = cursor_after.target_y+cursor_after.height;
+    			width = cursor_after.width;
+    			height = cursor_width;
+    		}
+    	}
+    	else
+    	{
+    		final switch(text.chars_layout)
+    		{
+    		case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+    			x = cursor_before.target_x+cursor_before.width;
+    			y = cursor_before.target_y;
+    			width = cursor_width;
+    			height = cursor_before.height;
+    			break;
+    		case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+    			x = cursor_before.target_x;
+    			y = cursor_before.target_y;
+    			width = cursor_width;
+    			height = cursor_before.height;
+    			break;
+    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+    			x = cursor_before.target_x;
+    			y = cursor_before.target_y+cursor_after.height;
+    			width = cursor_before.width;
+    			height = cursor_width;
+    		}
+    	}
+    	
+    	drawCursor(x,y,width,height);    	
+    	
+    	signal_perform_redraw.emit(x,y,width,height);
+    }
+    
+    void drawCursor(ulong x,ulong y,ulong width,ulong height)
+    {
+    	auto dot = ImageDot();
+    	dot.enabled=true;
+    	dot.intensivity=1;
+    	dot.color = Color(cast(ubyte[3])[255,0,0]);
+    	for (ulong i = x; i != x+width; i++)
+    	{
+    		for (ulong j = y; j != y+height; j++)
+    		{
+    			_rendered_image.setDot(x,y,dot);
+    		}
+    	}
+    }
+    
+    void timer500ms_handle_cursor_clear() {
+    	if (cursor_before !is null)
+    		drawElementVisibilityMapElement(cursor_before);
+    	if (cursor_after !is null)
+    		drawElementVisibilityMapElement(cursor_after);
+    }
+
+    void timer500ms_handle_cursor()
+    {
+    	if (!show_cursor)
+    		return;
+    	
+    	if (show_cursor_internal)
+    		timer500ms_handle_cursor_draw();
+    	else
+    		timer500ms_handle_cursor_clear();
+    }
+    
+    void changeCursorPosition(ulong x, ulong y)
+    {
+    	cursor_after = null;
+    	cursor_before = null;
+        auto el_clicked = determineVisibleElementAt(x,y);
+        
+        if (el_clicked[0] is null)
+        	return;
+        
+        cursor_position_line=el_clicked[0].line; 
+        
+        bool add_one_char;
+        
+        final switch(text.chars_layout)
+        {
+        case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+        	if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.right)
+        		add_one_char = true;
+        	break;
+        case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+        	if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.left)
+        		add_one_char = true;
+        	break;
+        case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+        	if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
+        		add_one_char = true;
+        	break;
+        case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+        	if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
+        		add_one_char = true;
+        	break;
+        }
+        
+        cursor_position_column = el_clicked[0].line_char;
+        cursor_before = el_clicked[0];
+        if (add_one_char)
+        	cursor_after = cursor_before;
+        	cursor_before = null;
+        	cursor_position_column++;
+                
+        show_cursor_internal=true;
+    }
+    
+    Tuple!(
+    	ElementVisibilityMapElement, 
+    	ElementVisibilityMapElementClickLeanH,
+    	ElementVisibilityMapElementClickLeanV
+    	)
+    determineVisibleElementAt(ulong x, ulong y)
+    {
+    	auto fail_res = tuple(
+    		cast(ElementVisibilityMapElement) null,
+    		cast(ElementVisibilityMapElementClickLeanH)0,
+    		cast(ElementVisibilityMapElementClickLeanV)0,
+    		);
+    	
+    	if (visibility_map is null)
+    		return fail_res;
+    	
+    	foreach (v; visibility_map.elements)
+    	{
+    		if (
+    			(x >= v.target_x && x <= v.target_x+v.width)
+    			&&
+    			(y >= v.target_y && y <= v.target_y+v.height)
+    			)
+    		{
+    			auto lh = ElementVisibilityMapElementClickLeanH.left;
+    			auto lv = ElementVisibilityMapElementClickLeanV.top;
+    			
+    			if (x >= v.target_x+(v.width/2))
+    				lh = ElementVisibilityMapElementClickLeanH.right;
+    			if (y >= v.target_y+(v.height/2))
+    				lv = ElementVisibilityMapElementClickLeanV.bottom;
+    			return tuple(v,lh,lv);
+    		}
+    	}
+    	
+    	return fail_res;
     }
 
 }
+
+enum ElementVisibilityMapElementClickLeanH : ubyte
+{
+	left,
+	right,
+}
+
+enum ElementVisibilityMapElementClickLeanV : ubyte
+{
+	top,
+	bottom,
+}
+
 
 mixin template getState(string state_container, alias state_type)
 {

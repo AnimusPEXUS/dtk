@@ -116,9 +116,6 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 
         Signal!(T1, T1) onBeforeChanged;
         Signal!(T1, T1) onAfterChanged;
-
-        // TODO: probably this have to be moved to signal consumers
-        // SignalConnectionContainer property_cc;
     }
 
     @disable this(this);
@@ -164,21 +161,6 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         }
     }
 
-    T1 getUnsetValue()
-    {
-        static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.initValue)
-        {
-            return settings.init_value;
-        }
-        static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.defaultValue)
-        {
-            return settings.default_value;
-        }
-        static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.typeInitValue)
-        {
-            return T1.init;
-        }
-    }
 
     static if (settings.unsettable)
     {
@@ -228,9 +210,28 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         bool isSet()
         {
             return !value_is_unset;
-        }
+        }        
     }
-
+    
+    // NOTE: this must be defined anyway, because it can be used also for 
+    //       getting default value
+    // TODO: this, probably, have to be reworked
+    T1 getUnsetValue()
+    {
+    	static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.initValue)
+    	{
+    		return settings.init_value;
+    	}
+    	static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.defaultValue)
+    	{
+    		return settings.default_value;
+    	}
+    	static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.typeInitValue)
+    	{
+    		return T1.init;
+    	}
+    }    
+    
     static if (settings.gettable)
     {
         T1 get()

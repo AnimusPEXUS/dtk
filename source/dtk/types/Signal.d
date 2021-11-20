@@ -1,6 +1,6 @@
 module dtk.types.Signal;
 
-import observable.signal;
+public import observable.signal;
 
 
 mixin template installSignal(

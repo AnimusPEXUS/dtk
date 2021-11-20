@@ -134,10 +134,11 @@ class Layout : Widget, ContainerableWidgetI
     {
         foreach (size_t counter, v; children)
         {
-            if (v.isUnsetPosition() || v.isUnsetSize())
-            {
-                throw new Exception(to!string(this) ~ " child size or position is not set");
-            }
+        	// TODO: what is this?
+            // if (v.isUnsetPosition() || v.isUnsetSize())
+            // {
+                // throw new Exception(to!string(this) ~ " child size or position is not set");
+            // }
             v.recalculateChildrenPositionsAndSizes();
         }
     }

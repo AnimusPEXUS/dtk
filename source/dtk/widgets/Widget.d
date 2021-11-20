@@ -42,8 +42,9 @@ class Widget : WidgetI
             PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
             PropSetting("gs_w_d", "bool", "vertical_fill", "VerticalFill", "false"),
             PropSetting("gs_w_d", "bool", "horizontal_fill", "HorizontalFill", "false"),
-            PropSetting("gsu", "Position2D", "position", "Position", ""),
-            PropSetting("gsu", "Size2D", "size", "Size", ""),
+            PropSetting("gs", "Position2D", "position", "Position", ""),
+            // PropSetting("gs_w_d", "Size2D", "size", "Size", q{Size2D(10, 10)}),
+            PropSetting("gs", "Size2D", "size", "Size", ""),
             PropSetting("gsu", "Size2D", "minimal_size", "MinimalSize", ""),
             PropSetting("gsu", "Size2D", "maximal_size", "MaximalSize", ""),
         ]

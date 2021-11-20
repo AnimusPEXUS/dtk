@@ -49,7 +49,7 @@ class ButtonRadio : Button
             if (old_v !is null)
                 if (old_v.isIn(this))
                     old_v.remove(this);
-        });
+        }());
         
     }
 
@@ -61,7 +61,7 @@ class ButtonRadio : Button
             if (new_v !is null)
                 if (!new_v.isIn(this))
                     new_v.add(this);
-        });
+        }());
     }
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
@@ -97,6 +97,8 @@ class ButtonRadio : Button
 
     override void redraw()
     {
+    	if (getForm() is null)
+    		return;
         this.redraw_x(this);
     }
 

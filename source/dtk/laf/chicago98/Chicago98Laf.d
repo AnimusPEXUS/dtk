@@ -339,14 +339,9 @@ class Chicago98Laf : LafI
                 );
         }
         
-        if (widget.textImage !is null)
+        if (widget.text_view !is null && widget.text_view.rendered_image !is null)
         {
-            /* if (widget.getDrawBewelAndBackground())
-            {
-            ds = new DrawingSurfaceShifted(ds, pos.x+2, pos.y+2);
-            } */
-            
-            auto image = widget.textImage;
+            auto image = widget.text_view.rendered_image;
             
             for (uint y = 0; y != image.height; y++)
             {

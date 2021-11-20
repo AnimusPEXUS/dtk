@@ -31,14 +31,14 @@ interface WidgetI : EventReceiverWidgetI
     void redraw();
 
     typeof(this) setPosition(Position2D);
-    typeof(this) unsetPosition();
+    //typeof(this) unsetPosition();
     Position2D getPosition();
-    bool isUnsetPosition();
+    //bool isUnsetPosition();
 
     typeof(this) setSize(Size2D);
-    typeof(this) unsetSize();
+    //typeof(this) unsetSize();
     Size2D getSize();
-    bool isUnsetSize();
+    //bool isUnsetSize();
 
     Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point);
 

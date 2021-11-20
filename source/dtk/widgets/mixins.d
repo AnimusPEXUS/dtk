@@ -45,10 +45,11 @@ mixin template mixin_getWidgetAtPosition()
 
             debug writeln("child of ", this, " is ", c);
 
-            if (c.isUnsetPosition() || c.isUnsetSize())
-            {
-                return tuple(cast(WidgetI)this, local_x, local_y);
-            }
+            // TODO: what is this?
+            // if (c.isUnsetPosition() || c.isUnsetSize())
+            // {
+                // return tuple(cast(WidgetI)this, local_x, local_y);
+            // }
 
             auto c_pos = c.getPosition();
             auto c_size = c.getSize();
@@ -81,10 +82,11 @@ mixin template mixin_getWidgetAtPosition()
             // TODO: optimize for visible part
             foreach (c; children)
             {
-                if (c.isUnsetPosition() || c.isUnsetSize())
-                {
-                    return tuple(cast(WidgetI)this, local_x, local_y);
-                }
+            	// TODO: what is this?
+                // if (c.isUnsetPosition() || c.isUnsetSize())
+                // {
+                    // return tuple(cast(WidgetI)this, local_x, local_y);
+                // }
 
                 auto c_pos = c.getPosition();
                 auto c_size = c.getSize();
