@@ -29,7 +29,7 @@ class TextEntry : Widget, ContainerableWidgetI
 
     TextView text_view;
 
-    mixin mixin_widget_set_multiple_properties!(
+    mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
             PropSetting("gs", "dstring", "text", "Text"),
             // TODO: use fontconfig instead of this
@@ -154,11 +154,13 @@ class TextEntry : Widget, ContainerableWidgetI
     				{
     					auto ds = getDrawingSurface();
     					
+    					auto rendered_image = text_view.getRenderedImage();
+    					
     					for (ulong i = x; i != x+width; i++)
     					{
     						for (ulong j = y; j != y+height; j++)
     						{
-    							auto dot = text_view.rendered_image.getDot(x,y);
+    							auto dot = rendered_image.getDot(x,y);
     							ds.drawDot(
     								Position2D(
     									// TODO: I don't like this casts
@@ -235,27 +237,28 @@ class TextEntry : Widget, ContainerableWidgetI
 
         auto tvt = text_view.getText();
 
-        tvt.faceFamily = getFontFamily();
-        tvt.faceStyle = getFontStyle();
-        tvt.faceSize = getFontSize() * 64;
-        tvt.faceResolution = 72;
-        tvt.bold = getFontBold();
-        tvt.italic = getFontItalic();
-        tvt.lines_layout = getLayoutLines();
-        tvt.chars_layout = getLayoutChars();
+        tvt.setFaceFamily(getFontFamily());
+        tvt.setFaceStyle(getFontStyle());
+        tvt.setFaceSize(getFontSize() * 64);
+        tvt.setFaceResolution(72);
+        tvt.setBold(getFontBold());
+        tvt.setItalic(getFontItalic());
+        tvt.setLinesLayout(getLayoutLines());
+        tvt.setLineCharsLayout(getLayoutChars());
 
         auto size = getSize();
-        text_view.width = size.width;
-        debug writeln("text_view.width = ", text_view.width);
-        text_view.height = size.height;
+        text_view.setWidth(size.width);
+        debug writeln("text_view.width = ", text_view.getWidth());
+        text_view.setHeight(size.height);
 
         if (getDrawBewelAndBackground())
         {
-            text_view.width -= 4;
-            text_view.height -= 4;
+            text_view.setWidth(text_view.getWidth()-4);
+            text_view.setHeight(text_view.getHeight()-4);
         }
 
-        text_view.redrawRequired = true;
+        // this not needed anymore, as TextView manually tracks propery changes
+        // text_view.redrawRequired = true;
         
         // debug writeln("before text_view.reprocess");
         // text_view.reprocess();

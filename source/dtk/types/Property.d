@@ -327,7 +327,8 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
     import std.format;
 
    	import observable.signal;
-
+   	
+   	static assert(__traits(identifier, property) != "");
     
     static if (__traits(hasMember, property, "get"))
     {
@@ -484,4 +485,62 @@ unittest
 
     }
 
+}
+
+
+struct PropSetting
+{
+    string mode;
+    string type;
+    string var_name;
+    string title_name;
+    string default_value;
+}
+
+mixin template mixin_install_multiple_properties(PropSetting[] settings)
+{
+    import std.format;
+
+    static foreach (v; settings)
+    {
+        static if (v.mode == "gs_w_d")
+        {
+            mixin(
+                q{
+                    private {
+                        mixin Property_%1$s!(%2$s, "%3$s", %5$s);
+                    }
+
+                    mixin Property_forwarding!(%2$s, %3$s, "%4$s");
+
+                }.format(
+                    v.mode,
+                    v.type,
+                    v.var_name,
+                    v.title_name,
+                    v.default_value,
+                    )
+                );
+        }
+
+        static if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
+        {
+            mixin(
+                q{
+                    private {
+                        mixin Property_%1$s!(%2$s, "%3$s");
+                    }
+
+                    mixin Property_forwarding!(%2$s, %3$s, "%4$s");
+
+                }.format(
+                    v.mode,
+                    v.type,
+                    v.var_name,
+                    v.title_name,
+                    )
+                );
+        }
+
+    }
 }

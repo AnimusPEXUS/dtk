@@ -28,7 +28,7 @@ import dtk.widgets.Widget;
 class Form : Widget, FormI
 {
     
-    mixin mixin_widget_set_multiple_properties!(
+    mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
         PropSetting("gsun", "WindowI", "window", "Window", ""),
         PropSetting("gsun", "LafI", "laf", "Laf", ""),

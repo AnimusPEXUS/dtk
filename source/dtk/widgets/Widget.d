@@ -36,7 +36,7 @@ class Widget : WidgetI
 
     // =====v===v===v===== [locator] =====v===v===v===== start
 
-    mixin mixin_widget_set_multiple_properties!(
+    mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
             PropSetting("gs_w_d", "bool", "vertical_expand", "VerticalExpand", "false"),
             PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
@@ -60,7 +60,7 @@ class Widget : WidgetI
 
     // =====v===v===v===== [info] =====v===v===v===== start
 
-    mixin mixin_widget_set_multiple_properties!(
+    mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
             PropSetting("gs_w_d", "bool", "visible", "Visible", "false"),
             PropSetting("gs_w_d", "bool", "enabled", "Enabled", "false"),
