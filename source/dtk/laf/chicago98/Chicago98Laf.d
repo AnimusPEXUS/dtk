@@ -344,6 +344,9 @@ class Chicago98Laf : LafI
         	
             auto image = widget.text_view.getRenderedImage();
             
+            // debug writefln("drawTextEntry going to draw this (%dx%d):", image.width, image.height);
+            // debug image.printImage();
+            
             if (image !is null)
             {
             	for (uint y = 0; y != image.height; y++)

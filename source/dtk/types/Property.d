@@ -494,3 +494,11 @@ mixin template mixin_install_multiple_properties(PropSetting[] settings)
 
     }
 }
+
+// struct stname(PropSetting2[] settings) {
+	// string sname;
+	// string tname;
+// }
+// 
+// 
+// mixin template mixin_connect_multiple_properties

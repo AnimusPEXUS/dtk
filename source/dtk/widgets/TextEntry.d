@@ -112,25 +112,47 @@ class TextEntry : Widget, ContainerableWidgetI
                 stname("TextSelectable", "bool"),
                 stname("TextEditable", "bool"),
                 ]
-            )
+                )
         {
-            mixin(q{
-                pragma(msg, "connectTo%1$s_onAfterChanged");
-                con_cont.add(connectTo%1$s_onAfterChanged(
-                     delegate void (%2$s v1, %2$s v2)
-                    {
-                    	collectException(
-                    		{
-                    			auto err = collectException(applySettingsToTextProcessor());
-                    			if (err !is null)
-                    				debug writeln(err);
-                    		}()
-                    		);
-                    }
-                    ));
-                }.format(v.sname, v.tname));
+            mixin(
+            	q{
+            		pragma(msg, "connectTo%1$s_onAfterChanged");
+            		con_cont.add(
+            			connectTo%1$s_onAfterChanged(
+            				delegate void (%2$s v1, %2$s v2)
+            				{
+            					collectException(
+            						{
+            							auto err = collectException(
+            								applySettingsToTextProcessor()
+            								);
+            							if (err !is null)
+            								debug writeln(err);
+            						}()
+            						);
+            				}
+            				)
+            			);
+            	}.format(v.sname, v.tname));
         }
-
+        
+        con_cont.add(
+        	connectToSize_onAfterChanged(
+        		delegate void(Size2D old_value, Size2D new_value)
+        		{
+        			collectException(
+        				{
+        					auto err = collectException(
+        						applySettingsToTextProcessor()
+        						);
+        					if (err !is null)
+        						debug writeln(err);
+        				}()
+        				);
+        		}
+        		)
+            );
+        
         con_cont.add(connectToText_onAfterChanged(&afterTextChanged));
         
         setMouseEvent("button-click", &on_mouse_click_internal);

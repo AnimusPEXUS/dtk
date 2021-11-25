@@ -7,6 +7,7 @@ import std.range.primitives;
 import std.stdio;
 import std.utf;
 import std.typecons;
+import std.exception;
 
 import observable.signal;
 
@@ -32,21 +33,21 @@ enum GenVisibilityMapForSubitemsLayout
 // max_width, max_height - defines page size
 // x,y,width,height - selects visible frame form the page
 void genVisibilityMapForSubitems(
-	ulong max_width, ulong max_height,
-	
-	ulong x, ulong y,
-	ulong width, ulong height,
-	
-	GenVisibilityMapForSubitemsLayout layout,
-	
-	ulong delegate() getSubitemCount,
-	ulong delegate(ulong subitem_index) getSubitemWidth,
-	ulong delegate(ulong subitem_index) getSubitemHeight,
-	void delegate(
-		ulong subitem_index,
-		ulong target_x, ulong target_y,
-		ulong x, ulong y,
-		ulong width, ulong height
+    ulong max_width, ulong max_height,
+    
+    ulong x, ulong y,
+    ulong width, ulong height,
+    
+    GenVisibilityMapForSubitemsLayout layout,
+    
+    ulong delegate() getSubitemCount,
+    ulong delegate(ulong subitem_index) getSubitemWidth,
+    ulong delegate(ulong subitem_index) getSubitemHeight,
+    void delegate(
+        ulong subitem_index,
+        ulong target_x, ulong target_y,
+        ulong x, ulong y,
+        ulong width, ulong height
         ) genVisibilityMapForSubitem,)
 {
 	
@@ -110,7 +111,7 @@ void genVisibilityMapForSubitems(
                 }
                 
                 if (!first_visible_item_found && z >= processed_size
-                	&& z < processed_size + current_size)
+                    && z < processed_size + current_size)
                 {
                     first_visible_item = i;
                     first_visible_item_found = true;
@@ -118,7 +119,7 @@ void genVisibilityMapForSubitems(
                 }
                 
                 if (!last_visible_item_found && z2 >= processed_size
-                	&& z2 < processed_size + current_size)
+                    && z2 < processed_size + current_size)
                 {
                     last_visible_item = i;
                     last_visible_item_found = true;
@@ -229,7 +230,7 @@ void genVisibilityMapForSubitems(
         // auto sy=calc_loop_source_y(i)     ;
         // auto sw=calc_loop_source_width(i) ;
         // auto sh=calc_loop_source_height(i);
-        // 
+        //
         // writeln("
         // i                         : %d
         // calc_loop_target_x(i)     : %d
@@ -297,9 +298,9 @@ class TextChar
         
         auto font_mgr = text_view.getFontManager();
         auto face = font_mgr.loadFace(
-        	parent_line.parent_text.getFaceFamily(),
-        	parent_line.parent_text.getFaceStyle()
-        	);
+            parent_line.parent_text.getFaceFamily(),
+            parent_line.parent_text.getFaceStyle()
+            );
         
         {
             auto x = parent_line.parent_text.getFaceSize();
@@ -389,7 +390,7 @@ class TextLineSublineViewState
     ulong height;
 }
 
-// NOTE: this is needed, because each subline can have it's own perpendicular 
+// NOTE: this is needed, because each subline can have it's own perpendicular
 //       size
 class TextLineSubline
 {
@@ -401,9 +402,9 @@ class TextLineSubline
     }
     
     mixin getState!(
-    	"text_view.text_line_subline_states", 
-    	TextLineSublineViewState
-    	);
+        "text_view.text_line_subline_states",
+        TextLineSublineViewState
+        );
     
     void recalculateWidthAndHeight(TextView text_view)
     {
@@ -422,34 +423,34 @@ class TextLineSubline
                 );
             case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
             case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-            	foreach (tc; state.textchars)
-            	{
-            		auto tc_state = tc.getState(text_view);
-            		
-            		state.width += tc_state.resImg.width;
-            		
-            		{
-            			auto h = tc_state.resImg.height;
-            			if (h > state.height)
-            				state.height = h;
-            		}
-            	}
-            	break;
+                foreach (tc; state.textchars)
+                {
+                    auto tc_state = tc.getState(text_view);
+                    
+                    state.width += tc_state.resImg.width;
+                    
+                    {
+                        auto h = tc_state.resImg.height;
+                        if (h > state.height)
+                            state.height = h;
+                    }
+                }
+                break;
             case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
             case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-            	foreach (tc; state.textchars)
-            	{
-            		auto tc_state = tc.getState(text_view);
-            		
-            		state.height += tc_state.resImg.height;
-            		
-            		{
-            			auto w = tc_state.resImg.width;
-            			if (w > state.width)
-            				state.width = w;
-            		}
-            	}
-            	break;
+                foreach (tc; state.textchars)
+                {
+                    auto tc_state = tc.getState(text_view);
+                    
+                    state.height += tc_state.resImg.height;
+                    
+                    {
+                        auto w = tc_state.resImg.width;
+                        if (w > state.width)
+                            state.width = w;
+                    }
+                }
+                break;
         }
         
     }
@@ -493,15 +494,15 @@ class TextLineSubline
             delegate ulong(ulong subitem_index)
             {
                 return state.textchars[subitem_index].getState(
-                	text_view
-                	).resImg.width;
+                    text_view
+                    ).resImg.width;
             },
             
             delegate ulong(ulong subitem_index)
             {
                 return state.textchars[subitem_index].getState(
-                	text_view
-                	).resImg.height;
+                    text_view
+                    ).resImg.height;
             },
             
             delegate void(
@@ -526,6 +527,7 @@ class TextLineSubline
                 evme.width=width;
                 evme.height=height;
                 
+                debug writefln("adding evme to elements (%d)", visibility_map.elements.length);
                 visibility_map.elements ~= evme;
             }
             );
@@ -605,7 +607,7 @@ class TextLine
         ulong required_size;
         
         if (text_view.getVirtualWrapBySpace()
-        	|| text_view.getVirtualWrapByChar())
+            || text_view.getVirtualWrapByChar())
         {
             switch (parent_text.getLinesLayout())
             {
@@ -616,12 +618,12 @@ class TextLine
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                	required_size = text_view.getWidth();
-                	break;
+                    required_size = text_view.getWidth();
+                    break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                	required_size = text_view.getHeight();
-                	break;
+                    required_size = text_view.getHeight();
+                    break;
             }
         }
         
@@ -649,16 +651,16 @@ class TextLine
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                	s = tc_state.resImg.width;
-                	break;
+                    s = tc_state.resImg.width;
+                    break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                	s = tc_state.resImg.height;
-                	break;
+                    s = tc_state.resImg.height;
+                    break;
             }
             
             if (text_view.getVirtualWrapBySpace()
-            	|| text_view.getVirtualWrapByChar())
+                || text_view.getVirtualWrapByChar())
             {
                 if (s > required_size)
                 {
@@ -668,8 +670,8 @@ class TextLine
             }
             
             if ((text_view.getVirtualWrapBySpace()
-            	|| text_view.getVirtualWrapByChar())
-            	&& required_size <= current_size + s)
+                || text_view.getVirtualWrapByChar())
+                && required_size <= current_size + s)
             {
                 state.sublines ~= new TextLineSubline(this);
                 current_line++;
@@ -718,34 +720,34 @@ class TextLine
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                	foreach (sl; state.sublines)
-                	{
-                		auto sl_state = sl.getState(text_view);
-                		
-                		{
-                			auto w = sl_state.width;
-                			if (w > state.width)
-                				state.width = w;
-                		}
-                		
-                		state.height += sl_state.height;
-                	}
-                	break;
+                    foreach (sl; state.sublines)
+                    {
+                        auto sl_state = sl.getState(text_view);
+                        
+                        {
+                            auto w = sl_state.width;
+                            if (w > state.width)
+                                state.width = w;
+                        }
+                        
+                        state.height += sl_state.height;
+                    }
+                    break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                	foreach (sl; state.sublines)
-                	{
-                		auto sl_state = sl.getState(text_view);
-                		
-                		state.width += sl_state.width;
-                		
-                		{
-                			auto w = sl_state.height;
-                			if (w > state.height)
-                				state.height = w;
-                		}
-                	}
-                	break;
+                    foreach (sl; state.sublines)
+                    {
+                        auto sl_state = sl.getState(text_view);
+                        
+                        state.width += sl_state.width;
+                        
+                        {
+                            auto w = sl_state.height;
+                            if (w > state.height)
+                                state.height = w;
+                        }
+                    }
+                    break;
             }
         }
     }
@@ -866,81 +868,130 @@ class TextViewState
 class Text
 {
 	
+    SignalConnectionContainer con_cont;
+    
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
         PropSetting(
-        	"gs_w_d", 
-        	"TextMarkupType", 
-        	"textMarkupType", 
-        	"TextMarkupType", 
-        	"TextMarkupType.plain"
-        	),
+            "gs_w_d",
+            "TextMarkupType",
+            "textMarkupType",
+            "TextMarkupType",
+            "TextMarkupType.plain"
+            ),
         
         PropSetting(
-        	"gs_w_d", 
-        	"GenVisibilityMapForSubitemsLayout", 
-        	"lines_layout", 
-        	"LinesLayout", 
-        	"GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"
-        	),
+            "gs_w_d",
+            "GenVisibilityMapForSubitemsLayout",
+            "lines_layout",
+            "LinesLayout",
+            "GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"
+            ),
         PropSetting(
-        	"gs_w_d", 
-        	"GenVisibilityMapForSubitemsLayout", 
-        	"line_chars_layout", 
-        	"LineCharsLayout", 
-        	"GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"
-        	),
+            "gs_w_d",
+            "GenVisibilityMapForSubitemsLayout",
+            "line_chars_layout",
+            "LineCharsLayout",
+            "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"
+            ),
         
         PropSetting("gs_w_d", "string", "faceFamily", "FaceFamily", "\"Go\""),
         PropSetting("gs_w_d", "string", "faceStyle", "FaceStyle", "\"Regular\""),
-        PropSetting("gs_w_d", "uint", "faceSize", "FaceSize", "10"),
-        PropSetting("gs_w_d", "uint", "faceResolution", "FaceResolution", "20"),
+        PropSetting("gs_w_d", "uint", "faceSize", "FaceSize", "20*64"),
+        PropSetting("gs_w_d", "uint", "faceResolution", "FaceResolution", "72"),
         
         PropSetting("gs_w_d", "bool", "bold", "Bold", "false"),
         PropSetting("gs_w_d", "bool", "italic", "Italic", "false"),
         PropSetting("gs_w_d", "bool", "underline", "Underlined", "false"),
         
         PropSetting(
-        	"gs_w_d", 
-        	"bool", 
-        	"defaultFGColorEnabled", 
-        	"DefaultFGColorEnabled", 
-        	"true"
-        	),
+            "gs_w_d",
+            "bool",
+            "defaultFGColorEnabled",
+            "DefaultFGColorEnabled",
+            "true"
+            ),
         PropSetting(
-        	"gs_w_d", 
-        	"Color", 
-        	"defaultFGColor", 
-        	"DefaultFGColor", 
-        	q{Color(0)}
-        	),
+            "gs_w_d",
+            "Color",
+            "defaultFGColor",
+            "DefaultFGColor",
+            q{Color(0)}
+            ),
         
         PropSetting(
-        	"gs_w_d", 
-        	"bool", 
-        	"defaultBGColorEnabled", 
-        	"DefaultBGColorEnabled", 
-        	"true"
-        	),
+            "gs_w_d",
+            "bool",
+            "defaultBGColorEnabled",
+            "DefaultBGColorEnabled",
+            "true"
+            ),
         PropSetting(
-        	"gs_w_d", 
-        	"Color", 
-        	"defaultBGColor", 
-        	"DefaultBGColor", 
-        	q{Color(cast(ubyte[3])[255,255,255])}
-        	),
+            "gs_w_d",
+            "Color",
+            "defaultBGColor",
+            "DefaultBGColor",
+            q{Color(cast(ubyte[3])[255,255,255])}
+            ),
         
         ]
-        );	
-	
+        );
+    
     TextLine[] lines;
     
     mixin installSignal!("LinesRecalcRequired", "signal_linesRecalcRequired");
+    mixin installSignal!("VisibilityMapRecalcRequired", "signal_visibilityMapRecalcRequired");
+    mixin installSignal!("ImageRegenRequired", "signal_imageRegenRequired");
     
-    // this()
-    // {
-    // 
-    // }
+    this()
+    {
+        struct stname {
+            string sname;
+            string tname;
+        }
+        
+        static foreach(
+            v;
+            [
+            // stname("X", "ulong"),
+            // stname("Y", "ulong"),
+            stname("TextMarkupType", "TextMarkupType"),
+            stname("LinesLayout", "GenVisibilityMapForSubitemsLayout"),
+            stname("LineCharsLayout", "GenVisibilityMapForSubitemsLayout"),
+            
+            stname("FaceFamily", "string"),
+            stname("FaceStyle", "string"),
+            stname("FaceSize", "uint"),
+            stname("FaceResolution", "uint"),
+            
+            stname("Bold", "bool"),
+            stname("Italic", "bool"),
+            stname("Underlined", "bool"),
+            
+            stname("DefaultFGColorEnabled", "bool"),
+            stname("DefaultFGColor", "Color"),
+            
+            stname("DefaultBGColorEnabled", "bool"),
+            stname("DefaultBGColor", "Color"),
+            ]
+            )
+        {
+            mixin(
+                q{
+                    pragma(msg, "connectTo%1$s_onAfterChanged");
+                    con_cont.add(
+                        connectTo%1$s_onAfterChanged(
+                            delegate void (%2$s v1, %2$s v2) nothrow
+                            {
+                                collectException(
+                                    signal_linesRecalcRequired.emit()
+                                    );
+                            }
+                            )
+                        );
+                }.format(v.sname, v.tname));
+        }
+    }
     
     mixin getState!("text_view.text_states", TextViewState,);
     
@@ -1102,7 +1153,7 @@ class Text
         if (first_text_textchar == last_text_textchar)
         {
             return lines[first_text_textchar].getText(
-            	first_text_textchar_index,
+                first_text_textchar_index,
                 last_text_textchar_index + 1
                 );
         }
@@ -1110,7 +1161,7 @@ class Text
         dstring ret;
         
         ret ~= lines[first_text_textchar].getText(first_text_textchar_index,
-        	lines[first_text_textchar].textchars.length);
+            lines[first_text_textchar].textchars.length);
         
         if (last_text_textchar - first_text_textchar > 1)
         {
@@ -1121,9 +1172,9 @@ class Text
         }
         
         ret ~= "\n" ~ lines[last_text_textchar].getText(
-        	0, 
-        	last_text_textchar_index
-        	);
+            0,
+            last_text_textchar_index
+            );
         
         return ret;
     }
@@ -1224,8 +1275,8 @@ class TextView
         
         PropSetting("gs_w_d", "TextViewMode", "textViewMode", "TextViewMode", "TextViewMode.singleLine"),
         
-        PropSetting("gs_w_d", "bool", "virtualWrapBySpace", "VirtualWrapBySpace", "true"), 			           
-        PropSetting("gs_w_d", "bool", "virtualWrapByChar", "VirtualWrapByChar", "true"), 			           
+        PropSetting("gs_w_d", "bool", "virtualWrapBySpace", "VirtualWrapBySpace", "true"),
+        PropSetting("gs_w_d", "bool", "virtualWrapByChar", "VirtualWrapByChar", "true"),
         ]
         );
     
@@ -1234,18 +1285,18 @@ class TextView
     
     // ulong cursor_position_line;
     // ulong cursor_position_column;
-    // 
+    //
     ElementVisibilityMapElement cursor_after;
     ElementVisibilityMapElement cursor_before;
     
     // Mode mode;
-    // 
+    //
     // bool getVirtualWrapBySpace();
     // bool getVirtualWrapByChar();
     
     Text text;
     
-    FontMgrI delegate() getFontManager;    
+    FontMgrI delegate() getFontManager;
     
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
@@ -1253,49 +1304,114 @@ class TextView
     TextViewState[Text] text_states;
     
     ElementVisibilityMap visibility_map;
-    Image _rendered_image;    
+    Image _rendered_image;
     
     bool linesRecalcRequired = true;
     bool visibilityMapRecalcRequired=true;
     bool imageRegenRequired = true;
     
+    // this one is for Text object
     SignalConnection text_linesRecalcRequired_sc;
+    // this one is for this object
+    SignalConnectionContainer con_cont;
     
-    Image getRenderedImage() 
-    {    	 
-    	if (linesRecalcRequired)
-    	{
-    		getText().reprocess(this);
-    		linesRecalcRequired = false;
-    		imageRegenRequired = true;
-    		visibilityMapRecalcRequired = true;
-    	}
-    	
-    	if (visibilityMapRecalcRequired)
-    	{
-    		genVisibilityMap();
-    		imageRegenRequired=true;
-    	}
-    	
-    	// genImage() uses visibilityMap to speed up rendering, so it must
-    	// be called after genVisibilityMap()
-    	if (imageRegenRequired)
-    	{
-    		genImage();
-    	}
-    	
-    	return _rendered_image;
+    Image getRenderedImage()
+    {
+        if (linesRecalcRequired)
+        {
+            debug writeln("linesRecalcRequired requested");
+            getText().reprocess(this);
+            linesRecalcRequired = false;
+            visibilityMapRecalcRequired = true;
+            imageRegenRequired = true;
+        }
+        
+        if (visibilityMapRecalcRequired)
+        {
+            debug writeln("visibilityMapRecalcRequired requested");
+            genVisibilityMap();
+        }
+        
+        // genImage() uses visibilityMap to speed up rendering, so it must
+        // be called after genVisibilityMap()
+        if (imageRegenRequired)
+        {
+            debug writeln("imageRegenRequired requested");
+            genImage();
+        }
+        
+        return _rendered_image;
     }
     
     // Signal!(ulong, ulong, ulong, ulong) redrawRequest;
     mixin installSignal!(
-    	"PerformRedraw", "signal_perform_redraw",
-    	ulong,ulong, ulong, ulong,  
-    	);
+        "PerformRedraw", "signal_perform_redraw",
+        ulong,ulong, ulong, ulong,
+        );
     
     this()
     {
+    	
+        struct stname {
+            string sname;
+            string tname;
+        }
+        
+        static foreach(
+            v;
+            [
+            // stname("X", "ulong"),
+            // stname("Y", "ulong"),
+            stname("Width", "ulong"),
+            stname("Height", "ulong"),
+            
+            stname("TextViewMode", "TextViewMode"),
+            stname("VirtualWrapBySpace", "bool"),
+            stname("VirtualWrapByChar", "bool"),
+            ]
+            )
+        {
+            mixin(
+                q{
+                    pragma(msg, "connectTo%1$s_onAfterChanged");
+                    con_cont.add(
+                        connectTo%1$s_onAfterChanged(
+                            delegate void (%2$s v1, %2$s v2) nothrow
+                            {
+                                linesRecalcRequired = true;
+                            }
+                            )
+                        );
+                }.format(v.sname, v.tname));
+        }
+        
+        
+        static foreach(
+            v;
+            [
+            stname("X", "ulong"),
+            stname("Y", "ulong"),
+            // stname("Width", "ulong"),
+            // stname("Height", "ulong"),
+            ]
+            )
+        {
+            mixin(
+                q{
+                    pragma(msg, "connectTo%1$s_onAfterChanged");
+                    con_cont.add(
+                        connectTo%1$s_onAfterChanged(
+                            delegate void (%2$s v1, %2$s v2) nothrow
+                            {
+                                visibilityMapRecalcRequired = true;
+                            }
+                            )
+                        );
+                }.format(v.sname, v.tname));
+        }
+        
         setTextString("");
+        
     }
     
     this(dstring txt)
@@ -1312,7 +1428,7 @@ class TextView
     // {
     // linesRecalcRequired=true;
     // }
-    // 
+    //
     void setTextString(dstring txt = "")
     {
         if (text is null)
@@ -1344,11 +1460,11 @@ class TextView
     {
         text = txt;
         text_linesRecalcRequired_sc = text.connectTo_LinesRecalcRequired(
-        	delegate void() nothrow
-        	{
-        		linesRecalcRequired=true;
-        	}
-        	);
+            delegate void() nothrow
+            {
+                linesRecalcRequired=true;
+            }
+            );
     }
     
     Text getText()
@@ -1367,34 +1483,59 @@ class TextView
         
         auto visibility_map = new ElementVisibilityMap(this);
         
+        auto x  =getX();
+        auto y =getY();
+        auto width= getWidth();
+        auto height= getHeight();
+        
+        debug writefln(
+            "genVisibilityMap for %s %s %s %s",
+            x,
+            y,
+            width,
+            height,
+            );
+        
         text.genVisibilityMap(
-        	getX(), 
-        	getY(), 
-        	getWidth(), 
-        	getHeight(), 
-        	this, 
-        	visibility_map
-        	);
+            x,
+            y,
+            width,
+            height,
+            this,
+            visibility_map
+            );
+        
+        debug writefln(
+            "genVisibilityMap length %s",
+            visibility_map.elements.length
+            );
         
         this.visibility_map=visibility_map;
         
         visibilityMapRecalcRequired = false;
+        imageRegenRequired=true;
     }
     
     void drawElementVisibilityMapElement(ElementVisibilityMapElement e)
     {
-    	auto chr_state = e.chr.getState(this);
-    	
-    	_rendered_image.putImage(
-    		e.target_x,
-    		e.target_y,
-    		chr_state.resImg.getImage(
-    			getX(), getY(),
-    			e.width, e.height
-    			)
-    		);
-    	
-    	signal_perform_redraw.emit(e.target_x, e.target_y, e.width,  e.height);
+        auto chr_state = e.chr.getState(this);
+        
+        debug writefln("putting char to picture (%s): ", e);
+        
+        auto z = chr_state.resImg.getImage(
+            getX(), getY(),
+            e.width, e.height
+            );
+        
+        // debug z.printImage();
+        
+        _rendered_image.putImage(
+            e.target_x,
+            e.target_y,
+            z
+            );
+        
+        signal_perform_redraw.emit(e.target_x, e.target_y, e.width,  e.height);
     }
     
     void genImage()
@@ -1402,19 +1543,27 @@ class TextView
         if (text is null)
             throw new Exception("text object is not set");
         
-        _rendered_image = new Image(getWidth(), getHeight());
+        auto w = getWidth();
+        auto h = getHeight();
+        
+        _rendered_image = new Image(w, h);
+        
+        debug writeln(
+            "genImage visibility_map.elements.length ",
+            visibility_map.elements.length
+            );
         
         if (visibility_map !is null)
         {
             foreach (v; visibility_map.elements)
             {
-            	drawElementVisibilityMapElement(v);
+                drawElementVisibilityMapElement(v);
             }
         }
         
         imageRegenRequired = false;
         
-        signal_perform_redraw.emit(0, 0, getWidth(), getHeight());
+        signal_perform_redraw.emit(0, 0, w, h);
     }
     
     // void reprocess()
@@ -1432,122 +1581,122 @@ class TextView
     {
         debug writeln("processor clicked [", x, ":", y, "]");
         if (getCursorEnabled())
-        	changeCursorPosition(x, y);
+            changeCursorPosition(x, y);
     }
     
     void timer500ms_handle()
     {
-    	timer500ms_handle_cursor();
+        timer500ms_handle_cursor();
     }
     
     void timer500ms_handle_cursor_draw()
     {
     	
-    	ulong x;
-    	ulong y;
-    	ulong width;
-    	ulong height;
-    	
-    	const ulong cursor_width = 2;
-    	
-    	if (cursor_after is null && cursor_before is null)
-    		return;
-    	
-    	if (cursor_after !is null)
-    	{
-    		final switch(text.getLineCharsLayout())
-    		{
-    		case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-    			x = cursor_after.target_x+cursor_after.width;
-    			y = cursor_after.target_y;
-    			width = cursor_width;
-    			height = cursor_after.height;
-    			break;
-    		case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-    			x = cursor_after.target_x;
-    			y = cursor_after.target_y;
-    			width = cursor_width;
-    			height = cursor_after.height;
-    			break;
-    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-    			x = cursor_after.target_x;
-    			y = cursor_after.target_y+cursor_after.height;
-    			width = cursor_after.width;
-    			height = cursor_width;
-    		}
-    	}
-    	else
-    	{
-    		final switch(text.getLineCharsLayout())
-    		{
-    		case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-    			x = cursor_before.target_x+cursor_before.width;
-    			y = cursor_before.target_y;
-    			width = cursor_width;
-    			height = cursor_before.height;
-    			break;
-    		case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-    			x = cursor_before.target_x;
-    			y = cursor_before.target_y;
-    			width = cursor_width;
-    			height = cursor_before.height;
-    			break;
-    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-    		case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-    			x = cursor_before.target_x;
-    			y = cursor_before.target_y+cursor_after.height;
-    			width = cursor_before.width;
-    			height = cursor_width;
-    		}
-    	}
-    	
-    	drawCursor(x,y,width,height);    	
-    	
-    	signal_perform_redraw.emit(x,y,width,height);
+        ulong x;
+        ulong y;
+        ulong width;
+        ulong height;
+        
+        const ulong cursor_width = 2;
+        
+        if (cursor_after is null && cursor_before is null)
+            return;
+        
+        if (cursor_after !is null)
+        {
+            final switch(text.getLineCharsLayout())
+            {
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                x = cursor_after.target_x+cursor_after.width;
+                y = cursor_after.target_y;
+                width = cursor_width;
+                height = cursor_after.height;
+                break;
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                x = cursor_after.target_x;
+                y = cursor_after.target_y;
+                width = cursor_width;
+                height = cursor_after.height;
+                break;
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                x = cursor_after.target_x;
+                y = cursor_after.target_y+cursor_after.height;
+                width = cursor_after.width;
+                height = cursor_width;
+            }
+        }
+        else
+        {
+            final switch(text.getLineCharsLayout())
+            {
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                x = cursor_before.target_x+cursor_before.width;
+                y = cursor_before.target_y;
+                width = cursor_width;
+                height = cursor_before.height;
+                break;
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                x = cursor_before.target_x;
+                y = cursor_before.target_y;
+                width = cursor_width;
+                height = cursor_before.height;
+                break;
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                x = cursor_before.target_x;
+                y = cursor_before.target_y+cursor_after.height;
+                width = cursor_before.width;
+                height = cursor_width;
+            }
+        }
+        
+        drawCursor(x,y,width,height);
+        
+        signal_perform_redraw.emit(x,y,width,height);
     }
     
     void drawCursor(ulong x,ulong y,ulong width,ulong height)
     {
-    	auto dot = ImageDot();
-    	dot.enabled=true;
-    	dot.intensivity=1;
-    	dot.color = Color(cast(ubyte[3])[255,0,0]);
-    	for (ulong i = x; i != x+width; i++)
-    	{
-    		for (ulong j = y; j != y+height; j++)
-    		{
-    			_rendered_image.setDot(x,y,dot);
-    		}
-    	}
+        auto dot = ImageDot();
+        dot.enabled=true;
+        dot.intensivity=1;
+        dot.color = Color(cast(ubyte[3])[255,0,0]);
+        for (ulong i = x; i != x+width; i++)
+        {
+            for (ulong j = y; j != y+height; j++)
+            {
+                _rendered_image.setDot(x,y,dot);
+            }
+        }
     }
     
     void timer500ms_handle_cursor_clear() {
-    	if (cursor_before !is null)
-    		drawElementVisibilityMapElement(cursor_before);
-    	if (cursor_after !is null)
-    		drawElementVisibilityMapElement(cursor_after);
+        if (cursor_before !is null)
+            drawElementVisibilityMapElement(cursor_before);
+        if (cursor_after !is null)
+            drawElementVisibilityMapElement(cursor_after);
     }
     
     void timer500ms_handle_cursor()
     {
-    	if (!getCursorEnabled())
-    		return;
-    	
-    	if (cursor_animation_iteration_visible)
-    		timer500ms_handle_cursor_draw();
-    	else
-    		timer500ms_handle_cursor_clear();
+        if (!getCursorEnabled())
+            return;
+        
+        if (cursor_animation_iteration_visible)
+            timer500ms_handle_cursor_draw();
+        else
+            timer500ms_handle_cursor_clear();
     }
     
     void changeCursorPosition(ulong x, ulong y)
     {
-    	cursor_after = null;
-    	cursor_before = null;
+        cursor_after = null;
+        cursor_before = null;
         auto el_clicked = determineVisibleElementAt(x,y);
         
         if (el_clicked[0] is null)
-        	return;
+            return;
         
         setCursorPositionLine(el_clicked[0].line);
         
@@ -1556,27 +1705,27 @@ class TextView
         final switch(text.getLineCharsLayout())
         {
         case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-        	if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.right)
-        		add_one_char = true;
-        	break;
+            if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.right)
+                add_one_char = true;
+            break;
         case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-        	if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.left)
-        		add_one_char = true;
-        	break;
+            if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.left)
+                add_one_char = true;
+            break;
         case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-        	if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
-        		add_one_char = true;
-        	break;
+            if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
+                add_one_char = true;
+            break;
         case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-        	if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
-        		add_one_char = true;
-        	break;
+            if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
+                add_one_char = true;
+            break;
         }
         
         setCursorPositionColumn(el_clicked[0].line_char);
         cursor_before = el_clicked[0];
         if (add_one_char)
-        	cursor_after = cursor_before;
+            cursor_after = cursor_before;
         cursor_before = null;
         setCursorPositionColumn(getCursorPositionColumn()+1);
         
@@ -1584,55 +1733,55 @@ class TextView
     }
     
     Tuple!(
-    	ElementVisibilityMapElement, 
-    	ElementVisibilityMapElementClickLeanH,
-    	ElementVisibilityMapElementClickLeanV
-    	)
+        ElementVisibilityMapElement,
+        ElementVisibilityMapElementClickLeanH,
+        ElementVisibilityMapElementClickLeanV
+        )
     determineVisibleElementAt(ulong x, ulong y)
     {
-    	auto fail_res = tuple(
-    		cast(ElementVisibilityMapElement) null,
-    		cast(ElementVisibilityMapElementClickLeanH)0,
-    		cast(ElementVisibilityMapElementClickLeanV)0,
-    		);
-    	
-    	if (visibility_map is null)
-    		return fail_res;
-    	
-    	foreach (v; visibility_map.elements)
-    	{
-    		if (
-    			(x >= v.target_x && x <= v.target_x+v.width)
-    		&&
-    		(y >= v.target_y && y <= v.target_y+v.height)
-    		)
-    		{
-    			auto lh = ElementVisibilityMapElementClickLeanH.left;
-    			auto lv = ElementVisibilityMapElementClickLeanV.top;
-    			
-    			if (x >= v.target_x+(v.width/2))
-    				lh = ElementVisibilityMapElementClickLeanH.right;
-    			if (y >= v.target_y+(v.height/2))
-    				lv = ElementVisibilityMapElementClickLeanV.bottom;
-    			return tuple(v,lh,lv);
-    		}
-    	}
-    	
-    	return fail_res;
+        auto fail_res = tuple(
+            cast(ElementVisibilityMapElement) null,
+            cast(ElementVisibilityMapElementClickLeanH)0,
+            cast(ElementVisibilityMapElementClickLeanV)0,
+            );
+        
+        if (visibility_map is null)
+            return fail_res;
+        
+        foreach (v; visibility_map.elements)
+        {
+            if (
+                (x >= v.target_x && x <= v.target_x+v.width)
+            &&
+            (y >= v.target_y && y <= v.target_y+v.height)
+            )
+            {
+                auto lh = ElementVisibilityMapElementClickLeanH.left;
+                auto lv = ElementVisibilityMapElementClickLeanV.top;
+                
+                if (x >= v.target_x+(v.width/2))
+                    lh = ElementVisibilityMapElementClickLeanH.right;
+                if (y >= v.target_y+(v.height/2))
+                    lv = ElementVisibilityMapElementClickLeanV.bottom;
+                return tuple(v,lh,lv);
+            }
+        }
+        
+        return fail_res;
     }
     
 }
 
 enum ElementVisibilityMapElementClickLeanH : ubyte
 {
-	left,
-	right,
+    left,
+    right,
 }
 
 enum ElementVisibilityMapElementClickLeanV : ubyte
 {
-	top,
-	bottom,
+    top,
+    bottom,
 }
 
 
