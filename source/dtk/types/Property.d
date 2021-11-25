@@ -436,57 +436,7 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
 
 }
 
-unittest
-{
-    import std.conv;
-
-    {
-        auto z = Property!(int, PropertySettingsCT!(int), {
-            PropertySettingsCT!int x = {variable_use_on_get: true};
-            return x;
-        }())({ PropertySettings!int x = {}; return x; }());
-
-        assert(z.isDefault());
-        assert(__traits(hasMember, z, "isUnset") == false);
-        assert(z.get() == int.init);
-        z.set(1);
-        assert(z.isDefault() == false);
-
-        {
-            auto x = z.get();
-            assert(x == 1, to!string(x));
-        }
-    }
-
-    {
-        class X
-        {
-            public
-            {
-                auto prop_z = Property!(int, PropertySettingsCT!(int), {
-                    PropertySettingsCT!int x = {variable_use_on_get: true};
-                    return x;
-                }())({ PropertySettings!int x = {}; return x; }());
-            }
-
-            mixin Property_forwarding!(int, prop_z, "PropZ");
-        }
-
-        auto x = new X();
-
-        assert(__traits(hasMember, x, "getPropZ"));
-        assert(x.isDefaultPropZ());
-        assert(x.isUnsetPropZ());
-        assert(x.getPropZ() == 0);
-        assert(!x.isDefaultPropZ());
-        assert(!x.isUnsetPropZ());
-        x.setPropZ(1);
-        assert(x.getPropZ() == 1);
-
-    }
-
-}
-
+// TODO: add new unittests
 
 struct PropSetting
 {

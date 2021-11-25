@@ -79,7 +79,7 @@ mixin template Property_gs(T, string variable)
 {
     import std.format;
 
-    pragma(msg, "creating property \"", variable, "\"");
+    // pragma(msg, "creating property \"", variable, "\"");
 
     mixin(q{
     Property!(T, PropertySettings!T, {

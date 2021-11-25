@@ -176,7 +176,7 @@ class TextEntry : Widget, ContainerableWidgetI
     				}()
     				);
     			if (err !is null)
-    				debug writeln(err);
+    				debug writeln("error on trying to draw on TextEntry on on_textview_redraw_request: ", err);
     		}()
     		);
         

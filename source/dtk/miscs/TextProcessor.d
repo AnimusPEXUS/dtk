@@ -1266,6 +1266,7 @@ class TextView
     	if (linesRecalcRequired)
     	{
     		getText().reprocess(this);
+    		linesRecalcRequired = false;
     		imageRegenRequired = true;
     		visibilityMapRecalcRequired = true;
     	}
