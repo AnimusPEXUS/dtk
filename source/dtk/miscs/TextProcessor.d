@@ -222,32 +222,33 @@ void genVisibilityMapForSubitems(
             break;
         }
         
-        // debug for (ulong i = 0; i <= items_count; i++)
-        // {
-        // auto tx= calc_loop_target_x(i)     ;
-        // auto ty=calc_loop_target_y(i)     ;
-        // auto sx=calc_loop_source_x(i)     ;
-        // auto sy=calc_loop_source_y(i)     ;
-        // auto sw=calc_loop_source_width(i) ;
-        // auto sh=calc_loop_source_height(i);
-        //
-        // writeln("
-        // i                         : %d
-        // calc_loop_target_x(i)     : %d
-        // calc_loop_target_y(i)     : %d
-        // calc_loop_source_x(i)     : %d
-        // calc_loop_source_y(i)     : %d
-        // calc_loop_source_width(i) : %d
-        // calc_loop_source_height(i): %d
-        // ".format(i,tx,ty,sx,sy,sw,sh));
-        // genVisibilityMapForSubitem(
-        // i,
-        // tx,
-        // ty,
-        // sx, sy,
-        // sw, sh
-        // );
-        // }
+        debug for (ulong i = 0; i <= items_count; i++)
+        {
+            auto tx = calc_loop_target_x(i);
+            auto ty = calc_loop_target_y(i);
+            auto sx = calc_loop_source_x(i);
+            auto sy = calc_loop_source_y(i);
+            auto sw = calc_loop_source_width(i);
+            auto sh = calc_loop_source_height(i);
+            
+            // writeln("
+            // i                         : %d
+            // calc_loop_target_x(i)     : %d
+            // calc_loop_target_y(i)     : %d
+            // calc_loop_source_x(i)     : %d
+            // calc_loop_source_y(i)     : %d
+            // calc_loop_source_width(i) : %d
+            // calc_loop_source_height(i): %d
+            // ".format(i,tx,ty,sx,sy,sw,sh));
+            
+            genVisibilityMapForSubitem(
+                i,
+                tx,
+                ty,
+                sx, sy,
+                sw, sh
+                );
+        }
     }
     
     return;
@@ -322,7 +323,7 @@ class TextChar
         catch (Exception e)
         {
             // TODO: replace with dummy glyph
-            debug writeln("error: ", e);
+            debug writeln("(non fatal) error: ", e);
             state.glyph = face.renderGlyphByChar(cast(dchar)'?');
             /* state.width = state.glyph.bitmap.width;
             state.height = state.glyph.bitmap.height; */
@@ -521,13 +522,16 @@ class TextLineSubline
                 evme.line_char=this_line_done_chars_count + subitem_index;
                 
                 evme.target_x=sublines_target_x + target_x;
-                evme.target_y=sublines_target_y+target_y;
+                evme.target_y=sublines_target_y + target_y;
                 evme.x=x;
                 evme.y=y;
                 evme.width=width;
                 evme.height=height;
                 
-                debug writefln("adding evme to elements (%d)", visibility_map.elements.length);
+                debug writefln(
+                    "adding evme to elements (%d) %s",
+                    visibility_map.elements.length, evme.chr.chr
+                    );
                 visibility_map.elements ~= evme;
             }
             );
@@ -591,12 +595,14 @@ class TextLine
         }
     }
     
-    void reprocessSublines(TextView text_view)
+    // recreates sublines
+    void recreateSublines(TextView text_view)
     {
         auto state = getState(text_view);
         
         state.sublines = state.sublines[0 .. 0];
         
+        // each line always have at least one subline
         state.sublines ~= new TextLineSubline(this);
         ulong current_line = 0;
         
@@ -609,12 +615,12 @@ class TextLine
         if (text_view.getVirtualWrapBySpace()
             || text_view.getVirtualWrapByChar())
         {
-            switch (parent_text.getLinesLayout())
+            switch (parent_text.getLineCharsLayout())
             {
             default:
                 throw new Exception(
-                    "parent_text.getLinesLayout ",
-                    to!string(parent_text.getLinesLayout())
+                    "not supported parent_text.getLineCharsLayout ",
+                    to!string(parent_text.getLineCharsLayout())
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
@@ -634,7 +640,7 @@ class TextLine
         
         sl_state.textchars=sl_state.textchars[0 .. 0];
         
-        debug writeln("reprocessSublines textchars.length ", textchars.length);
+        debug writeln("recreateSublines textchars.length ", textchars.length);
         
         foreach (tc; textchars)
         {
@@ -642,12 +648,12 @@ class TextLine
             
             auto tc_state = tc.getState(text_view);
             
-            switch (parent_text.getLinesLayout())
+            switch (parent_text.getLineCharsLayout())
             {
             default:
                 throw new Exception(
-                    "parent_text.getLinesLayout ",
-                    to!string(parent_text.getLinesLayout())
+                    "not supported parent_text.getLineCharsLayout ",
+                    to!string(parent_text.getLineCharsLayout())
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
@@ -687,23 +693,22 @@ class TextLine
             sl_state.textchars ~= tc;
         }
         
-        recalculateWidthAndHeight(text_view);
     }
     
-    void reprocess(TextView text_view)
+    void recalculateSublinesWidthsAndHeights(TextView text_view)
     {
-        recalculateWidthAndHeight(text_view);
-    }
-    
-    void recalculateWidthAndHeight(TextView text_view)
-    {
-    	
         auto state = getState(text_view);
         
         foreach (sl; state.sublines)
         {
             sl.recalculateWidthAndHeight(text_view);
         }
+    }
+    
+    void recalculateWidthAndHeight(TextView text_view)
+    {
+    	
+        auto state = getState(text_view);
         
         state.width = 0;
         state.height = 0;
@@ -742,9 +747,9 @@ class TextLine
                         state.width += sl_state.width;
                         
                         {
-                            auto w = sl_state.height;
-                            if (w > state.height)
-                                state.height = w;
+                            auto h = sl_state.height;
+                            if (h > state.height)
+                                state.height = h;
                         }
                     }
                     break;
@@ -937,6 +942,7 @@ class Text
         ]
         );
     
+    // NOTE: lines should remain here, not to be moved into State
     TextLine[] lines;
     
     mixin installSignal!("LinesRecalcRequired", "signal_linesRecalcRequired");
@@ -995,12 +1001,73 @@ class Text
     
     mixin getState!("text_view.text_states", TextViewState,);
     
+    void recalculateWidthAndHeight(TextView text_view)
+    {
+    	
+        auto state = getState(text_view);
+        
+        // foreach (sl; state.sublines)
+        // {
+        // sl.recalculateWidthAndHeight(text_view);
+        // }
+        //
+        state.width = 0;
+        state.height = 0;
+        
+        if (lines.length != 0)
+        {
+        	
+            switch (getLinesLayout())
+            {
+            default:
+                throw new Exception(
+                    "getLinesLayout ",
+                    to!string(getLinesLayout())
+                    );
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                    foreach (l; lines)
+                    {
+                        auto l_state = l.getState(text_view);
+                        
+                        {
+                            auto w = l_state.width;
+                            if (w > state.width)
+                                state.width = w;
+                        }
+                        
+                        state.height += l_state.height;
+                    }
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                    foreach (l; lines)
+                    {
+                        auto l_state = l.getState(text_view);
+                        
+                        state.width += l_state.width;
+                        
+                        {
+                            auto h = l_state.height;
+                            if (h > state.height)
+                                state.height = h;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+    
     void setText(dstring txt)
     {
         lines = lines[0 .. 0];
         
         debug writeln("setText entering slicing loop");
-        debug scope(exit) writeln("setText exited slicing loop");
+        debug scope(exit)
+        {
+            signal_linesRecalcRequired.emit();
+            writeln("setText exited slicing loop");
+        }
         
         auto line_ended = false;
         
@@ -1042,11 +1109,29 @@ class Text
         
     }
     
+    // the target of reprocess is to calculate Text width and height
+    // in order to do so, each structural unit must have (or have recalculated)
+    // it's width and height
     void reprocess(TextView text_view)
     {
+        debug writeln("Text.reprocess called");
+        
+        // obviously, each character's size have to be known
+        // in systems with freetype this also renders characters at once
         reprocessUnits(text_view);
-        reprocessSublines(text_view);
-        reprocessLines(text_view);
+        
+        // disect Lines to Sublines
+        recreateSublines(text_view);
+        
+        // sublines widths and heights necessary to know lines widths and
+        // heights
+        recalculateSublinesWidthsAndHeights(text_view);
+        
+        // lines widths and heights necessary to know text width and height
+        recalculateLinesWidthsAndHeights(text_view);
+        
+        // do the final step
+        recalculateWidthAndHeight(text_view);
     }
     
     void reprocessUnits(TextView text_view)
@@ -1057,22 +1142,33 @@ class Text
         }
     }
     
-    void reprocessSublines(TextView text_view)
+    void recreateSublines(TextView text_view)
     {
         foreach (l; lines)
         {
-            l.reprocessSublines(text_view);
+            l.recreateSublines(text_view);
         }
     }
     
-    void reprocessLines(TextView text_view)
+    void recalculateSublinesWidthsAndHeights(TextView text_view)
     {
         foreach (l; lines)
         {
-            l.reprocess(text_view);
+            l.recalculateSublinesWidthsAndHeights(text_view);
         }
-        
     }
+    
+    void recalculateLinesWidthsAndHeights(TextView text_view)
+    {
+        foreach (l; lines)
+        {
+            l.recalculateWidthAndHeight(text_view);
+        }
+    }
+    
+    // void reprocessText(TextView text_view)
+    // {
+    // }
     
     dstring getText()
     {
@@ -1483,10 +1579,10 @@ class TextView
         
         auto visibility_map = new ElementVisibilityMap(this);
         
-        auto x  =getX();
-        auto y =getY();
-        auto width= getWidth();
-        auto height= getHeight();
+        auto x = getX();
+        auto y = getY();
+        auto width = getWidth();
+        auto height = getHeight();
         
         debug writefln(
             "genVisibilityMap for %s %s %s %s",
@@ -1516,7 +1612,7 @@ class TextView
         imageRegenRequired=true;
     }
     
-    void drawElementVisibilityMapElement(ElementVisibilityMapElement e)
+    void drawElementVisibilityMapElement(ElementVisibilityMapElement e, bool emit)
     {
         auto chr_state = e.chr.getState(this);
         
@@ -1535,7 +1631,8 @@ class TextView
             z
             );
         
-        signal_perform_redraw.emit(e.target_x, e.target_y, e.width,  e.height);
+        if (emit)
+            signal_perform_redraw.emit(e.target_x, e.target_y, e.width,  e.height);
     }
     
     void genImage()
@@ -1557,7 +1654,7 @@ class TextView
         {
             foreach (v; visibility_map.elements)
             {
-                drawElementVisibilityMapElement(v);
+                drawElementVisibilityMapElement(v, false);
             }
         }
         
@@ -1673,9 +1770,9 @@ class TextView
     
     void timer500ms_handle_cursor_clear() {
         if (cursor_before !is null)
-            drawElementVisibilityMapElement(cursor_before);
+            drawElementVisibilityMapElement(cursor_before, true);
         if (cursor_after !is null)
-            drawElementVisibilityMapElement(cursor_after);
+            drawElementVisibilityMapElement(cursor_after, true);
     }
     
     void timer500ms_handle_cursor()
