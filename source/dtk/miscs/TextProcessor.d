@@ -1365,9 +1365,11 @@ class TextView
         
         // NOTE: I think it's better not to create entire property for this
         // PropSetting("gs_w_d", "bool", "cursor_animation_iteration_visible", "CursorAnimationIterationVisible", "false"),
-        
+       
         PropSetting("gs_w_d", "ulong", "cursor_position_line", "CursorPositionLine", "0"),
         PropSetting("gs_w_d", "ulong", "cursor_position_column", "CursorPositionColumn", "0"),
+
+        PropSetting("gs_w_d", "bool", "readOnly", "ReadOnly", "false"),
         
         PropSetting("gs_w_d", "TextViewMode", "textViewMode", "TextViewMode", "TextViewMode.singleLine"),
         
@@ -1681,8 +1683,10 @@ class TextView
             changeCursorPosition(x, y);
     }
     
+    // this have to be called from outside each 500ms
     void timer500ms_handle()
     {
+    	debug writeln("timer500ms_handle()");
         timer500ms_handle_cursor();
     }
     
@@ -1763,7 +1767,7 @@ class TextView
         {
             for (ulong j = y; j != y+height; j++)
             {
-                _rendered_image.setDot(x,y,dot);
+                _rendered_image.setDot(i,j,dot);
             }
         }
     }
@@ -1778,16 +1782,31 @@ class TextView
     void timer500ms_handle_cursor()
     {
         if (!getCursorEnabled())
-            return;
+            return;               
         
         if (cursor_animation_iteration_visible)
+        {
+        	debug writeln("drawing cursor");
             timer500ms_handle_cursor_draw();
+        }
         else
+        {
+        	debug writeln("clearing cursor");
             timer500ms_handle_cursor_clear();
+        }
+        
+        cursor_animation_iteration_visible = !cursor_animation_iteration_visible;
     }
     
     void changeCursorPosition(ulong x, ulong y)
     {
+    	scope(exit) {
+    		writefln(
+    			"cursor moved to line %d, column %d",
+    			getCursorPositionLine(),
+    			getCursorPositionColumn()
+    			);
+    	}
         cursor_after = null;
         cursor_before = null;
         auto el_clicked = determineVisibleElementAt(x,y);
@@ -1824,7 +1843,7 @@ class TextView
         if (add_one_char)
             cursor_after = cursor_before;
         cursor_before = null;
-        setCursorPositionColumn(getCursorPositionColumn()+1);
+        setCursorPositionColumn(getCursorPositionColumn()+1);               
         
         cursor_animation_iteration_visible=true;
     }

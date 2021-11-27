@@ -49,12 +49,14 @@ class TextEntry : Widget, ContainerableWidgetI
             PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
             PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
             PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
+            PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
         ]
         );
     
     private {
     	SignalConnectionContainer con_cont;
     	SignalConnection textViewConnCon;
+    	SignalConnection textViewTimerConnection;
     }
     
 
@@ -111,6 +113,7 @@ class TextEntry : Widget, ContainerableWidgetI
                 stname("ForceMonowidth", "bool"),
                 stname("TextSelectable", "bool"),
                 stname("TextEditable", "bool"),
+                stname("CursorEnabled", "bool"),
                 ]
                 )
         {
@@ -160,6 +163,8 @@ class TextEntry : Widget, ContainerableWidgetI
         textViewConnCon = text_view.connectTo_PerformRedraw(
         	&on_textview_redraw_request
         	);
+        
+        // textViewTimerConnection = getForm()
 
     }
     
@@ -270,14 +275,18 @@ class TextEntry : Widget, ContainerableWidgetI
 
         auto size = getSize();
         text_view.setWidth(size.width);
-        debug writeln("text_view.width = ", text_view.getWidth());
         text_view.setHeight(size.height);
 
         if (getDrawBewelAndBackground())
         {
+        	// TODO: optimize this: must be as less view redrawings as possible
             text_view.setWidth(text_view.getWidth()-4);
             text_view.setHeight(text_view.getHeight()-4);
         }
+        
+        text_view.setTextSelectionEnabled(getTextSelectable());
+        text_view.setReadOnly(!getTextEditable());
+        text_view.setCursorEnabled(getCursorEnabled());
 
         // this not needed anymore, as TextView manually tracks propery changes
         // text_view.redrawRequired = true;

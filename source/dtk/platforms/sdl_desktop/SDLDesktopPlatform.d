@@ -22,14 +22,14 @@ import dtk.miscs.WindowEventMgr;
 
 // TODO: ensure those events are not needed
 immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
-	SDL_WINDOWEVENT_NONE, 
-	SDL_WINDOWEVENT_SIZE_CHANGED,
-	cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
+SDL_WINDOWEVENT_NONE,
+SDL_WINDOWEVENT_SIZE_CHANGED,
+cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
 ];
 
 class SDLDesktopPlatform : PlatformI
 {
-	
+
     private
     {
         Window[] windows;
@@ -39,36 +39,36 @@ class SDLDesktopPlatform : PlatformI
         // bool exit;
         bool stop_flag;
         // alias exit = stop_flag;
-        
+
         SDL_EventType timer500_event_id;
     }
-    
+
     string getName()
     {
         return "SDL-Desktop";
     }
-    
+
     string getDescription()
     {
         return "DTK (D ToolKit). on SDL Platform";
     }
-    
+
     string getSystemTriplet()
     {
         return "x86_64-pc-linux-gnu"; // TODO: fix this
     }
-    
+
     bool canCreateWindow()
     {
         return true;
     }
-    
+
     WindowI createWindow(WindowCreationSettings window_settings)
     {
         auto w = new Window(window_settings, this);
         return w;
     }
-    
+
     void registerWindow(Window win)
     {
         foreach (ref Window w; windows)
@@ -78,7 +78,7 @@ class SDLDesktopPlatform : PlatformI
         }
         windows ~= win;
     }
-    
+
     void unregisterWindow(Window win)
     {
         size_t[] indexes;
@@ -87,37 +87,37 @@ class SDLDesktopPlatform : PlatformI
             if (w == win)
                 indexes ~= i;
         }
-        
+
         foreach_reverse (size_t i; indexes)
         {
             windows = windows[0 .. i] ~ windows[i + 1 .. $];
         }
     }
-    
+
     bool getFormCanResizeWindow()
     {
         return true;
     }
-    
+
     void init()
     {
         SDL_Init(SDL_INIT_VIDEO);
         SDL_version v;
         SDL_GetVersion(&v);
         debug writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
-        
+
         {
         	timer500_event_id = cast(SDL_EventType)SDL_RegisterEvents(1);
         	if (timer500_event_id == -1)
         		throw new Exception("Couldn't register 500 ms timer event");
-        	
+
         }
-                
+
         version (linux)
         {
             pragma(msg, "using freetype font manager");
             import dtk.platforms.sdl_desktop.FontMgrLinux;
-            
+
             font_mgr = cast(FontMgrI) new FontMgrLinux;
         }
         else
@@ -126,19 +126,19 @@ class SDLDesktopPlatform : PlatformI
             static assert(false, "Couldn't select Font Manager for platform");
         }
     }
-    
+
     void destroy()
     {
         SDL_Quit();
     }
-    
+
     mixin installSignal!("Timer500", "signal_timer500");
-    
+
     FontMgrI getFontManager()
     {
         return font_mgr;
     }
-    
+
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)
     {
         Window ret;
@@ -156,12 +156,12 @@ class SDLDesktopPlatform : PlatformI
         }
         return ret;
     }
-    
+
     void timer500Loop()
     {
     	import core.thread;
     	import core.time;
-    	
+
     	//    	auto sleep_f = core.thread.osthread.Thread.getThis.sleep;
     	auto m500 = msecs(500);
     	while(!stop_flag)
@@ -174,53 +174,54 @@ class SDLDesktopPlatform : PlatformI
     		SDL_PushEvent(e);
     	}
     }
-    
+
     void mainLoop()
     {
     	import std.parallelism;
-    	
+
         SDL_Event* event = new SDL_Event;
-        
+
         auto timer500 = task(&timer500Loop);
-        //timer500.executeInNewThread();
+        timer500.executeInNewThread();
         scope(exit) {
         	writeln("mainLoop exiting..");
         	stop_flag=true;
-        	//timer500.workForce();
+        	timer500.workForce();
         	writeln("mainLoop exited.");
         }
-        
+
         main_loop: while (!stop_flag)
         {
-            
+
             auto res = SDL_WaitEvent(event);
-            
+
             if (res == 0) // TODO: use GetError()
             {
                 debug writeln("TODO: got error on SDL_WaitEvent");
                 return;
             }
-            
+
             // TODO: probably, at this point, things have to become asynchronous
-            
+
             debug writeln("mainLoop event type: " ,event.type);
-            
+
             if (event.type == SDL_USEREVENT)
             {
-            	if (cast(SDL_EventType)event.user.type 
+            	if (cast(SDL_EventType)event.user.type
             		== timer500_event_id)
             	{
             		writeln("500ms event");
             		// foreach (w;windows)
             		// {
             			// w.handle_SDL_Event(event);
-            		// }    
+            		// }
+            		signal_timer500.emit();
             	}
-            } 
+            }
             else
             {
             	typeof(SDL_WindowEvent.windowID) windowID;
-            
+
             	event_type_switch:
             	switch (event.type)
             	{
@@ -254,37 +255,34 @@ class SDLDesktopPlatform : PlatformI
             	case SDL_QUIT:
             		break main_loop;
             	}
-            	
+
             	// writeln(1);
             	auto w = getWindowByWindowID(event.window.windowID);
             	// writeln(2);
-            	
+
             	// NOTE: window have to recieve all events, because not all
             	// platforms have same set of events, and so, Window may be required
             	// to emitate event emission in some curcumstances based on it's
             	// current state.
-            	w.handle_SDL_Event(event); 	
+            	w.handle_SDL_Event(event);
             	// writeln(3);
             }
         }
-        
-        // TODO: try to place this to scope exit
-        // stop_flag=true;
-        // timer500.workForce();
-                
+
+
         return;
     }
-    
+
     LafI getLaf()
     {
         return laf;
     }
-    
+
     void setLaf(LafI t)
     {
         laf = t;
     }
-    
+
     void unsetLaf()
     {
         laf = null;
