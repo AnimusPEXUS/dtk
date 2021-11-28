@@ -17,11 +17,13 @@ import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.FontMgrI;
+import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
 import dtk.miscs.TextProcessor;
+import dtk.miscs.DrawingSurfaceShift;
 
 class TextEntry : Widget, ContainerableWidgetI
 {
@@ -56,38 +58,24 @@ class TextEntry : Widget, ContainerableWidgetI
     private {
     	SignalConnectionContainer con_cont;
     	SignalConnection textViewConnCon;
-    	SignalConnection textViewTimerConnection;
     }
     
 
     this()
     {
         text_view = new TextView();
-        text_view.getFontManager = delegate FontMgrI() 
+        text_view.getForm = delegate FormI() 
         {
         	auto f = getForm();
         	if (f is null)
         	{
         		throw new Exception("can't get form");
         	}
-        	// auto w = (cast(Form)f).getWindow();
-        	auto w = f.getWindow();
-        	if (w is null)
-        	{
-        		throw new Exception("can't get window");
-        	}
-        	auto p = w.getPlatform();
-        	if (p is null)
-        	{
-        		throw new Exception("can't get platform");
-        	}
-        	auto fm = p.getFontManager();
-        	if (fm is null)
-        	{
-        		throw new Exception("can't get font manager");
-        	}
-        	return fm;
+        	
+        	return f;
         };
+        
+        text_view.getDrawingSurface = &getDrawingSurfaceForTextView;
         
         struct stname {
             string sname;
@@ -160,75 +148,86 @@ class TextEntry : Widget, ContainerableWidgetI
         
         setMouseEvent("button-click", &on_mouse_click_internal);
         
-        textViewConnCon = text_view.connectTo_PerformRedraw(
-        	&on_textview_redraw_request
-        	);
+        // textViewConnCon = text_view.connectTo_PerformRedraw(
+        	// &on_textview_redraw_request
+        	// );
         
         // textViewTimerConnection = getForm()
 
     }
     
-    void on_textview_redraw_request(
-    	ulong x,
-    	ulong y,
-    	ulong width,
-    	ulong height
-    	)     nothrow
+    DrawingSurfaceI getDrawingSurfaceForTextView()
     {
-    	collectException(
-    		{
-    			auto err = collectException(
-    				{
-    					auto ds = getDrawingSurface();
-    					
-    					auto rendered_image = text_view.getRenderedImage();
-    					
-    					for (ulong i = x; i != x+width; i++)
-    					{
-    						for (ulong j = y; j != y+height; j++)
-    						{
-    							auto dot = rendered_image.getDot(x,y);
-    							ds.drawDot(
-    								Position2D(
-    									// TODO: I don't like this casts
-    									cast(int)(x+2), 
-    									cast(int)(y+2)
-    									), 
-    								dot
-    								);
-    						}
-    					}
-    					
-    					ds.present();
-    				}()
-    				);
-    			if (err !is null)
-    				debug writeln("error on trying to draw on TextEntry on on_textview_redraw_request: ", err);
-    		}()
-    		);
-        
+    	auto p = getPosition();
+    	if (getDrawBewelAndBackground())
+    	{
+    		p.x+=2;
+    		p.y+=2;
+    	}
+    	return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y);
     }
     
+    // void on_textview_redraw_request(
+    	// ulong x,
+    	// ulong y,
+    	// ulong width,
+    	// ulong height
+    	// )     nothrow
+    // {
+    	// collectException(
+    		// {
+    			// auto err = collectException(
+    				// {
+    					// auto ds = getDrawingSurfaceForTextView();
+    					// 
+    					// auto rendered_image = text_view.getRenderedImage();
+    					// 
+    					// for (ulong i = x; i != x+width; i++)
+    					// {
+    						// for (ulong j = y; j != y+height; j++)
+    						// {
+    							// auto dot = rendered_image.getDot(x,y);
+    							// ds.drawDot(
+    								// Position2D(
+    									// // TODO: I don't like this casts
+    									// cast(int)(x), 
+    									// cast(int)(y)
+    									// ), 
+    								// dot
+    								// );
+    						// }
+    					// }
+    					// 
+    					// ds.present();
+    				// }()
+    				// );
+    			// if (err !is null)
+    				// debug writeln("error on trying to draw on TextEntry on on_textview_redraw_request: ", err);
+    		// }()
+    		// );
+        // 
+    // }
+    // 
     void on_mouse_click_internal(
     	EventMouse* event, 
-    	ulong mouseWidget_x, 
-    	ulong mouseWidget_y
+    	ulong x, 
+    	ulong y
     	)
     {
         debug writeln(
         	"textentry click x:", 
-        	mouseWidget_x, 
+        	x, 
         	" y:", 
-        	mouseWidget_y
+        	y
         	);
 
         if (getDrawBewelAndBackground())
         {
-            mouseWidget_x += 2;
-            mouseWidget_y += 2;
+            x += 2;
+            y += 2;
         }
 
-        text_view.click(mouseWidget_x, mouseWidget_y);
+        text_view.click(x, y);
         
         return ;
     }
@@ -267,6 +266,7 @@ class TextEntry : Widget, ContainerableWidgetI
         tvt.setFaceFamily(getFontFamily());
         tvt.setFaceStyle(getFontStyle());
         tvt.setFaceSize(getFontSize() * 64);
+        tvt.setDefaultFGColor(getFontColor());
         tvt.setFaceResolution(72);
         tvt.setBold(getFontBold());
         tvt.setItalic(getFontItalic());
@@ -282,6 +282,10 @@ class TextEntry : Widget, ContainerableWidgetI
         	// TODO: optimize this: must be as less view redrawings as possible
             text_view.setWidth(text_view.getWidth()-4);
             text_view.setHeight(text_view.getHeight()-4);
+            tvt.setDefaultBGColor(getBewelBackgroundColor());
+        } else {
+        	// TODO: get default form color from Theme
+        	tvt.setDefaultBGColor(Color(0xc0c0c0));
         }
         
         text_view.setTextSelectionEnabled(getTextSelectable());

@@ -12,6 +12,11 @@ import std.exception;
 import observable.signal;
 
 import dtk.interfaces.FontMgrI;
+import dtk.interfaces.WindowI;
+import dtk.interfaces.FormI;
+import dtk.interfaces.PlatformI;
+import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.FaceI;
 
 import dtk.types.Image;
 import dtk.types.Color;
@@ -20,6 +25,7 @@ import dtk.types.Size2D;
 import dtk.types.fontinfo;
 import dtk.types.Signal;
 import dtk.types.Property;
+
 
 
 enum GenVisibilityMapForSubitemsLayout
@@ -281,14 +287,24 @@ class TextChar
         auto state = getState(text_view);
         if (state.glyph is null)
         {
-            loadGlyph(text_view);
+            auto err = collectException(loadGlyph(text_view, chr));
+            if (err !is null)
+            {
+            	debug writefln("warning: exception while trying to load glyph for %s", chr);
+            	err = collectException(loadGlyph(text_view, cast(dchar)'?'));
+            	if (err !is null)
+            	{
+            		// NOTE: considering this fatal error
+            		throw err;
+            	}
+            }
             state.resImg = genImage(text_view);
         }
     }
     
     /* alias reprocess = rerender; */
     
-    private void loadGlyph(TextView text_view)
+    private void loadGlyph(TextView text_view, dchar chr)
     {
         auto state = getState(text_view);
         
@@ -297,12 +313,33 @@ class TextChar
         
         debug writeln("rendering char: ", chr);
         
+        auto f_family = parent_line.parent_text.getFaceFamily();
+        auto f_style = parent_line.parent_text.getFaceStyle();
+        FaceI face;
+
         auto font_mgr = text_view.getFontManager();
-        auto face = font_mgr.loadFace(
-            parent_line.parent_text.getFaceFamily(),
-            parent_line.parent_text.getFaceStyle()
-            );
         
+        label1:
+        auto err = collectException(
+        	{
+        		face = font_mgr.loadFace(f_family, f_style);
+        	}()
+        	);
+        if (err !is null)
+        {
+        	debug writefln(
+        		"(warning) couldn't load Face %s %s : %s",
+        		f_family,
+        		f_style,
+        		err
+        		);
+        	// TODO: better solution required to case if font not found
+        	if (f_family == "Go")
+        		throw err;
+        	f_family = "Go";
+        	f_style = "Regular";
+        	goto label1;
+        }
         {
             auto x = parent_line.parent_text.getFaceSize();
             debug writeln("setting size to ", x);
@@ -323,11 +360,12 @@ class TextChar
         catch (Exception e)
         {
             // TODO: replace with dummy glyph
-            debug writeln("(non fatal) error: ", e);
+            debug writefln("(warning) couldn't load glyph for char %s: %s", chr, e);
             state.glyph = face.renderGlyphByChar(cast(dchar)'?');
             /* state.width = state.glyph.bitmap.width;
             state.height = state.glyph.bitmap.height; */
         }
+        
     }
     
     private Image genImage(TextView text_view) {
@@ -336,10 +374,10 @@ class TextChar
         
         auto state = getState(text_view);
         
-        if (state.glyph is null)
-        {
-            loadGlyph(text_view);
-        }
+        // if (state.glyph is null)
+        // {
+            // loadGlyph(text_view, chr);
+        // }
         
         auto gi = state.glyph.glyph_info;
         
@@ -1394,7 +1432,26 @@ class TextView
     
     Text text;
     
-    FontMgrI delegate() getFontManager;
+    FormI delegate() getForm;
+    
+    PlatformI getPlatform() 
+    {
+    	return getWindow().getPlatform();
+    }
+    
+    WindowI getWindow() 
+    {
+    	assert(getForm !is null);
+    	return getForm().getWindow();
+    }
+    
+    FontMgrI getFontManager() 
+    {
+    	return getPlatform().getFontManager();
+    }
+    
+    DrawingSurfaceI delegate() getDrawingSurface;
+    
     
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
@@ -1412,6 +1469,9 @@ class TextView
     SignalConnection text_linesRecalcRequired_sc;
     // this one is for this object
     SignalConnectionContainer con_cont;
+    
+    SignalConnection timer500_signal_connection;
+
     
     Image getRenderedImage()
     {
@@ -1442,10 +1502,96 @@ class TextView
     }
     
     // Signal!(ulong, ulong, ulong, ulong) redrawRequest;
-    mixin installSignal!(
-        "PerformRedraw", "signal_perform_redraw",
-        ulong,ulong, ulong, ulong,
-        );
+    // mixin installSignal!(
+        // "PerformRedraw", "signal_perform_redraw",
+        // ulong,ulong, ulong, ulong,
+        // );
+        
+    void fullRedrawToDS()
+    {
+    	ulong x;
+    	ulong y;
+    	ulong width;
+    	ulong height;
+    	
+    	x = getX();
+    	y = getY();
+    	width = getWidth();
+    	height = getHeight();
+    	
+    	drawImageToDrawingSurface(x,y,width,height);
+    }
+    
+    // TODO: move this to some more appropriate place
+    private ubyte chanBlend(ubyte lower, ubyte higher, real part)
+    {
+        return cast(ubyte)(lower + ((higher - lower) * part));
+    }    
+    
+    void drawImageToDrawingSurface(ulong target_x, ulong target_y, ulong width, ulong height)
+    {
+    	auto ds = getDrawingSurface();
+    	auto image = getRenderedImage();
+    	auto pos = Position2D(0, 0);
+    	
+    	auto bg_color = text.getDefaultBGColor();
+    	auto fg_color = text.getDefaultFGColor();
+
+    	// auto p = Position2D(cast(int)x,cast(int)y);
+    	// auto i = img.getImage(p, Size2D(cast(int)width, cast(int)height));
+    	// ds.drawImage(p, i);
+    	
+    	for (uint y = cast(uint)target_y; y < height; y++)
+    	{
+    		for (uint x = cast(uint)target_x; x < width; x++)
+    		{
+    			auto new_color = bg_color;
+    			
+    			auto dot = image.getDot(x, y);
+    			
+    			if (dot.enabled)
+    			{
+    				// TODO: take background color from already existing dot
+    				auto part = dot.intensivity;
+    				new_color.r = chanBlend(new_color.r, fg_color.r, part);
+    				new_color.g = chanBlend(new_color.g, fg_color.g, part);
+    				new_color.b = chanBlend(new_color.b, fg_color.b, part);
+    			}
+    			
+    			{
+    				auto id = ImageDot();
+    				id.color = new_color;
+    				id.enabled=true;
+    				id.intensivity=1;
+    				ds.drawDot(Position2D(pos.x + x, pos.y + y), id);
+    			}
+    			
+    		}
+    	}
+    	ds.present();
+    }
+
+    void ensureTimer500Connection()
+    {
+    	// TODO: maybe mutexes and synchronization have to be used here
+    	if (!timer500_signal_connection.connected)
+    	{
+    		auto p = getPlatform();
+    		timer500_signal_connection = p.connectTo_Timer500(
+    			delegate void() nothrow{
+    				collectException(
+    					{
+    						auto err = collectException(timer500ms_handle());
+    						if (err !is null)
+    						{
+    							debug writeln("error handling timer500: ", err);
+    						}
+    					}()
+    					);
+    			}
+    			);    		
+    	}
+    }
     
     this()
     {
@@ -1614,27 +1760,34 @@ class TextView
         imageRegenRequired=true;
     }
     
-    void drawElementVisibilityMapElement(ElementVisibilityMapElement e, bool emit)
+    void drawElementVisibilityMapElement(
+    	ElementVisibilityMapElement e, 
+    	bool redrawOnImage,
+    	bool copyToDS
+    	)
     {
         auto chr_state = e.chr.getState(this);
         
         debug writefln("putting char to picture (%s): ", e);
         
-        auto z = chr_state.resImg.getImage(
-            getX(), getY(),
-            e.width, e.height
-            );
+        if (redrawOnImage)
+        {
+        	auto z = chr_state.resImg.getImage(
+        		getX(), getY(),
+        		e.width, e.height
+        		);
+        	
+        	// debug z.printImage();
+        	
+        	_rendered_image.putImage(
+        		e.target_x,
+        		e.target_y,
+        		z
+        		);
+        }
         
-        // debug z.printImage();
-        
-        _rendered_image.putImage(
-            e.target_x,
-            e.target_y,
-            z
-            );
-        
-        if (emit)
-            signal_perform_redraw.emit(e.target_x, e.target_y, e.width,  e.height);
+        if (copyToDS)
+        	drawImageToDrawingSurface(e.target_x, e.target_y, e.width,  e.height);
     }
     
     void genImage()
@@ -1656,34 +1809,25 @@ class TextView
         {
             foreach (v; visibility_map.elements)
             {
-                drawElementVisibilityMapElement(v, false);
+                drawElementVisibilityMapElement(v, true, false);
             }
         }
         
         imageRegenRequired = false;
         
-        signal_perform_redraw.emit(0, 0, w, h);
+       	// drawImageToDrawingSurface(0, 0, w, h);
     }
-    
-    // void reprocess()
-    // {
-    // getText().reprocess(this);
-    // genVisibilityMap();
-    // }
-    
-    /* void printInfo()
-    {
-    getText().printInfo(this);
-    } */
     
     void click(ulong x, ulong y)
     {
         debug writeln("processor clicked [", x, ":", y, "]");
+        // TODO: maybe there should be better way to ensure timer is connected
+        //       as soon, as Platform is available
+        ensureTimer500Connection(); 
         if (getCursorEnabled())
             changeCursorPosition(x, y);
     }
     
-    // this have to be called from outside each 500ms
     void timer500ms_handle()
     {
     	debug writeln("timer500ms_handle()");
@@ -1698,7 +1842,7 @@ class TextView
         ulong width;
         ulong height;
         
-        const ulong cursor_width = 2;
+        const ulong cursor_width = 1;
         
         if (cursor_after is null && cursor_before is null)
             return;
@@ -1754,29 +1898,36 @@ class TextView
         
         drawCursor(x,y,width,height);
         
-        signal_perform_redraw.emit(x,y,width,height);
+        // signal_perform_redraw.emit(x,y,width,height);
     }
     
     void drawCursor(ulong x,ulong y,ulong width,ulong height)
     {
+    	auto ds = getDrawingSurface();
+    	
         auto dot = ImageDot();
         dot.enabled=true;
         dot.intensivity=1;
         dot.color = Color(cast(ubyte[3])[255,0,0]);
+        
+        // auto color = Color(cast(ubyte[3])[255,0,0]);
+        
         for (ulong i = x; i != x+width; i++)
         {
             for (ulong j = y; j != y+height; j++)
             {
-                _rendered_image.setDot(i,j,dot);
+                 ds.drawDot(Position2D(cast(int)i,cast(int)j),dot);
             }
         }
+        
+        ds.present();
     }
     
     void timer500ms_handle_cursor_clear() {
         if (cursor_before !is null)
-            drawElementVisibilityMapElement(cursor_before, true);
+            drawElementVisibilityMapElement(cursor_before, false, true);
         if (cursor_after !is null)
-            drawElementVisibilityMapElement(cursor_after, true);
+            drawElementVisibilityMapElement(cursor_after, false, true);
     }
     
     void timer500ms_handle_cursor()

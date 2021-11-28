@@ -1,5 +1,7 @@
 module dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 
+import core.thread.osthread;
+
 import std.stdio;
 import std.algorithm;
 import std.parallelism;
@@ -178,6 +180,8 @@ class SDLDesktopPlatform : PlatformI
     void mainLoop()
     {
     	import std.parallelism;
+    	
+    	ulong main_thread_id = core.thread.osthread.Thread.getThis().id;
 
         SDL_Event* event = new SDL_Event;
 
@@ -200,8 +204,14 @@ class SDLDesktopPlatform : PlatformI
                 debug writeln("TODO: got error on SDL_WaitEvent");
                 return;
             }
+            
+            if (core.thread.osthread.Thread.getThis().id != main_thread_id)
+            {
+            	throw new Exception("SDL_WaitEvent exited into invalid thread");
+            }
 
             // TODO: probably, at this point, things have to become asynchronous
+            //       in environments which supports this
 
             debug writeln("mainLoop event type: " ,event.type);
 

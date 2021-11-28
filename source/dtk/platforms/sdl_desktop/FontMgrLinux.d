@@ -160,13 +160,9 @@ class Face : FaceI
         char[] o_fs_fn = cast(char[]) face_info.on_fs_filename;
 
         auto err = FT_New_Face(fnt_mgr.ft_library, &o_fs_fn[0], face_info.face_index, &face);
-        if (err == FT_Err_Unknown_File_Format)
+        if (err != 0)
         {
-            throw new Exception("Can't load file as font: ", face_info.on_fs_filename);
-        }
-        else if (err)
-        {
-            throw new Exception("Can't load file as font: unknown error");
+            throw new Exception("Can't load file (%s) as font: error code: %s".format(o_fs_fn, err));
         }
 
         err = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
