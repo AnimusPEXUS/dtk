@@ -473,7 +473,7 @@ mixin template mixin_install_multiple_properties(PropSetting[] settings)
                 );
         }
 
-        static if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
+        else static if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
         {
             mixin(
                 q{
@@ -490,6 +490,10 @@ mixin template mixin_install_multiple_properties(PropSetting[] settings)
                     v.title_name,
                     )
                 );
+        }
+        else 
+        {
+        	static assert(false, "invalid PropSetting.mode value");
         }
 
     }
