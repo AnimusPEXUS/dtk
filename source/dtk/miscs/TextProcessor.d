@@ -228,7 +228,7 @@ void genVisibilityMapForSubitems(
             break;
         }
 
-        debug for (ulong i = 0; i <= items_count; i++)
+        for (ulong i = 0; i <= items_count; i++)
         {
             auto tx = calc_loop_target_x(i);
             auto ty = calc_loop_target_y(i);
@@ -236,16 +236,6 @@ void genVisibilityMapForSubitems(
             auto sy = calc_loop_source_y(i);
             auto sw = calc_loop_source_width(i);
             auto sh = calc_loop_source_height(i);
-
-            // writeln("
-            // i                         : %d
-            // calc_loop_target_x(i)     : %d
-            // calc_loop_target_y(i)     : %d
-            // calc_loop_source_x(i)     : %d
-            // calc_loop_source_y(i)     : %d
-            // calc_loop_source_width(i) : %d
-            // calc_loop_source_height(i): %d
-            // ".format(i,tx,ty,sx,sy,sw,sh));
 
             genVisibilityMapForSubitem(
                 i,
@@ -290,7 +280,6 @@ class TextChar
             auto err = collectException(loadGlyph(text_view, chr));
             if (err !is null)
             {
-            	debug writefln("warning: exception while trying to load glyph for %s", chr);
             	err = collectException(loadGlyph(text_view, cast(dchar)'?'));
             	if (err !is null)
             	{
@@ -308,11 +297,6 @@ class TextChar
     {
         auto state = getState(text_view);
 
-        /* state.width = 0;
-        state.height = 0; */
-
-        debug writeln("rendering char: ", chr);
-
         auto f_family = parent_line.parent_text.getFaceFamily();
         auto f_style = parent_line.parent_text.getFaceStyle();
         FaceI face;
@@ -327,12 +311,6 @@ class TextChar
         	);
         if (err !is null)
         {
-        	debug writefln(
-        		"(warning) couldn't load Face %s %s : %s",
-        		f_family,
-        		f_style,
-        		err
-        		);
         	// TODO: better solution required to case if font not found
         	if (f_family == "Go")
         		throw err;
@@ -342,28 +320,21 @@ class TextChar
         }
         {
             auto x = parent_line.parent_text.getFaceSize();
-            debug writeln("setting size to ", x);
             face.setCharSize(x, x);
         }
         {
             auto x = parent_line.parent_text.getFaceResolution();
-            debug writeln("setting resolution to ", x);
             face.setCharResolution(x, x);
         }
 
         try
         {
             state.glyph = face.renderGlyphByChar(chr);
-            /* state.width = state.glyph.bitmap.width;
-            state.height = state.glyph.bitmap.height; */
         }
         catch (Exception e)
         {
             // TODO: replace with dummy glyph
-            debug writefln("(warning) couldn't load glyph for char %s: %s", chr, e);
             state.glyph = face.renderGlyphByChar(cast(dchar)'?');
-            /* state.width = state.glyph.bitmap.width;
-            state.height = state.glyph.bitmap.height; */
         }
 
     }
@@ -412,9 +383,6 @@ class TextChar
                 ret.setDot(tx,ty,dot);
             }
         }
-
-        debug writeln("TextChar.genImage");
-        debug ret.printImage();
 
         return ret;
 
@@ -512,9 +480,6 @@ class TextLineSubline
         )
     {
 
-        debug writeln("genVisibilityMap at ", __LINE__);
-        debug writeln(" chars layout ", parent_line.parent_text.getLineCharsLayout());
-
         auto state = getState(text_view);
 
         genVisibilityMapForSubitems(
@@ -566,10 +531,6 @@ class TextLineSubline
                 evme.width=width;
                 evme.height=height;
 
-                debug writefln(
-                    "adding evme to elements (%d) %s",
-                    visibility_map.elements.length, evme.chr.chr
-                    );
                 visibility_map.elements ~= evme;
             }
             );
@@ -682,8 +643,6 @@ class TextLine
         auto sl_state = sl.getState(text_view);
 
         sl_state.textchars=sl_state.textchars[0 .. 0];
-
-        debug writeln("recreateSublines textchars.length ", textchars.length);
 
         foreach (tc; textchars)
         {
@@ -838,8 +797,6 @@ class TextLine
         ElementVisibilityMap visibility_map
         )
     {
-        debug writeln("genVisibilityMap at ", __LINE__);
-
         auto state = getState(text_view);
 
         genVisibilityMapForSubitems(
@@ -1137,11 +1094,9 @@ class Text
     {
         lines = lines[0 .. 0];
 
-        debug writeln("setText entering slicing loop");
-        debug scope(exit)
+        scope(exit)
         {
-            signal_linesRecalcRequired.emit();
-            writeln("setText exited slicing loop");
+            signal_linesRecalcRequired.emit();            
         }
 
         auto line_ended = false;
@@ -1189,8 +1144,6 @@ class Text
     // it's width and height
     void reprocess(TextView text_view)
     {
-        debug writeln("Text.reprocess called");
-
         // obviously, each character's size have to be known
         // in systems with freetype this also renders characters at once
         reprocessUnits(text_view);
@@ -1247,7 +1200,6 @@ class Text
 
     dstring getText()
     {
-        debug writeln("dstring getText() ", this, " ", lines.length);
         dstring ret;
 
         if (lines.length == 0)
@@ -1357,8 +1309,6 @@ class Text
         ElementVisibilityMap visibility_map
         )
     {
-        debug writeln("genVisibilityMap at ", __LINE__);
-
         auto state = getState(text_view);
 
         genVisibilityMapForSubitems(
@@ -1598,7 +1548,6 @@ class TextView
     {
         if (linesRecalcRequired)
         {
-            debug writeln("linesRecalcRequired requested");
             getText().reprocess(this);
             linesRecalcRequired = false;
             visibilityMapRecalcRequired = true;
@@ -1607,7 +1556,6 @@ class TextView
 
         if (visibilityMapRecalcRequired)
         {
-            debug writeln("visibilityMapRecalcRequired requested");
             genVisibilityMap();
         }
 
@@ -1615,7 +1563,6 @@ class TextView
         // be called after genVisibilityMap()
         if (imageRegenRequired)
         {
-            debug writeln("imageRegenRequired requested");
             genImage();
         }
 
@@ -1711,7 +1658,7 @@ class TextView
     						auto err = collectException(timer500ms_handle());
     						if (err !is null)
     						{
-    							debug writeln("error handling timer500: ", err);
+    							writeln("error handling timer500: ", err);
     						}
     					}()
     					);
@@ -1784,14 +1731,6 @@ class TextView
         auto width = getWidth();
         auto height = getHeight();
 
-        debug writefln(
-            "genVisibilityMap for %s %s %s %s",
-            x,
-            y,
-            width,
-            height,
-            );
-
         text.genVisibilityMap(
             x,
             y,
@@ -1799,11 +1738,6 @@ class TextView
             height,
             this,
             visibility_map
-            );
-
-        debug writefln(
-            "genVisibilityMap length %s",
-            visibility_map.elements.length
             );
 
         this.visibility_map=visibility_map;
@@ -1820,12 +1754,10 @@ class TextView
     {
         auto chr_state = e.chr.getState(this);
 
-        debug writefln("putting char to picture (%s): ", e);
-
         if (redrawOnImage)
         {
 
-        	// NOTE: it is intended what character raster doesnt know anything 
+        	// NOTE: it is intended what character raster doesn't know anything 
         	//       about color yet, and knows only intensivity, so color 
         	//       information is required.
         	//       maybe in future caharacter images will be with color
@@ -1851,29 +1783,29 @@ class TextView
         			auto fg_dot = chr_image.getDot(x, y);
         			if (fg_dot.enabled) 
         			{
-
-        			auto bg_color = bg_dot.color; 
-        			// auto fg_color = fg_dot.color; 
-        			
-        			Color new_color;
-        			
-    				auto part = fg_dot.intensivity;
-    				new_color.r = chanBlend(bg_color.r, fg_color.r, part);
-    				new_color.g = chanBlend(bg_color.g, fg_color.g, part);
-    				new_color.b = chanBlend(bg_color.b, fg_color.b, part);
-    				
-    				auto id = ImageDot();
-    				id.enabled=true;
-    				id.intensivity=1;
-    				id.color = new_color;  
-    				
-    				_rendered_image.drawDot(
-    					Position2D(
-    						cast(int)(x+e.target_x), 
-    						cast(int)(y+e.target_y)
-    						), 
-    					id
-    					);
+        				
+        				auto bg_color = bg_dot.color; 
+        				// auto fg_color = fg_dot.color; 
+        				
+        				Color new_color;
+        				
+        				auto part = fg_dot.intensivity;
+        				new_color.r = chanBlend(bg_color.r, fg_color.r, part);
+        				new_color.g = chanBlend(bg_color.g, fg_color.g, part);
+        				new_color.b = chanBlend(bg_color.b, fg_color.b, part);
+        				
+        				auto id = ImageDot();
+        				id.enabled=true;
+        				id.intensivity=1;
+        				id.color = new_color;  
+        				
+        				_rendered_image.drawDot(
+        					Position2D(
+        						cast(int)(x+e.target_x), 
+        						cast(int)(y+e.target_y)
+        						), 
+        					id
+        					);
         			}
         			else
         			{
@@ -1925,11 +1857,6 @@ class TextView
         	}
 		}
 
-        debug writeln(
-            "genImage visibility_map.elements.length ",
-            visibility_map.elements.length
-            );
-
         if (visibility_map !is null)
         {
             foreach (v; visibility_map.elements)
@@ -1945,7 +1872,6 @@ class TextView
 
     void timer500ms_handle()
     {
-    	debug writeln("timer500ms_handle()");
         timer500ms_handle_cursor();
     }
 
@@ -1955,15 +1881,9 @@ class TextView
             return;
 
         if (cursor_animation_iteration_visible)
-        {
-        	debug writeln("drawing cursor");
             timer500ms_handle_cursor_draw_operation(false);
-        }
         else
-        {
-        	debug writeln("clearing cursor");
             timer500ms_handle_cursor_draw_operation(true);
-        }
 
         cursor_animation_iteration_visible =
         !cursor_animation_iteration_visible;
@@ -1971,18 +1891,6 @@ class TextView
 
     void timer500ms_handle_cursor_draw_operation(bool clear)
     {
-
-    	// final switch(text.getLineCharsLayout())
-    	// {
-    	// case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-    	// break;
-    	// case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-    	// break;
-    	// case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-    	// case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-    	// }
-
-        // signal_perform_redraw.emit(x,y,width,height);
 
         ulong line;
         ulong column;
@@ -2082,6 +1990,7 @@ class TextView
     				break;
     			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
     			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+    				// TODO: complete this
     				break;
     			}
     			
@@ -2093,8 +2002,6 @@ class TextView
 
     void click(ulong x, ulong y)
     {
-        debug writeln("processor clicked [", x, ":", y, "]");
-
         if (getCursorEnabled())
         {
         	// TODO: maybe there should be better way to ensure timer is connected
@@ -2150,23 +2057,6 @@ class TextView
 
     void changeCursorPositionByLineAndColumn(ulong line, ulong column)
     {
-    	scope(exit) {
-    		if (cursor_positions.length == 0)
-    		{
-    			debug writeln(
-    				"cursor moved to nowhere"
-    				);
-    		} else
-    		{
-    			auto cp = cursor_positions[$-1];
-    			debug writefln(
-    				"cursor moved to: line %d, column %d",
-    				cp.line,
-    				cp.column
-    				);
-    		}
-    	}
-
     	foreach(v;cursor_positions)
     	{
     		clearCursorAtLineAndColumn(v.line, v.column);

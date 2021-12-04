@@ -52,17 +52,13 @@ class Form : Widget, FormI
     {
         try
         {
-            debug writeln("Form child changed");
             auto c = getChild();
             c.setParent(this);
-            /* c.setPosition(Position2D(5,5));
-            auto = this_size
-            c.setSize(Size2D()); */
             this.recalculateChildrenPositionsAndSizes();
         }
         catch (Exception e)
         {
-        	
+        	// TODO: todo
         }
         
     }
@@ -74,15 +70,6 @@ class Form : Widget, FormI
             ret = getWindow().getDrawingSurface();
         return ret;
     }
-    
-    /* private nothrow void onwindowchanged()
-    {
-    try {
-    debug writeln("onwindowchanged()");
-    } catch (Exception e) {
-    // TODO:
-    }
-    } */
     
     override typeof(this) setParent(WidgetI widget)
     {
@@ -129,7 +116,6 @@ class Form : Widget, FormI
         
         if (isSetChild())
         {
-            debug writeln("getChild().redraw();");
             getChild().redraw();
         }
         
@@ -141,7 +127,6 @@ class Form : Widget, FormI
     
     void focusTo(WidgetI widget)
     {
-        debug writeln("Form:focusTo: ", widget);
         auto x = getFocusedWidget();
         setFocusedWidget(widget);
         if (x !is null)

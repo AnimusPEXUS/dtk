@@ -117,8 +117,10 @@ class TextEntry : Widget, ContainerableWidgetI
             							auto err = collectException(
             								applySettingsToTextProcessor()
             								);
-            							if (err !is null)
-            								debug writeln(err);
+            							if (err !is null) 
+            							{
+            								writeln(err);
+            							}
             						}()
             						);
             				}
@@ -137,7 +139,9 @@ class TextEntry : Widget, ContainerableWidgetI
         						applySettingsToTextProcessor()
         						);
         					if (err !is null)
-        						debug writeln(err);
+        					{
+        						writeln(err);
+        					}
         				}()
         				);
         		}
@@ -167,60 +171,12 @@ class TextEntry : Widget, ContainerableWidgetI
     	return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y);
     }
     
-    // void on_textview_redraw_request(
-    	// ulong x,
-    	// ulong y,
-    	// ulong width,
-    	// ulong height
-    	// )     nothrow
-    // {
-    	// collectException(
-    		// {
-    			// auto err = collectException(
-    				// {
-    					// auto ds = getDrawingSurfaceForTextView();
-    					// 
-    					// auto rendered_image = text_view.getRenderedImage();
-    					// 
-    					// for (ulong i = x; i != x+width; i++)
-    					// {
-    						// for (ulong j = y; j != y+height; j++)
-    						// {
-    							// auto dot = rendered_image.getDot(x,y);
-    							// ds.drawDot(
-    								// Position2D(
-    									// // TODO: I don't like this casts
-    									// cast(int)(x), 
-    									// cast(int)(y)
-    									// ), 
-    								// dot
-    								// );
-    						// }
-    					// }
-    					// 
-    					// ds.present();
-    				// }()
-    				// );
-    			// if (err !is null)
-    				// debug writeln("error on trying to draw on TextEntry on on_textview_redraw_request: ", err);
-    		// }()
-    		// );
-        // 
-    // }
-    // 
     void on_mouse_click_internal(
     	EventMouse* event, 
     	ulong x, 
     	ulong y
     	)
     {
-        debug writeln(
-        	"textentry click x:", 
-        	x, 
-        	" y:", 
-        	y
-        	);
-
         if (getDrawBewelAndBackground())
         {
             x += 2;
@@ -237,28 +193,25 @@ class TextEntry : Widget, ContainerableWidgetI
     	collectException(
     		{
     			
-    			auto err = collectException({
+    			auto err = collectException(
+    				{
     					auto x = getText();
     					text_view.setText(x);
-    					auto y = text_view.getTextString();
-    					debug writefln("
-    						afterTextChanged
-    						x: %s
-    						y: %s
-    						==?: %s
-    						", x, y, x == y);
-    						applySettingsToTextProcessor();
-    			}());
-    					if (err !is null)
-    						debug writeln(err);
+    					// auto y = text_view.getTextString();
+    					
+    					applySettingsToTextProcessor();
+    				}()
+    				);
+    			if (err !is null)
+    			{
+    				writeln(err);
+    			}
     		}()
     		);
     }
 
     void applySettingsToTextProcessor()
     {
-        debug writeln("TextEntry applySettingsToTextProcessor triggered");
-
         /* text_view.setText(getText()); */ // NOTE: too expansive probably
 
         auto tvt = text_view.getText();
@@ -291,17 +244,6 @@ class TextEntry : Widget, ContainerableWidgetI
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
         text_view.setCursorEnabled(getCursorEnabled());
-
-        // this not needed anymore, as TextView manually tracks propery changes
-        // text_view.redrawRequired = true;
-        
-        // debug writeln("before text_view.reprocess");
-        // text_view.reprocess();
-        // debug writeln("after text_view.reprocess");
-
-        // textImage = text_view.genImage();
-        //debug writeln("calling text_view.genImage");
-        //text_view.genImage();
     }
 
     mixin mixin_getWidgetAtPosition;

@@ -27,7 +27,6 @@ class ButtonCheck : Button
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
-        debug writeln("ButtonCheck click");
         setChecked(!getChecked());
         redraw();
         return ;
@@ -41,14 +40,12 @@ class ButtonCheck : Button
             f.focusTo(this);
         }
 
-        debug writeln("ButtonCheck down");
         redraw();
         return ;
     }
 
     override void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
-        debug writeln("ButtonCheck up");
         return ;
     }
 

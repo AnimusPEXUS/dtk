@@ -71,11 +71,8 @@ class DrawingSurface : DrawingSurfaceI
 
             auto dots = calculateDotsInLine(pos, pos2);
 
-            debug writeln("dots");
-
             foreach (v; dots)
             {
-                debug write("  dot[", v.x, ":", v.y, "], ");
                 if (style_dup[0])
                 {
                     {
@@ -88,7 +85,6 @@ class DrawingSurface : DrawingSurfaceI
                 }
                 style_dup = style_dup[1 .. $] ~ style_dup[0];
             }
-            debug writeln();
         }
     }
 

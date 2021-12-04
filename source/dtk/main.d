@@ -12,8 +12,6 @@ PlatformI instantiatePlatform()
 
         auto ret = new SDLDesktopPlatform();
 
-        debug writeln("SDLDesktopPlatform instantiated");
-
         return ret;
     }
     else version (DTK_PLATFORM_MOZILLA_WEB_EXTENSION)

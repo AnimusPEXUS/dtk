@@ -38,7 +38,6 @@ class Button : Widget, ContainerableWidgetI
 
     void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
-        debug writeln("button click x:", mouseWidget_x, " y:", mouseWidget_y);
         return ;
     }
 
@@ -50,7 +49,6 @@ class Button : Widget, ContainerableWidgetI
         {
             f.focusTo(this);
         }
-        debug writeln("button down");
         redraw();
         return ;
     }
@@ -58,7 +56,6 @@ class Button : Widget, ContainerableWidgetI
     void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         button_is_down = false;
-        debug writeln("button up");
         redraw();
         return ;
     }
@@ -67,10 +64,5 @@ class Button : Widget, ContainerableWidgetI
     {
         this.redraw_x(this);
     }
-
-    /* void redraw(alias A1)()
-    {
-        super.redraw!(A1)();
-    } */
 
 }

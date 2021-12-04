@@ -72,11 +72,9 @@ class FontMgrLinux : FontMgrI
 	            i.on_fs_filename == face_info.on_fs_filename && 
 	            i.face_index == face_info.face_index
 	            ) {
-            debug writeln("not calling new Face");
             return v;
             }
         }
-        debug writeln("calling new Face");
         auto ret = new Face(this, face_info);
         face_cache ~= ret;
         return ret;
@@ -271,8 +269,6 @@ class Face : FaceI
             throw new Exception("FT_Render_Glyph error");
         }
 
-        /* debug writeln("pixel mode: ", cast(FT_Pixel_Mode)face.glyph.bitmap.pixel_mode); */
-
         auto b = face.glyph.bitmap;
 
         if (b.pixel_mode != FT_PIXEL_MODE_GRAY)
@@ -294,7 +290,6 @@ class Face : FaceI
                 if (c != 0)
                 {
                     intens = cast(real) 1 / (cast(real) 255 / c);
-                    /* debug writeln("renderGlyphByChar ", x, " ", y, " intens ", intens); */
                 }
                 auto dot = ImageDot();
                 dot.intensivity = intens;
@@ -302,8 +297,6 @@ class Face : FaceI
                 ret_i.setDot(x, y, dot);
             }
         }
-
-        debug ret_i.printImage();
 
         auto ret = new GlyphRenderResult();
 
@@ -313,51 +306,51 @@ class Face : FaceI
 
         ret.glyph_info = generateGlyphInfo();
 
-        debug {
-        writeln("                     b_left: ", ret.bitmap_left);
-        writeln("                      b_top: ", ret.bitmap_top);
-        writeln("                    b_width: ", ret.bitmap.width);
-        writeln("                   b_height: ", ret.bitmap.height);
-
-        writeln("         metrics.size.width: ", ret.glyph_info.metrics.size.width);
-        writeln("        metrics.size.height: ", ret.glyph_info.metrics.size.height);
-        writeln("      metrics.horiBearing.x: ", ret.glyph_info.metrics.horiBearing.x);
-        writeln("      metrics.horiBearing.y: ", ret.glyph_info.metrics.horiBearing.y);
-        writeln("      metrics.vertBearing.x: ", ret.glyph_info.metrics.vertBearing.x);
-        writeln("      metrics.vertBearing.y: ", ret.glyph_info.metrics.vertBearing.y);
-        writeln("      metrics.advance.width: ", ret.glyph_info.metrics.advance.width);
-        writeln("     metrics.advance.height: ", ret.glyph_info.metrics.advance.height);
-
-        writeln("  linear_horizontal_advance: ", ret.glyph_info.linear_horizontal_advance);
-        writeln("    linear_vertical_advance: ", ret.glyph_info.linear_vertical_advance);
-        writeln("                  advance.x: ", ret.glyph_info.advance.x);
-        writeln("                  advance.y: ", ret.glyph_info.advance.y);
-        writeln("                  lsb_delta: ", ret.glyph_info.lsb_delta);
-        writeln("                  rsb_delta: ", ret.glyph_info.rsb_delta);
-
-        writeln("              face ascender: ", ret.glyph_info.face_info.ascender);
-        writeln("             face descender: ", ret.glyph_info.face_info.descender);
-        writeln("                     height: ", ret.glyph_info.face_info.height);
-        writeln("          max_advance_width: ", ret.glyph_info.face_info.max_advance_width);
-        writeln("         max_advance_height: ", ret.glyph_info.face_info.max_advance_height);
-
-        writeln("         bounding_box min x: ", ret.glyph_info.face_info.bounding_box.min.x);
-        writeln("         bounding_box min y: ", ret.glyph_info.face_info.bounding_box.min.y);
-        writeln("         bounding_box max x: ", ret.glyph_info.face_info.bounding_box.max.x);
-        writeln("         bounding_box max y: ", ret.glyph_info.face_info.bounding_box.max.y);
-
-        writeln("                size.x_PPEM: ", ret.glyph_info.face_info.size.x_PPEM);
-        writeln("                size.y_PPEM: ", ret.glyph_info.face_info.size.y_PPEM);
-
-        writeln("               size.x_scale: ", ret.glyph_info.face_info.size.x_scale);
-        writeln("               size.y_scale: ", ret.glyph_info.face_info.size.y_scale);
-
-        writeln("              size.ascender: ", ret.glyph_info.face_info.size.ascender);
-        writeln("             size.descender: ", ret.glyph_info.face_info.size.descender);
-        writeln("                size.height: ", ret.glyph_info.face_info.size.height);
-
-        writeln("           size.max_advance: ", ret.glyph_info.face_info.size.max_advance);
-        }
+        // debug {
+        // writeln("                     b_left: ", ret.bitmap_left);
+        // writeln("                      b_top: ", ret.bitmap_top);
+        // writeln("                    b_width: ", ret.bitmap.width);
+        // writeln("                   b_height: ", ret.bitmap.height);
+// 
+        // writeln("         metrics.size.width: ", ret.glyph_info.metrics.size.width);
+        // writeln("        metrics.size.height: ", ret.glyph_info.metrics.size.height);
+        // writeln("      metrics.horiBearing.x: ", ret.glyph_info.metrics.horiBearing.x);
+        // writeln("      metrics.horiBearing.y: ", ret.glyph_info.metrics.horiBearing.y);
+        // writeln("      metrics.vertBearing.x: ", ret.glyph_info.metrics.vertBearing.x);
+        // writeln("      metrics.vertBearing.y: ", ret.glyph_info.metrics.vertBearing.y);
+        // writeln("      metrics.advance.width: ", ret.glyph_info.metrics.advance.width);
+        // writeln("     metrics.advance.height: ", ret.glyph_info.metrics.advance.height);
+// 
+        // writeln("  linear_horizontal_advance: ", ret.glyph_info.linear_horizontal_advance);
+        // writeln("    linear_vertical_advance: ", ret.glyph_info.linear_vertical_advance);
+        // writeln("                  advance.x: ", ret.glyph_info.advance.x);
+        // writeln("                  advance.y: ", ret.glyph_info.advance.y);
+        // writeln("                  lsb_delta: ", ret.glyph_info.lsb_delta);
+        // writeln("                  rsb_delta: ", ret.glyph_info.rsb_delta);
+// 
+        // writeln("              face ascender: ", ret.glyph_info.face_info.ascender);
+        // writeln("             face descender: ", ret.glyph_info.face_info.descender);
+        // writeln("                     height: ", ret.glyph_info.face_info.height);
+        // writeln("          max_advance_width: ", ret.glyph_info.face_info.max_advance_width);
+        // writeln("         max_advance_height: ", ret.glyph_info.face_info.max_advance_height);
+// 
+        // writeln("         bounding_box min x: ", ret.glyph_info.face_info.bounding_box.min.x);
+        // writeln("         bounding_box min y: ", ret.glyph_info.face_info.bounding_box.min.y);
+        // writeln("         bounding_box max x: ", ret.glyph_info.face_info.bounding_box.max.x);
+        // writeln("         bounding_box max y: ", ret.glyph_info.face_info.bounding_box.max.y);
+// 
+        // writeln("                size.x_PPEM: ", ret.glyph_info.face_info.size.x_PPEM);
+        // writeln("                size.y_PPEM: ", ret.glyph_info.face_info.size.y_PPEM);
+// 
+        // writeln("               size.x_scale: ", ret.glyph_info.face_info.size.x_scale);
+        // writeln("               size.y_scale: ", ret.glyph_info.face_info.size.y_scale);
+// 
+        // writeln("              size.ascender: ", ret.glyph_info.face_info.size.ascender);
+        // writeln("             size.descender: ", ret.glyph_info.face_info.size.descender);
+        // writeln("                size.height: ", ret.glyph_info.face_info.size.height);
+// 
+        // writeln("           size.max_advance: ", ret.glyph_info.face_info.size.max_advance);
+        // }
 
         return ret;
     }

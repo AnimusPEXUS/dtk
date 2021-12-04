@@ -45,7 +45,6 @@ class ButtonRadio : Button
     {
         
         collectException({
-            debug writeln("handleRadioGroup_onBeforeChanged: ", old_v, new_v);
             if (old_v !is null)
                 if (old_v.isIn(this))
                     old_v.remove(this);
@@ -57,7 +56,6 @@ class ButtonRadio : Button
     {
         
         collectException({
-            debug writeln("handleRadioGroup_onAfterChanged: ", old_v, new_v);
             if (new_v !is null)
                 if (!new_v.isIn(this))
                     new_v.add(this);
@@ -66,7 +64,6 @@ class ButtonRadio : Button
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
-        debug writeln("ButtonRadio click");
         auto rg = getRadioGroup();
         if (rg !is null)
         {
@@ -84,14 +81,12 @@ class ButtonRadio : Button
             f.focusTo(this);
         }
 
-        debug writeln("ButtonRadio down");
         redraw();
         return ;
     }
 
     override void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
-        debug writeln("ButtonRadio up");
         return ;
     }
 

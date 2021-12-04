@@ -73,30 +73,11 @@ class Widget : WidgetI
 
     // =====^===^===^===== [info] =====^===^===^===== end
 
-    private
-    {
-        /* WidgetDrawingSurfaceShifted _ds; */
-    }
-
     // TODO: ensure all subclasses calls for super();
     // NOTE: ensured. init called implicitly by dlang
     this()
     {
-        debug writeln("Widget:init() is called for ", this);
-        /* _ds = new WidgetDrawingSurfaceShifted(this); */
-        /* this.connectToParent_onAfterChanged(&onParentChanged); */
     }
-
-    /* void onParentChanged(WidgetI old_v, WidgetI new_v) nothrow
-    {
-        try
-        {
-            debug writeln(this, " parent changed");
-        }
-        catch (Exception e)
-        {
-        }
-    } */
 
     /++ return FormI on which this Widget is placed. returns null in case if
     there is no attached form or if this widget is deeper than 200 levels to
@@ -146,17 +127,12 @@ class Widget : WidgetI
 
         /* alias A1 = typeof(new_this); */
 
-        debug writeln("redraw_x called at ", this);
-
         const id = __traits(identifier, new_this);
         const id_t = __traits(identifier, T);
-
-        pragma(msg, "generating redraw_x for ", id_t);
 
         static if (!is(T == Widget))
         {
             const drawid = "draw" ~ id_t;
-            debug writeln("Widget::draw() <------------------ drawid = ", drawid);
 
             FormI form = new_this.getForm();
             if (form is null)
@@ -173,30 +149,17 @@ class Widget : WidgetI
 
             static if (!__traits(hasMember, theme, drawid))
             {
-                pragma(msg, "theme doesn't have " ~ drawid ~ " function");
-                debug writeln("theme doesn't have " ~ drawid ~ " function");
                 return;
             }
             else
             {
-                debug writeln("calling " ~ drawid);
                 __traits(getMember, theme, drawid)(new_this);
             }
-        }
-        else
-        {
-            debug writeln("xxxxxxxxxxxxxxxxx Widget doesn't uses themes for drawing");
-        }
+        }        
     }
-
-    /* void redraw()
-    {
-
-    } */
 
     void positionAndSizeRequest(Position2D position, Size2D size)
     {
-        debug writeln("setting ", this, " position to ", position.x, ",", position.y);
         setPosition(position);
         setSize(size);
     }
@@ -208,19 +171,16 @@ class Widget : WidgetI
 
     bool handle_event_keyboard(EventKeyboard* e)
     {
-        debug writeln("handle_event_keyboard() called ", this);
         return false;
     }
 
     bool handle_event_mouse(EventMouse* e)
     {
-        debug writeln("handle_event_mouse() called ", this);
         return false;
     }
 
     bool handle_event_textinput(EventTextInput* e)
     {
-        debug writeln("handle_event_textinput() called ", this);
         return false;
     }
 
@@ -229,8 +189,6 @@ class Widget : WidgetI
         return tuple(cast(WidgetI)this, 0UL, 0UL);
     }
     
-    // mixin mixin_getWidgetAtPosition;
-
     WidgetI getNextFocusableWidget()
     {
         return null;

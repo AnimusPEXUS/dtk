@@ -70,8 +70,6 @@ class Chicago98Laf : LafI
     void drawForm(Form widget)
     {
     	
-        debug writeln("drawForm called");
-        
         auto ds = widget.getDrawingSurface();
         
         auto pos = widget.getPosition();
@@ -90,8 +88,6 @@ class Chicago98Laf : LafI
     
     void drawButton(Button widget)
     {
-        debug writeln("drawButton called");
-        
         bool is_default = delegate bool() {
             auto f = widget.getForm();
             if (f is null)
@@ -145,8 +141,6 @@ class Chicago98Laf : LafI
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
     void drawButtonRadio(ButtonRadio widget)
     {
-        debug writeln("drawButtonRadio called");
-        
         auto ds = widget.getDrawingSurface();
         auto pos = Position2D(0, 0);
         auto size = widget.getSize();
@@ -269,7 +263,7 @@ class Chicago98Laf : LafI
     
     void drawImage(Image widget)
     {
-        debug writeln("drawImage called");
+        
     }
     
     // TODO: move this to some more appropriate place or delete
@@ -281,8 +275,6 @@ class Chicago98Laf : LafI
     
     void drawLayout(Layout widget)
     {
-        debug writeln("drawLayout called");
-
         auto ds = widget.getDrawingSurface();
         auto size = widget.getSize();
         
@@ -298,28 +290,22 @@ class Chicago98Laf : LafI
     
     void drawMenu(Menu widget)
     {
-        debug writeln("drawMenu called");
     }
     
     void drawMenuItem(MenuItem widget)
     {
-        debug writeln("drawMenuItem called");
     }
     
     void drawBar(Bar widget)
     {
-        debug writeln("drawBar called");
     }
     
     void drawScrollBar(ScrollBar widget)
     {
-        debug writeln("drawScrollBar called");
     }
     
     void drawTextEntry(TextEntry widget)
     {
-        debug writeln("drawTextEntry called");
-        
         auto ds = widget.getDrawingSurface();
         auto pos = Position2D(0, 0);
         auto size = widget.getSize();
@@ -343,48 +329,7 @@ class Chicago98Laf : LafI
         
         if (widget.text_view !is null)
         {
-
-        	widget.text_view.fullRedrawToDS();
-        	
-            // auto image = widget.text_view.getRenderedImage();
-            // 
-            // // debug writefln("drawTextEntry going to draw this (%dx%d):", image.width, image.height);
-            // // debug image.printImage();
-            // 
-            // if (image !is null)
-            // {
-            	// for (uint y = 0; y != image.height; y++)
-            	// {
-            		// for (uint x = 0; x != image.width; x++)
-            		// {
-            			// Color new_color = formBackground;
-            			// if (draw_bewel)
-            			// {
-            				// new_color = bewel_bg_color;
-            			// }
-            			// auto dot = image.getDot(x, y);
-            			// 
-            			// if (dot.enabled)
-            			// {
-            				// // TODO: take background color from already existing dot
-            				// auto part = dot.intensivity;
-            				// new_color.r = chanBlend(new_color.r, elementDarkedColor.r, part);
-            				// new_color.g = chanBlend(new_color.g, elementDarkedColor.g, part);
-            				// new_color.b = chanBlend(new_color.b, elementDarkedColor.b, part);
-            			// }
-            			// 
-            			// {
-            				// auto id = ImageDot();
-            				// id.color = new_color;
-            				// id.enabled=true;
-            				// id.intensivity=1;
-            				// ds.drawDot(Position2D(pos.x + x, pos.y + y), id);
-            			// }
-            			// 
-            		// }
-            	// }
-            	// ds.present();
-            // }
+        	widget.text_view.fullRedrawToDS();        	
         }
     }
     
@@ -404,13 +349,7 @@ class Chicago98Laf : LafI
     				ulong mouseWidget_y
                 	) {
                 auto mc = e.keysym.modcode;
-                debug writeln("caps:", (mc & EnumKeyboardModCode.CapsLock) != 0);
-                debug writeln("num:", (mc & EnumKeyboardModCode.NumLock) != 0);
-                debug writeln("scroll:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
                 mc &= EnumKeyboardModCodeNOT.Locks;
-                debug writeln("caps2:", (mc & EnumKeyboardModCode.CapsLock) != 0);
-                debug writeln("num2:", (mc & EnumKeyboardModCode.NumLock) != 0);
-                debug writeln("scroll2:", (mc & EnumKeyboardModCode.ScrollLock) != 0);
                 if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation
                 	&& (mc == 0 || mc == EnumKeyboardModCode.LeftShift))
                 return true;
@@ -427,11 +366,6 @@ class Chicago98Laf : LafI
                 		) {
                 	auto mc = e.keysym.modcode;
                     mc &= EnumKeyboardModCodeNOT.Locks;
-                    debug writeln("tab pressed");
-                    if (mc == EnumKeyboardModCode.LeftShift)
-                    {
-                        debug writeln("with shift");
-                    }
                     return true;
             },};
             
@@ -464,7 +398,6 @@ class Chicago98Laf : LafI
                     	) {
                     if (mouseWidget is null)
                     {
-                    	debug writeln("error: got mouse event, but mouseWidget is null");
                     	return false;
                     }
                     
@@ -502,7 +435,6 @@ class Chicago98Laf : LafI
     				ulong mouseWidget_x, 
     				ulong mouseWidget_y
         			) {
-        		debug writeln("checkMatch 1 called");
         		return true;
         			}, 
         			action: delegate bool(
@@ -516,8 +448,6 @@ class Chicago98Laf : LafI
         				) {
         			bool needs_resize = false;
         			bool needs_redraw = false;
-        			
-        			debug writeln("action 1 called");
         			
         			switch (e.eventId)
         			{

@@ -69,15 +69,6 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 
     ImageDot getDot(ulong x, ulong y)
     {
-    	import std.format;
-    	// debug writeln(
-    	// q{
-    	// width:  %d
-    	// height: %d
-    	// x:      %d
-    	// y:      %d
-    	// }.format(width, height, x, y)
-    	// );
         return this.data[y * width + x];
     }
 
@@ -196,7 +187,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
+    	writeln(new Exception("todo"));
     }
 
     void drawRectangle(
@@ -209,7 +200,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         Nullable!(FillStyle) fill_style
         )
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
+        writeln(new Exception("todo"));
     }
 
     void drawArc(
@@ -220,12 +211,12 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         real turn_step,
         Color color)
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
+        writeln(new Exception("todo"));
     }
 
     void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
     {
-        try { throw new Exception("todo") ;} catch (Exception e) {debug writeln(e);}
+        writeln(new Exception("todo"));
     }
 
     void drawImage(Position2D pos, Image image)

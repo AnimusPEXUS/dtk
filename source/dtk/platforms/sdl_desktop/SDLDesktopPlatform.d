@@ -106,7 +106,6 @@ class SDLDesktopPlatform : PlatformI
         SDL_Init(SDL_INIT_VIDEO);
         SDL_version v;
         SDL_GetVersion(&v);
-        debug writeln("SDL Version: ", v.major, ".", v.minor, ".", v.patch);
 
         {
         	timer500_event_id = cast(SDL_EventType)SDL_RegisterEvents(1);
@@ -201,8 +200,7 @@ class SDLDesktopPlatform : PlatformI
 
             if (res == 0) // TODO: use GetError()
             {
-                debug writeln("TODO: got error on SDL_WaitEvent");
-                return;
+                throw new Exception("got error on SDL_WaitEvent");
             }
             
             if (core.thread.osthread.Thread.getThis().id != main_thread_id)
@@ -213,18 +211,11 @@ class SDLDesktopPlatform : PlatformI
             // TODO: probably, at this point, things have to become asynchronous
             //       in environments which supports this
 
-            debug writeln("mainLoop event type: " ,event.type);
-
             if (event.type == SDL_USEREVENT)
             {
             	if (cast(SDL_EventType)event.user.type
             		== timer500_event_id)
             	{
-            		writeln("500ms event");
-            		// foreach (w;windows)
-            		// {
-            			// w.handle_SDL_Event(event);
-            		// }
             		signal_timer500.emit();
             	}
             }
@@ -241,7 +232,6 @@ class SDLDesktopPlatform : PlatformI
             		windowID = event.window.windowID;
             		if (ignoredSDLWindowEvents.canFind(event.window.event))
             		{
-            			debug writeln("warning: ignored SDL_WINDOWEVENT::", event.window.event, " just now");
             			continue main_loop;
             		}
             		break;

@@ -26,30 +26,17 @@ mixin template mixin_getWidgetAtPosition()
         // if this have only single child - work with it
         static if (__traits(hasMember, this, "getChild"))
         {
-            debug writeln("getting child of ", this);
-            /* auto isunset = __traits(getMember, this, "isUnsetChild")(); */
             auto isunset = this.isUnsetChild(); // __traits(getMember, this, "isUnsetChild")();
             if (isunset)
             {
-                debug writeln("child of ", this, " is not set");
                 return tuple(cast(WidgetI)this, local_x, local_y);
             }
 
-            /* WidgetI c = __traits(getMember, this, "getChild")(); */
             WidgetI c = this.getChild();
             if (c is null)
             {
-                debug writeln("child of ", this, " is null");
                 return tuple(cast(WidgetI)this, local_x, local_y);
             }
-
-            debug writeln("child of ", this, " is ", c);
-
-            // TODO: what is this?
-            // if (c.isUnsetPosition() || c.isUnsetSize())
-            // {
-                // return tuple(cast(WidgetI)this, local_x, local_y);
-            // }
 
             auto c_pos = c.getPosition();
             auto c_size = c.getSize();
@@ -58,12 +45,7 @@ mixin template mixin_getWidgetAtPosition()
             	x >= c_pos.x && x <= (c_pos.x + c_size.width) && y >= c_pos.y
                     && y <= (c_pos.y + c_size.height))
             {
-                debug writeln("x/y is in ", c);
                 return c.getWidgetAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
-            }
-            else
-            {
-                debug writeln("x/y is not in ", c);
             }
         }
 
@@ -71,41 +53,27 @@ mixin template mixin_getWidgetAtPosition()
         static if (__traits(hasMember, this, "getChildren"))
         {
 
-            debug writeln("getting children of ", this);
             auto children = this.getChildren();
             if (children.length == 0)
             {
-                debug writeln("children of ", this, " is not set");
                 return tuple(cast(WidgetI)this, local_x, local_y);
             }
 
             // TODO: optimize for visible part
             foreach (c; children)
             {
-            	// TODO: what is this?
-                // if (c.isUnsetPosition() || c.isUnsetSize())
-                // {
-                    // return tuple(cast(WidgetI)this, local_x, local_y);
-                // }
-
                 auto c_pos = c.getPosition();
                 auto c_size = c.getSize();
 
                 if (x >= c_pos.x && x <= (c_pos.x + c_size.width) && y >= c_pos.y
                         && y <= (c_pos.y + c_size.height))
                 {
-                    debug writeln("x/y is in ", c);
                     return c.getWidgetAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
-                }
-                else
-                {
-                    debug writeln("x/y is not in ", c);
                 }
             }
 
         }
 
-        debug writeln("returning ", this, " as a child");
         return tuple(cast(WidgetI)this, local_x, local_y);
     }
 }

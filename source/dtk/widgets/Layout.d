@@ -124,8 +124,6 @@ class Layout : Widget, ContainerableWidgetI
 
     override void positionAndSizeRequest(Position2D position, Size2D size)
     {
-        /* setCalculatedPosition(position);
-        setCalculatedSize(size); */
         super.positionAndSizeRequest(position, size);
         this.recalculateChildrenPositionsAndSizes();
     }
@@ -134,11 +132,6 @@ class Layout : Widget, ContainerableWidgetI
     {
         foreach (size_t counter, v; children)
         {
-        	// TODO: what is this?
-            // if (v.isUnsetPosition() || v.isUnsetSize())
-            // {
-                // throw new Exception(to!string(this) ~ " child size or position is not set");
-            // }
             v.recalculateChildrenPositionsAndSizes();
         }
     }
@@ -153,11 +146,6 @@ class Layout : Widget, ContainerableWidgetI
 
         foreach (size_t i, v; children)
         {
-            debug writeln(i, " - Layout child redraw()");
-            auto p = v.getPosition();
-            auto s = v.getSize();
-            debug writeln(i, " child position is ", p.x, ",", p.y);
-            debug writeln(i, " child size is     ", s.width, ",", s.height);
             v.redraw();
         }
     }

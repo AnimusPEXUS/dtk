@@ -50,8 +50,6 @@ class RadioGroup
         {
             auto x = v == b;
 
-            debug writeln("ButtonRadio Checked?: ", b, " ", x);
-
             v.setChecked(x);
             v.redraw();
         }

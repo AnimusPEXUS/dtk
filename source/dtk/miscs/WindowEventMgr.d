@@ -70,24 +70,11 @@ class WindowEventMgr : WindowEventMgrI
         
         static if (is(T1 == EventMouse*))
         {   
-        	debug writeln("is(T1 == EventMouse*)");
         	auto x = getWidgetAtPosition(Position2D(event.x, event.y));
             mouseWidget = x[0];
             widget_local_x = x[1];
             widget_local_y = x[2];          
         }
-        
-        debug writeln(
-        	"handle_event_x_search_and_call x:", 
-        	widget_local_x,
-        	" y:",
-        	widget_local_y
-        	);
-        
-        /* if (type == XEventType.mouse)
-        {
-        mouseWidget=getWidgetAtVisible(Position2D(event.emouse.x, event.emouse.y));
-        } */
         
         bool processed;
         
@@ -142,7 +129,6 @@ class WindowEventMgr : WindowEventMgrI
     
     bool handle_event_mouse(EventMouse* e)
     {
-        debug writeln("   mouse clicks:", e.button.clicks);
         return handle_event_x_search_and_call!listMouseActions(e);
     }
     
@@ -163,12 +149,14 @@ class WindowEventMgr : WindowEventMgrI
     
     static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
+    	// TODO: use q{}
         mixin("private Event" ~ v ~ "Action[] list" ~ v ~ "Actions;");
         mixin("void add" ~ v ~ "Action(Event" ~ v ~ "Action eva) { list" ~ v ~ "Actions ~= eva; }");
     }
     
     void removeAllActions()
     {
+    	// TODO: use q{}
         static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
         {
             mixin("list" ~ v ~ "Actions = []; ");

@@ -26,12 +26,8 @@ EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
     switch (e.event)
     {
     default:
-        /* case SDL_WINDOWEVENT_HIT_TEST: */
-        debug writeln("warning: ", "unsupported SDL_WindowEvent.event:", e.event);
         break;
     case SDL_WINDOWEVENT_NONE:
-        /* throw new Exception("unsupported SDL_WindowEvent.event"); */
-        debug writeln("warning: ", "unsupported SDL_WindowEvent.event:" ~ to!string(e.event));
         break;
     case SDL_WINDOWEVENT_SIZE_CHANGED:
         throw new Exception("should be ignored, not processed");
@@ -177,7 +173,6 @@ EventMouse* convertSDLMouseButtonEventToDtkEventMouse(SDL_MouseButtonEvent* e)
     switch (e.button)
     {
     default:
-        debug writeln("warning: resulted in default case at convertSDLMouseButtonEventToDtkEventMouse");
         break;
     case SDL_BUTTON_LEFT:
         ret.button.button = EnumMouseButton.bl;
