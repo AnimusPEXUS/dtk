@@ -53,7 +53,8 @@ void genVisibilityMapForSubitems(
         ulong subitem_index,
         ulong target_x, ulong target_y,
         ulong x, ulong y,
-        ulong width, ulong height
+        ulong width, ulong height,
+        bool its_the_last_visible_item
         ) genVisibilityMapForSubitem,)
 {
 
@@ -149,7 +150,7 @@ void genVisibilityMapForSubitems(
     }
 
     {
-        ulong items_count = last_visible_item - first_visible_item;
+        ulong items_count = last_visible_item - first_visible_item+1;
 
         ulong delegate(ulong i) calc_loop_target_x;
         ulong delegate(ulong i) calc_loop_target_y;
@@ -228,7 +229,7 @@ void genVisibilityMapForSubitems(
             break;
         }
 
-        for (ulong i = 0; i <= items_count; i++)
+        for (ulong i = 0; i != items_count; i++)
         {
             auto tx = calc_loop_target_x(i);
             auto ty = calc_loop_target_y(i);
@@ -242,7 +243,8 @@ void genVisibilityMapForSubitems(
                 tx,
                 ty,
                 sx, sy,
-                sw, sh
+                sw, sh,
+                i == items_count-1
                 );
         }
     }
@@ -513,7 +515,8 @@ class TextLineSubline
                 ulong subitem_index,
                 ulong target_x, ulong target_y,
                 ulong x, ulong y,
-                ulong width, ulong height
+                ulong width, ulong height,
+                bool its_the_last_visible_item
                 )
             {
                 auto evme = new ElementVisibilityMapElement();
@@ -523,6 +526,8 @@ class TextLineSubline
 
                 evme.line=this_line_index;
                 evme.column=this_line_done_chars_count + subitem_index;
+                
+                evme.eovl = its_the_last_visible_item;
 
                 evme.target_x=sublines_target_x + target_x;
                 evme.target_y=sublines_target_y + target_y;
@@ -825,7 +830,8 @@ class TextLine
                 ulong subitem_index,
                 ulong target_x, ulong target_y,
                 ulong x, ulong y,
-                ulong width, ulong height
+                ulong width, ulong height,
+                bool its_the_last_visible_item
                 )
             {
                 ulong sum=0;
@@ -848,38 +854,6 @@ class TextLine
             }
             );
 
-    }
-
-    Tuple!(bool, ulong, ulong) calcSublineAndColumnByColumn(
-    	ulong column,
-    	TextView text_view,
-    	)
-    {
-    	auto state = getState(text_view);
-
-    	auto fail_res = tuple(false, 0UL, 0UL);
-
-    	if (column > textchars.length)
-    	{
-    		return fail_res;
-    	}
-    	//ulong res_subline;
-    	//ulong res_column;
-
-    	ulong cur_subline;
-    	ulong sub_col = column;
-    	while(true)
-    	{
-    		auto z = state.sublines[cur_subline].getState(text_view).textchars.length;
-    		if (z > sub_col)
-    		{
-    			return tuple(true, cur_subline, sub_col);
-    		}
-    		sub_col -= z;
-    		cur_subline++;
-    	}
-
-    	// return fail_res;
     }
 
 }
@@ -1335,7 +1309,8 @@ class Text
                 ulong subitem_index,
                 ulong target_x, ulong target_y,
                 ulong x, ulong y,
-                ulong width, ulong height
+                ulong width, ulong height,
+                bool its_the_last_visible_item
                 )
             {
                 lines[subitem_index].genVisibilityMap(
@@ -1361,6 +1336,7 @@ class Text
         ret += lines.length - 1; // new line symbol count
         return ret;
     }
+    
 }
 
 struct CursorPosition
@@ -1412,19 +1388,8 @@ class TextView
     // NOTE: this is instead of property
     bool cursor_animation_iteration_visible;
 
-    // ulong cursor_position_line;
-    // ulong cursor_position_column;
-    //
-    // ElementVisibilityMapElement cursor_after;
-    // ElementVisibilityMapElement cursor_before;
-
     CursorPosition[] cursor_positions;
 
-    // Mode mode;
-    //
-    // bool getVirtualWrapBySpace();
-    // bool getVirtualWrapByChar();
-    
     Text text;
     
     FormI delegate() getForm;
@@ -1461,8 +1426,6 @@ class TextView
         static foreach(
             v;
             [
-            // stname("X", "ulong"),
-            // stname("Y", "ulong"),
             stname("Width", "ulong"),
             stname("Height", "ulong"),
             
@@ -1569,12 +1532,6 @@ class TextView
         return _rendered_image;
     }
 
-    // Signal!(ulong, ulong, ulong, ulong) redrawRequest;
-    // mixin installSignal!(
-    // "PerformRedraw", "signal_perform_redraw",
-    // ulong,ulong, ulong, ulong,
-    // );
-
     void fullRedrawToDS()
     {
     	ulong x;
@@ -1605,44 +1562,11 @@ class TextView
     {
     	auto ds = getDrawingSurface();
     	auto image = getRenderedImage();
-    	// auto pos = Position2D(0, 0);
-    	
-    	// auto bg_color = text.getDefaultBGColor();
-    	// auto fg_color = text.getDefaultFGColor();
     	
     	auto p = Position2D(cast(int)target_x,cast(int)target_y);
     	auto i = image.getImage(p, Size2D(cast(int)width, cast(int)height));
     	ds.drawImage(p, i);
     	ds.present();
-    	
-    	/*
-    	for (uint y = cast(uint)target_y; y < height; y++)
-    	{
-    		for (uint x = cast(uint)target_x; x < width; x++)
-    		{
-    			auto new_color = bg_color;
-
-    			auto dot = image.getDot(x, y);
-   				
-    			//if (dot.enabled)
-    			//{
-    				// TODO: take background color from already existing dot
-    				auto part = dot.intensivity;
-    				new_color.r = chanBlend(new_color.r, fg_color.r, part);
-    				new_color.g = chanBlend(new_color.g, fg_color.g, part);
-    				new_color.b = chanBlend(new_color.b, fg_color.b, part);
-    			//}
-    			
-    			auto id = ImageDot();
-   				id.enabled=true;
-   				id.intensivity=1;
-   				id.color = new_color;  
-    			
-   				ds.drawDot(Position2D(x, y), id);
-    		}
-    	}
-    	*/
-    	// ds.present();
     }
 
     void ensureTimer500Connection()
@@ -1667,11 +1591,6 @@ class TextView
     	}
     }
 
-    // void on_text_requires_line_recalc() nothrow
-    // {
-    // linesRecalcRequired=true;
-    // }
-    //
     void setTextString(dstring txt = "")
     {
         if (text is null)
@@ -1823,7 +1742,12 @@ class TextView
         }
 
         if (copyToDS)
-        	drawImageToDrawingSurface(e.target_x, e.target_y, e.width,  e.height);
+        	drawImageToDrawingSurface(
+        		e.target_x, 
+        		e.target_y, 
+        		e.width,  
+        		e.height
+        		);
     }
 
     void genImage()
@@ -1969,15 +1893,18 @@ class TextView
 
         if (visibility_map is null)
         	return fail_res;
+        
+        bool at_end_of_line;
+        // bool at_end_of_subline; // TODO: todo
 
         foreach (v; visibility_map.elements)
     	{
-    		if (v.line == line && v.column == column)
-    		{
+    		if (v.eovl && column == v.column+1)
+    		{  // the case when cursor is at the end of visible line
     			final switch(text.getLineCharsLayout())
     			{
     			case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-    				x = v.target_x;
+    				x = v.target_x+v.width;
     				y = v.target_y;
     				width = 1;
     				height = v.height;
@@ -1990,10 +1917,41 @@ class TextView
     				break;
     			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
     			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-    				// TODO: complete this
+    				x = v.target_x;
+    				y = v.target_y+v.height;
+    				width = v.width;
+    				height = 1;
     				break;
     			}
-    			
+
+    			return tuple(true, x,y,width,height);
+    		}
+    		
+    		if (v.line == line && v.column == column)
+    		{
+    			final switch(text.getLineCharsLayout())
+    			{
+    			case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+    				x = v.target_x;
+    				y = v.target_y;
+    				width = 1;
+    				height = v.height;
+    				break;
+    			case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+    				x = v.target_x+v.width;
+    				y = v.target_y;
+    				width = 1;
+    				height = v.height;
+    				break;
+    			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+    			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+    				x = v.target_x;
+    				y = v.target_y;
+    				width = v.width;
+    				height = 1;
+    				break;
+    			}
+
     			return tuple(true, x,y,width,height);
     		}
     	}
@@ -2002,6 +1960,7 @@ class TextView
 
     void click(ulong x, ulong y)
     {
+    	debug writefln("TextView clicked at %d %d", x, y);
         if (getCursorEnabled())
         {
         	// TODO: maybe there should be better way to ensure timer is connected
@@ -2086,18 +2045,18 @@ class TextView
         foreach (v; visibility_map.elements)
         {
             if (
-                (x >= v.target_x && x <= v.target_x+v.width)
-            &&
-            (y >= v.target_y && y <= v.target_y+v.height)
+                (x >= v.target_x && x < v.target_x+v.width)
+            &&  (y >= v.target_y && y < v.target_y+v.height)
             )
             {
                 auto lh = ElementVisibilityMapElementClickLeanH.left;
                 auto lv = ElementVisibilityMapElementClickLeanV.top;
-
+                
                 if (x >= v.target_x+(v.width/2))
                     lh = ElementVisibilityMapElementClickLeanH.right;
                 if (y >= v.target_y+(v.height/2))
                     lv = ElementVisibilityMapElementClickLeanV.bottom;
+                debug writefln("clicked %d %d %s %s %s", v.line, v.column, lh, lv, v.eovl);
                 return tuple(v,lh,lv);
             }
         }
@@ -2147,6 +2106,9 @@ class ElementVisibilityMapElement
 
     ulong line;
     ulong column;
+    
+    // end of visible line
+    bool eovl;
 
     ulong target_x;
     ulong target_y;

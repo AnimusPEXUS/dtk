@@ -179,8 +179,10 @@ class TextEntry : Widget, ContainerableWidgetI
     {
         if (getDrawBewelAndBackground())
         {
-            x += 2;
-            y += 2;
+        	if (x <= 2 || y <= 2)
+        		return;
+            x -= 2;
+            y -= 2;
         }
 
         text_view.click(x, y);

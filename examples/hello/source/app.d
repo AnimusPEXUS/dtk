@@ -64,6 +64,10 @@ void main()
     lbl1.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); */
     lbl1.setFontSize(10);
     lbl1.setVirtualWrapByWord(true);
+    lbl1.setDrawBewelAndBackground(true);
+    lbl1.setTextSelectable(true);
+    lbl1.setTextEditable(true);
+    lbl1.setCursorEnabled(true);
 
     lbl2.setText(
     	"ぁぃぅぇぁぃぅぇぁぃぅぇ\n"
