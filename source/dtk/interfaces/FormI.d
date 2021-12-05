@@ -35,6 +35,7 @@ interface FormI
     void focusTo(WidgetI);
 
     WidgetI getFocusedWidget();
+    typeof(this) setFocusedWidget(WidgetI);
     bool isUnsetFocusedWidget();
     WidgetI focusNextWidget();
     WidgetI focusPrevWidget();

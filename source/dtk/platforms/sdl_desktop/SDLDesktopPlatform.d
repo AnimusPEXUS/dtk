@@ -116,14 +116,12 @@ class SDLDesktopPlatform : PlatformI
 
         version (linux)
         {
-            pragma(msg, "using freetype font manager");
             import dtk.platforms.sdl_desktop.FontMgrLinux;
 
             font_mgr = cast(FontMgrI) new FontMgrLinux;
         }
         else
         {
-            pragma(msg, "Font Manager error");
             static assert(false, "Couldn't select Font Manager for platform");
         }
     }
@@ -227,6 +225,7 @@ class SDLDesktopPlatform : PlatformI
             	switch (event.type)
             	{
             	default:
+            		debug writeln("unsupported event: ", event.type);
             		continue main_loop;
             	case SDL_WINDOWEVENT:
             		windowID = event.window.windowID;

@@ -225,10 +225,11 @@ EventMouse* convertSDLMouseWheelEventToDtkEventMouse(SDL_MouseWheelEvent* e)
 EventTextInput* convertSDLTextInputEventToDtkEventTextInput(SDL_TextInputEvent* e)
 {
     import std.conv;
+    import std.string;
 
     EventTextInput* ret = new EventTextInput;
 
-    ret.character = to!string(e.text)[0];
+    ret.text = to!dstring(cast(string)(fromStringz(e.text)));
 
     return ret;
 }

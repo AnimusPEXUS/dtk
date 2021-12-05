@@ -12,6 +12,7 @@ import dtk.types.Signal;
 import dtk.types.Image;
 import dtk.types.Color;
 import dtk.types.EventMouse;
+import dtk.types.EventTextInput;
 
 import dtk.interfaces.ContainerableWidgetI;
 import dtk.interfaces.WidgetI;
@@ -107,7 +108,6 @@ class TextEntry : Widget, ContainerableWidgetI
         {
             mixin(
             	q{
-            		pragma(msg, "connectTo%1$s_onAfterChanged");
             		con_cont.add(
             			connectTo%1$s_onAfterChanged(
             				delegate void (%2$s v1, %2$s v2)
@@ -151,6 +151,7 @@ class TextEntry : Widget, ContainerableWidgetI
         con_cont.add(connectToText_onAfterChanged(&afterTextChanged));
         
         setMouseEvent("button-click", &on_mouse_click_internal);
+        setTextInputEvent("text-input", &on_text_input_internal);
         
         // textViewConnCon = text_view.connectTo_PerformRedraw(
         	// &on_textview_redraw_request
@@ -177,6 +178,9 @@ class TextEntry : Widget, ContainerableWidgetI
     	ulong y
     	)
     {
+    	auto f = getForm();
+    	f.setFocusedWidget(this);
+    	
         if (getDrawBewelAndBackground())
         {
         	if (x <= 2 || y <= 2)
@@ -188,6 +192,17 @@ class TextEntry : Widget, ContainerableWidgetI
         text_view.click(x, y);
         
         return ;
+    }
+    
+    void on_text_input_internal(
+    	EventTextInput* event, 
+    	ulong x, 
+    	ulong y
+    	)
+    {
+    	// debug writeln("text input to TextEntry is happened: ", event.text);
+    	text_view.textInput(event.text);
+    	redraw(); // TODO: maybe this is too expansive and optimization is required
     }
 
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow

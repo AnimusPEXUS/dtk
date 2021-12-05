@@ -2,6 +2,7 @@ module dtk.miscs.WindowEventMgr;
 
 import std.stdio;
 import std.typecons;
+import std.format;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
@@ -149,9 +150,14 @@ class WindowEventMgr : WindowEventMgrI
     
     static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
-    	// TODO: use q{}
-        mixin("private Event" ~ v ~ "Action[] list" ~ v ~ "Actions;");
-        mixin("void add" ~ v ~ "Action(Event" ~ v ~ "Action eva) { list" ~ v ~ "Actions ~= eva; }");
+    	mixin(
+    		q{
+    			private Event%1$sAction[] list%1$sActions;
+    			void add%1$sAction(Event%1$sAction eva) { 
+    				list%1$sActions ~= eva; 
+    			}
+    		}.format(v)
+    		);    	
     }
     
     void removeAllActions()
@@ -159,7 +165,7 @@ class WindowEventMgr : WindowEventMgrI
     	// TODO: use q{}
         static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
         {
-            mixin("list" ~ v ~ "Actions = []; ");
+            mixin("list%1$sActions = []; ".format(v));
         }
     }
     

@@ -122,9 +122,9 @@ class Window : WindowI
             setLaf(window_settings.laf);
         else
         {
-            auto plaf = _platform.getLaf();
-            assert(plaf !is null, "platform doesn't have Laf defined. this is not ok");
-            setLaf(plaf);
+            auto platform_laf = _platform.getLaf();
+            assert(platform_laf !is null, "platform doesn't have Laf defined. this is not ok");
+            setLaf(platform_laf);
         }
 
         platform.registerWindow(this);
@@ -178,6 +178,9 @@ class Window : WindowI
             break;
         case SDL_MOUSEWHEEL:
             handle_SDL_MouseWheelEvent(&event.wheel);
+            break;
+        case SDL_TEXTINPUT:
+            handle_SDL_TextInputEvent(&event.text);
             break;
         }
 
@@ -293,8 +296,6 @@ class Window : WindowI
 
     void installForm(FormI form)
     {
-        assert(form !is null);
-
         uninstallForm();
 
         setForm(form);

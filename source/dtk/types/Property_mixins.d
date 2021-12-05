@@ -5,8 +5,6 @@ mixin template Property_gsu(T, string variable)
 {
     import std.format;
 
-    /* pragma(msg, "creating property \"", variable, "\""); */
-
     mixin(q{
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
@@ -40,8 +38,6 @@ mixin template Property_gsu(T, string variable)
 mixin template Property_gsun(T, string variable)
 {
     import std.format;
-
-    /* pragma(msg, "creating property \"", variable, "\""); */
 
     mixin(q{
     Property!(T, PropertySettings!T, {
@@ -79,8 +75,6 @@ mixin template Property_gs(T, string variable)
 {
     import std.format;
 
-    // pragma(msg, "creating property \"", variable, "\"");
-
     mixin(q{
     Property!(T, PropertySettings!T, {
         PropertySettings!T x = {
@@ -114,8 +108,6 @@ mixin template Property_gs(T, string variable)
 mixin template Property_gs_w_d(T, string variable, alias defaultValue)
 {
     import std.format;
-
-    /* pragma(msg, "creating property \"", variable, "\""); */
 
     mixin(q{
     Property!(T, PropertySettings!T, {

@@ -990,7 +990,6 @@ class Text
         {
             mixin(
                 q{
-                    pragma(msg, "connectTo%1$s_onAfterChanged");
                     con_cont.add(
                         connectTo%1$s_onAfterChanged(
                             delegate void (%2$s v1, %2$s v2) nothrow
@@ -1437,7 +1436,6 @@ class TextView
         {
             mixin(
                 q{
-                    pragma(msg, "connectTo%1$s_onAfterChanged");
                     con_cont.add(
                         connectTo%1$s_onAfterChanged(
                             delegate void (%2$s v1, %2$s v2) nothrow
@@ -1462,7 +1460,6 @@ class TextView
         {
             mixin(
                 q{
-                    pragma(msg, "connectTo%1$s_onAfterChanged");
                     con_cont.add(
                         connectTo%1$s_onAfterChanged(
                             delegate void (%2$s v1, %2$s v2) nothrow
@@ -1958,18 +1955,6 @@ class TextView
     	return fail_res;
     }
 
-    void click(ulong x, ulong y)
-    {
-    	debug writefln("TextView clicked at %d %d", x, y);
-        if (getCursorEnabled())
-        {
-        	// TODO: maybe there should be better way to ensure timer is connected
-        	//       as soon, as Platform is available
-        	ensureTimer500Connection();
-            changeCursorPositionByCoordinates(x, y);
-        }
-    }
-
     void changeCursorPositionByCoordinates(ulong x, ulong y)
     {
 
@@ -2063,6 +2048,50 @@ class TextView
 
         return fail_res;
     }
+    
+
+    void click(ulong x, ulong y)
+    {
+    	debug writefln("TextView clicked at %d %d", x, y);
+        if (getCursorEnabled())
+        {
+        	// TODO: maybe there should be better way to ensure timer is connected
+        	//       as soon, as Platform is available
+        	ensureTimer500Connection();
+            changeCursorPositionByCoordinates(x, y);
+        }
+    }
+
+    void textInput(dstring txt)
+    {
+    	linesRecalcRequired = true;
+    	ulong line;
+    	ulong column;
+    	if (cursor_positions.length != 0)
+    	{
+    		auto z = cursor_positions[$-1];
+    		line = z.line;
+    		column = z.column;
+    	}
+    	
+    	auto line_obj = text.lines[line];
+    	
+    	TextChar[] new_chars;
+    	
+    	foreach (v; cast(dchar[]) txt)
+    	{
+    		auto x = new TextChar(line_obj);
+    		x.chr = v;
+    		new_chars ~= x; 
+    	}
+    	
+    	text.lines[line].textchars=
+    		text.lines[line].textchars[0 .. column] 
+    		~ new_chars
+    		~ text.lines[line].textchars[column .. $];
+    	
+    	changeCursorPositionByLineAndColumn(line, column+new_chars.length);
+    }    
 
 }
 

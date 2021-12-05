@@ -220,6 +220,7 @@ class Widget : WidgetI
     			{
     				handlers%1$s[name] = handler;
     			}
+    			
     			void call%1$sEvent(
     				string name, 
     				Event%1$s* e,
@@ -233,6 +234,7 @@ class Widget : WidgetI
     					ev(e,mouse_widget_local_x,mouse_widget_local_y);
     				}
     			}
+    			
     			void unset%1$sEvent(string name)
     			{
     				handlers%1$s.remove(name);
