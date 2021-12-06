@@ -52,8 +52,8 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new TextEntry();
-    auto lbl2 = new TextEntry();
-    auto lbl3 = new TextEntry();
+    /*auto lbl2 = new TextEntry();
+    auto lbl3 = new TextEntry();*/
     lbl1.setText(
         "1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑\n"
         ~"вторая строка\n"
@@ -69,6 +69,7 @@ void main()
     lbl1.setTextEditable(true);
     lbl1.setCursorEnabled(true);
 
+    /*
     lbl2.setText(
     	"ぁぃぅぇぁぃぅぇぁぃぅぇ\n"
     	~"ぁぃぅぇぁぃぅぇぁぃぅぇぁぃぅぇ\n"
@@ -79,7 +80,7 @@ void main()
     lbl2.setDrawBewelAndBackground(true);
 
     /* lbl2.setLayoutLines(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop);
-    lbl2.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); */
+    lbl2.setLayoutChars(GenImageFromSubimagesLayout.verticalTopToBottomAlignRight); * /
     lbl2.setFontSize(15);
     lbl2.setTextSelectable(true);
     lbl2.setTextEditable(true);
@@ -91,9 +92,9 @@ void main()
     lbl3.setFontFamily("DejaVuSans");
     lbl3.setFontStyle("Regular");
     /* lbl3.setLayoutLines(GenImageFromSubimagesLayout.verticalTopToBottomAlignLeft);
-    lbl3.setLayoutChars(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop); */
+    lbl3.setLayoutChars(GenImageFromSubimagesLayout.horizontalRightToLeftAlignTop); * /
     lbl3.setFontSize(20);
-    lbl3.setVirtualWrapByWord(true);
+    lbl3.setVirtualWrapByWord(true); */
 
     /* DS ds = new DS(); */
 
@@ -110,8 +111,8 @@ void main()
     btn4.setPosition(Position2D(10, 100)).setSize(Size2D(12, 12));
     btn5.setPosition(Position2D(10, 120)).setSize(Size2D(12, 12));
     lbl1.setPosition(Position2D(10, 140)).setSize(Size2D(500, 100));
-    lbl2.setPosition(Position2D(10, 240)).setSize(Size2D(500, 100));
-    lbl3.setPosition(Position2D(10, 340)).setSize(Size2D(500, 100));
+    /*lbl2.setPosition(Position2D(10, 240)).setSize(Size2D(500, 100));
+    lbl3.setPosition(Position2D(10, 340)).setSize(Size2D(500, 100));*/
     /* ds.setPosition(Position2D(50, 50)).setSize(Size2D(50, 50)); */
 
     lo.packStart(btn, true, true);
@@ -120,8 +121,8 @@ void main()
     lo.packStart(btn4, false, true);
     lo.packStart(btn5, false, true);
     lo.packStart(lbl1, false, true);
-    lo.packStart(lbl2, false, true);
-    lo.packStart(lbl3, false, true);
+    /*lo.packStart(lbl2, false, true);
+    lo.packStart(lbl3, false, true);*/
 
 
     /* auto fm = pl.getFontManager();

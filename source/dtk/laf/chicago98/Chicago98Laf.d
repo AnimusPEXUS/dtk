@@ -533,7 +533,7 @@ class Chicago98Laf : LafI
         				ulong mouseWidget_x, 
         				ulong mouseWidget_y
         				) {
-        			debug writeln("action of window event manager");
+        			
         			if (focusedWidget is null)
                     {
                     	return false;

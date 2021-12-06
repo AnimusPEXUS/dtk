@@ -200,7 +200,6 @@ class TextEntry : Widget, ContainerableWidgetI
     	ulong y
     	)
     {
-    	// debug writeln("text input to TextEntry is happened: ", event.text);
     	text_view.textInput(event.text);
     	redraw(); // TODO: maybe this is too expansive and optimization is required
     }

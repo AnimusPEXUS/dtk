@@ -38,6 +38,8 @@ enum GenVisibilityMapForSubitemsLayout
 
 // max_width, max_height - defines page size
 // x,y,width,height - selects visible frame form the page
+// NOTE: this function does not calculate wrapping. wrapping is based on 
+//       lines and sublines sizes done by Text.reprocess() and it's subcalls
 void genVisibilityMapForSubitems(
     ulong max_width, ulong max_height,
 
@@ -168,7 +170,7 @@ void genVisibilityMapForSubitems(
                 if (i == 0)
                     return 0;
                 ulong width;
-                for (ulong j = 0; j < i; j++)
+                for (ulong j = 0; j != i; j++)
                 {
                     width += getSubitemWidth(first_visible_item + j);
                 }
@@ -187,7 +189,8 @@ void genVisibilityMapForSubitems(
 
             calc_loop_source_width = delegate ulong(ulong i) {
                 if (i == 0)
-                    return getSubitemWidth(first_visible_item + i) - first_visible_item_offset;
+                    return getSubitemWidth(first_visible_item + i) 
+                - first_visible_item_offset;
                 return getSubitemWidth(first_visible_item + i);
             };
 
@@ -202,7 +205,7 @@ void genVisibilityMapForSubitems(
                 if (i == 0)
                     return 0;
                 ulong height;
-                for (ulong j = 0; j < i; j++)
+                for (ulong j = 0; j != i; j++)
                 {
                     height += getSubitemHeight(first_visible_item + j);
                 }
@@ -223,7 +226,8 @@ void genVisibilityMapForSubitems(
 
             calc_loop_source_height = delegate ulong(ulong i) {
                 if (i == 0)
-                    return getSubitemHeight(first_visible_item + i) - first_visible_item_offset;
+                    return getSubitemHeight(first_visible_item + i) 
+                - first_visible_item_offset;
                 return getSubitemHeight(first_visible_item + i);
             };
             break;
@@ -237,7 +241,7 @@ void genVisibilityMapForSubitems(
             auto sy = calc_loop_source_y(i);
             auto sw = calc_loop_source_width(i);
             auto sh = calc_loop_source_height(i);
-
+            
             genVisibilityMapForSubitem(
                 i,
                 tx,
@@ -568,7 +572,14 @@ class TextLine
 
     ulong getLength()
     {
-    	return textchars.length + 1; // NOTE: 1 is for \n
+    	auto ret = textchars.length;
+    	
+    	// all lines, except the last one, assumed to have \n in the end
+    	if (parent_text.lines.length != 0 && parent_text.lines[$-1] != this)
+    	{
+    		ret++;
+    	}
+    	return  ret;
     }
 
     void setText(dstring txt)
@@ -736,13 +747,13 @@ class TextLine
                     {
                         auto sl_state = sl.getState(text_view);
 
-                        {
-                            auto w = sl_state.width;
-                            if (w > state.width)
-                                state.width = w;
-                        }
+                        state.width += sl_state.width;
 
-                        state.height += sl_state.height;
+                        {
+                            auto h = sl_state.height;
+                            if (h > state.height)
+                                state.height = h;
+                        }
                     }
                     break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
@@ -751,13 +762,13 @@ class TextLine
                     {
                         auto sl_state = sl.getState(text_view);
 
-                        state.width += sl_state.width;
-
                         {
-                            auto h = sl_state.height;
-                            if (h > state.height)
-                                state.height = h;
+                            auto w = sl_state.width;
+                            if (w > state.width)
+                                state.width = w;
                         }
+
+                        state.height += sl_state.height;
                     }
                     break;
             }
@@ -2041,7 +2052,7 @@ class TextView
                     lh = ElementVisibilityMapElementClickLeanH.right;
                 if (y >= v.target_y+(v.height/2))
                     lv = ElementVisibilityMapElementClickLeanV.bottom;
-                debug writefln("clicked %d %d %s %s %s", v.line, v.column, lh, lv, v.eovl);
+                
                 return tuple(v,lh,lv);
             }
         }
@@ -2052,7 +2063,6 @@ class TextView
 
     void click(ulong x, ulong y)
     {
-    	debug writefln("TextView clicked at %d %d", x, y);
         if (getCursorEnabled())
         {
         	// TODO: maybe there should be better way to ensure timer is connected
