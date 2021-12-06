@@ -1907,7 +1907,7 @@ class TextView
         
         foreach (v; visibility_map.elements)
         {
-            if (v.eovl && column == v.column+1)
+            if (v.eovl && v.line == line && column == v.column+1)
             {  // the case when cursor is at the end of visible line
                 final switch(text.getLineCharsLayout())
                 {
@@ -2052,6 +2052,15 @@ class TextView
                     lh = ElementVisibilityMapElementClickLeanH.right;
                 if (y >= v.target_y+(v.height/2))
                     lv = ElementVisibilityMapElementClickLeanV.bottom;
+                
+                // debug writefln(
+                	// "element visibility (at x: %s y: %s): %s (line: %s column: %s last?: %s)",
+                	// x,y,
+                	// v.chr.chr,
+                	// v.line,
+                	// v.column,
+                	// v.eovl
+                	// );
                 
                 return tuple(v,lh,lv);
             }
