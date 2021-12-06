@@ -94,7 +94,7 @@ class Chicago98Laf : LafI
         	LineStyle(formBackground),
         	nullable(FillStyle(formBackground))
         	);
-       ds.present;
+        ds.present;
     }
     
     void drawButton(Button widget)
@@ -234,11 +234,11 @@ class Chicago98Laf : LafI
         ds.drawRectangle(
         	Position2D(pos.x + 2, pos.y + 2), 
         	Size2D(size.width - 4,
-        	size.height - 4), 
+        		size.height - 4), 
         	LineStyle(Color(0xffffff)),
         	nullable(FillStyle(Color(0xffffff)))
         	);
-
+        
         if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawRectangle(
@@ -275,7 +275,7 @@ class Chicago98Laf : LafI
     // NOTE: have copy of this function in TextProcessor
     // private ubyte chanBlend(ubyte lower, ubyte higher, real part)
     // {
-        // return cast(ubyte)(lower + ((higher - lower) * part));
+    // return cast(ubyte)(lower + ((higher - lower) * part));
     // }
     
     void drawLayout(Layout widget)
@@ -289,7 +289,7 @@ class Chicago98Laf : LafI
         	LineStyle(Color(0)), 
         	Nullable!FillStyle()
         	);
-        	
+        
         ds.present();
     }
     
@@ -352,27 +352,67 @@ class Chicago98Laf : LafI
                 	WidgetI mouseWidget, 
     				ulong mouseWidget_x, 
     				ulong mouseWidget_y
-                	) {
-                auto mc = e.keysym.modcode;
-                mc &= EnumKeyboardModCodeNOT.Locks;
-                if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation
-                	&& (mc == 0 || mc == EnumKeyboardModCode.LeftShift))
-                return true;
-                return false;
-                	}, 
-                	action: delegate bool(
-                		WindowEventMgrI mgr, 
-                		WindowI window,
-                		EventKeyboard* e, 
-                		WidgetI focusedWidget, 
-                		WidgetI mouseWidget, 
-                		ulong mouseWidget_x, 
-                		ulong mouseWidget_y
-                		) {
+                	) 
+                {
                 	auto mc = e.keysym.modcode;
-                    mc &= EnumKeyboardModCodeNOT.Locks;
+                	mc &= EnumKeyboardModCodeNOT.Locks;
+                	if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation
+                		&& (mc == 0 || mc == EnumKeyboardModCode.LeftShift))
+                	return true;
+                	return false;
+                }, 
+                action: delegate bool(
+                	WindowEventMgrI mgr, 
+                	WindowI window,
+                	EventKeyboard* e, 
+                	WidgetI focusedWidget, 
+                	WidgetI mouseWidget, 
+                	ulong mouseWidget_x, 
+                	ulong mouseWidget_y
+                	) 
+                {
+                	// auto mc = e.keysym.modcode;
+                    // mc &= EnumKeyboardModCodeNOT.Locks;
+                    if (focusedWidget is null)
+    				{
+    					return false;
+    				}
+    				
+    				if (e.key_state 
+    					== EnumKeyboardKeyState.pressed)
+    				{
+    					focusedWidget.callKeyboardEvent(
+    						"key-down", 
+    						e,
+    						mouseWidget_x,
+    						mouseWidget_y
+    						);
+    				}
+    				
+    				if (e.key_state 
+    					== EnumKeyboardKeyState.released)
+    				{
+    					focusedWidget.callKeyboardEvent(
+    						"key-up", 
+    						e,
+    						mouseWidget_x,
+    						mouseWidget_y
+    						);
+    					
+    					// TODO: fix this..?
+    					// if (e.button.clicks != 0)
+    					// {
+    						// focusedWidget.callKeyboardEvent(
+    							// "key-click", 
+    							// e,
+    							// mouseWidget_x,
+    							// mouseWidget_y
+    							// );
+    					// }
+    				}
+    				
                     return true;
-            },
+                },
             };
             
             mgr.addKeyboardAction(ea);
@@ -390,57 +430,60 @@ class Chicago98Laf : LafI
         			WidgetI mouseWidget, 
     				ulong mouseWidget_x, 
     				ulong mouseWidget_y
-    				) {
-    			return e.type == EventMouseType.button;
-    				}, 
-                    action: delegate bool(
-                    	WindowEventMgrI mgr, 
-                    	WindowI window,
-                    	EventMouse* e, 
-                    	WidgetI focusedWidget, 
-                    	WidgetI mouseWidget, 
-                    	ulong mouseWidget_x, 
-                    	ulong mouseWidget_y
-                    	) {
-                    if (mouseWidget is null)
-                    {
-                    	return false;
-                    }
-                    
-                    if (e.button.buttonState 
-                    	== EnumMouseButtonState.pressed)
-                    {
-                    	mouseWidget.callMouseEvent(
-                    		"button-down", 
-                    		e,
-                    		mouseWidget_x,
-                    		mouseWidget_y
-                    		);
-                    }
-                    
-                    if (e.button.buttonState 
-                    	== EnumMouseButtonState.released)
-                    {
-                    	mouseWidget.callMouseEvent(
-                    		"button-up", 
-                    		e,
-                    		mouseWidget_x,
-                    		mouseWidget_y
-                    		);
-                    	
-                    	if (e.button.clicks != 0)
-                    	{
-                    		mouseWidget.callMouseEvent(
-                    			"button-click", 
-                    			e,
-                    			mouseWidget_x,
-                    			mouseWidget_y
-                    			);
-                    	}
-                    }
-                    
-                    return true;
-            },};
+    				) 
+    			{
+    				return e.type == EventMouseType.button;
+    			}, 
+    			action: delegate bool(
+    				WindowEventMgrI mgr, 
+    				WindowI window,
+    				EventMouse* e, 
+    				WidgetI focusedWidget, 
+    				WidgetI mouseWidget, 
+    				ulong mouseWidget_x, 
+    				ulong mouseWidget_y
+    				) 
+    			{
+    				if (mouseWidget is null)
+    				{
+    					return false;
+    				}
+    				
+    				if (e.button.buttonState 
+    					== EnumMouseButtonState.pressed)
+    				{
+    					mouseWidget.callMouseEvent(
+    						"button-down", 
+    						e,
+    						mouseWidget_x,
+    						mouseWidget_y
+    						);
+    				}
+    				
+    				if (e.button.buttonState 
+    					== EnumMouseButtonState.released)
+    				{
+    					mouseWidget.callMouseEvent(
+    						"button-up", 
+    						e,
+    						mouseWidget_x,
+    						mouseWidget_y
+    						);
+    					
+    					if (e.button.clicks != 0)
+    					{
+    						mouseWidget.callMouseEvent(
+    							"button-click", 
+    							e,
+    							mouseWidget_x,
+    							mouseWidget_y
+    							);
+    					}
+    				}
+    				
+    				return true;
+    			},
+            };
             
             mgr.addMouseAction(ea);
         }
@@ -457,18 +500,20 @@ class Chicago98Laf : LafI
         			WidgetI mouseWidget, 
     				ulong mouseWidget_x, 
     				ulong mouseWidget_y
-        			) {
-        		return true;
-        			}, 
-        			action: delegate bool(
-        				WindowEventMgrI mgr, 
-        				WindowI window,
-        				EventWindow* e, 
-        				WidgetI focusedWidget, 
-        				WidgetI mouseWidget, 
-        				ulong mouseWidget_x, 
-        				ulong mouseWidget_y
-        				) {
+        			) 
+        		{
+        			return true;
+        		}, 
+        		action: delegate bool(
+        			WindowEventMgrI mgr, 
+        			WindowI window,
+        			EventWindow* e, 
+        			WidgetI focusedWidget, 
+        			WidgetI mouseWidget, 
+        			ulong mouseWidget_x, 
+        			ulong mouseWidget_y
+        			) 
+        		{
         			bool needs_resize = false;
         			bool needs_redraw = false;
         			
@@ -503,13 +548,13 @@ class Chicago98Laf : LafI
         				window.redraw();
         			}
         			return true;
-        	},
+        		},
         	};
         	
         	mgr.addWindowAction(ea);
         }
         
-                {
+        {
         	EventTextInputAction ea = {
         		any_focusedWidget: true, 
         		any_mouseWidget: true, 
@@ -521,18 +566,20 @@ class Chicago98Laf : LafI
         			WidgetI mouseWidget, 
     				ulong mouseWidget_x, 
     				ulong mouseWidget_y
-        			) {
-        		return true;
-        			}, 
-        			action: delegate bool(
-        				WindowEventMgrI mgr, 
-        				WindowI window,
-        				EventTextInput* e, 
-        				WidgetI focusedWidget, 
-        				WidgetI mouseWidget, 
-        				ulong mouseWidget_x, 
-        				ulong mouseWidget_y
-        				) {
+        			) 
+        		{
+        			return true;
+        		}, 
+        		action: delegate bool(
+        			WindowEventMgrI mgr, 
+        			WindowI window,
+        			EventTextInput* e, 
+        			WidgetI focusedWidget, 
+        			WidgetI mouseWidget, 
+        			ulong mouseWidget_x, 
+        			ulong mouseWidget_y
+        			) 
+        		{
         			
         			if (focusedWidget is null)
                     {
@@ -547,7 +594,7 @@ class Chicago98Laf : LafI
                     	);
         			
         			return true;
-        	},
+        		},
         	};
         	
         	mgr.addTextInputAction(ea);

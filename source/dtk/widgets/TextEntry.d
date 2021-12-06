@@ -77,6 +77,17 @@ class TextEntry : Widget, ContainerableWidgetI
         };
         
         text_view.getDrawingSurface = &getDrawingSurfaceForTextView;
+
+        text_view.isFocused = delegate bool()
+        {
+            auto f = getForm();
+            if (f is null)
+            {
+                throw new Exception("can't get form");
+            }
+            
+            return f.getFocusedWidget() == this;
+        };        
         
         struct stname {
             string sname;
@@ -179,7 +190,7 @@ class TextEntry : Widget, ContainerableWidgetI
         )
     {
         auto f = getForm();
-        f.setFocusedWidget(this);
+        f.focusTo(this);
         
         if (getDrawBewelAndBackground())
         {

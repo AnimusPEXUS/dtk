@@ -91,7 +91,7 @@ Tuple!(EventKeyboard*, Exception) convertSDLKeyboardEventToDtkEventKeyboard(SDL_
         ret.key_state = EnumKeyboardKeyState.pressed;
         break;
     case SDL_RELEASED:
-        ret.key_state = EnumKeyboardKeyState.depressed;
+        ret.key_state = EnumKeyboardKeyState.released;
         break;
     }
 

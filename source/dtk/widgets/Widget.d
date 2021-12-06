@@ -38,10 +38,10 @@ class Widget : WidgetI
 
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
-            PropSetting("gs_w_d", "bool", "vertical_expand", "VerticalExpand", "false"),
-            PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
-            PropSetting("gs_w_d", "bool", "vertical_fill", "VerticalFill", "false"),
-            PropSetting("gs_w_d", "bool", "horizontal_fill", "HorizontalFill", "false"),
+            // PropSetting("gs_w_d", "bool", "vertical_expand", "VerticalExpand", "false"),
+            // PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
+            // PropSetting("gs_w_d", "bool", "vertical_fill", "VerticalFill", "false"),
+            // PropSetting("gs_w_d", "bool", "horizontal_fill", "HorizontalFill", "false"),
             PropSetting("gs", "Position2D", "position", "Position", ""),
             PropSetting("gs_w_d", "Size2D", "size", "Size", q{Size2D(10, 10)}),
             //PropSetting("gs", "Size2D", "size", "Size", ""),
@@ -52,8 +52,8 @@ class Widget : WidgetI
 
     // NOTE: those two properties are really a synonym for their //Horizontal//
     //       analogs
-    mixin Property_forwarding!(bool, horizontal_expand, "Expand");
-    mixin Property_forwarding!(bool, horizontal_fill, "Fill");
+    // mixin Property_forwarding!(bool, horizontal_expand, "Expand");
+    // mixin Property_forwarding!(bool, horizontal_fill, "Fill");
 
 
     // =====^===^===^===== [locator] =====^===^===^===== end
@@ -64,10 +64,10 @@ class Widget : WidgetI
         cast(PropSetting[])[
             PropSetting("gs_w_d", "bool", "visible", "Visible", "false"),
             PropSetting("gs_w_d", "bool", "enabled", "Enabled", "false"),
-            PropSetting("gs_w_d", "bool", "focusable", "Focusable", "false"),
-            PropSetting("gs_w_d", "bool", "focus_kb_capture", "FocusKeyboardCapture", "false"),
-            PropSetting("gs_w_d", "bool", "uses_text_input", "UsesTextInput", "false"),
-            PropSetting("gs_w_d", "MoveT", "move_type", "MoveType", "MoveT.none"),
+            // PropSetting("gs_w_d", "bool", "focusable", "Focusable", "false"),
+            // PropSetting("gs_w_d", "bool", "focus_kb_capture", "FocusKeyboardCapture", "false"),
+            // PropSetting("gs_w_d", "bool", "uses_text_input", "UsesTextInput", "false"),
+            // PropSetting("gs_w_d", "MoveT", "move_type", "MoveType", "MoveT.none"),
         ]
         );
 

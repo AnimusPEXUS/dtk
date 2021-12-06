@@ -104,8 +104,8 @@ class Layout : Widget, ContainerableWidgetI
         {
             children = children ~ widget;
             auto WidgetX = cast(Widget) widget;
-            WidgetX.setExpand(expand);
-            WidgetX.setFill(fill);
+            // WidgetX.setExpand(expand);
+            // WidgetX.setFill(fill);
             WidgetX.setParent(this);
         }
     }
@@ -116,8 +116,8 @@ class Layout : Widget, ContainerableWidgetI
         {
             children = widget ~ children;
             auto WidgetX = cast(Widget) widget;
-            WidgetX.setExpand(expand);
-            WidgetX.setFill(fill);
+            // WidgetX.setExpand(expand);
+            // WidgetX.setFill(fill);
             WidgetX.setParent(this);
         }
     }

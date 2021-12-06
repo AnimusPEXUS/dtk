@@ -27,7 +27,7 @@ class Button : Widget, ContainerableWidgetI
 
     this()
     {
-        setFocusable(true);
+        // setFocusable(true);
         
         setMouseEvent("button-click", &on_mouse_click_internal);
         setMouseEvent("button-down", &on_mouse_down_internal);

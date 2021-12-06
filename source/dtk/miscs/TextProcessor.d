@@ -1403,8 +1403,8 @@ class TextView
     Text text;
     
     FormI delegate() getForm;
-    
     DrawingSurfaceI delegate() getDrawingSurface;
+    bool delegate() isFocused;
     
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
@@ -1810,7 +1810,28 @@ class TextView
     void timer500ms_handle_cursor()
     {
         if (!getCursorEnabled())
-            return;
+        {
+        	if (cursor_animation_iteration_visible == false)
+        		goto exit;
+        	else
+        		goto force_clear; 
+        }
+
+        if (!isFocused())
+        {
+        	if (cursor_animation_iteration_visible == false)
+        		goto exit;
+        	else
+        		goto force_clear; 
+        }
+        
+        goto normal_work;
+        
+        force_clear:
+        cursor_animation_iteration_visible = false;
+        
+        normal_work:
+        
         
         if (cursor_animation_iteration_visible)
             timer500ms_handle_cursor_draw_operation(false);
@@ -1819,6 +1840,8 @@ class TextView
         
         cursor_animation_iteration_visible =
         !cursor_animation_iteration_visible;
+        
+        exit:
     }
     
     void timer500ms_handle_cursor_draw_operation(bool clear)
