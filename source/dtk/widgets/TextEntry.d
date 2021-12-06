@@ -29,51 +29,51 @@ import dtk.miscs.DrawingSurfaceShift;
 class TextEntry : Widget, ContainerableWidgetI
 {
     // Image textImage;
-
+    
     TextView text_view;
-
+    
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
-            PropSetting("gs", "dstring", "text", "Text"),
-            // TODO: use fontconfig instead of this
-            PropSetting("gs_w_d", "string", "font_family", "FontFamily", "\"Go\""),
-            PropSetting("gs_w_d", "string", "font_style", "FontStyle", "\"Regular\""),
-            PropSetting("gs_w_d", "Color", "font_color", "FontColor", q{Color(0)}),
-            PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
-            PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
-            PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
-            PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_lines", "LayoutLines", "GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"),
-            PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_line_chars", "LayoutChars", "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"),
-            PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "false"),
-            PropSetting("gs_w_d", "Color", "bewel_background_color", "BewelBackgroundColor", q{Color(cast(ubyte[3])[255,255,255])}),
-            PropSetting("gs_w_d", "bool", "multiline", "Multiline", "false"),
-            PropSetting("gs_w_d", "bool", "virtual_wrap_by_char", "VirtualWrapByChar", "false"),
-            PropSetting("gs_w_d", "bool", "virtual_wrap_by_word", "VirtualWrapByWord", "false"),
-            PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
-            PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
-            PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
-            PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
+        PropSetting("gs", "dstring", "text", "Text"),
+        // TODO: use fontconfig instead of this
+        PropSetting("gs_w_d", "string", "font_family", "FontFamily", "\"Go\""),
+        PropSetting("gs_w_d", "string", "font_style", "FontStyle", "\"Regular\""),
+        PropSetting("gs_w_d", "Color", "font_color", "FontColor", q{Color(0)}),
+        PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
+        PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
+        PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
+        PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_lines", "LayoutLines", "GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"),
+        PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_line_chars", "LayoutChars", "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"),
+        PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "false"),
+        PropSetting("gs_w_d", "Color", "bewel_background_color", "BewelBackgroundColor", q{Color(cast(ubyte[3])[255,255,255])}),
+        PropSetting("gs_w_d", "bool", "multiline", "Multiline", "false"),
+        PropSetting("gs_w_d", "bool", "virtual_wrap_by_char", "VirtualWrapByChar", "false"),
+        PropSetting("gs_w_d", "bool", "virtual_wrap_by_word", "VirtualWrapByWord", "false"),
+        PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
+        PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
+        PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
+        PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
         ]
         );
     
     private {
-    	SignalConnectionContainer con_cont;
-    	SignalConnection textViewConnCon;
+        SignalConnectionContainer con_cont;
+        SignalConnection textViewConnCon;
     }
     
-
+    
     this()
     {
         text_view = new TextView();
-        text_view.getForm = delegate FormI() 
+        text_view.getForm = delegate FormI()
         {
-        	auto f = getForm();
-        	if (f is null)
-        	{
-        		throw new Exception("can't get form");
-        	}
-        	
-        	return f;
+            auto f = getForm();
+            if (f is null)
+            {
+                throw new Exception("can't get form");
+            }
+            
+            return f;
         };
         
         text_view.getDrawingSurface = &getDrawingSurfaceForTextView;
@@ -81,71 +81,71 @@ class TextEntry : Widget, ContainerableWidgetI
         struct stname {
             string sname;
             string tname;
-            }
-
+        }
+        
         static foreach(
             v;
             [
-                stname("FontFamily", "string"),
-                stname("FontStyle", "string"),
-                stname("FontColor", "Color"),
-                stname("FontSize", "ushort"),
-                stname("FontItalic", "bool"),
-                stname("FontBold", "bool"),
-                stname("LayoutLines", "GenVisibilityMapForSubitemsLayout"),
-                stname("LayoutChars", "GenVisibilityMapForSubitemsLayout"),
-                stname("DrawBewelAndBackground", "bool"),
-                stname("BewelBackgroundColor", "Color"),
-                stname("Multiline", "bool"),
-                stname("VirtualWrapByChar", "bool"),
-                stname("VirtualWrapByWord", "bool"),
-                stname("ForceMonowidth", "bool"),
-                stname("TextSelectable", "bool"),
-                stname("TextEditable", "bool"),
-                stname("CursorEnabled", "bool"),
-                ]
-                )
+            stname("FontFamily", "string"),
+            stname("FontStyle", "string"),
+            stname("FontColor", "Color"),
+            stname("FontSize", "ushort"),
+            stname("FontItalic", "bool"),
+            stname("FontBold", "bool"),
+            stname("LayoutLines", "GenVisibilityMapForSubitemsLayout"),
+            stname("LayoutChars", "GenVisibilityMapForSubitemsLayout"),
+            stname("DrawBewelAndBackground", "bool"),
+            stname("BewelBackgroundColor", "Color"),
+            stname("Multiline", "bool"),
+            stname("VirtualWrapByChar", "bool"),
+            stname("VirtualWrapByWord", "bool"),
+            stname("ForceMonowidth", "bool"),
+            stname("TextSelectable", "bool"),
+            stname("TextEditable", "bool"),
+            stname("CursorEnabled", "bool"),
+            ]
+            )
         {
             mixin(
-            	q{
-            		con_cont.add(
-            			connectTo%1$s_onAfterChanged(
-            				delegate void (%2$s v1, %2$s v2)
-            				{
-            					collectException(
-            						{
-            							auto err = collectException(
-            								applySettingsToTextProcessor()
-            								);
-            							if (err !is null) 
-            							{
-            								writeln(err);
-            							}
-            						}()
-            						);
-            				}
-            				)
-            			);
-            	}.format(v.sname, v.tname));
+                q{
+                    con_cont.add(
+                        connectTo%1$s_onAfterChanged(
+                            delegate void (%2$s v1, %2$s v2)
+                            {
+                                collectException(
+                                    {
+                                        auto err = collectException(
+                                            applySettingsToTextProcessor()
+                                            );
+                                        if (err !is null)
+                                        {
+                                            writeln(err);
+                                        }
+                                    }()
+                                    );
+                            }
+                            )
+                        );
+                }.format(v.sname, v.tname));
         }
         
         con_cont.add(
-        	connectToSize_onAfterChanged(
-        		delegate void(Size2D old_value, Size2D new_value)
-        		{
-        			collectException(
-        				{
-        					auto err = collectException(
-        						applySettingsToTextProcessor()
-        						);
-        					if (err !is null)
-        					{
-        						writeln(err);
-        					}
-        				}()
-        				);
-        		}
-        		)
+            connectToSize_onAfterChanged(
+                delegate void(Size2D old_value, Size2D new_value)
+                {
+                    collectException(
+                        {
+                            auto err = collectException(
+                                applySettingsToTextProcessor()
+                                );
+                            if (err !is null)
+                            {
+                                writeln(err);
+                            }
+                        }()
+                        );
+                }
+                )
             );
         
         con_cont.add(connectToText_onAfterChanged(&afterTextChanged));
@@ -154,84 +154,84 @@ class TextEntry : Widget, ContainerableWidgetI
         setTextInputEvent("text-input", &on_text_input_internal);
         
         // textViewConnCon = text_view.connectTo_PerformRedraw(
-        	// &on_textview_redraw_request
-        	// );
+        // &on_textview_redraw_request
+        // );
         
         // textViewTimerConnection = getForm()
-
+        
     }
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
     {
-    	auto p = getPosition();
-    	if (getDrawBewelAndBackground())
-    	{
-    		p.x+=2;
-    		p.y+=2;
-    	}
-    	return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y);
+        auto p = getPosition();
+        if (getDrawBewelAndBackground())
+        {
+            p.x+=2;
+            p.y+=2;
+        }
+        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y);
     }
     
     void on_mouse_click_internal(
-    	EventMouse* event, 
-    	ulong x, 
-    	ulong y
-    	)
+        EventMouse* event,
+        ulong x,
+        ulong y
+        )
     {
-    	auto f = getForm();
-    	f.setFocusedWidget(this);
-    	
+        auto f = getForm();
+        f.setFocusedWidget(this);
+        
         if (getDrawBewelAndBackground())
         {
-        	if (x <= 2 || y <= 2)
-        		return;
+            if (x <= 2 || y <= 2)
+                return;
             x -= 2;
             y -= 2;
         }
-
+        
         text_view.click(x, y);
         
         return ;
     }
     
     void on_text_input_internal(
-    	EventTextInput* event, 
-    	ulong x, 
-    	ulong y
-    	)
+        EventTextInput* event,
+        ulong x,
+        ulong y
+        )
     {
-    	text_view.textInput(event.text);
-    	redraw(); // TODO: maybe this is too expansive and optimization is required
+        text_view.textInput(event.text);
+        redraw(); // TODO: maybe this is too expansive and optimization is required
     }
-
+    
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow
     {
-    	collectException(
-    		{
-    			
-    			auto err = collectException(
-    				{
-    					auto x = getText();
-    					text_view.setText(x);
-    					// auto y = text_view.getTextString();
-    					
-    					applySettingsToTextProcessor();
-    				}()
-    				);
-    			if (err !is null)
-    			{
-    				writeln(err);
-    			}
-    		}()
-    		);
+        collectException(
+            {
+            	
+                auto err = collectException(
+                    {
+                        auto x = getText();
+                        text_view.setText(x);
+                        // auto y = text_view.getTextString();
+                        
+                        applySettingsToTextProcessor();
+                    }()
+                    );
+                if (err !is null)
+                {
+                    writeln(err);
+                }
+            }()
+            );
     }
-
+    
     void applySettingsToTextProcessor()
     {
         /* text_view.setText(getText()); */ // NOTE: too expansive probably
-
+        
         auto tvt = text_view.getText();
-
+        
         tvt.setFaceFamily(getFontFamily());
         tvt.setFaceStyle(getFontStyle());
         tvt.setFaceSize(getFontSize() * 64);
@@ -241,29 +241,29 @@ class TextEntry : Widget, ContainerableWidgetI
         tvt.setItalic(getFontItalic());
         tvt.setLinesLayout(getLayoutLines());
         tvt.setLineCharsLayout(getLayoutChars());
-
+        
         auto size = getSize();
         text_view.setWidth(size.width);
         text_view.setHeight(size.height);
-
+        
         if (getDrawBewelAndBackground())
         {
-        	// TODO: optimize this: must be as less view redrawings as possible
+            // TODO: optimize this: must be as less view redrawings as possible
             text_view.setWidth(text_view.getWidth()-4);
             text_view.setHeight(text_view.getHeight()-4);
             tvt.setDefaultBGColor(getBewelBackgroundColor());
         } else {
-        	// TODO: get default form color from Theme
-        	tvt.setDefaultBGColor(Color(0xc0c0c0));
+            // TODO: get default form color from Theme
+            tvt.setDefaultBGColor(Color(0xc0c0c0));
         }
         
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
         text_view.setCursorEnabled(getCursorEnabled());
     }
-
+    
     mixin mixin_getWidgetAtPosition;
-
+    
     override void redraw()
     {
         this.redraw_x(this);
