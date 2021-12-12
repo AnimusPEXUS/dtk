@@ -11,6 +11,7 @@ import dtk.types.Property;
 import dtk.types.Signal;
 import dtk.types.Image;
 import dtk.types.Color;
+import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
@@ -163,6 +164,9 @@ class TextEntry : Widget, ContainerableWidgetI
         
         setMouseEvent("button-click", &on_mouse_click_internal);
         setTextInputEvent("text-input", &on_text_input_internal);
+
+        setKeyboardEvent("key-down", &on_keyboard_down_internal);
+        setKeyboardEvent("key-up", &on_keyboard_up_internal);
         
         // textViewConnCon = text_view.connectTo_PerformRedraw(
         // &on_textview_redraw_request
@@ -213,6 +217,40 @@ class TextEntry : Widget, ContainerableWidgetI
     {
         text_view.textInput(event.text);
         redraw(); // TODO: maybe this is too expansive and optimization is required
+    }
+    
+    void on_keyboard_internal(
+    	string type, // TODO: better type for parameter
+        EventKeyboard* event,
+        ulong x,
+        ulong y
+        )
+    {
+    	debug writeln("EventKeyboard: ");        
+    	debug writeln(" key_state: ", event.key_state);        
+    	debug writeln("      type: ", type);        
+    	debug writeln("    repeat: ", event.repeat);        
+    	debug writeln("    keysym: ", event.keysym);
+    	
+        text_view.keyboardInput(type, event);
+    }
+    
+    void on_keyboard_up_internal(
+        EventKeyboard* event,
+        ulong x,
+        ulong y
+        )
+    {
+    	on_keyboard_internal("up", event, x,y);
+    }
+    
+    void on_keyboard_down_internal(
+        EventKeyboard* event,
+        ulong x,
+        ulong y
+        )
+    {
+    	on_keyboard_internal("down", event, x,y);    	      
     }
     
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow

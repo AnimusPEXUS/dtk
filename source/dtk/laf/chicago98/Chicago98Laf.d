@@ -354,12 +354,7 @@ class Chicago98Laf : LafI
     				ulong mouseWidget_y
                 	) 
                 {
-                	auto mc = e.keysym.modcode;
-                	mc &= EnumKeyboardModCodeNOT.Locks;
-                	if (e.keysym.keycode == EnumKeyboardKeyCode.Tabulation
-                		&& (mc == 0 || mc == EnumKeyboardModCode.LeftShift))
                 	return true;
-                	return false;
                 }, 
                 action: delegate bool(
                 	WindowEventMgrI mgr, 
@@ -378,8 +373,7 @@ class Chicago98Laf : LafI
     					return false;
     				}
     				
-    				if (e.key_state 
-    					== EnumKeyboardKeyState.pressed)
+    				if (e.key_state == EnumKeyboardKeyState.pressed)
     				{
     					focusedWidget.callKeyboardEvent(
     						"key-down", 
@@ -389,8 +383,7 @@ class Chicago98Laf : LafI
     						);
     				}
     				
-    				if (e.key_state 
-    					== EnumKeyboardKeyState.released)
+    				if (e.key_state == EnumKeyboardKeyState.released)
     				{
     					focusedWidget.callKeyboardEvent(
     						"key-up", 
