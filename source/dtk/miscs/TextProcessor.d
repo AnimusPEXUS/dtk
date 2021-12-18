@@ -43,12 +43,12 @@ enum GenVisibilityMapForSubitemsLayout
 //       lines and sublines sizes done by Text.reprocess() and it's subcalls
 void genVisibilityMapForSubitems(
     ulong max_width, ulong max_height,
-    
+
     ulong x, ulong y,
     ulong width, ulong height,
-    
+
     GenVisibilityMapForSubitemsLayout layout,
-    
+
     ulong delegate() getSubitemCount,
     ulong delegate(ulong subitem_index) getSubitemWidth,
     ulong delegate(ulong subitem_index) getSubitemHeight,
@@ -60,37 +60,37 @@ void genVisibilityMapForSubitems(
         bool its_the_last_visible_item
         ) genVisibilityMapForSubitem,)
 {
-	
+
     /* Image ret = new Image(width, height); */
-    
+
     if (x > width || y > height)
         return;
-    
+
     auto actual_width = (x + width > max_width ? max_width - x : width);
     auto actual_height = (y + height > max_height ? max_height - y : height);
-    
+
     auto x2 = x + width;
     auto y2 = y + height;
-    
+
     ulong first_visible_item;
     bool first_visible_item_found;
     ulong first_visible_item_offset;
-    
+
     ulong last_visible_item;
     bool last_visible_item_found;
     ulong last_visible_item_offset;
-    
+
     ulong subitem_count = getSubitemCount();
-    
+
     {
         ulong processed_size;
-        
+
         {
             ulong z;
             ulong z2;
-            
+
             ulong current_size;
-            
+
             switch (layout)
             {
             default:
@@ -104,10 +104,10 @@ void genVisibilityMapForSubitems(
                 z2 = y2;
                 break;
             }
-            
+
             for (ulong i = 0; i != subitem_count; i++)
             {
-            	
+
                 switch (layout)
                 {
                 default:
@@ -119,7 +119,7 @@ void genVisibilityMapForSubitems(
                     current_size = getSubitemHeight(i);
                     break;
                 }
-                
+
                 if (!first_visible_item_found && z >= processed_size
                     && z < processed_size + current_size)
                 {
@@ -127,7 +127,7 @@ void genVisibilityMapForSubitems(
                     first_visible_item_found = true;
                     first_visible_item_offset = z - processed_size;
                 }
-                
+
                 if (!last_visible_item_found && z2 >= processed_size
                     && z2 < processed_size + current_size)
                 {
@@ -135,33 +135,33 @@ void genVisibilityMapForSubitems(
                     last_visible_item_found = true;
                     last_visible_item_offset = processed_size + current_size - z2;
                 }
-                
+
                 if (first_visible_item_found && last_visible_item_found)
                     break;
-                
+
                 processed_size += current_size;
             }
         }
     }
-    
+
     if (!first_visible_item_found)
         return;
-    
+
     if (!last_visible_item_found)
     {
         last_visible_item = subitem_count - 1;
     }
-    
+
     {
         ulong items_count = last_visible_item - first_visible_item+1;
-        
+
         ulong delegate(ulong i) calc_loop_target_x;
         ulong delegate(ulong i) calc_loop_target_y;
         ulong delegate(ulong i) calc_loop_source_x;
         ulong delegate(ulong i) calc_loop_source_y;
         ulong delegate(ulong i) calc_loop_source_width;
         ulong delegate(ulong i) calc_loop_source_height;
-        
+
         switch (layout)
         {
         default:
@@ -177,31 +177,31 @@ void genVisibilityMapForSubitems(
                 }
                 return width - first_visible_item_offset;
             };
-            
+
             calc_loop_target_y = delegate ulong(ulong i) { return 0; };
-            
+
             calc_loop_source_x = delegate ulong(ulong i) {
                 if (i == 0)
                     return first_visible_item_offset;
                 return 0;
             };
-            
+
             calc_loop_source_y = delegate ulong(ulong i) { return 0; };
-            
+
             calc_loop_source_width = delegate ulong(ulong i) {
                 if (i == 0)
                     return getSubitemWidth(first_visible_item + i)
                 - first_visible_item_offset;
                 return getSubitemWidth(first_visible_item + i);
             };
-            
+
             calc_loop_source_height = delegate ulong(ulong i) {
                 return getSubitemHeight(first_visible_item + i);
             };
             break;
         case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
             calc_loop_target_x = delegate ulong(ulong i) { return 0; };
-            
+
             calc_loop_target_y = delegate ulong(ulong i) {
                 if (i == 0)
                     return 0;
@@ -212,19 +212,19 @@ void genVisibilityMapForSubitems(
                 }
                 return height - first_visible_item_offset;
             };
-            
+
             calc_loop_source_x = delegate ulong(ulong i) { return 0; };
-            
+
             calc_loop_source_y = delegate ulong(ulong i) {
                 if (i == 0)
                     return first_visible_item_offset;
                 return 0;
             };
-            
+
             calc_loop_source_width = delegate ulong(ulong i) {
                 return getSubitemWidth(first_visible_item + i);
             };
-            
+
             calc_loop_source_height = delegate ulong(ulong i) {
                 if (i == 0)
                     return getSubitemHeight(first_visible_item + i)
@@ -233,7 +233,7 @@ void genVisibilityMapForSubitems(
             };
             break;
         }
-        
+
         for (ulong i = 0; i != items_count; i++)
         {
             auto tx = calc_loop_target_x(i);
@@ -242,7 +242,7 @@ void genVisibilityMapForSubitems(
             auto sy = calc_loop_source_y(i);
             auto sw = calc_loop_source_width(i);
             auto sh = calc_loop_source_height(i);
-            
+
             genVisibilityMapForSubitem(
                 i,
                 tx,
@@ -253,7 +253,7 @@ void genVisibilityMapForSubitems(
                 );
         }
     }
-    
+
     return;
 }
 
@@ -261,22 +261,32 @@ class TextCharViewState
 {
     GlyphRenderResult* glyph;
     Image resImg;
-    TextLineSubline subline;
+    // TextLineSubline subline;
 }
 
 class TextChar
 {
     TextLine parent_line;
-    
+
     dchar chr;
-    
+
     this(TextLine parent_line)
     {
         this.parent_line = parent_line;
     }
-    
+
     mixin getState!("text_view.text_char_states", TextCharViewState);
-    
+
+    ulong getWidth(TextView text_view)
+    {
+        return getState(text_view).resImg.width;
+    }
+
+    ulong getHeight(TextView text_view)
+    {
+        return getState(text_view).resImg.height;
+    }
+
     void reprocess(TextView text_view)
     {
         auto state = getState(text_view);
@@ -296,19 +306,19 @@ class TextChar
             state.resImg = genImage(text_view);
         }
     }
-    
+
     /* alias reprocess = rerender; */
-    
+
     private void loadGlyph(TextView text_view, dchar chr)
     {
         auto state = getState(text_view);
-        
+
         auto f_family = parent_line.parent_text.getFaceFamily();
         auto f_style = parent_line.parent_text.getFaceStyle();
         FaceI face;
-        
+
         auto font_mgr = text_view.getFontManager();
-        
+
         label1:
         auto err = collectException(
             {
@@ -332,7 +342,7 @@ class TextChar
             auto x = parent_line.parent_text.getFaceResolution();
             face.setCharResolution(x, x);
         }
-        
+
         try
         {
             state.glyph = face.renderGlyphByChar(chr);
@@ -342,43 +352,43 @@ class TextChar
             // TODO: replace with dummy glyph
             state.glyph = face.renderGlyphByChar(cast(dchar)'?');
         }
-        
+
     }
-    
+
     private Image genImage(TextView text_view) {
-    	
+
         auto layout = parent_line.parent_text.getLineCharsLayout();
-        
+
         auto state = getState(text_view);
-        
+
         // if (state.glyph is null)
         // {
         // loadGlyph(text_view, chr);
         // }
-        
+
         auto gi = state.glyph.glyph_info;
-        
+
         auto width = gi.advance.x / 64;
         auto bearing_x = gi.metrics.horiBearing.x / 64;
         auto bearing_y = gi.metrics.horiBearing.y;
         if (bearing_y < 0)
             bearing_y = -bearing_y;
         bearing_y /= 64;
-        
+
         auto ascend =gi.face_info.size.ascender;
         if (ascend < 0)
             ascend = -ascend;
         ascend /= 64;
-        
+
         auto descend =gi.face_info.size.descender;
         if (descend < 0)
             descend = -descend;
         descend /= 64;
-        
+
         auto height = ascend + descend;
-        
+
         auto ret = new Image(width,height);
-        
+
         for (ulong x= 0 ; x != state.glyph.bitmap.width; x++)
         {
             auto tx = x+bearing_x;
@@ -389,14 +399,19 @@ class TextChar
                 ret.setDot(tx,ty,dot);
             }
         }
-        
+
         return ret;
     }
-    
+
+    TextLine calcLine()
+    {
+        // TODO: maybe it must be exception, if line not text.lines
+        return parent_line;
+    }
+
     ulong calcLineIndex()
     {
         auto lines = parent_line.parent_text.lines;
-        auto fail_res = tuple(false, 0UL);
         foreach (i, v; lines)
         {
             if (v == parent_line)
@@ -406,7 +421,7 @@ class TextChar
         }
         throw new Exception("line not found");
     }
-    
+
     ulong calcLineColumnIndex()
     {
         auto textchars = parent_line.textchars;
@@ -419,25 +434,47 @@ class TextChar
         }
         throw new Exception("char not found");
     }
-    
+
+    Tuple!(TextLine, ulong) calcLineAndColumnIndex()
+    {
+        auto textchars = parent_line.textchars;
+        foreach (ulong i, v ; textchars)
+        {
+            if (v == this)
+            {
+                return tuple(parent_line, i);
+            }
+        }
+        throw new Exception("char not found");
+    }
+
     ulong calcSublineIndex(TextView text_view)
     {
         auto line_state = parent_line.getState(text_view);
-        auto this_state = getState(text_view);
+        auto this_subline = calcSubline(text_view);
+        if (this_subline is null)
+        {
+            throw new Exception("subline not found");
+        }
         foreach (ulong i, v ; line_state.sublines)
         {
-            if (v == this_state.subline)
+            if (v == this_subline)
             {
                 return i;
             }
         }
         throw new Exception("subline not found");
     }
-    
+
     ulong calcSublineColumnIndex(TextView text_view)
     {
         auto this_state = getState(text_view);
-        auto textchars = this_state.subline.getState(text_view).textchars;
+        auto this_subline = calcSubline(text_view);
+        if (this_subline is null)
+        {
+            throw new Exception("subline not found");
+        }
+        auto textchars = this_subline.getState(text_view).textchars;
         foreach (ulong i, v ; textchars)
         {
             if (v == this)
@@ -446,6 +483,82 @@ class TextChar
             }
         }
         throw new Exception("subline column not found");
+    }
+
+    TextLineSubline calcSubline(TextView text_view)
+    {
+        foreach (subline;parent_line.getState(text_view).sublines)
+        {
+            foreach(loc_chr; subline.getState(text_view).textchars)
+            {
+                if (loc_chr == this)
+                {
+                    return subline;
+                }
+            }
+        }
+        return cast(TextLineSubline) null;
+    }
+
+    // firs ret value for "ok?"
+    Tuple!(bool, TextChar) getPrevCharInSubline(TextView text_view, bool search_prev=true)
+    {
+        auto fail_res = tuple(false, cast(TextChar) null);
+        auto subline = calcSubline(text_view);
+        if (subline == cast(TextLineSubline) null)
+        {
+            return fail_res;
+        }
+        auto textchars = subline.getState(text_view).textchars;
+        foreach (i, loc_chr ; textchars)
+        {
+            if (loc_chr == this)
+            {
+                if (i==(search_prev ? 0 : textchars.length-1))
+                {
+                    return tuple(true, cast(TextChar) null);
+                }
+                else
+                {
+                    return tuple(
+                        true,
+                        (search_prev ? textchars[i-1]:textchars[i+1])
+                        );
+                }
+            }
+        }
+        return fail_res;
+    }
+
+    Tuple!(bool, TextChar) getNextCharInSubline(TextView text_view)
+    {
+        return getPrevCharInSubline(text_view, false);
+    }
+
+    Tuple!(bool, TextChar) getPrevCharInLine(bool search_prev=true)
+    {
+        auto fail_res = tuple(false, cast(TextChar) null);
+        auto textchars = parent_line.textchars;
+        foreach (i, loc_chr ; textchars)
+        {
+            if (i==(search_prev ? 0 : textchars.length-1))
+            {
+                return tuple(true, cast(TextChar) null);
+            }
+            else
+            {
+                return tuple(
+                    true,
+                    (search_prev ? textchars[i-1]:textchars[i+1])
+                    );
+            }
+        }
+        return fail_res;
+    }
+
+    Tuple!(bool, TextChar) getNextCharInLine()
+    {
+        return getPrevCharInLine(false);
     }
 }
 
@@ -461,25 +574,35 @@ class TextLineSublineViewState
 class TextLineSubline
 {
     TextLine parent_line;
-    
+
     this(TextLine parent_line)
     {
         this.parent_line=parent_line;
     }
-    
+
     mixin getState!(
         "text_view.text_line_subline_states",
         TextLineSublineViewState
         );
-    
+
+    ulong getWidth(TextView text_view)
+    {
+        return getState(text_view).width;
+    }
+
+    ulong getHeight(TextView text_view)
+    {
+        return getState(text_view).height;
+    }
+
     void recalculateWidthAndHeight(TextView text_view)
     {
-    	
+
         auto state = getState(text_view);
-        
+
         state.width = 0;
         state.height = 0;
-        
+
         switch (parent_line.parent_text.getLineCharsLayout())
         {
         default:
@@ -492,9 +615,9 @@ class TextLineSubline
                 foreach (tc; state.textchars)
                 {
                     auto tc_state = tc.getState(text_view);
-                    
+
                     state.width += tc_state.resImg.width;
-                    
+
                     {
                         auto h = tc_state.resImg.height;
                         if (h > state.height)
@@ -507,9 +630,9 @@ class TextLineSubline
                 foreach (tc; state.textchars)
                 {
                     auto tc_state = tc.getState(text_view);
-                    
+
                     state.height += tc_state.resImg.height;
-                    
+
                     {
                         auto w = tc_state.resImg.width;
                         if (w > state.width)
@@ -518,56 +641,52 @@ class TextLineSubline
                 }
                 break;
         }
-        
+
     }
-    
+
     void genVisibilityMap(
         ulong this_line_index,
         ulong this_subline_index,
         ulong this_line_done_chars_count,
-        
+
         ulong sublines_target_x,
         ulong sublines_target_y,
-        
+
         ulong x,
         ulong y,
         ulong width,
         ulong height,
-        
+
         TextView text_view,
         ElementVisibilityMap visibility_map
         )
     {
-    	
+
         auto state = getState(text_view);
-        
+
         genVisibilityMapForSubitems(
             state.width, state.height,
-            
+
             x, y,
             width, height,
-            
+
             parent_line.parent_text.getLineCharsLayout(),
-            
+
             delegate ulong()
             {
                 return state.textchars.length;
             },
-            
+
             delegate ulong(ulong subitem_index)
             {
-                return state.textchars[subitem_index].getState(
-                    text_view
-                    ).resImg.width;
+                return state.textchars[subitem_index].getWidth(text_view);
             },
-            
+
             delegate ulong(ulong subitem_index)
             {
-                return state.textchars[subitem_index].getState(
-                    text_view
-                    ).resImg.height;
+                return state.textchars[subitem_index].getHeight(text_view);
             },
-            
+
             delegate void(
                 ulong subitem_index,
                 ulong target_x, ulong target_y,
@@ -577,28 +696,86 @@ class TextLineSubline
                 )
             {
                 auto evme = new ElementVisibilityMapElement();
-                
+
                 evme.map = visibility_map;
                 evme.chr = state.textchars[subitem_index];
-                
+
                 // evme.line=this_line_index;
                 // evme.column=this_line_done_chars_count + subitem_index;
-                
-                evme.eovl = its_the_last_visible_item;
-                
+
+                // evme.eovl = its_the_last_visible_item;
+
                 evme.target_x=sublines_target_x + target_x;
                 evme.target_y=sublines_target_y + target_y;
                 evme.x=x;
                 evme.y=y;
                 evme.width=width;
                 evme.height=height;
-                
+
                 visibility_map.elements ~= evme;
             }
             );
         return ;
     }
-    
+
+    TextLine calcLine()
+    {
+        // TODO: maybe it must be exception, if line not text.lines
+        return parent_line;
+    }
+
+    ulong calcLineIndex()
+    {
+        auto lines = parent_line.parent_text.lines;
+        foreach (i, v; lines)
+        {
+            if (v == parent_line)
+            {
+                return i;
+            }
+        }
+        throw new Exception("line not found");
+    }
+
+    ulong calcLineColumnIndex()
+    {
+        auto textchars = parent_line.textchars;
+        foreach (ulong i, v ; textchars)
+        {
+            if (v == this)
+            {
+                return i;
+            }
+        }
+        throw new Exception("char not found");
+    }
+
+    Tuple!(TextLine, ulong) calcLineAndColumnIndex()
+    {
+        auto textchars = parent_line.textchars;
+        foreach (ulong i, v ; textchars)
+        {
+            if (v == this)
+            {
+                return tuple(parent_line, i);
+            }
+        }
+        throw new Exception("char not found");
+    }
+
+    ulong calcSublineIndex(TextView text_view)
+    {
+        auto line_state = parent_line.getState(text_view);
+        foreach (ulong i, v ; line_state.sublines)
+        {
+            if (v == this)
+            {
+                return i;
+            }
+        }
+        throw new Exception("subline not found");
+    }
+
 }
 
 // NOTE: TextLine have it's own contextual status, because in text wrap mode
@@ -613,20 +790,20 @@ class TextLineViewState
 class TextLine
 {
     Text parent_text;
-    
+
     TextChar[] textchars;
-    
+
     this(Text parent)
     {
         this.parent_text = parent;
     }
-    
+
     mixin getState!("text_view.text_line_states", TextLineViewState);
-    
+
     ulong getLength()
     {
         auto ret = textchars.length;
-        
+
         // all lines, except the last one, assumed to have \n in the end
         if (parent_text.lines.length != 0 && parent_text.lines[$-1] != this)
         {
@@ -634,14 +811,14 @@ class TextLine
         }
         return  ret;
     }
-    
+
     void setText(dstring txt)
     {
         /* auto state = getState(); */
-        
+
         textchars = textchars[0 .. 0];
         /* sublines = sublines[0 .. 0]; */
-        
+
         foreach (c; txt)
         {
             if (c == cast(dchar) '\n' || c == cast(dchar) '\r')
@@ -651,7 +828,7 @@ class TextLine
                     );
             }
         }
-        
+
         foreach (c; txt)
         {
             auto tc = new TextChar(this);
@@ -659,7 +836,7 @@ class TextLine
             textchars ~= tc;
         }
     }
-    
+
     void reprocessUnits(TextView text_view)
     {
         foreach (tc; textchars)
@@ -667,32 +844,32 @@ class TextLine
             tc.reprocess(text_view);
         }
     }
-    
+
     // recreates sublines
     void recreateSublines(TextView text_view)
     {
         auto state = getState(text_view);
-        
+
         state.sublines = state.sublines[0 .. 0];
         scope(exit)
         {
-        	// line must always have at least one subline
-        	if (state.sublines.length == 0)
-        	{
-        		state.sublines ~= new TextLineSubline(this);
-        	}
+            // line must always have at least one subline
+            if (state.sublines.length == 0)
+            {
+                state.sublines ~= new TextLineSubline(this);
+            }
         }
-        
+
         // each line always have at least one subline
         state.sublines ~= new TextLineSubline(this);
         ulong current_line = 0;
-        
+
         // TODO: comment this out?
         /* reprocessUnits(text_view); */
-        
+
         // TODO: optimization required
         ulong required_size;
-        
+
         if (text_view.getVirtualWrapBySpace()
             || text_view.getVirtualWrapByChar())
         {
@@ -713,20 +890,20 @@ class TextLine
                     break;
             }
         }
-        
+
         ulong current_size = 0;
-        
+
         auto sl = state.sublines[current_line];
         auto sl_state = sl.getState(text_view);
-        
+
         sl_state.textchars=sl_state.textchars[0 .. 0];
-        
+
         foreach (tc; textchars)
         {
             ulong s;
-            
-            auto tc_state = tc.getState(text_view);
-            
+
+            // auto tc_state = tc.getState(text_view);
+
             switch (parent_text.getLineCharsLayout())
             {
             default:
@@ -736,14 +913,14 @@ class TextLine
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    s = tc_state.resImg.width;
+                    s = tc.getWidth(text_view);
                     break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    s = tc_state.resImg.height;
+                    s = tc.getHeight(text_view);
                     break;
             }
-            
+
             if (text_view.getVirtualWrapBySpace()
                 || text_view.getVirtualWrapByChar())
             {
@@ -753,7 +930,7 @@ class TextLine
                     return;
                 }
             }
-            
+
             if ((text_view.getVirtualWrapBySpace()
                 || text_view.getVirtualWrapByChar())
                 && required_size <= current_size + s)
@@ -768,34 +945,34 @@ class TextLine
             {
                 current_size += s;
             }
-            
+
             sl_state.textchars ~= tc;
-            tc_state.subline = sl;
+            // tc_state.subline = sl;
         }
-        
+
     }
-    
+
     void recalculateSublinesWidthsAndHeights(TextView text_view)
     {
         auto state = getState(text_view);
-        
+
         foreach (sl; state.sublines)
         {
             sl.recalculateWidthAndHeight(text_view);
         }
     }
-    
+
     void recalculateWidthAndHeight(TextView text_view)
     {
-    	
+
         auto state = getState(text_view);
-        
+
         state.width = 0;
         state.height = 0;
-        
+
         if (state.sublines.length != 0)
         {
-        	
+
             switch (parent_text.getLinesLayout())
             {
             default:
@@ -808,9 +985,9 @@ class TextLine
                     foreach (sl; state.sublines)
                     {
                         auto sl_state = sl.getState(text_view);
-                        
+
                         state.width += sl_state.width;
-                        
+
                         {
                             auto h = sl_state.height;
                             if (h > state.height)
@@ -823,20 +1000,20 @@ class TextLine
                     foreach (sl; state.sublines)
                     {
                         auto sl_state = sl.getState(text_view);
-                        
+
                         {
                             auto w = sl_state.width;
                             if (w > state.width)
                                 state.width = w;
                         }
-                        
+
                         state.height += sl_state.height;
                     }
                     break;
             }
         }
     }
-    
+
     dstring getText()
     {
         dstring ret;
@@ -846,55 +1023,55 @@ class TextLine
         }
         return ret;
     }
-    
+
     dstring getText(ulong start, ulong stop)
     {
         dstring ret;
-        
+
         for (ulong i = start; i != stop; i++)
         {
             ret ~= textchars[i].chr;
         }
-        
+
         return ret;
     }
-    
+
     void genVisibilityMap(
         // this is passed deeper to TextChar and stored to visibility_map items
         ulong this_line_index,
-        
+
         ulong lines_target_x,
         ulong lines_target_y,
-        
+
         ulong x,
         ulong y,
         ulong width,
         ulong height,
-        
+
         TextView text_view,
         ElementVisibilityMap visibility_map
         )
     {
         auto state = getState(text_view);
-        
+
         genVisibilityMapForSubitems(
             state.width, state.height,
-            
+
             x, y,
             width, height,
-            
+
             parent_text.getLinesLayout(),
-            
+
             delegate ulong()
             {
                 return state.sublines.length;
             },
-            
+
             delegate ulong(ulong subitem_index)
             {
                 return state.sublines[subitem_index].getState(text_view).width;
             },
-            
+
             delegate ulong(ulong subitem_index)
             {
                 return state.sublines[subitem_index].getState(text_view).height;
@@ -913,7 +1090,7 @@ class TextLine
                 {
                     sum += v.getState(text_view).textchars.length;
                 }
-                
+
                 state.sublines[subitem_index].genVisibilityMap(
                     this_line_index,
                     subitem_index,
@@ -926,22 +1103,22 @@ class TextLine
                     );
             }
             );
-        
+
     }
-    
+
     ulong calcSublinesCount(TextView text_view)
     {
         auto state = getState(text_view);
         return state.sublines.length;
     }
-    
+
 }
 
 enum TextMarkupType
 {
     none,
     plain = none,
-    
+
     asciidocPlain,
     bbcodePlain,
     markdownPlain,
@@ -957,9 +1134,9 @@ class TextViewState
 
 class Text
 {
-	
+
     SignalConnectionContainer con_cont;
-    
+
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
         PropSetting(
@@ -969,7 +1146,7 @@ class Text
             "TextMarkupType",
             "TextMarkupType.plain"
             ),
-        
+
         PropSetting(
             "gs_w_d",
             "GenVisibilityMapForSubitemsLayout",
@@ -984,16 +1161,16 @@ class Text
             "LineCharsLayout",
             "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"
             ),
-        
+
         PropSetting("gs_w_d", "string", "faceFamily", "FaceFamily", "\"Go\""),
         PropSetting("gs_w_d", "string", "faceStyle", "FaceStyle", "\"Regular\""),
         PropSetting("gs_w_d", "uint", "faceSize", "FaceSize", "20*64"),
         PropSetting("gs_w_d", "uint", "faceResolution", "FaceResolution", "72"),
-        
+
         PropSetting("gs_w_d", "bool", "bold", "Bold", "false"),
         PropSetting("gs_w_d", "bool", "italic", "Italic", "false"),
         PropSetting("gs_w_d", "bool", "underline", "Underlined", "false"),
-        
+
         PropSetting(
             "gs_w_d",
             "bool",
@@ -1008,7 +1185,7 @@ class Text
             "DefaultFGColor",
             q{Color(0)}
             ),
-        
+
         PropSetting(
             "gs_w_d",
             "bool",
@@ -1023,24 +1200,24 @@ class Text
             "DefaultBGColor",
             q{Color(cast(ubyte[3])[255,255,255])}
             ),
-        
+
         ]
         );
-    
+
     // NOTE: lines should remain here, not to be moved into State
     TextLine[] lines;
-    
+
     mixin installSignal!("LinesRecalcRequired", "signal_linesRecalcRequired");
     mixin installSignal!("VisibilityMapRecalcRequired", "signal_visibilityMapRecalcRequired");
     mixin installSignal!("ImageRegenRequired", "signal_imageRegenRequired");
-    
+
     this()
     {
         struct stname {
             string sname;
             string tname;
         }
-        
+
         static foreach(
             v;
             [
@@ -1049,19 +1226,19 @@ class Text
             stname("TextMarkupType", "TextMarkupType"),
             stname("LinesLayout", "GenVisibilityMapForSubitemsLayout"),
             stname("LineCharsLayout", "GenVisibilityMapForSubitemsLayout"),
-            
+
             stname("FaceFamily", "string"),
             stname("FaceStyle", "string"),
             stname("FaceSize", "uint"),
             stname("FaceResolution", "uint"),
-            
+
             stname("Bold", "bool"),
             stname("Italic", "bool"),
             stname("Underlined", "bool"),
-            
+
             stname("DefaultFGColorEnabled", "bool"),
             stname("DefaultFGColor", "Color"),
-            
+
             stname("DefaultBGColorEnabled", "bool"),
             stname("DefaultBGColor", "Color"),
             ]
@@ -1082,14 +1259,14 @@ class Text
                 }.format(v.sname, v.tname));
         }
     }
-    
+
     mixin getState!("text_view.text_states", TextViewState,);
-    
+
     void recalculateWidthAndHeight(TextView text_view)
     {
-    	
+
         auto state = getState(text_view);
-        
+
         // foreach (sl; state.sublines)
         // {
         // sl.recalculateWidthAndHeight(text_view);
@@ -1097,10 +1274,10 @@ class Text
         //
         state.width = 0;
         state.height = 0;
-        
+
         if (lines.length != 0)
         {
-        	
+
             switch (getLinesLayout())
             {
             default:
@@ -1113,13 +1290,13 @@ class Text
                     foreach (l; lines)
                     {
                         auto l_state = l.getState(text_view);
-                        
+
                         {
                             auto w = l_state.width;
                             if (w > state.width)
                                 state.width = w;
                         }
-                        
+
                         state.height += l_state.height;
                     }
                     break;
@@ -1128,9 +1305,9 @@ class Text
                     foreach (l; lines)
                     {
                         auto l_state = l.getState(text_view);
-                        
+
                         state.width += l_state.width;
-                        
+
                         {
                             auto h = l_state.height;
                             if (h > state.height)
@@ -1141,20 +1318,20 @@ class Text
             }
         }
     }
-    
+
     void setText(dstring txt)
     {
         lines = lines[0 .. 0];
-        
+
         scope(exit)
         {
             signal_linesRecalcRequired.emit();
         }
-        
+
         auto line_ended = false;
-        
+
         /* int length */
-        
+
         main_loop:
         while (true)
         {
@@ -1182,15 +1359,15 @@ class Text
                     continue main_loop;
                 }
             }
-            
+
             auto tl = new TextLine(this);
             tl.setText(txt);
             lines ~= tl;
             break;
         }
-        
+
     }
-    
+
     // the target of reprocess is to calculate Text width and height
     // in order to do so, each structural unit must have (or have recalculated)
     // it's width and height
@@ -1199,21 +1376,21 @@ class Text
         // obviously, each character's size have to be known
         // in systems with freetype this also renders characters at once
         reprocessUnits(text_view);
-        
+
         // disect Lines to Sublines
         recreateSublines(text_view);
-        
+
         // sublines widths and heights necessary to know lines widths and
         // heights
         recalculateSublinesWidthsAndHeights(text_view);
-        
+
         // lines widths and heights necessary to know text width and height
         recalculateLinesWidthsAndHeights(text_view);
-        
+
         // do the final step
         recalculateWidthAndHeight(text_view);
     }
-    
+
     void reprocessUnits(TextView text_view)
     {
         foreach (l; lines)
@@ -1221,7 +1398,7 @@ class Text
             l.reprocessUnits(text_view);
         }
     }
-    
+
     void recreateSublines(TextView text_view)
     {
         foreach (l; lines)
@@ -1229,7 +1406,7 @@ class Text
             l.recreateSublines(text_view);
         }
     }
-    
+
     void recalculateSublinesWidthsAndHeights(TextView text_view)
     {
         foreach (l; lines)
@@ -1237,7 +1414,7 @@ class Text
             l.recalculateSublinesWidthsAndHeights(text_view);
         }
     }
-    
+
     void recalculateLinesWidthsAndHeights(TextView text_view)
     {
         foreach (l; lines)
@@ -1245,50 +1422,50 @@ class Text
             l.recalculateWidthAndHeight(text_view);
         }
     }
-    
+
     // void reprocessText(TextView text_view)
     // {
     // }
-    
+
     dstring getText()
     {
         dstring ret;
-        
+
         if (lines.length == 0)
         {
             return ret;
         }
-        
+
         ret = lines[0].getText();
-        
+
         if (lines.length == 1)
         {
             return ret;
         }
-        
+
         foreach (l; lines[1 .. $])
         {
             ret ~= "\n" ~ l.getText();
         }
-        
+
         return ret;
     }
-    
+
     dstring getText(ulong start, ulong stop)
     {
         bool first_found = false;
         ulong first_text_textchar;
         ulong first_text_textchar_index;
-        
+
         bool last_found = false;
         ulong last_text_textchar;
         ulong last_text_textchar_index;
-        
+
         bool searching_first = true;
-        
+
         /* ulong prev_length = 0; */
         ulong calc_length = 0;
-        
+
         {
             if (start > stop)
                 throw new Exception("start is behind stop");
@@ -1298,33 +1475,33 @@ class Text
             if (stop > l)
                 throw new Exception("stop is behind text length");
         }
-        
+
         foreach (i, l; lines)
         {
             auto l_l = l.textchars.length;
             if (i < lines.length)
                 l_l += 1; // add new line
-            
+
             if (start < calc_length + l_l)
             {
                 first_found = true;
                 first_text_textchar = i;
                 first_text_textchar_index = start - calc_length;
             }
-            
+
             if (stop < calc_length + l_l)
             {
                 last_found = true;
                 last_text_textchar = i;
                 last_text_textchar_index = stop - calc_length;
             }
-            
+
             if (first_found && last_found)
                 break;
-            
+
             calc_length += l_l;
         }
-        
+
         if (first_text_textchar == last_text_textchar)
         {
             return lines[first_text_textchar].getText(
@@ -1332,12 +1509,12 @@ class Text
                 last_text_textchar_index + 1
                 );
         }
-        
+
         dstring ret;
-        
+
         ret ~= lines[first_text_textchar].getText(first_text_textchar_index,
             lines[first_text_textchar].textchars.length);
-        
+
         if (last_text_textchar - first_text_textchar > 1)
         {
             for (ulong i = first_text_textchar + 1; i < last_text_textchar; i++)
@@ -1345,15 +1522,15 @@ class Text
                 ret ~= "\n" ~ lines[i].getText();
             }
         }
-        
+
         ret ~= "\n" ~ lines[last_text_textchar].getText(
             0,
             last_text_textchar_index
             );
-        
+
         return ret;
     }
-    
+
     void genVisibilityMap(
         ulong x, ulong y,
         ulong width, ulong height,
@@ -1362,15 +1539,15 @@ class Text
         )
     {
         auto state = getState(text_view);
-        
+
         genVisibilityMapForSubitems(
             state.width, state.height,
-            
+
             x, y,
             width, height,
-            
+
             getLinesLayout(),
-            
+
             delegate ulong()
             {
                 return lines.length;
@@ -1401,9 +1578,9 @@ class Text
                     );
             }
             );
-        
+
     }
-    
+
     ulong getLength()
     {
         ulong ret;
@@ -1414,33 +1591,33 @@ class Text
         ret += lines.length - 1; // new line symbol count
         return ret;
     }
-    
+
     bool isLineEmpty(ulong line)
     {
         return getTextLine(line).textchars.length == 0;
     }
-    
+
     bool isEOL(
         ulong line, ulong column
         )
     {
         return getTextLine(line).textchars.length == column;
     }
-    
+
     TextLine getTextLine(
         ulong line
         )
     {
         return lines[line];
     }
-    
+
     TextChar getTextLineChar(
         ulong line, ulong column
         )
     {
         return getTextLine(line).textchars[column];
     }
-    
+
     bool isEOL(
         ulong line, ulong subline, ulong subline_column,
         TextView text_view
@@ -1450,7 +1627,7 @@ class Text
         .textchars.length == subline_column
         && getTextLine(line).getState(text_view).sublines.length-1 == subline;
     }
-    
+
     bool isEOSL(
         ulong line, ulong subline, ulong subline_column,
         TextView text_view
@@ -1459,7 +1636,7 @@ class Text
         return getTextLineSubline(line, subline, text_view).getState(text_view)
         .textchars.length == subline_column;
     }
-    
+
     TextLineSubline getTextLineSubline(
         ulong line, ulong subline,
         TextView text_view
@@ -1467,7 +1644,7 @@ class Text
     {
         return getTextLine(line).getState(text_view).sublines[subline];
     }
-    
+
     TextChar getTextLineSublineChar(
         ulong line, ulong subline, ulong column,
         TextView text_view
@@ -1476,13 +1653,22 @@ class Text
         return getTextLineSubline(line, subline, text_view)
         .getState(text_view).textchars[column];
     }
-    
+
 }
 
-struct CursorPosition
+class CursorPosition
 {
-    ulong line;
-    ulong column;
+    // chr may be null if cursor on virtual entity
+    TextChar chr;
+    TextLineSubline subline;
+
+    // this must be true if cursor is at the end of the subline.
+    bool atEOL;
+
+    // at end of visible line (if wrapping is disabled and EOL not in view) and
+    // cursor is after last visible char.
+    // this is needed for correct cursor drawing in this case.
+    bool atEOVL;
 }
 
 enum TextViewMode
@@ -1494,81 +1680,81 @@ enum TextViewMode
 
 class TextView
 {
-	
+
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
         PropSetting("gs_w_d", "ulong", "x", "X", "0"),
         PropSetting("gs_w_d", "ulong", "y", "Y", "0"),
         PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
         PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
-        
+
         // TODO: text selection mechanism looks dumb
         PropSetting("gs_w_d", "bool", "text_selection_enabled", "TextSelectionEnabled", "true"),
         PropSetting("gs_w_d", "bool", "text_selected", "TextSelected", "false"),
         PropSetting("gs_w_d", "ulong", "selection_start", "TextSelectionStart", "0"),
         PropSetting("gs_w_d", "ulong", "selection_end", "TextSelectionEnd", "0"),
-        
+
         PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
-        
+
         // NOTE: I think it's better not to create entire property for this
         // PropSetting("gs_w_d", "bool", "cursor_animation_iteration_visible", "CursorAnimationIterationVisible", "false"),
-        
+
         //PropSetting("gs_w_d", "ulong", "cursor_position_line", "CursorPositionLine", "0"),
         //PropSetting("gs_w_d", "ulong", "cursor_position_column", "CursorPositionColumn", "0"),
-        
+
         PropSetting("gs_w_d", "bool", "readOnly", "ReadOnly", "false"),
-        
+
         PropSetting("gs_w_d", "TextViewMode", "textViewMode", "TextViewMode", "TextViewMode.singleLine"),
-        
+
         PropSetting("gs_w_d", "bool", "virtualWrapBySpace", "VirtualWrapBySpace", "true"),
         PropSetting("gs_w_d", "bool", "virtualWrapByChar", "VirtualWrapByChar", "true"),
         ]
         );
-    
+
     // NOTE: this is instead of property
     bool cursor_animation_iteration_visible;
-    
+
     CursorPosition[] cursor_positions;
-    
+
     Text text;
-    
+
     FormI delegate() getForm;
     DrawingSurfaceI delegate() getDrawingSurface;
     bool delegate() isFocused;
-    
+
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
     TextLineViewState[TextLine] text_line_states;
     TextViewState[Text] text_states;
-    
+
     ElementVisibilityMap visibility_map;
     Image _rendered_image;
-    
+
     bool linesRecalcRequired = true;
     bool visibilityMapRecalcRequired=true;
     bool imageRegenRequired = true;
-    
+
     // this one is for Text object
     SignalConnection text_linesRecalcRequired_sc;
     // this one is for this object
     SignalConnectionContainer con_cont;
-    
+
     SignalConnection timer500_signal_connection;
-    
+
     this()
     {
-    	
+
         struct stname {
             string sname;
             string tname;
         }
-        
+
         static foreach(
             v;
             [
             stname("Width", "ulong"),
             stname("Height", "ulong"),
-            
+
             stname("TextViewMode", "TextViewMode"),
             stname("VirtualWrapBySpace", "bool"),
             stname("VirtualWrapByChar", "bool"),
@@ -1587,8 +1773,8 @@ class TextView
                         );
                 }.format(v.sname, v.tname));
         }
-        
-        
+
+
         static foreach(
             v;
             [
@@ -1611,40 +1797,40 @@ class TextView
                         );
                 }.format(v.sname, v.tname));
         }
-        
+
         setTextString("");
-        
+
     }
-    
+
     this(dstring txt)
     {
         this();
         setTextString(txt);
     }
-    
+
     this(Text txt)
     {
         this();
         setText(txt);
     }
-    
-    
+
+
     PlatformI getPlatform()
     {
         return getWindow().getPlatform();
     }
-    
+
     WindowI getWindow()
     {
         assert(getForm !is null);
         return getForm().getWindow();
     }
-    
+
     FontMgrI getFontManager()
     {
         return getPlatform().getFontManager();
     }
-    
+
     Image getRenderedImage()
     {
         if (linesRecalcRequired)
@@ -1654,43 +1840,43 @@ class TextView
             visibilityMapRecalcRequired = true;
             imageRegenRequired = true;
         }
-        
+
         if (visibilityMapRecalcRequired)
         {
             genVisibilityMap();
         }
-        
+
         // genImage() uses visibilityMap to speed up rendering, so it must
         // be called after genVisibilityMap()
         if (imageRegenRequired)
         {
             genImage();
         }
-        
+
         return _rendered_image;
     }
-    
+
     void fullRedrawToDS()
     {
         ulong x;
         ulong y;
         ulong width;
         ulong height;
-        
+
         x = getX();
         y = getY();
         width = getWidth();
         height = getHeight();
-        
+
         drawImageToDrawingSurface(x,y,width,height);
     }
-    
+
     // TODO: move this to some more appropriate place
     private ubyte chanBlend(ubyte lower, ubyte higher, real part)
     {
         return cast(ubyte)(lower + ((higher - lower) * part));
     }
-    
+
     void drawImageToDrawingSurface(
         ulong target_x,
         ulong target_y,
@@ -1700,13 +1886,13 @@ class TextView
     {
         auto ds = getDrawingSurface();
         auto image = getRenderedImage();
-        
+
         auto p = Position2D(cast(int)target_x,cast(int)target_y);
         auto i = image.getImage(p, Size2D(cast(int)width, cast(int)height));
         ds.drawImage(p, i);
         ds.present();
     }
-    
+
     void ensureTimer500Connection()
     {
         // TODO: maybe mutexes and synchronization have to be used here
@@ -1728,34 +1914,34 @@ class TextView
                 );
         }
     }
-    
+
     void setTextString(dstring txt = "")
     {
         if (text is null)
         {
             text = new Text();
         }
-        
+
         text.setText(txt);
     }
-    
+
     dstring getTextString()
     {
         dstring ret;
-        
+
         if (text !is null)
         {
             ret = text.getText();
         }
-        
+
         return ret;
     }
-    
+
     void setText(dstring txt)
     {
         setTextString(txt);
     }
-    
+
     void setText(Text txt)
     {
         text = txt;
@@ -1766,28 +1952,28 @@ class TextView
             }
             );
     }
-    
+
     Text getText()
     {
         if (text is null)
             setTextString();
         return text;
     }
-    
+
     void genVisibilityMap()
     {
         if (text is null)
             throw new Exception("text object is not set");
-        
+
         this.visibility_map = null;
-        
+
         auto visibility_map = new ElementVisibilityMap(this);
-        
+
         auto x = getX();
         auto y = getY();
         auto width = getWidth();
         auto height = getHeight();
-        
+
         text.genVisibilityMap(
             x,
             y,
@@ -1796,13 +1982,13 @@ class TextView
             this,
             visibility_map
             );
-        
+
         this.visibility_map=visibility_map;
-        
+
         visibilityMapRecalcRequired = false;
         imageRegenRequired=true;
     }
-    
+
     void drawElementVisibilityMapElement(
         ElementVisibilityMapElement e,
         bool redrawOnImage,
@@ -1810,25 +1996,25 @@ class TextView
         )
     {
         auto chr_state = e.chr.getState(this);
-        
+
         if (redrawOnImage)
         {
-        	
+
             // NOTE: it is intended what character raster doesn't know anything
             //       about color yet, and knows only intensivity, so color
             //       information is required.
             //       maybe in future caharacter images will be with color
             //       already at this point.
             auto fg_color = text.getDefaultFGColor();
-            
+
             auto chr_image = chr_state.resImg.getImage(
                 e.x, e.y,
                 e.width, e.height
                 );
-            
+
             // auto tv_x = getX();
             // auto tv_y = getY();
-            
+
             for (ulong y = 0; y < chr_image.height; y++)
             {
                 for (ulong x = 0; x < chr_image.width; x++)
@@ -1840,22 +2026,22 @@ class TextView
                     auto fg_dot = chr_image.getDot(x, y);
                     if (fg_dot.enabled)
                     {
-                    	
+
                         auto bg_color = bg_dot.color;
                         // auto fg_color = fg_dot.color;
-                        
+
                         Color new_color;
-                        
+
                         auto part = fg_dot.intensivity;
                         new_color.r = chanBlend(bg_color.r, fg_color.r, part);
                         new_color.g = chanBlend(bg_color.g, fg_color.g, part);
                         new_color.b = chanBlend(bg_color.b, fg_color.b, part);
-                        
+
                         auto id = ImageDot();
                         id.enabled=true;
                         id.intensivity=1;
                         id.color = new_color;
-                        
+
                         _rendered_image.drawDot(
                             Position2D(
                                 cast(int)(x+e.target_x),
@@ -1876,9 +2062,9 @@ class TextView
                     }
                 }
             }
-            
+
         }
-        
+
         if (copyToDS)
         drawImageToDrawingSurface(
             e.target_x,
@@ -1887,23 +2073,23 @@ class TextView
             e.height
             );
     }
-    
+
     void genImage()
     {
         if (text is null)
             throw new Exception("text object is not set");
-        
+
         auto w = getWidth();
         auto h = getHeight();
-        
+
         _rendered_image = new Image(w, h);
-        
+
         {
             auto bg_dot = ImageDot();
             bg_dot.enabled=true;
             bg_dot.intensivity=1;
             bg_dot.color = text.getDefaultBGColor();
-            
+
             for (ulong y = 0; y != h; y++)
             {
                 for (ulong x = 0; x != w; x++)
@@ -1918,7 +2104,7 @@ class TextView
                 }
             }
         }
-        
+
         if (visibility_map !is null)
         {
             foreach (v; visibility_map.elements)
@@ -1926,17 +2112,17 @@ class TextView
                 drawElementVisibilityMapElement(v, true, false);
             }
         }
-        
+
         imageRegenRequired = false;
-        
+
         // drawImageToDrawingSurface(0, 0, w, h);
     }
-    
+
     void timer500ms_handle()
     {
         timer500ms_handle_cursor();
     }
-    
+
     void timer500ms_handle_cursor()
     {
         if (!getCursorEnabled())
@@ -1946,7 +2132,7 @@ class TextView
             else
                 goto force_clear;
         }
-        
+
         if (!isFocused())
         {
             if (cursor_animation_iteration_visible == false)
@@ -1954,69 +2140,74 @@ class TextView
             else
                 goto force_clear;
         }
-        
+
         goto normal_work;
-        
+
         force_clear:
         cursor_animation_iteration_visible = false;
-        
+
         normal_work:
-        
-        
+
+
         if (cursor_animation_iteration_visible)
             timer500ms_handle_cursor_draw_operation(false);
         else
             timer500ms_handle_cursor_draw_operation(true);
-        
+
         cursor_animation_iteration_visible =
         !cursor_animation_iteration_visible;
-        
+
         exit:
     }
-    
+
     void timer500ms_handle_cursor_draw_operation(bool clear)
     {
-    	
-        ulong line;
-        ulong column;
-        
+
+        CursorPosition cusor_pos;
+
         ulong x;
         ulong y;
         ulong width;
         ulong height;
-        
+
         if (visibility_map is null)
-            return;
-        
-        if (cursor_positions.length == 0)
-            return;
         {
-            auto z = cursor_positions[$-1];
-            line = z.line;
-            column = z.column;
-        }
-        
-        auto res = calculateVisibleCursor(line, column);
-        if (res[0] == false)
+            debug writeln("visibility_map is null");
             return;
-        
+        }
+
+        if (cursor_positions.length == 0)
+        {
+            debug writeln("cursor_positions.length == 0");
+            return;
+        }
+
+        cusor_pos = cursor_positions[$-1];
+
+        auto res = calculateVisibleCursor(cusor_pos);
+        if (res[0] == false)
+        {
+            debug writeln("res[0] == false");
+            return;
+        }
+
         if (!clear)
             drawCursor(res[1], res[2], res[3], res[4]);
         else
             clearCursor(res[1], res[2], res[3], res[4]);
     }
-    
+
     void drawCursor(ulong x,ulong y,ulong width,ulong height)
     {
         auto ds = getDrawingSurface();
-        
+
         auto dot = ImageDot();
         dot.enabled=true;
         dot.intensivity=1;
         dot.color = Color(cast(ubyte[3])[0,0,0]);
-        
+
         // auto color = Color(cast(ubyte[3])[255,0,0]);
-        
+
         for (ulong i = x; i != x+width; i++)
         {
             for (ulong j = y; j != y+height; j++)
@@ -2024,75 +2215,114 @@ class TextView
                 ds.drawDot(Position2D(cast(int)i,cast(int)j),dot);
             }
         }
-        
+
         ds.present();
     }
-    
-    void clearCursorAtLineAndColumn(ulong line, ulong column)
+
+    void clearCursor(CursorPosition cp)
     {
-        auto res = calculateVisibleCursor(line, column);
+        auto res = calculateVisibleCursor(cp);
         if (!res[0])
             return;
         clearCursor(res[1], res[2], res[3], res[4]);
     }
-    
+
     void clearCursor(ulong x,ulong y,ulong width,ulong height) {
         drawImageToDrawingSurface(x, y, width, height);
     }
-    
+
     Tuple!(bool, ulong, ulong, ulong, ulong) calculateVisibleCursor(
-        ulong line,
-        ulong column
+        CursorPosition cursor_pos
         )
     {
+        debug {
+            write("calculateVisibleCursor:", );
+            if (cursor_pos.chr is null)
+                writeln("null");
+            else
+                writeln(cursor_pos.chr.chr);
+            writeln("    atEOL:", cursor_pos.atEOL);
+            writeln("   atEOVL:", cursor_pos.atEOVL);
+        }
+
         auto fail_res = tuple(false, 0UL,0UL,0UL,0UL);
-        
+
         ulong x;
         ulong y;
         ulong width;
         ulong height;
-        
+
         if (visibility_map is null)
             return fail_res;
-        
-        bool at_end_of_line;
-        // bool at_end_of_subline; // TODO: todo
-        
+
+        assert(cursor_pos.subline !is null, "cursor_pos.subline must never be null");
+
+        if (cursor_pos.atEOVL)
+        {
+            ElementVisibilityMapElement last;
+            bool subline_started;
+            // bool subline_ended;
+            foreach (ve; visibility_map.elements)
+            {
+                auto ve_subline = ve.chr.calcSubline(this);
+                if (ve_subline == cursor_pos.subline)
+                {
+                    if (!subline_started)
+                    {
+                        subline_started = true;
+                    }
+
+                    last = ve;
+                } else {
+                    if (subline_started)
+                    {
+                        // subline_ended = true;
+                        break;
+                    }
+                }
+            }
+
+            if (last is null)
+            {
+                debug writeln("calculateVisibleCursor: last is null");
+                return fail_res;
+            }
+
+            final switch(text.getLineCharsLayout())
+            {
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                x = last.target_x+last.width;
+                y = last.target_y;
+                width = 1;
+                height = last.height;
+                break;
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                x = last.target_x;
+                y = last.target_y;
+                width = 1;
+                height = last.height;
+                break;
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                x = last.target_x;
+                y = last.target_y+last.height;
+                width = last.width;
+                height = 1;
+                break;
+            }
+
+            return tuple(true, x,y,width,height);
+        }
+
+        if (cursor_pos.chr is null)
+        {
+            debug writeln("calculateVisibleCursor: cursor_pos.chr is null");
+            return fail_res;
+        }
+
         foreach (v; visibility_map.elements)
         {
-            // TODO: multiple calls to v.chr.calc* functions probably non-optimal
-            auto v_line = v.chr.calcLineIndex();
-            auto v_column = v.chr.calcLineColumnIndex();
-            
-            if (v.eovl && v_line == line && column == v_column+1)
-            {  // the case when cursor is at the end of visible line
-                final switch(text.getLineCharsLayout())
-                {
-                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                    x = v.target_x+v.width;
-                    y = v.target_y;
-                    width = 1;
-                    height = v.height;
-                    break;
-                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    x = v.target_x;
-                    y = v.target_y;
-                    width = 1;
-                    height = v.height;
-                    break;
-                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    x = v.target_x;
-                    y = v.target_y+v.height;
-                    width = v.width;
-                    height = 1;
-                    break;
-                }
-                
-                return tuple(true, x,y,width,height);
-            }
-            
-            if (v_line == line && v_column == column)
+            if (v.chr == cursor_pos.chr)
             {
                 final switch(text.getLineCharsLayout())
                 {
@@ -2116,28 +2346,32 @@ class TextView
                     height = 1;
                     break;
                 }
-                
+
                 return tuple(true, x,y,width,height);
             }
         }
+
+        debug writeln("calculateVisibleCursor: default fail");
         return fail_res;
     }
-    
+
     void changeCursorPositionByCoordinates(ulong x, ulong y)
     {
-    	
+
         ulong line;
         ulong column;
-        
+
         auto el_clicked = determineVisibleElementAt(x,y);
-        
+
         // TODO: develop solution for clicks in other places
         if (el_clicked[0] is null)
+        {
+            debug writeln(new Exception("todo"));
             return;
-        
-        
+        }
+
         bool after_clicked;
-        
+
         final switch(text.getLineCharsLayout())
         {
         case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
@@ -2154,38 +2388,75 @@ class TextView
                 after_clicked = true;
             break;
         }
-        
-        auto ec = el_clicked[0];
-        
-        auto ec_line = ec.chr.calcLineIndex();
-        auto ec_column = ec.chr.calcLineColumnIndex();
-        
-        line = ec_line;
-        column = ec_column;
+
+        auto cp = new CursorPosition();
+
+        // subline is same in any case
+        cp.subline = el_clicked[0].chr.calcSubline(this);
+
+        if (cp.subline is null)
+        {
+            throw new Exception("programming error: report a bug");
+        }
+
         if (after_clicked)
         {
-            column++;
+            if (el_clicked[5] is null)
+            {
+                cp.chr = null;
+                cp.atEOL = true;
+                cp.atEOVL = true;
+            }
+            else
+            {
+                if (el_clicked[6] !is null)
+                {
+                    cp.chr = el_clicked[6].chr;
+                    cp.atEOL = false;
+                    cp.atEOVL = false;
+                }
+                else
+                {
+                    cp.chr = el_clicked[6].chr;
+                    cp.atEOL = false;
+                    cp.atEOVL = true;
+                }
+            }
         }
-        
-        changeCursorPositionByLineAndColumn(line, column);
+        else
+        {
+            cp.chr=el_clicked[0].chr;
+            cp.atEOL = false;
+            cp.atEOVL = false;
+        }
+
+        setNewCursorPosition(cp);
     }
-    
-    void changeCursorPositionByLineAndColumn(ulong line, ulong column)
+
+    void setNewCursorPosition(CursorPosition cp)
     {
         foreach(v;cursor_positions)
         {
-            clearCursorAtLineAndColumn(v.line, v.column);
+            clearCursor(v);
         }
-        
-        cursor_positions=cursor_positions[0 .. 0] ~ CursorPosition(line, column);
-        
+
+        cursor_positions=cursor_positions[0 .. 0] ~ cp;
+
         cursor_animation_iteration_visible=true;
     }
-    
+
     Tuple!(
-        ElementVisibilityMapElement,
-        ElementVisibilityMapElementClickLeanH,
-        ElementVisibilityMapElementClickLeanV
+        ElementVisibilityMapElement, // 0
+        ElementVisibilityMapElementClickLeanH, // 1
+        ElementVisibilityMapElementClickLeanV, // 2
+        // char before the clicked
+        TextChar, // 3
+        // element before the clicked (null if it's not in view)
+        ElementVisibilityMapElement, // 4
+        // char after the clicked
+        TextChar, // 5
+        // element after the clicked (null if it's not in view)
+        ElementVisibilityMapElement, // 6
         )
     determineVisibleElementAt(ulong x, ulong y)
     {
@@ -2193,11 +2464,23 @@ class TextView
             cast(ElementVisibilityMapElement) null,
             cast(ElementVisibilityMapElementClickLeanH)0,
             cast(ElementVisibilityMapElementClickLeanV)0,
+            cast(TextChar) null,
+            cast(ElementVisibilityMapElement) null,
+            cast(TextChar) null,
+            cast(ElementVisibilityMapElement) null,
             );
-        
+
         if (visibility_map is null)
             return fail_res;
-        
+
+        ElementVisibilityMapElement res_element;
+        auto lh = ElementVisibilityMapElementClickLeanH.left;
+        auto lv = ElementVisibilityMapElementClickLeanV.top;
+        TextChar prev_char;
+        ElementVisibilityMapElement prev_element;
+        TextChar next_char;
+        ElementVisibilityMapElement next_element;
+
         foreach (v; visibility_map.elements)
         {
             if (
@@ -2205,31 +2488,45 @@ class TextView
             &&  (y >= v.target_y && y < v.target_y+v.height)
             )
             {
-                auto lh = ElementVisibilityMapElementClickLeanH.left;
-                auto lv = ElementVisibilityMapElementClickLeanV.top;
-                
+
                 if (x >= v.target_x+(v.width/2))
                     lh = ElementVisibilityMapElementClickLeanH.right;
                 if (y >= v.target_y+(v.height/2))
                     lv = ElementVisibilityMapElementClickLeanV.bottom;
-                
-                // debug writefln(
-                // "element visibility (at x: %s y: %s): %s (line: %s column: %s last?: %s)",
-                // x,y,
-                // v.chr.chr,
-                // v.line,
-                // v.column,
-                // v.eovl
-                // );
-                
-                return tuple(v,lh,lv);
+
+                res_element = v;
+
+                auto pc = v.chr.getPrevCharInSubline(this);
+                if (!pc[0])
+                {
+                    throw new Exception("programming error: report a bug");
+                }
+
+                auto nc = v.chr.getNextCharInSubline(this);
+                if (!nc[0])
+                {
+                    throw new Exception("programming error: report a bug");
+                }
+
+                prev_char = pc[1];
+                next_char = nc[1];
+
+                prev_element = visibility_map.getElementByTextChar(prev_char);
+                next_element = visibility_map.getElementByTextChar(next_char);
+
+                break;
             }
         }
-        
-        return fail_res;
+
+        return tuple(
+            res_element,
+            lh, lv,
+            prev_char, prev_element,
+            next_char, next_element,
+            );
     }
-    
-    
+
+
     void click(ulong x, ulong y)
     {
         if (getCursorEnabled())
@@ -2240,32 +2537,39 @@ class TextView
             changeCursorPositionByCoordinates(x, y);
         }
     }
-    
+
     void textInput(dstring txt)
     {
         linesRecalcRequired = true;
-        ulong line;
-        ulong column;
-        
-        getCursorLineAndColumn(line, column);
-        
-        auto line_obj = text.lines[line];
-        
+
+        auto cp = getCursorPosition();
+
+        if (cp.chr is null)
+        {
+            debug writeln("cp.chr is null");
+            return;
+        }
+
+        TextLine line;
+        ulong index;
+        {
+            auto res = cp.chr.calcLineAndColumnIndex();
+            line = res[0];
+            index = res[1];
+        }
+
         TextChar[] new_chars;
-        
+
         foreach (v; cast(dchar[]) txt)
         {
-            auto x = new TextChar(line_obj);
+            auto x = new TextChar(line);
             x.chr = v;
             new_chars ~= x;
         }
-        
-        text.lines[line].textchars=
-        text.lines[line].textchars[0 .. column]
+
+        line.textchars = line.textchars[0 .. index]
         ~ new_chars
-        ~ text.lines[line].textchars[column .. $];
-        
-        changeCursorPositionByLineAndColumn(line, column+new_chars.length);
+        ~ line.textchars[index .. $];
     }
 
     void keyboardInput(string type, EventKeyboard* event)
@@ -2278,182 +2582,234 @@ class TextView
             default:
                 break;
             case EnumKeyboardKeyCode.Up:
-            	final switch(text.getLinesLayout())
-            	{
-            	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-            		cursorMoveToNextOrToPrevChar(false);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-            		cursorMoveToNextOrToPrevChar(false);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-            		cursorMoveToNextOrToPrevLine(false);
-            		break;
-            	}
-            	break;
+                final switch(text.getLinesLayout())
+                {
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                    cursorMoveToNextOrToPrevChar(false);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                    cursorMoveToNextOrToPrevChar(false);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                    cursorMoveToNextOrToPrevLine(false);
+                    break;
+                }
+                break;
             case EnumKeyboardKeyCode.Down:
-            	final switch(text.getLinesLayout())
-            	{
-            	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-            		cursorMoveToNextOrToPrevChar(true);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-            		cursorMoveToNextOrToPrevChar(true);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-            		cursorMoveToNextOrToPrevLine(true);
-            		break;
-            	}
-            	break;
+                final switch(text.getLinesLayout())
+                {
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                    cursorMoveToNextOrToPrevChar(true);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                    cursorMoveToNextOrToPrevChar(true);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                    cursorMoveToNextOrToPrevLine(true);
+                    break;
+                }
+                break;
             case EnumKeyboardKeyCode.Left:
-            	final switch(text.getLinesLayout())
-            	{
-            	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-            		cursorMoveToNextOrToPrevLine(false);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-            		cursorMoveToNextOrToPrevLine(true);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-            		cursorMoveToNextOrToPrevChar(false);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-            		cursorMoveToNextOrToPrevChar(true);
-            		break;
-            	}
-            	break;
+                final switch(text.getLinesLayout())
+                {
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                    cursorMoveToNextOrToPrevLine(false);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                    cursorMoveToNextOrToPrevLine(true);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                    cursorMoveToNextOrToPrevChar(false);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                    cursorMoveToNextOrToPrevChar(true);
+                    break;
+                }
+                break;
             case EnumKeyboardKeyCode.Right:
-            	final switch(text.getLinesLayout())
-            	{
-            	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-            		cursorMoveToNextOrToPrevLine(true);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-            		cursorMoveToNextOrToPrevLine(false);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-            		cursorMoveToNextOrToPrevChar(true);
-            		break;
-            	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-            		cursorMoveToNextOrToPrevChar(false);
-            		break;
-            	}
-            	break;
+                final switch(text.getLinesLayout())
+                {
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                    cursorMoveToNextOrToPrevLine(true);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                    cursorMoveToNextOrToPrevLine(false);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                    cursorMoveToNextOrToPrevChar(true);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                    cursorMoveToNextOrToPrevChar(false);
+                    break;
+                }
+                break;
             }
         }
     }
 
     void cursorMoveToNextOrToPrevLine(bool next)
-    {    	
-    	ulong line;
-    	ulong column;
-    	
-    	getCursorLineAndColumn(line, column);
-    	
-    	bool line_column_isEOL = text.isEOL(line, column);
-    	bool line_is_empty = text.isLineEmpty(line);
-    	
-    	ulong subline;
-    	ulong subline_column;
-    	TextChar chr;
-    	
-    	if (line_column_isEOL && line_is_empty)
-    	{
-    		subline = 0;
-    		subline_column = 0;
-    		goto get_line;
-    	}
-    	
-    	chr = text.getTextLineChar(
-    		line,
-    		(line_column_isEOL ? column-1 : column)
-    		);
-    	subline = chr.calcSublineIndex(this);
-    	subline_column = chr.calcSublineColumnIndex(this);
-    	
-    	get_line:
-    	auto line_obj = text.getTextLine(line);
-    	auto line_sublines_count = line_obj.calcSublinesCount(this);
-    	auto line_subline_obj = text.getTextLineSubline(line, subline, this);
-    	
-    	if (subline == (next == false ? 0 : line_sublines_count-1))
-    	{
-    		if (line == (next == false ? 0 : text.lines.length-1)) {
-    			return; // this is ok
-    		}
-    		else
-    		{
-    			(next == false ? line-- : line++);
-    			line_obj = text.getTextLine(line);
-    			line_subline_obj = text.getTextLineSubline(
-    				line,
-    				(next == false ? line_obj.calcSublinesCount(this)-1 : 0),
-    				this
-    				);
-    			if (line_subline_obj.getState(this).textchars.length < subline_column)
-    			{
-    				subline_column = line_subline_obj.getState(this).textchars.length -1;
-    			}
-    		}
-    	}
-    	else
-    	{
-    		(next == false ? subline-- : subline++);
-    	}
-    	
-    	bool new_subline_isEOL = text.isEOL(
-    		line,
-    		subline,
-    		subline_column,
-    		this
-    		);
-    	
-    	if (line_column_isEOL)
-    	{
-    		subline_column++;
-    	}
-    	
-    	changeCursorPositionByLineAndColumn(line, subline_column);
+    {
+        auto cursor = getCursorPosition();
+
+        /*      if (cursor.chr is null)
+        {
+        debug writeln("cursorMoveToNextOrToPrevLine: cursor.chr is null");
+        return;
+        } */
+
+        TextLine cursor_line;
+        ulong cursor_line_index;
+        ulong cursor_subline_index;
+        ulong cursor_line_subline_count;
+
+        TextLineSubline cursor_subline;
+        ulong cursor_subline_column_index;
+
+        if (cursor.chr !is null)
+        {
+            cursor_line = cursor.chr.calcLine();
+            cursor_line_index = cursor.chr.calcLineIndex();
+            cursor_subline_index = cursor.chr.calcSublineIndex(this);
+            cursor_line_subline_count = cursor_line.getState(this).sublines.length;
+
+            cursor_subline = cursor.chr.calcSubline(this);
+            cursor_subline_column_index = cursor.chr.calcSublineColumnIndex(this);
+        }
+        else
+        {
+            cursor_line = cursor.subline.calcLine();
+            cursor_line_index = cursor.subline.calcLineIndex();
+            cursor_subline_index = cursor.subline.calcSublineIndex(this);
+            cursor_line_subline_count = cursor_line.getState(this).sublines.length;
+
+            cursor_subline = cursor.subline;
+        }
+
+        ulong same_line_chars_width_or_height;
+
+        auto textchars = cursor_subline.getState(this).textchars;
+
+        if (cursor.chr is null)
+        {
+            final switch(text.getLineCharsLayout())
+            {
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                same_line_chars_width_or_height = cursor_subline.getWidth(this);
+                break;
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                same_line_chars_width_or_height = cursor_subline.getHeight(this);
+                break;
+            }
+        }
+        else
+        {
+            foreach (v; textchars[0 .. cursor_subline_column_index+1])
+            {
+                final switch(text.getLineCharsLayout())
+                {
+                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                    same_line_chars_width_or_height += v.getWidth(this);
+                    break;
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                    same_line_chars_width_or_height += v.getHeight(this);
+                    break;
+                }
+            }
+        }
+
+        TextLineSubline new_subline;
+
+        if (cursor_subline_index == (next ? cursor_line_subline_count-1 : 0))
+        {
+            if (cursor_line_index == (next ? text.lines.length-1 : 0))
+            {
+                // do nothing
+                // TODO: maybe this should move cursor to start or to end of
+                //       whole text
+                return;
+            }
+            else
+            {
+                TextLine new_line;
+                new_line = text.lines[cursor_line_index+(next ? 1 : -1)];
+                auto new_line_sublines = new_line.getState(this).sublines;
+                new_subline = new_line_sublines[(next ? 0 : new_line_sublines.length -1)];
+            }
+        }
+        else
+        {
+            new_subline =
+            cursor_line.getState(this).sublines[cursor_subline_index+(next ? 1 : -1)];
+        }
+
+        TextChar new_char;
+        bool new_atEOL;
+        bool new_atEOVL;
+        ulong new_line_chars_width_or_height;
+
+        bool new_char_found = false;
+        foreach (v;new_subline.getState(this).textchars)
+        {
+            final switch(text.getLineCharsLayout())
+            {
+            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                new_line_chars_width_or_height += v.getWidth(this);
+                break;
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                new_line_chars_width_or_height += v.getHeight(this);
+                break;
+            }
+
+            debug writeln(
+                "new_line_chars_width_or_height <= same_line_chars_width_or_height:",
+                new_line_chars_width_or_height, ":",
+                same_line_chars_width_or_height
+                );
+            if (new_line_chars_width_or_height <= same_line_chars_width_or_height)
+            {
+                new_char=v;
+            }
+            else
+            {
+                new_char_found = true;
+                break;
+            }
+        }
+
+        if (!new_char_found)
+        {
+            new_char = null;
+            new_atEOL = true;
+            new_atEOVL = true;
+        }
+
+        CursorPosition cp = new CursorPosition();
+        cp.chr = new_char;
+        cp.atEOL = new_atEOL;
+        cp.atEOVL = new_atEOVL;
+        cp.subline = new_subline;
+
+        setNewCursorPosition(cp);
     }
 
     void cursorMoveToNextOrToPrevChar(bool next)
-    {    	
-    	ulong line;
-    	ulong column;
-    	
+    {
 
-    	changeCursorPositionByLineAndColumn(line, column);
-    }    
-    
-    Tuple!(bool, ulong, ulong) getCursorLineAndColumn()
-    {
-        auto fail_res = tuple(false, 0UL, 0UL);
-        
-        ulong line;
-        ulong column;
-        
-        if (cursor_positions.length == 0)
-            return fail_res;
-        
-        auto z = cursor_positions[$-1];
-        line = z.line;
-        column = z.column;
-        
-        return tuple(true, line, column);
     }
-    
-    bool getCursorLineAndColumn(out ulong line, out ulong column)
+
+    CursorPosition getCursorPosition()
     {
-        auto res = getCursorLineAndColumn();
-        if (!res[0])
-            return false;
-        
-        line = res[1];
-        column = res[2];
-        
-        return true;
+        if (cursor_positions.length == 0)
+            return cast(CursorPosition) null;
+        return cursor_positions[$-1];
     }
 }
 
@@ -2477,7 +2833,7 @@ mixin template getState(string state_container, alias state_type)
             state_type getState(TextView text_view)
             {
                 state_type state;
-                
+
                 if (this !in %1$s) {
                     state = new state_type();
                     // state.entity = this;
@@ -2485,7 +2841,7 @@ mixin template getState(string state_container, alias state_type)
                 } else {
                     state = %1$s[this];
                 }
-                
+
                 return state;
             }
         }.format(state_container)
@@ -2496,13 +2852,13 @@ class ElementVisibilityMapElement
 {
     ElementVisibilityMap map;
     TextChar chr;
-    
+
     // ulong line;
     // ulong column;
-    
+
     // end of visible line
-    bool eovl;
-    
+    // bool eovl;
+
     ulong target_x;
     ulong target_y;
     ulong x;
@@ -2514,11 +2870,33 @@ class ElementVisibilityMapElement
 class ElementVisibilityMap
 {
     TextView textview;
-    
+
     ElementVisibilityMapElement[] elements;
-    
+
     this(TextView textview)
     {
         this.textview = textview;
+    }
+
+    ElementVisibilityMapElement getElementByTextChar(TextChar chr)
+    {
+        auto fail_res = cast(ElementVisibilityMapElement) null;
+        if (chr is null)
+        {
+            return fail_res;
+        }
+        foreach(v;elements)
+        {
+            if (v.chr == chr)
+            {
+                return v;
+            }
+        }
+        return fail_res;
+    }
+
+    bool isTextCharInView(TextChar chr)
+    {
+        return getElementByTextChar(chr) !is null;
     }
 }
