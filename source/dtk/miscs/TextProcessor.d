@@ -452,10 +452,6 @@ class TextChar
     {
         auto line_state = parent_line.getState(text_view);
         auto this_subline = calcSubline(text_view);
-        if (this_subline is null)
-        {
-            throw new Exception("subline not found");
-        }
         foreach (ulong i, v ; line_state.sublines)
         {
             if (v == this_subline)
@@ -470,10 +466,6 @@ class TextChar
     {
         auto this_state = getState(text_view);
         auto this_subline = calcSubline(text_view);
-        if (this_subline is null)
-        {
-            throw new Exception("subline not found");
-        }
         auto textchars = this_subline.getState(text_view).textchars;
         foreach (ulong i, v ; textchars)
         {
@@ -497,18 +489,15 @@ class TextChar
                 }
             }
         }
-        return cast(TextLineSubline) null;
+
+        throw new Exception("char not found in text line sublines");
     }
 
     // firs ret value for "ok?"
-    Tuple!(bool, TextChar) getPrevCharInSubline(TextView text_view, bool search_prev=true)
+    TextChar calcPrevCharInSubline(TextView text_view, bool search_prev=true)
     {
-        auto fail_res = tuple(false, cast(TextChar) null);
+        auto fail_res = cast(TextChar) null;
         auto subline = calcSubline(text_view);
-        if (subline == cast(TextLineSubline) null)
-        {
-            return fail_res;
-        }
         auto textchars = subline.getState(text_view).textchars;
         foreach (i, loc_chr ; textchars)
         {
@@ -516,49 +505,43 @@ class TextChar
             {
                 if (i==(search_prev ? 0 : textchars.length-1))
                 {
-                    return tuple(true, cast(TextChar) null);
+                    return fail_res;
                 }
                 else
                 {
-                    return tuple(
-                        true,
-                        (search_prev ? textchars[i-1]:textchars[i+1])
-                        );
+                    return (search_prev ? textchars[i-1]:textchars[i+1]);
                 }
             }
         }
         return fail_res;
     }
 
-    Tuple!(bool, TextChar) getNextCharInSubline(TextView text_view)
+    TextChar calcNextCharInSubline(TextView text_view)
     {
-        return getPrevCharInSubline(text_view, false);
+        return calcPrevCharInSubline(text_view, false);
     }
 
-    Tuple!(bool, TextChar) getPrevCharInLine(bool search_prev=true)
+    TextChar calcPrevCharInLine(bool search_prev=true)
     {
-        auto fail_res = tuple(false, cast(TextChar) null);
+        auto fail_res = cast(TextChar) null;
         auto textchars = parent_line.textchars;
         foreach (i, loc_chr ; textchars)
         {
             if (i==(search_prev ? 0 : textchars.length-1))
             {
-                return tuple(true, cast(TextChar) null);
+                return fail_res;
             }
             else
             {
-                return tuple(
-                    true,
-                    (search_prev ? textchars[i-1]:textchars[i+1])
-                    );
+                return (search_prev ? textchars[i-1]:textchars[i+1]);
             }
         }
         return fail_res;
     }
 
-    Tuple!(bool, TextChar) getNextCharInLine()
+    TextChar calcNextCharInLine()
     {
-        return getPrevCharInLine(false);
+        return calcPrevCharInLine(false);
     }
 }
 
@@ -612,32 +595,46 @@ class TextLineSubline
                 );
             case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
             case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                foreach (tc; state.textchars)
+            	if (state.textchars.length != 0)
+            	{
+            		foreach (tc; state.textchars)
+            		{
+            			auto tc_state = tc.getState(text_view);
+
+            			state.width += tc_state.resImg.width;
+
+            			{
+            				auto h = tc_state.resImg.height;
+            				if (h > state.height)
+            					state.height = h;
+            			}
+            		}
+                }
+                else
                 {
-                    auto tc_state = tc.getState(text_view);
-
-                    state.width += tc_state.resImg.width;
-
-                    {
-                        auto h = tc_state.resImg.height;
-                        if (h > state.height)
-                            state.height = h;
-                    }
+                	state.height = parent_line.parent_text.getFaceSize()/64;
                 }
                 break;
             case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
             case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                foreach (tc; state.textchars)
+            	if (state.textchars.length != 0)
+            	{
+            		foreach (tc; state.textchars)
+            		{
+            			auto tc_state = tc.getState(text_view);
+
+            			state.height += tc_state.resImg.height;
+
+            			{
+            				auto w = tc_state.resImg.width;
+            				if (w > state.width)
+            					state.width = w;
+            			}
+            		}
+                }
+                else
                 {
-                    auto tc_state = tc.getState(text_view);
-
-                    state.height += tc_state.resImg.height;
-
-                    {
-                        auto w = tc_state.resImg.width;
-                        if (w > state.width)
-                            state.width = w;
-                    }
+                	state.width = parent_line.parent_text.getFaceSize()/64;
                 }
                 break;
         }
@@ -774,6 +771,44 @@ class TextLineSubline
             }
         }
         throw new Exception("subline not found");
+    }
+
+    TextLineSubline calcNextSubline(TextView text_view, bool prev=false)
+    {
+    	auto line = calcLine();
+    	auto line_state = line.getState(text_view);
+    	auto line_sublines = line_state.sublines;
+    	auto line_index = calcLineIndex();
+    	auto subline_index = calcSublineIndex(text_view);
+    	auto lines = parent_line.parent_text.lines;
+
+    	TextLine new_line;
+    	TextLineSubline new_subline;
+
+    	if (subline_index == (prev ? 0 : line_sublines.length-1))
+    	{
+    		if (line_index == (prev ? 0 : lines.length-1))
+    		{
+    			return null;
+    		}
+    		else
+    		{
+    			(prev ? line_index--: line_index++);
+    			line = lines[line_index];
+    			line_sublines = line.getState(text_view).sublines;
+    			return line_sublines[(prev ? line_sublines.length -1 : 0)];
+    		}
+    	}
+    	else
+    	{
+    		(prev ? subline_index--: subline_index++);
+    		return line_sublines[subline_index];
+    	}
+    }
+
+    TextLineSubline calcPrevSubline(TextView text_view)
+    {
+    	return calcNextSubline(text_view, true);
     }
 
 }
@@ -1662,13 +1697,31 @@ class CursorPosition
     TextChar chr;
     TextLineSubline subline;
 
-    // this must be true if cursor is at the end of the subline.
-    bool atEOL;
+    bool atEOL()
+    {
+    	return chr is null;
+    }
 
-    // at end of visible line (if wrapping is disabled and EOL not in view) and
-    // cursor is after last visible char.
-    // this is needed for correct cursor drawing in this case.
-    bool atEOVL;
+    bool atEOVL(TextView text_view)
+    {
+    	if (atEOL())
+    		return true;
+
+    	auto next_chr = chr.calcNextCharInSubline(text_view);
+    	if (next_chr is null)
+    		return true;
+
+    	if (text_view.visibility_map is null)
+    		throw new Exception("text_view.visibility_map is null");
+
+    	foreach (v; text_view.visibility_map.elements)
+    	{
+    		if (v.chr == next_chr)
+    			return false;
+    	}
+
+    	return true;
+    }
 }
 
 enum TextViewMode
@@ -2241,8 +2294,8 @@ class TextView
                 writeln("null");
             else
                 writeln(cursor_pos.chr.chr);
-            writeln("    atEOL:", cursor_pos.atEOL);
-            writeln("   atEOVL:", cursor_pos.atEOVL);
+            writeln("    atEOL:", cursor_pos.atEOL());
+            writeln("   atEOVL:", cursor_pos.atEOVL(this));
         }
 
         auto fail_res = tuple(false, 0UL,0UL,0UL,0UL);
@@ -2257,61 +2310,61 @@ class TextView
 
         assert(cursor_pos.subline !is null, "cursor_pos.subline must never be null");
 
-        if (cursor_pos.atEOVL)
+        if (cursor_pos.atEOVL(this))
         {
-            ElementVisibilityMapElement last;
-            bool subline_started;
-            // bool subline_ended;
-            foreach (ve; visibility_map.elements)
-            {
-                auto ve_subline = ve.chr.calcSubline(this);
-                if (ve_subline == cursor_pos.subline)
-                {
-                    if (!subline_started)
-                    {
-                        subline_started = true;
-                    }
+        	ElementVisibilityMapElement last;
+        	bool subline_started;
+        	// bool subline_ended;
+        	foreach (ve; visibility_map.elements)
+        	{
+        		auto ve_subline = ve.chr.calcSubline(this);
+        		if (ve_subline == cursor_pos.subline)
+        		{
+        			if (!subline_started)
+        			{
+        				subline_started = true;
+        			}
 
-                    last = ve;
-                } else {
-                    if (subline_started)
-                    {
-                        // subline_ended = true;
-                        break;
-                    }
-                }
-            }
+        			last = ve;
+        		} else {
+        			if (subline_started)
+        			{
+        				// subline_ended = true;
+        				break;
+        			}
+        		}
+        	}
 
-            if (last is null)
-            {
-                debug writeln("calculateVisibleCursor: last is null");
-                return fail_res;
-            }
+        	if (last is null)
+        	{
+        		debug writeln("calculateVisibleCursor: last is null");
+        		return fail_res;
+        	}
 
-            final switch(text.getLineCharsLayout())
-            {
-            case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                x = last.target_x+last.width;
-                y = last.target_y;
-                width = 1;
-                height = last.height;
-                break;
-            case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                x = last.target_x;
-                y = last.target_y;
-                width = 1;
-                height = last.height;
-                break;
-            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-            case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                x = last.target_x;
-                y = last.target_y+last.height;
-                width = last.width;
-                height = 1;
-                break;
-            }
+        	final switch(text.getLineCharsLayout())
+        	{
+        	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+        		x = last.target_x+last.width;
+        		y = last.target_y;
+        		width = 1;
+        		height = last.height;
+        		break;
+        	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+        		x = last.target_x;
+        		y = last.target_y;
+        		width = 1;
+        		height = last.height;
+        		break;
+        	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+        	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+        		x = last.target_x;
+        		y = last.target_y+last.height;
+        		width = last.width;
+        		height = 1;
+        		break;
+        	}
 
-            return tuple(true, x,y,width,height);
+        	return tuple(true, x,y,width,height);
         }
 
         if (cursor_pos.chr is null)
@@ -2401,40 +2454,40 @@ class TextView
 
         if (after_clicked)
         {
-            if (el_clicked[5] is null)
+        	cp.chr = el_clicked[5];
+/*             if (el_clicked[5] is null)
             {
                 cp.chr = null;
-                cp.atEOL = true;
-                cp.atEOVL = true;
             }
             else
             {
-                if (el_clicked[6] !is null)
-                {
-                    cp.chr = el_clicked[6].chr;
-                    cp.atEOL = false;
-                    cp.atEOVL = false;
-                }
-                else
-                {
-                    cp.chr = el_clicked[6].chr;
-                    cp.atEOL = false;
-                    cp.atEOVL = true;
-                }
+            	cp.chr = el_clicked[5];
             }
-        }
+ */        }
         else
         {
             cp.chr=el_clicked[0].chr;
-            cp.atEOL = false;
-            cp.atEOVL = false;
         }
 
-        setNewCursorPosition(cp);
+        setCursorPosition(cp);
     }
 
-    void setNewCursorPosition(CursorPosition cp)
+    void setCursorPosition(CursorPosition cp)
     {
+    	debug {
+    		writeln("setCursorPosition");
+    		if (cp.chr !is null)
+    		{
+    			writeln("  chr : ", cp.chr, " ", cp.chr.chr);
+    		}
+    		else
+    		{
+    			writeln("  chr : null");
+    		}
+    		writeln("  EOL : ", cp.atEOL());
+    		writeln("  EOVL: ", cp.atEOVL(this));
+    	}
+
         foreach(v;cursor_positions)
         {
             clearCursor(v);
@@ -2496,20 +2549,9 @@ class TextView
 
                 res_element = v;
 
-                auto pc = v.chr.getPrevCharInSubline(this);
-                if (!pc[0])
-                {
-                    throw new Exception("programming error: report a bug");
-                }
-
-                auto nc = v.chr.getNextCharInSubline(this);
-                if (!nc[0])
-                {
-                    throw new Exception("programming error: report a bug");
-                }
-
-                prev_char = pc[1];
-                next_char = nc[1];
+                prev_char = v.chr.calcPrevCharInSubline(this);
+                next_char = v.chr.calcNextCharInSubline(this);
+                debug writeln("next_char == ", next_char);
 
                 prev_element = visibility_map.getElementByTextChar(prev_char);
                 next_element = visibility_map.getElementByTextChar(next_char);
@@ -2585,29 +2627,23 @@ class TextView
                 final switch(text.getLinesLayout())
                 {
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                    cursorMoveToNextOrToPrevChar(false);
-                    break;
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    cursorMoveToNextOrToPrevChar(false);
                     break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    cursorMoveToNextOrToPrevLine(false);
-                    break;
+                	cursorMoveToNextOrToPrevLine(true);
+                	break;
                 }
                 break;
             case EnumKeyboardKeyCode.Down:
                 final switch(text.getLinesLayout())
                 {
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                    cursorMoveToNextOrToPrevChar(true);
-                    break;
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    cursorMoveToNextOrToPrevChar(true);
                     break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    cursorMoveToNextOrToPrevLine(true);
+                	cursorMoveToNextOrToPrevLine(false);
                     break;
                 }
                 break;
@@ -2615,49 +2651,78 @@ class TextView
                 final switch(text.getLinesLayout())
                 {
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                    cursorMoveToNextOrToPrevLine(false);
                     break;
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    cursorMoveToNextOrToPrevLine(true);
                     break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-                    cursorMoveToNextOrToPrevChar(false);
-                    break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    cursorMoveToNextOrToPrevChar(true);
-                    break;
+                	final switch(text.getLineCharsLayout())
+                	{
+                	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                		cursorMoveToNextOrToPrevChar(true);
+                		break;
+                	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                		cursorMoveToNextOrToPrevChar(false);
+                		break;
+                	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                		break;
+                	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                		break;
+                	}
+                	break;
                 }
                 break;
             case EnumKeyboardKeyCode.Right:
                 final switch(text.getLinesLayout())
                 {
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                    cursorMoveToNextOrToPrevLine(true);
                     break;
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    cursorMoveToNextOrToPrevLine(false);
                     break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-                    cursorMoveToNextOrToPrevChar(true);
-                    break;
                 case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    cursorMoveToNextOrToPrevChar(false);
-                    break;
+                	final switch(text.getLineCharsLayout())
+                	{
+                	case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+                		cursorMoveToNextOrToPrevChar(false);
+                		break;
+                	case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+                		cursorMoveToNextOrToPrevChar(true);
+                		break;
+                	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+                		break;
+                	case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+                		break;
+                	}
+                	break;
                 }
                 break;
             }
         }
     }
 
-    void cursorMoveToNextOrToPrevLine(bool next)
+    void resetCursorPosition()
     {
+    	auto cp = new CursorPosition();
+    	cp.subline = text.lines[0].getState(this).sublines[0];
+    	auto textchars = cp.subline.getState(this).textchars;
+    	if (textchars.length != 0)
+    	{
+    		cp.chr = textchars[0];
+    	}
+    	setCursorPosition(cp);
+    }
+
+    void cursorMoveToNextOrToPrevLine(bool prev)
+    {
+    	debug writeln("cursorMoveToNextOrToPrevLine: ", prev);
         auto cursor = getCursorPosition();
 
-        /*      if (cursor.chr is null)
-        {
-        debug writeln("cursorMoveToNextOrToPrevLine: cursor.chr is null");
-        return;
-        } */
+        if (cursor is null)
+    	{
+    		resetCursorPosition();
+    		return;
+    	}
 
         TextLine cursor_line;
         ulong cursor_line_index;
@@ -2725,9 +2790,9 @@ class TextView
 
         TextLineSubline new_subline;
 
-        if (cursor_subline_index == (next ? cursor_line_subline_count-1 : 0))
+        if (cursor_subline_index == (prev ? 0 : cursor_line_subline_count-1))
         {
-            if (cursor_line_index == (next ? text.lines.length-1 : 0))
+            if (cursor_line_index == (prev ?  0 : text.lines.length-1))
             {
                 // do nothing
                 // TODO: maybe this should move cursor to start or to end of
@@ -2737,15 +2802,15 @@ class TextView
             else
             {
                 TextLine new_line;
-                new_line = text.lines[cursor_line_index+(next ? 1 : -1)];
+                new_line = text.lines[cursor_line_index+(prev ? -1 : +1)];
                 auto new_line_sublines = new_line.getState(this).sublines;
-                new_subline = new_line_sublines[(next ? 0 : new_line_sublines.length -1)];
+                new_subline = new_line_sublines[(prev ? new_line_sublines.length -1 : 0 )];
             }
         }
         else
         {
             new_subline =
-            cursor_line.getState(this).sublines[cursor_subline_index+(next ? 1 : -1)];
+            cursor_line.getState(this).sublines[cursor_subline_index+(prev ? -1 : +1)];
         }
 
         TextChar new_char;
@@ -2793,16 +2858,94 @@ class TextView
 
         CursorPosition cp = new CursorPosition();
         cp.chr = new_char;
-        cp.atEOL = new_atEOL;
-        cp.atEOVL = new_atEOVL;
         cp.subline = new_subline;
 
-        setNewCursorPosition(cp);
+        setCursorPosition(cp);
     }
 
-    void cursorMoveToNextOrToPrevChar(bool next)
+    void cursorMoveToNextOrToPrevChar(bool prev)
     {
-
+    	debug writeln("cursorMoveToNextOrToPrevChar: ", prev);
+    	auto cp = getCursorPosition();
+    	if (cp is null)
+    	{
+    		resetCursorPosition();
+    		return;
+    	}
+    	auto subline = cp.subline;
+    	auto new_cp = new CursorPosition();
+    	if (cp.chr is null)
+    	{
+    		if (!prev)
+    		{
+    			auto new_subline = subline.calcNextSubline(this);
+    			if (new_subline is null)
+    			{
+    				return;
+    			}
+    			auto new_subline_textchars = new_subline.getState(this).textchars;
+    			new_cp.subline = new_subline;
+    			if (new_subline_textchars.length != 0)
+    			{
+    				new_cp.chr = new_subline_textchars[0];
+    			}
+    			setCursorPosition(new_cp);
+    			return;
+    		}
+    		else
+    		{
+    			auto subline_textchars = subline.getState(this).textchars;
+    			if (subline_textchars.length != 0)
+    			{
+    				new_cp.subline = subline;
+    				new_cp.chr = subline_textchars[$-1];
+    			}
+    			else
+    			{
+    				auto new_subline = subline.calcPrevSubline(this);
+    				new_cp.subline = new_subline;
+    			}
+    			setCursorPosition(new_cp);
+    			return;
+    		}
+    	}
+    	else
+    	{
+    		ulong chr_index = cp.chr.calcSublineColumnIndex(this);
+    		auto subline_textchars = subline.getState(this).textchars;
+    		if (!prev)
+    		{
+    			if (chr_index == subline_textchars.length-1)
+    			{
+    				new_cp.subline = subline;
+    				setCursorPosition(new_cp);
+    				return;
+    			}
+    			else
+    			{
+    				new_cp.subline = subline;
+    				new_cp.chr = subline_textchars[chr_index+1];
+    				setCursorPosition(new_cp);
+    				return;
+    			}
+    		}
+    		else
+    		{
+    			if (chr_index == 0)
+    			{
+    				new_cp.subline = subline.calcPrevSubline(this);
+    				setCursorPosition(new_cp);
+    				return;
+    			}
+    			else
+    			{
+    				new_cp.subline = subline;
+    				new_cp.chr = subline_textchars[chr_index-1];
+    				setCursorPosition(new_cp);
+    				return;
+    			}
+    		}
+    	}
     }
 
     CursorPosition getCursorPosition()
@@ -2852,12 +2995,6 @@ class ElementVisibilityMapElement
 {
     ElementVisibilityMap map;
     TextChar chr;
-
-    // ulong line;
-    // ulong column;
-
-    // end of visible line
-    // bool eovl;
 
     ulong target_x;
     ulong target_y;
