@@ -26,18 +26,7 @@ enum LayoutOverflowBehavior
     Resize, // resize self to fit everything
 }
 
-enum LayoutDirections : ubyte
-{
-    undefined,
-    leftToRightTopToBottom,
-    leftToRightBottomToTop,
-    topToBottomLeftToRight,
-    topToBottomRightToLeft,
-    rightToLeftTopToBottom,
-    rightToLeftBottomToTop,
-    bottomToTopLeftToRight,
-    bottomToTopRightToLeft,
-}
+
 
 enum LayoutType : ubyte
 {
@@ -46,58 +35,80 @@ enum LayoutType : ubyte
     linearWrapped,
 }
 
+class LayoutChild
+{
+	ContainerableWidgetI widget;
+	bool expand;
+	bool fill;
+	// float halign;
+	// float valign;
+}
+
 /++
 
-    new layouts can be implimented by inheriting Layout and overriding functions
-    such as positionAndSizeRequest() and redraw().
+new layouts can be implimented by inheriting Layout and overriding functions
+such as positionAndSizeRequest() and redraw().
 
-    NOTE: Layout should not do any changes to any positions and sizes of it's
-    own children.
+NOTE: Layout should not do any changes to any positions and sizes of it's
+own children.
 
 +/
 class Layout : Widget, ContainerableWidgetI
 {
-
+	
     private
     {
-        ContainerableWidgetI[] children;
-
-        mixin Property_gs_w_d!(LayoutOverflowBehavior,
-                "vertical_overflow_behavior", LayoutOverflowBehavior.Resize);
-        mixin Property_gs_w_d!(LayoutOverflowBehavior,
-                "horizontal_overflow_behavior", LayoutOverflowBehavior.Resize);
+        LayoutChild[] children;
+        
+        mixin Property_gs_w_d!(
+        	LayoutOverflowBehavior,
+        	"vertical_overflow_behavior", 
+        	LayoutOverflowBehavior.Resize
+        	);
+        
+        mixin Property_gs_w_d!(
+        	LayoutOverflowBehavior,
+        	"horizontal_overflow_behavior", 
+        	LayoutOverflowBehavior.Resize
+        	);
     }
-
-    mixin Property_forwarding!(LayoutOverflowBehavior,
-            vertical_overflow_behavior, "VerticalOverflowBehavior");
-    mixin Property_forwarding!(LayoutOverflowBehavior,
-            vertical_overflow_behavior, "HorizontalOverflowBehavior");
-
+    
+    mixin Property_forwarding!(
+    	LayoutOverflowBehavior,
+    	vertical_overflow_behavior, 
+    	"VerticalOverflowBehavior"
+    	);
+    mixin Property_forwarding!(
+    	LayoutOverflowBehavior,
+    	vertical_overflow_behavior, 
+    	"HorizontalOverflowBehavior"
+    	);
+    
     final ContainerableWidgetI[] getChildren()
     {
         return children;
     }
-
+    
     final size_t getChildrenCount()
     {
         return children.length;
     }
-
+    
     final WidgetI getChildByIndex(size_t index)
     {
         return children[index];
     }
-
+    
     final void removeChild(size_t index)
     {
         children = children[index .. index + 1];
     }
-
+    
     final void removeChild(ContainerableWidgetI widget)
     {
         assert(false, "todo");
     }
-
+    
     final void packStart(ContainerableWidgetI widget, bool expand, bool fill)
     {
         if (!children.canFind(widget))
@@ -109,7 +120,7 @@ class Layout : Widget, ContainerableWidgetI
             WidgetX.setParent(this);
         }
     }
-
+    
     final void packEnd(ContainerableWidgetI widget, bool expand, bool fill)
     {
         if (!children.canFind(widget))
@@ -121,13 +132,13 @@ class Layout : Widget, ContainerableWidgetI
             WidgetX.setParent(this);
         }
     }
-
+    
     override void positionAndSizeRequest(Position2D position, Size2D size)
     {
         super.positionAndSizeRequest(position, size);
         this.recalculateChildrenPositionsAndSizes();
     }
-
+    
     override void recalculateChildrenPositionsAndSizes()
     {
         foreach (size_t counter, v; children)
@@ -135,20 +146,20 @@ class Layout : Widget, ContainerableWidgetI
             v.recalculateChildrenPositionsAndSizes();
         }
     }
-
+    
     override void redraw()
     {
-
+    	
         super.redraw();
-
+        
         this.redraw_x(this);
         
-
+        
         foreach (size_t i, v; children)
         {
             v.redraw();
         }
     }
-
+    
     mixin mixin_getWidgetAtPosition;
 }

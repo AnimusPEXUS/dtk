@@ -266,6 +266,8 @@ class TextCharViewState
 
 class TextChar
 {
+	// TODO: probably this should be replaced with function which throws if line
+	//       isn't in text.lines
     TextLine parent_line;
 
     dchar chr;
@@ -550,6 +552,7 @@ class TextLineSublineViewState
     TextChar[] textchars;
     ulong width;
     ulong height;
+    // TextChar prev_char;
 }
 
 // NOTE: this is needed, because each subline can have it's own perpendicular
@@ -811,6 +814,61 @@ class TextLineSubline
     	return calcNextSubline(text_view, true);
     }
 
+    // TextChar getPrevChar(TextView text_view)
+    // {
+    // auto state = getState(text_view);
+    // return state.prev_char();
+    // }
+    
+    TextChar calcCharBeforeEOVL(TextView text_view, bool across_line=false)
+    {    	
+    	auto subline = this;
+    	auto subline_state = subline.getState(text_view);
+    	auto subline_textchars = subline_state.textchars;
+    	
+    	continue_search:
+    	while (true)
+    	{
+    		if (subline_textchars.length != 0)
+    		{
+    			return subline_textchars[$-1];
+    		}
+    		subline = subline.calcPrevSubline(text_view);
+    		if (subline is null)
+    		{
+    			break;
+    		}
+    		subline_state = subline.getState(text_view);
+    		subline_textchars = subline_state.textchars;
+    	}
+    	
+    	if (across_line)
+    	{
+    		auto line = subline.calcLine().calcPrevLine();
+    		if (line is null) {
+    			return null;
+    		}
+    		subline = line.getState(text_view).sublines[$-1];
+    		subline_state =  subline.getState(text_view);
+    		subline_textchars = subline_state.textchars;
+    		
+    		goto continue_search;
+    	}
+    	
+    	return null;
+    }
+    
+    // TextChar calcNextCharInLine(TextView text_view)
+    // {
+    	// auto line = calcLine();
+    	// auto line_sublines = line.getState(text_view).sublines;
+    	// auto subline_index = calcSublineIndex(text_view);
+    	// if (subline_index == line_sublines.length-1)
+    	// {
+    		// return null;
+    	// }
+    	// return line_sublines();
+    // }
 }
 
 // NOTE: TextLine have it's own contextual status, because in text wrap mode
@@ -969,11 +1027,13 @@ class TextLine
             if ((text_view.getVirtualWrapBySpace()
                 || text_view.getVirtualWrapByChar())
                 && required_size <= current_size + s)
-            {
+            { // TODO: at least 1 char should be in subline before wrapping
+            	TextChar prev_char=state.sublines[$-1].getState(text_view).textchars[$-1];
                 state.sublines ~= new TextLineSubline(this);
                 current_line++;
                 sl = state.sublines[current_line];
                 sl_state = sl.getState(text_view);
+                // sl_state.prev_char=prev_char;
                 current_size = s;
             }
             else
@@ -1145,6 +1205,44 @@ class TextLine
     {
         auto state = getState(text_view);
         return state.sublines.length;
+    }
+
+    ulong calcLineIndex()
+    {
+    	foreach (ulong i, v; parent_text.lines)
+    	{
+    		if (v == this)
+    		{
+    			return i;
+    		}
+    	}
+    	throw new Exception("this line is not in text's lines");
+    }
+
+    TextLine calcNextLine(bool prev=false)
+    {
+    	auto line_index = calcLineIndex();
+    	if (line_index == (prev ? 0 : parent_text.lines.length-1))
+    	{
+    		return null;
+    	}
+    	else
+    	{
+    		return parent_text.lines[(prev ? line_index-1 : line_index+1)];
+    	}
+    }
+
+    TextLine calcPrevLine()
+    {
+    	return calcNextLine(true);
+    }
+
+    CursorPosition makeEOLCursor(TextView text_view)
+    {
+    	auto state = getState(text_view);
+    	auto new_cursor = new CursorPosition();
+    	new_cursor.subline = state.sublines[$-1];
+    	return new_cursor;
     }
 
 }
@@ -1689,6 +1787,15 @@ class Text
         .getState(text_view).textchars[column];
     }
 
+    // void concatLines(TextLine line_to_stay, TextLine line_to_delete)
+    // {
+    // }
+
+    void deleteLine(TextLine line)
+    {
+    	auto line_index = line.calcLineIndex();
+    	lines = lines[0 .. line_index] ~ lines[line_index+1 .. $];
+    }
 }
 
 class CursorPosition
@@ -1709,7 +1816,10 @@ class CursorPosition
 
     	auto next_chr = chr.calcNextCharInSubline(text_view);
     	if (next_chr is null)
-    		return true;
+    	{
+    		// debug writeln("no more chars in subline");
+    		return false;
+    	}
 
     	if (text_view.visibility_map is null)
     		throw new Exception("text_view.visibility_map is null");
@@ -1719,6 +1829,8 @@ class CursorPosition
     		if (v.chr == next_chr)
     			return false;
     	}
+
+    	debug writeln("chr ", next_chr.chr, " is not in visibility map");
 
     	return true;
     }
@@ -1793,6 +1905,7 @@ class TextView
     SignalConnectionContainer con_cont;
 
     SignalConnection timer500_signal_connection;
+    ubyte skip_cursor_clears;
 
     this()
     {
@@ -1884,7 +1997,7 @@ class TextView
         return getPlatform().getFontManager();
     }
 
-    Image getRenderedImage()
+    void reprocess()
     {
         if (linesRecalcRequired)
         {
@@ -1905,11 +2018,15 @@ class TextView
         {
             genImage();
         }
+    }
 
+    Image getRenderedImage()
+    {
+    	reprocess();
         return _rendered_image;
     }
 
-    void fullRedrawToDS()
+    void completeRedrawToDS()
     {
         ulong x;
         ulong y;
@@ -2175,6 +2292,12 @@ class TextView
     {
         timer500ms_handle_cursor();
     }
+    
+    void cursorMakeLongerVisible()
+    {
+    	skip_cursor_clears = 3;
+    	cursor_animation_iteration_visible = true;
+    }
 
     void timer500ms_handle_cursor()
     {
@@ -2198,15 +2321,25 @@ class TextView
 
         force_clear:
         cursor_animation_iteration_visible = false;
-
+        
         normal_work:
-
-
-        if (cursor_animation_iteration_visible)
-            timer500ms_handle_cursor_draw_operation(false);
+        
+        if (skip_cursor_clears > 0)
+        {
+        	timer500ms_handle_cursor_draw_operation(false);
+        	skip_cursor_clears--;
+        }
         else
-            timer500ms_handle_cursor_draw_operation(true);
-
+        {
+        	if (cursor_animation_iteration_visible)
+        	{
+        		timer500ms_handle_cursor_draw_operation(true);
+        	}
+        	else {
+        		timer500ms_handle_cursor_draw_operation(false);
+        	}
+        }
+        
         cursor_animation_iteration_visible =
         !cursor_animation_iteration_visible;
 
@@ -2455,15 +2588,15 @@ class TextView
         if (after_clicked)
         {
         	cp.chr = el_clicked[5];
-/*             if (el_clicked[5] is null)
+        	/*             if (el_clicked[5] is null)
             {
-                cp.chr = null;
+            cp.chr = null;
             }
             else
             {
-            	cp.chr = el_clicked[5];
+            cp.chr = el_clicked[5];
             }
- */        }
+        */        }
         else
         {
             cp.chr=el_clicked[0].chr;
@@ -2490,7 +2623,7 @@ class TextView
 
         foreach(v;cursor_positions)
         {
-            clearCursor(v);
+            collectException(clearCursor(v));
         }
 
         cursor_positions=cursor_positions[0 .. 0] ~ cp;
@@ -2582,22 +2715,27 @@ class TextView
 
     void textInput(dstring txt)
     {
-        linesRecalcRequired = true;
-
         auto cp = getCursorPosition();
 
-        if (cp.chr is null)
+        if (cp is null)
         {
-            debug writeln("cp.chr is null");
+            debug writeln(new Exception("cp is null"));
             return;
         }
 
+        auto cp_chr = cp.chr;
         TextLine line;
         ulong index;
-        {
+        bool atEOVL=cp.atEOVL(this);
+
+        if (cp.chr !is null) {
             auto res = cp.chr.calcLineAndColumnIndex();
             line = res[0];
             index = res[1];
+        }
+        else
+        {
+        	// TOOD: what's should behere?
         }
 
         TextChar[] new_chars;
@@ -2612,12 +2750,24 @@ class TextView
         line.textchars = line.textchars[0 .. index]
         ~ new_chars
         ~ line.textchars[index .. $];
+
+        linesRecalcRequired = true;
+        reprocess();
+        completeRedrawToDS();
+
+        auto new_cp = new CursorPosition();
+        new_cp.chr = cp_chr;
+        new_cp.subline = cp_chr.calcSubline(this);
+        setCursorPosition(new_cp);
     }
 
     void keyboardInput(string type, EventKeyboard* event)
-    {
+    { 
+    	// TODO: reproces() and redrawing usage have to be smarter
+    	// TODO: this function obviously requires optimizations
         if (event.key_state == EnumKeyboardKeyState.pressed)
         {
+        	cursorMakeLongerVisible();
 
             switch (event.keysym.keycode)
             {
@@ -2634,7 +2784,7 @@ class TextView
                 	cursorMoveToNextOrToPrevLine(true);
                 	break;
                 }
-                break;
+                return;
             case EnumKeyboardKeyCode.Down:
                 final switch(text.getLinesLayout())
                 {
@@ -2646,7 +2796,7 @@ class TextView
                 	cursorMoveToNextOrToPrevLine(false);
                     break;
                 }
-                break;
+                return;
             case EnumKeyboardKeyCode.Left:
                 final switch(text.getLinesLayout())
                 {
@@ -2671,7 +2821,7 @@ class TextView
                 	}
                 	break;
                 }
-                break;
+                return;
             case EnumKeyboardKeyCode.Right:
                 final switch(text.getLinesLayout())
                 {
@@ -2696,7 +2846,204 @@ class TextView
                 	}
                 	break;
                 }
-                break;
+                return;
+            }
+
+            if (event.keysym.keycode == EnumKeyboardKeyCode.BackSpace)
+            {
+            	auto cp = getCursorPosition();
+            	if (cp.chr !is null)
+            	{
+            		TextLine line;
+            		ulong line_column_index;
+            		{
+            			auto line_and_column_index = cp.chr.calcLineAndColumnIndex();
+            			line = line_and_column_index[0];
+            			line_column_index = line_and_column_index[1];
+            		}
+
+            		if (line_column_index == 0)
+            		{
+            			auto line_index = line.calcLineIndex();
+            			auto prev_line = line.calcPrevLine();
+            			if (prev_line !is null)
+            			{
+            				prev_line.textchars ~= line.textchars;
+            				text.lines =
+            				text.lines[0 .. line_index]
+            				~ text.lines[line_index+1 .. $];
+            				
+            				foreach (v; prev_line.textchars)
+            				{
+            					v.parent_line = prev_line;
+            				}
+            			} else {
+            				return;
+            			}
+            		}
+            		else
+            		{
+            			line.textchars = line.textchars[0 .. line_column_index-1]
+            			~ line.textchars[line_column_index .. $];
+            		}
+
+            		linesRecalcRequired = true;
+            		reprocess();
+            		completeRedrawToDS();
+
+            		auto new_cp = new CursorPosition();
+            		new_cp.chr = cp.chr;
+            		new_cp.subline = cp.chr.calcSubline(this);
+            		setCursorPosition(new_cp);            		
+            		return;
+
+            	}
+            	else
+            	{
+            		auto line = cp.subline.calcLine();
+            		auto line_textchars = line.textchars;
+
+            		if (line_textchars.length == 0)
+            		{
+            			auto prev_line = line.calcPrevLine();
+            			if (prev_line is null)
+            			{
+            				return;
+            			}
+
+            			text.deleteLine(line);
+
+            			linesRecalcRequired = true;
+            			reprocess();
+            			completeRedrawToDS();
+
+            			setCursorPosition(prev_line.makeEOLCursor(this));
+
+            			return;
+            		} else {
+            			auto line_column = cp.chr.calcLineColumnIndex();
+            			line.textchars = line_textchars[0 .. line_column-1]
+            			~ line_textchars[line_column .. $];
+
+            			linesRecalcRequired = true;
+            			reprocess();
+            			completeRedrawToDS();
+
+            			auto new_cp = new CursorPosition();
+            			new_cp.chr = cp.chr;
+            			new_cp.subline = cp.chr.calcSubline(this);
+            			setCursorPosition(new_cp);
+            			return;
+            		}
+
+            	}
+            }
+
+            if (event.keysym.keycode == EnumKeyboardKeyCode.Delete)
+            {
+            	auto cp = getCursorPosition();
+            	if (cp.chr !is null)
+            	{
+            		TextLine line;
+            		ulong    line_column_index;         		
+            		{
+            			auto line_and_index = cp.chr.calcLineAndColumnIndex();
+            			line = line_and_index[0];
+            			line_column_index = line_and_index[1];
+            		}
+            		
+            		if (line_column_index == line.textchars.length-1)
+            		{
+            			line.textchars = line.textchars[0..line_column_index];
+            			
+            			linesRecalcRequired = true;
+            			reprocess();
+            			completeRedrawToDS();
+            			
+            			auto new_cp = new CursorPosition();
+            			if (line.textchars.length != 0)
+            			{
+            				new_cp.subline = line.textchars[$-1].calcSubline(this);
+            			} 
+            			else 
+            			{
+            				new_cp.subline = line.getState(this).sublines[0];
+            			}
+            			setCursorPosition(new_cp);
+            			
+            			return;
+            		}
+            		else
+            		{
+            			auto new_chr = line.textchars[line_column_index+1];
+            			
+            			line.textchars = line.textchars[0..line_column_index]
+            			~ line.textchars[line_column_index+1 .. $];
+            			
+            			linesRecalcRequired = true;
+            			reprocess();
+            			completeRedrawToDS();
+            			
+            			auto new_cp = new CursorPosition();
+            			new_cp.chr = new_chr;
+            			new_cp.subline = new_chr.calcSubline(this);
+            			setCursorPosition(new_cp);
+            			
+            			return;
+            		}
+            	}
+            	else
+            	{
+            		TextLine line = cp.subline.calcLine();
+					ulong line_index = line.calcLineIndex();
+            		if (line_index == text.lines.length-1) {
+            			return;
+            		}
+            		
+            		auto next_line_index = line_index+1;
+            		auto next_line =text.lines[next_line_index];
+            		auto next_line_textchars=next_line.textchars;
+            		
+            		foreach(v; next_line_textchars)
+            		{
+            			v.parent_line= line;
+            		}
+            		
+            		TextChar next_line_first_char;
+            		if (next_line_textchars.length != 0)
+            		{
+            			next_line_first_char = next_line_textchars[0];
+            		}
+            		
+            		line.textchars ~= next_line_textchars;
+            		
+           			text.deleteLine(text.lines[next_line_index]);
+            		
+            		linesRecalcRequired = true;
+            		reprocess();
+            		completeRedrawToDS();
+            		
+            		auto new_cp = new CursorPosition();
+            		
+            		if (next_line_first_char !is null)
+            		{
+            			new_cp.chr = next_line_first_char;
+            			new_cp.subline = new_cp.chr.calcSubline(this);
+            		} else {
+            			new_cp.subline = cp.subline;
+            		}
+            		
+            		setCursorPosition(new_cp);
+            		
+            		return;
+            	}
+            	
+            }
+
+            if (event.keysym.keycode == EnumKeyboardKeyCode.Return)
+            {
+            	
+            	return;
             }
         }
     }
@@ -2933,7 +3280,10 @@ class TextView
     		{
     			if (chr_index == 0)
     			{
-    				new_cp.subline = subline.calcPrevSubline(this);
+    				auto new_subline = subline.calcPrevSubline(this);
+    				if (new_subline is null)
+    					return;
+    				new_cp.subline = new_subline;
     				setCursorPosition(new_cp);
     				return;
     			}

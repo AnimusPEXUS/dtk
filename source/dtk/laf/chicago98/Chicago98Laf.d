@@ -334,7 +334,7 @@ class Chicago98Laf : LafI
         
         if (widget.text_view !is null)
         {
-        	widget.text_view.fullRedrawToDS();        	
+        	widget.text_view.completeRedrawToDS();        	
         }
     }
     
