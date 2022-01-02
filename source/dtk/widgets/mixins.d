@@ -2,7 +2,7 @@ module dtk.widgets.mixins;
 
 import std.stdio;
 
-import dtk.widgets;
+// import dtk.widgets;
 
 mixin template mixin_getWidgetAtPosition()
 {

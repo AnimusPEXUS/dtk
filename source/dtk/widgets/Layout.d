@@ -8,14 +8,16 @@ import std.typecons;
 import std.array;
 
 import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.FormI;
+import dtk.interfaces.WidgetI;
+import dtk.interfaces.LayoutI;
+
+
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
 
-import dtk.interfaces.FormI;
-import dtk.interfaces.WidgetI;
-
-import dtk.widgets;
+import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
 enum LayoutOverflowBehavior
@@ -38,10 +40,36 @@ enum LayoutType : ubyte
 class LayoutChild
 {
 	ContainerableWidgetI widget;
-	bool expand;
-	bool fill;
 	// float halign;
 	// float valign;
+	
+    mixin mixin_install_multiple_properties!(
+        cast(PropSetting[])
+        [
+        // X, Y, Width and Height is for storring real effective values
+        // users should not change those unless Layout is set to use
+        // free positioning for widgets.
+        PropSetting("gs_w_d", "ulong", "x", "X", "0"),
+        PropSetting("gs_w_d", "ulong", "y", "Y", "0"),
+        PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
+        PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
+        
+        // CA stends for 'Child Asks'. through this properties, 
+        // child widget can ask certain desirable settings for it,
+        // but Layout can ignore those if it need so. Child can leave 
+        // those properties unset if it not doesn't have need for them
+        PropSetting("gsu", "ulong", "ca_x", "CAX", "0"),
+        PropSetting("gsu", "ulong", "ca_y", "CAY", "0"),
+        PropSetting("gsu", "ulong", "ca_width", "CAWidth", "0"),
+        PropSetting("gsu", "ulong", "ca_height", "CAHeight", "0"),
+        
+        PropSetting("gs_w_d", "bool", "ca_hfill", "CAHFill", "false"),
+        PropSetting("gs_w_d", "bool", "ca_vfill", "CAVFill", "false"),
+        
+        PropSetting("gs_w_d", "bool", "ca_hexpand", "CAHExpand", "false"),
+        PropSetting("gs_w_d", "bool", "ca_vexpand", "CAVExpand", "false"),
+        ]
+        );	
 }
 
 /++
@@ -53,12 +81,17 @@ NOTE: Layout should not do any changes to any positions and sizes of it's
 own children.
 
 +/
-class Layout : Widget, ContainerableWidgetI
+class Layout : Widget, ContainerableWidgetI, LayoutI
 {
+
+    // children field is public and is a normal array. you can use it to
+    // add, remove or rearrange layout's children. checkChildren() method is 
+    // needed to be called after you've done what you wanted with children 
+    // array.
+    LayoutChild[] children;
 	
     private
     {
-        LayoutChild[] children;
         
         mixin Property_gs_w_d!(
         	LayoutOverflowBehavior,
@@ -84,53 +117,32 @@ class Layout : Widget, ContainerableWidgetI
     	"HorizontalOverflowBehavior"
     	);
     
-    final ContainerableWidgetI[] getChildren()
+    void checkChildren()
     {
-        return children;
+    	foreach_reverse (i, v; children)
+    	{
+    		if (v.widget is null)
+    		{
+    			children = children[0 .. i] ~ children[i+1 .. $];
+    			continue;
+    		}
+    		if (v.widget.getParent() != this)
+    		{
+    			v.widget.setParent(this);
+    		}
+    	}
     }
     
-    final size_t getChildrenCount()
+    LayoutChildI getLayoutChildByWidget(ContainerableWidgetI widget)
     {
-        return children.length;
-    }
-    
-    final WidgetI getChildByIndex(size_t index)
-    {
-        return children[index];
-    }
-    
-    final void removeChild(size_t index)
-    {
-        children = children[index .. index + 1];
-    }
-    
-    final void removeChild(ContainerableWidgetI widget)
-    {
-        assert(false, "todo");
-    }
-    
-    final void packStart(ContainerableWidgetI widget, bool expand, bool fill)
-    {
-        if (!children.canFind(widget))
-        {
-            children = children ~ widget;
-            auto WidgetX = cast(Widget) widget;
-            // WidgetX.setExpand(expand);
-            // WidgetX.setFill(fill);
-            WidgetX.setParent(this);
-        }
-    }
-    
-    final void packEnd(ContainerableWidgetI widget, bool expand, bool fill)
-    {
-        if (!children.canFind(widget))
-        {
-            children = widget ~ children;
-            auto WidgetX = cast(Widget) widget;
-            // WidgetX.setExpand(expand);
-            // WidgetX.setFill(fill);
-            WidgetX.setParent(this);
-        }
+    	foreach (v; children)
+    	{
+    		if (v.widget == widget)
+    		{
+    			return v;
+    		}
+    	}
+    	return null;
     }
     
     override void positionAndSizeRequest(Position2D position, Size2D size)

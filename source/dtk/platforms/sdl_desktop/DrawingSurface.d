@@ -35,7 +35,7 @@ class DrawingSurface : DrawingSurfaceI
 
     void drawDot(Position2D pos, ImageDot dot)
     {
-        auto rndr = SDL_GetRenderer(w._sdl_window);
+        auto rndr = SDL_GetRenderer(w.sdl_window);
         SDL_SetRenderDrawColor(
             rndr,
             dot.color.r,

@@ -5,7 +5,7 @@ module dtk.miscs.RadioGroup;
 import std.stdio;
 import std.typecons;
 
-import dtk.widgets;
+import dtk.widgets.ButtonRadio;
 
 class RadioGroup
 {

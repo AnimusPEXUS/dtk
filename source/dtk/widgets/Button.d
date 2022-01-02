@@ -17,7 +17,7 @@ import dtk.interfaces.FormI;
 import dtk.types.Size2D;
 import dtk.types.EventMouse;
 
-import dtk.widgets;
+import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
 /// Button class

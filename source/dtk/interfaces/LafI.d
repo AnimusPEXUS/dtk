@@ -5,7 +5,17 @@ import dtk.interfaces.WindowEventMgrI;
 
 import dtk.types.Image;
 
-import dtk.widgets;
+import dtk.widgets.Form;
+import dtk.widgets.Button;
+import dtk.widgets.ButtonRadio;
+import dtk.widgets.ButtonCheck;
+// import dtk.widgets.Image;
+import dtk.widgets.Layout;
+import dtk.widgets.Menu;
+import dtk.widgets.MenuItem;
+import dtk.widgets.Bar;
+import dtk.widgets.ScrollBar;
+import dtk.widgets.TextEntry;
 
 interface LafI
 {

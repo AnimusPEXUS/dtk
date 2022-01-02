@@ -5,7 +5,7 @@ import std.stdio;
 import dtk.types.EventMouse;
 import dtk.types.Property;
 
-import dtk.widgets;
+import dtk.widgets.Button;
 
 class ButtonCheck : Button
 {

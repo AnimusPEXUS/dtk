@@ -25,7 +25,18 @@ import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.WindowEventMgrI;
 
-import dtk.widgets;
+import dtk.widgets.Form;
+import dtk.widgets.Button;
+import dtk.widgets.ButtonCheck;
+import dtk.widgets.ButtonRadio;
+import dtk.widgets.Layout;
+import dtk.widgets.Menu;
+import dtk.widgets.MenuItem;
+import dtk.widgets.Bar;
+import dtk.widgets.ScrollBar;
+import dtk.widgets.TextEntry;
+
+// TODO: deprecate Position2D and Size2D and pass values directly
 
 const
 {
@@ -83,11 +94,14 @@ class Chicago98Laf : LafI
     	
         auto ds = widget.getDrawingSurface();
         
-        auto pos = widget.getPosition();
-        auto size = widget.getSize();
+        // auto pos = widget.getPosition();
+        auto pos_x = cast(int) widget.getX();
+        auto pos_y = cast(int) widget.getY();
+        auto size_w = cast(int) widget.getWidth();
+        auto size_h = cast(int) widget.getHeight();
         ds.drawRectangle(
-        	pos, 
-        	size, 
+        	Position2D(pos_x, pos_y), 
+        	Size2D(size_w, size_h), 
         	LineStyle(formBackground), 
         	LineStyle(formBackground),
         	LineStyle(formBackground), 
@@ -117,30 +131,32 @@ class Chicago98Laf : LafI
         
         auto ds = widget.getDrawingSurface();
         
-        auto pos = Position2D(0, 0);
-        auto size = widget.getSize();
+        auto pos_x = cast(int) widget.getX();
+        auto pos_y = cast(int) widget.getY();
+        auto size_w = cast(int) widget.getWidth();
+        auto size_h = cast(int) widget.getHeight();
         
         if (is_default)
         {
             ds.drawRectangle(
-            	pos, 
-            	size, 
+            	Position2D(pos_x, pos_y),
+            	Size2D(size_w, size_h), 
             	LineStyle(Color(0)), 
             	Nullable!FillStyle()
             	);
-            pos.x++;
-            pos.y++;
-            size.width -= 2;
-            size.height -= 2;
+            pos_x++;
+            pos_y++;
+            size_w -= 2;
+            size_h -= 2;
         }
         
-        drawBewel(ds, pos, size, is_down);
+        drawBewel(ds, Position2D(pos_x, pos_y), Size2D(size_w, size_h),  is_down);
         
         ds.drawRectangle(
-        	Position2D(pos.x + 2, pos.y + 2), 
+        	Position2D(pos_x + 2, pos_y + 2), 
         	Size2D(
-        		size.width - 4,
-        		size.height - 4
+        		size_w - 4,
+        		size_h - 4
         		), 
         	LineStyle(buttonColor), 
         	nullable(FillStyle(buttonColor))
@@ -149,8 +165,8 @@ class Chicago98Laf : LafI
         if (is_focused)
         {
             ds.drawRectangle(
-            	Position2D(pos.x + 4, pos.y + 4),
-            	Size2D(size.width - 8, size.height - 8), 
+            	Position2D(pos_x + 4, pos_y + 4),
+            	Size2D(size_w - 8, size_h - 8), 
             	LineStyle(Color(0), [true, false]), 
             	Nullable!FillStyle()
             	);
@@ -163,8 +179,11 @@ class Chicago98Laf : LafI
     void drawButtonRadio(ButtonRadio widget)
     {
         auto ds = widget.getDrawingSurface();
-        auto pos = Position2D(0, 0);
-        auto size = widget.getSize();
+        
+        auto pos_x = cast(int) widget.getX();
+        auto pos_y = cast(int) widget.getY();
+        auto size_w = cast(int) widget.getWidth();
+        auto size_h = cast(int) widget.getHeight();
         
         // TODO: this have to be more flexible
         auto step = 2 * PI / 32;
@@ -172,8 +191,8 @@ class Chicago98Laf : LafI
         auto p = Position2D(6, 6);
         
         ds.drawRectangle(
-        	pos,
-        	Size2D(size.width + 1, size.height + 1),
+        	Position2D(pos_x, pos_y),
+        	Size2D(size_w + 1, size_h + 1),
         	LineStyle(formBackground), 
         	nullable(FillStyle(formBackground))
         	);
@@ -208,8 +227,8 @@ class Chicago98Laf : LafI
         if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawRectangle(
-            	pos, 
-            	size, 
+            	Position2D(pos_x, pos_y), 
+            	Size2D(size_w, size_h), 
             	LineStyle(
             		Color(0), 
             		[true, false]
@@ -226,15 +245,16 @@ class Chicago98Laf : LafI
     void drawButtonCheck(ButtonCheck widget)
     {
         auto ds = widget.getDrawingSurface();
-        auto pos = Position2D(0, 0);
-        auto size = widget.getSize();
+        auto pos_x = cast(int) widget.getX();
+        auto pos_y = cast(int) widget.getY();
+        auto size_w = cast(int) widget.getWidth();
+        auto size_h = cast(int) widget.getHeight();
         
-        drawBewel(ds, pos, size, true);
+        drawBewel(ds, Position2D(pos_x, pos_y), Size2D(size_w, size_h), true);
         
         ds.drawRectangle(
-        	Position2D(pos.x + 2, pos.y + 2), 
-        	Size2D(size.width - 4,
-        		size.height - 4), 
+        	Position2D(pos_x + 2, pos_y + 2), 
+        	Size2D(size_w - 4, size_h - 4), 
         	LineStyle(Color(0xffffff)),
         	nullable(FillStyle(Color(0xffffff)))
         	);
@@ -242,8 +262,8 @@ class Chicago98Laf : LafI
         if (widget.getForm().getFocusedWidget() == widget)
         {
             ds.drawRectangle(
-            	pos, 
-            	size, 
+            	Position2D(pos_x, pos_y), 
+            	Size2D(size_w, size_h), 
             	LineStyle(Color(0), [true, false]), 
             	Nullable!FillStyle()
             	);
@@ -257,8 +277,8 @@ class Chicago98Laf : LafI
         }
         
         ds.drawRectangle(
-        	Position2D(pos.x + 3, pos.y + 3), 
-        	Size2D(size.width - 6, size.height - 6), 
+        	Position2D(pos_x + 3, pos_y + 3), 
+        	Size2D(size_w - 6, size_h - 6), 
         	LineStyle(Color(0)), 
         	nullable(FillStyle(fillColor))
         	);
@@ -281,11 +301,12 @@ class Chicago98Laf : LafI
     void drawLayout(Layout widget)
     {
         auto ds = widget.getDrawingSurface();
-        auto size = widget.getSize();
+        auto size_w = cast(int) widget.getWidth();
+        auto size_h = cast(int) widget.getHeight();
         
         ds.drawRectangle(
         	Position2D(0, 0), 
-        	Size2D(size.width, size.height), 
+        	Size2D(size_w, size_h), 
         	LineStyle(Color(0)), 
         	Nullable!FillStyle()
         	);
@@ -312,21 +333,28 @@ class Chicago98Laf : LafI
     void drawTextEntry(TextEntry widget)
     {
         auto ds = widget.getDrawingSurface();
-        auto pos = Position2D(0, 0);
-        auto size = widget.getSize();
+        auto pos_x = cast(int) widget.getX();
+        auto pos_y = cast(int) widget.getY();
+        auto size_w = cast(int) widget.getWidth();
+        auto size_h = cast(int) widget.getHeight();
         auto draw_bewel = widget.getDrawBewelAndBackground();
         auto bewel_bg_color = widget.getBewelBackgroundColor();
         
         if (draw_bewel)
         {
-            drawBewel(ds, pos, size, true);
-            pos.x += 2;
-            pos.y += 2;
-            size.width -= 4;
-            size.height -= 4;
+            drawBewel(
+            	ds, 
+            	Position2D(pos_x, pos_y), 
+            	Size2D(size_w, size_h), 
+            	true
+            	);
+            pos_x += 2;
+            pos_y += 2;
+            size_w -= 4;
+            size_h -= 4;
             ds.drawRectangle(
-                pos,
-                size,
+                Position2D(pos_x, pos_y), 
+                Size2D(size_w, size_h),  
                 LineStyle(Color(0)),
                 nullable(FillStyle(bewel_bg_color))
                 );

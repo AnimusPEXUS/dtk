@@ -28,6 +28,9 @@ interface WindowI
     void setForm(FormI form);
     void unsetForm();
     FormI getForm();
+    
+    ulong getFormWidth();
+    ulong getFormHeight();
 
     DrawingSurfaceI getDrawingSurface();
 

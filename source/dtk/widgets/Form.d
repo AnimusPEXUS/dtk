@@ -13,6 +13,7 @@ import dtk.interfaces.LafI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.LayoutI;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
@@ -25,14 +26,14 @@ import dtk.types.Property;
 import dtk.widgets.mixins;
 import dtk.widgets.Widget;
 
-class Form : Widget, FormI
+class Form : FormI
 {
-    
+
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[
         PropSetting("gsun", "WindowI", "window", "Window", ""),
         PropSetting("gsun", "LafI", "laf", "Laf", ""),
-        PropSetting("gsun", "ContainerableWidgetI", "child", "Child", ""),
+        PropSetting("gsun", "LayoutI", "layout", "Layout", ""),
         
         PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
         PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
@@ -45,22 +46,55 @@ class Form : Widget, FormI
     
     this()
     {
-        con_cont.add(connectToChild_onAfterChanged(&onChildChanged));
     }
-
-    void onChildChanged(ContainerableWidgetI old_v, ContainerableWidgetI new_v) nothrow
+    
+    
+    ulong getX()
     {
-        try
-        {
-            auto c = getChild();
-            c.setParent(this);
-            this.recalculateChildrenPositionsAndSizes();
-        }
-        catch (Exception e)
-        {
-        	// TODO: todo
-        }
-        
+    	return 0;
+    }
+    
+    ulong getY()
+    {
+    	return 0;
+    }
+    
+    ulong getWidth()
+    {
+    	if (isSetWindow()) 
+    	{
+    		return getWindow.getFormWidth();
+    	}
+    	return 0;
+    }
+    
+    ulong getHeight()
+    {
+    	if (isSetWindow()) 
+    	{
+    		return getWindow.getFormHeight();
+    	}
+    	return 0;
+    }
+    
+    Form setX(ulong v)
+    {
+    	return this;
+    }
+    
+    Form setY(ulong v)
+    {
+    	return this;
+    }
+    
+    Form setWidth(ulong v)
+    {
+    	return this;
+    }
+    
+    Form setHeight(ulong v)
+    {
+    	return this;
     }
     
     override DrawingSurfaceI getDrawingSurface()
@@ -69,26 +103,6 @@ class Form : Widget, FormI
         if (isSetWindow())
             ret = getWindow().getDrawingSurface();
         return ret;
-    }
-    
-    override typeof(this) setParent(WidgetI widget)
-    {
-        return null;
-    }
-    
-    override typeof(this) unsetParent()
-    {
-        return null;
-    }
-    
-    override WidgetI getParent()
-    {
-        return null;
-    }
-    
-    override Form getForm()
-    {
-        return this;
     }
     
     override void positionAndSizeRequest(Position2D position, Size2D size)
@@ -164,12 +178,12 @@ class Form : Widget, FormI
         return focusXWidget(&getPrevFocusableWidget);
     }
     
-    override WidgetI getNextFocusableWidget()
+    WidgetI getNextFocusableWidget()
     {
         return null;
     }
     
-    override WidgetI getPrevFocusableWidget()
+    WidgetI getPrevFocusableWidget()
     {
         return null;
     }

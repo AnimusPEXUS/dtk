@@ -13,8 +13,10 @@ struct WindowCreationSettings
 
     LafI laf;
 
-    Nullable!Position2D position;
-    Nullable!Size2D size;
+    Nullable!int x;
+    Nullable!int y;
+    Nullable!ulong width;
+    Nullable!ulong height;
 
     Nullable!bool fullscreen;
     Nullable!bool fullscreen_desktop;

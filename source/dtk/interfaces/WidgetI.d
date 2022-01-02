@@ -3,6 +3,7 @@ module dtk.interfaces.WidgetI;
 import std.typecons;
 
 import dtk.interfaces.FormI;
+import dtk.interfaces.LayoutI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.event_receivers;
 
@@ -14,13 +15,15 @@ import dtk.types.EventTextInput;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
+import dtk.widgets.Layout;
+
 interface WidgetI : EventReceiverWidgetI
 {
-    WidgetI getParent();
 
-    typeof(this) setParent(WidgetI widget);
-    typeof(this) unsetParent();
-    bool isUnsetParent();
+    typeof(this) setParentLayout(LayoutI layout);
+    typeof(this) unsetParentLayout();
+    bool isUnsetParentLayout();
+    LayoutI getParentLayout();
 
     FormI getForm();
 
@@ -30,16 +33,25 @@ interface WidgetI : EventReceiverWidgetI
     void recalculateChildrenPositionsAndSizes();
     void redraw();
 
-    typeof(this) setPosition(Position2D);
-    //typeof(this) unsetPosition();
-    Position2D getPosition();
-    //bool isUnsetPosition();
+    // typeof(this) setPosition(Position2D);
+    // typeof(this) unsetPosition();
+    // Position2D getPosition();
+    // bool isUnsetPosition();
 
-    typeof(this) setSize(Size2D);
-    //typeof(this) unsetSize();
-    Size2D getSize();
-    //bool isUnsetSize();
+    // typeof(this) setSize(Size2D);
+    // typeof(this) unsetSize();
+    // Size2D getSize();
+    // bool isUnsetSize();
+    ulong getX();
+    ulong getY();
+    ulong getWidth();
+    ulong getHeight();
 
+    typeof(this) setX(ulong);
+    typeof(this) setY(ulong);
+    typeof(this) setWidth(ulong);
+    typeof(this) setHeight(ulong);
+    
     Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point);
 
     WidgetI getNextFocusableWidget();

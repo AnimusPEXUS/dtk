@@ -10,7 +10,7 @@ import dtk.types.Property;
 
 import dtk.miscs.RadioGroup;
 
-import dtk.widgets;
+import dtk.widgets.Button;
 
 class ButtonRadio : Button
 {

@@ -7,6 +7,7 @@ import std.typecons;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.LayoutI;
 
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
@@ -22,18 +23,20 @@ import dtk.types.Position2D;
 import dtk.miscs.DrawingSurfaceShift;
 
 /* import dtk.widgets.WidgetLocator; */
-import dtk.widgets;
+// import dtk.widgets;
 /* import dtk.widgets.WidgetDrawingSurface; */
+
+import dtk.widgets.Layout;
 
 class Widget : WidgetI
 {
-    private
-    {
-        mixin Property_gsun!(WidgetI, "parent");
-    }
-
-    mixin Property_forwarding!(WidgetI, parent, "Parent");
-
+    mixin mixin_install_multiple_properties!(
+        cast(PropSetting[])
+        [
+            PropSetting("gsu", "LayoutI", "parent_layout", "ParentLayout", "null"),
+        ]
+        );
+    
     // =====v===v===v===== [locator] =====v===v===v===== start
 
     mixin mixin_install_multiple_properties!(
@@ -42,11 +45,11 @@ class Widget : WidgetI
             // PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
             // PropSetting("gs_w_d", "bool", "vertical_fill", "VerticalFill", "false"),
             // PropSetting("gs_w_d", "bool", "horizontal_fill", "HorizontalFill", "false"),
-            PropSetting("gs", "Position2D", "position", "Position", ""),
-            PropSetting("gs_w_d", "Size2D", "size", "Size", q{Size2D(10, 10)}),
-            //PropSetting("gs", "Size2D", "size", "Size", ""),
-            PropSetting("gsu", "Size2D", "minimal_size", "MinimalSize", ""),
-            PropSetting("gsu", "Size2D", "maximal_size", "MaximalSize", ""),
+            // PropSetting("gs", "Position2D", "position", "Position", ""),
+            // PropSetting("gs_w_d", "Size2D", "size", "Size", q{Size2D(10, 10)}),
+            // PropSetting("gs", "Size2D", "size", "Size", ""),
+            // PropSetting("gsu", "Size2D", "minimal_size", "MinimalSize", ""),
+            // PropSetting("gsu", "Size2D", "maximal_size", "MaximalSize", ""),
         ]
         );
 
@@ -242,6 +245,63 @@ class Widget : WidgetI
     		}.format(v)
     		);
     }
+
+    void exceptionIfParentNotSet()
+    {
+    	if (!isSetParent())
+    	{
+    		throw new Exception("parent not set");
+    	}
+    	if (getParent() is null)
+    	{
+    		throw new Exception("parent not set: null");
+    	}
+    }
     
+    LayoutChild getLayoutChildE()
+    {
+    	exceptionIfParentNotSet();
+    	auto p = getParentLayout();
+    	auto lc = p.getLayoutChildByWidget(this);
+    	if (lc is null)
+    	{
+    		throw new Exception("layout has no child for this widget");
+    	}
+    	return lc;
+    }
+    
+    ulong getX()
+    {
+    	auto lc = getLayoutChildE();
+    	return lc.getX();
+    }
+    
+    ulong getY()
+    {
+    	auto lc = getLayoutChildE();
+    	return lc.getY();
+    }
+
+    ulong getWidth()
+    {
+    	auto lc = getLayoutChildE();
+    	return lc.getWidth();
+    }
+    
+    ulong getHeight()
+    {
+    	auto lc = getLayoutChildE();
+    	return lc.getHeight();
+    }
+
+    typeof(this) setX(ulong v)
+    {
+    	auto lc = getLayoutChildE();
+    	return lc.getHeight();
+    }
+    
+    typeof(this) setY(ulong v);
+    typeof(this) setWidth(ulong v);
+    typeof(this) setHeight(ulong v);    
 
 }
