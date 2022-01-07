@@ -57,6 +57,10 @@ struct PropertySettings(T)
     bool settable = true; /// define function to set value
     bool resettable = true; /// define function to reset value to default
     bool unsettable = false; /// value can have 'unset' state. also defines unset() function.
+    
+    bool recursiveChangeProtection = true;
+    bool recursiveChangeDebugWarn = false;
+    bool recursiveChangeException = true;
 
     PropertyWhatToReturnIfValueIsUnset whatToReturnIfUnset = PropertyWhatToReturnIfValueIsUnset
         .typeInitValue;
@@ -65,6 +69,32 @@ struct PropertySettings(T)
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
 	import observable.signal;
+	
+	static if (settings.recursiveChangeProtection)
+	{
+		private {
+			bool changeCallInProgress;
+			// TODO: maybe this have to be shared or __gshared
+			Mutex changeCallMutex;
+		}
+		
+		private void recursiveChangeReaction()
+		{
+			debug static if (settings.recursiveChangeDebugWarn)
+			{
+				import std.stdio;
+				writeln(
+					"recursive change detected: ", 
+					collectException(throw new Exception("recursion"))
+					);
+			}
+			
+			static if (settings.recursiveChangeException)
+			{
+				throw new Exception("recursion");
+			}
+		}
+	}
 	
     static if (settings.variable_define)
     {
@@ -122,37 +152,55 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 
     static if (settings.resettable)
     {
+    	private void reset_priv()
+    	{
+    		T1 old_value;
+    		T1 new_value;
+    		
+    		static if (settings.variable_define)
+    		{
+    			old_value = variable;
+    			new_value = getUnsetValue();
+    		}
+    		
+    		onBeforeChanged.emit(old_value, new_value);
+    		scope (success)
+    		onAfterChanged.emit(old_value, new_value);
+    		onBeforeReset.emit(old_value, new_value);
+    		scope (success)
+    		onAfterReset.emit(old_value, new_value);
+    		
+    		static if (settings.variable_define)
+    		{
+    			value = settings.default_value;
+    		}
+    		value_is_default = true;
+    		static if (settings.unsettable)
+    		{
+    			if (settings.default_is_unset)
+    			{
+    				value_is_unset = true;
+    			}
+    		}
+    	}
+    	
         void reset()
-        {
-            T1 old_value;
-            T1 new_value;
-
-            static if (settings.variable_define)
-            {
-                old_value = variable;
-                new_value = getUnsetValue();
-            }
-
-            onBeforeChanged.emit(old_value, new_value);
-            scope (success)
-                onAfterChanged.emit(old_value, new_value);
-            onBeforeReset.emit(old_value, new_value);
-            scope (success)
-                onAfterReset.emit(old_value, new_value);
-
-            static if (settings.variable_define)
-            {
-                value = settings.default_value;
-            }
-            value_is_default = true;
-            static if (settings.unsettable)
-            {
-                if (settings.default_is_unset)
-                {
-                    value_is_unset = true;
-                }
-            }
-
+        {        	
+        	static if (settings.recursiveChangeProtection)
+        	{
+        		recursionGuard(
+        			changeCallInProgress,
+        			changeCallMutex,
+        			void delegate() {
+        				recursiveChangeReaction();
+        			},
+        			&reset_priv,
+        			);
+        	} 
+        	else 
+        	{
+        		reset_priv();
+        	}
         }
 
         bool isDefault()
@@ -164,7 +212,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 
     static if (settings.unsettable)
     {
-        void unset()
+        private void unset_priv()
         {
             T1 old_value;
             T1 new_value;
@@ -196,11 +244,30 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
             {
                 static if (settings.resettable)
                 {
-                    reset();
+                    reset_priv();
                 }
             }
 
         }
+
+        void unset()
+        {        	
+        	static if (settings.recursiveChangeProtection)
+        	{
+        		recursionGuard(
+        			changeCallInProgress,
+        			changeCallMutex,
+        			void delegate() {
+        				recursiveChangeReaction();
+        			},
+        			&unset_priv,
+        			);
+        	} 
+        	else 
+        	{
+        		unset_priv();
+        	}
+        }        
 
         bool isUnset()
         {
@@ -269,7 +336,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 
     static if (settings.settable)
     {
-        void set(T1 new_value)
+        private void set_priv(T1 new_value)
         {
             T1 old_value;
 
@@ -304,7 +371,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
                 if (settings.setting_to_default_value_makes_property_reset
                         && new_value == settings.default_value)
                 {
-                    reset();
+                    reset_priv();
                 }
             }
             static if (settings.unsettable)
@@ -312,10 +379,29 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
                 if (settings.setting_to_default_value_makes_property_unset
                         && new_value == settings.default_value)
                 {
-                    unset();
+                    unset_priv();
                 }
             }
         }
+        
+        void set(T1 new_value)
+        {        	
+        	static if (settings.recursiveChangeProtection)
+        	{
+        		recursionGuard(
+        			changeCallInProgress,
+        			changeCallMutex,
+        			void delegate() {
+        				recursiveChangeReaction();
+        			},
+        			&set_priv,
+        			);
+        	} 
+        	else 
+        	{
+        		set_priv();
+        	}
+        }        
     }
 }
 

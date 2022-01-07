@@ -26,6 +26,7 @@ import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
+import dtk.types.Property;
 
 import dtk.miscs.WindowEventMgr;
 
@@ -46,14 +47,6 @@ class Window : WindowI
         // Position2D _form_point;
         // Size2D _form_size;
         
-        int x;
-        int y;
-        ulong width;
-        ulong height;
-        
-        ulong form_width;
-        ulong form_height;
-        
         string title;
         
         bool minimized;
@@ -70,6 +63,17 @@ class Window : WindowI
         SDL_Window* sdl_window;
         typeof(SDL_WindowEvent.windowID) sdl_window_id;
     }
+
+    mixin mixin_install_multiple_properties!(
+        cast(PropSetting[])[
+        PropSetting("gs_w_d", "int", "x", "X", "0"),
+        PropSetting("gs_w_d", "int", "y", "Y", "0"),
+        PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
+        PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
+        PropSetting("gs_w_d", "ulong", "form_width", "FormWidth", "0"),
+        PropSetting("gs_w_d", "ulong", "form_height", "FormHeight", "0"),
+        ]
+        );
     
     @disable this();
     
@@ -78,24 +82,28 @@ class Window : WindowI
         platform = platform;
         title = window_settings.title;
         
-        if (!window_settings.x.isNull())
+        static foreach (
+        	Tuple!(string, string) v; 
+        	[
+        	tuple("x", "X"), 
+        	tuple("y", "Y"), 
+        	tuple("width", "Width"), 
+        	tuple("height", "Height")
+        	]
+        	)
         {
-            this.x = window_settings.x.get();
-        }
-        
-        static foreach (v; ["x", "y", "width", "height"])
-        {
+        	import std.format;
         	mixin(
         		q{
         			if (!window_settings.%1$s.isNull())
         			{
-        				this.%1$s = window_settings.%1$s.get();
-        			}.format(v);
-        		}
+        				set%2$s(window_settings.%1$s.get());
+        			}
+        		}.format(v[0], v[1])
         		);
         }
         
-        _drawing_surface = new DrawingSurface(this);
+        drawing_surface = new DrawingSurface(this);
         
         auto flags = cast(SDL_WindowFlags) 0 /* else flags init with FULLSCREEN option */ ;
         
@@ -104,10 +112,10 @@ class Window : WindowI
         
         sdl_window = SDL_CreateWindow(
         	cast(char*) window_settings.title, 
-        	x, 
-        	y, 
-        	width, 
-        	height, 
+        	getX(), 
+        	getY(), 
+        	cast(int) getWidth(), 
+        	cast(int) getHeight(), 
         	flags
         	);
         if (sdl_window is null)
@@ -146,27 +154,27 @@ class Window : WindowI
     
     ~this()
     {
-        _platform.unregisterWindow(this);
+        platform.unregisterWindow(this);
     }
     
     void setEventManager(WindowEventMgrI mgr)
     {
-        _emgr = mgr;
+        emgr = mgr;
     }
     
     WindowEventMgrI getEventManager()
     {
-        return _emgr;
+        return emgr;
     }
     
     void setLaf(LafI laf)
     {
-        _laf = laf;
-        if (_emgr !is null)
+        this.laf = laf;
+        if (emgr !is null)
         {
-            _emgr.removeAllActions();
-            assert(_laf !is null);
-            _laf.addEventHandling(_emgr);
+            emgr.removeAllActions();
+            assert(this.laf !is null);
+            this.laf.addEventHandling(emgr);
         }
     }
     
@@ -258,21 +266,24 @@ class Window : WindowI
     	{
     		int w, h;
     		
-    		SDL_GetWindowSize(_sdl_window, &w, &h);
+    		SDL_GetWindowSize(sdl_window, &w, &h);
     		
-    		form_width = w;
-    		form_height = h;
-    		width = form_width;
-    		height = form_height;
+    		setFormWidth(w);
+    		setFormHeight(h);
+    		setWidth(w);
+    		setHeight(h);
     		
     		
-    		int t, l, b, r;
-    		auto res = SDL_GetWindowBordersSize(_sdl_window, &t, &l, &b, &r);
+    		// int t, l, b, r;
+    		// TODO: undefined identifier `SDL_GetWindowBordersSize`
+    		/*
+    		auto res = SDL_GetWindowBordersSize(sdl_window, &t, &l, &b, &r);
     		if (res != -1)
     		{
     			height = form_height + t + b;
     			width = form_width + l + r;
     		}
+    		*/
     		
     	}
         auto emgr = getEventManager();
@@ -307,26 +318,44 @@ class Window : WindowI
     
     void redraw()
     {
-        if (this._form is null)
+        if (form is null)
             return;
         
-        this._form.redraw();
+        form.redraw();
     }
     
     void printParams()
     {
-        writeln(_title, " : ", this._point.x, " ", this._point.y, " ",
-        	this._size.width, " ", this._size.height);
+    	import std.format;
+        writeln(
+        	q{
+title      : %s         		
+x          : %d
+y          : %d
+width      : %d
+height     : %d
+form_width : %d
+form_height: %d
+        	}.format(
+        		title, 
+        		getX(),
+        		getY(),
+        		getWidth(),
+        		getHeight(), 
+        		getFormWidth(),
+        		getFormHeight()
+        		)
+        	);
     }
     
     PlatformI getPlatform()
     {
-        return _platform;
+        return platform;
     }
     
     DrawingSurfaceI getDrawingSurface()
     {
-        return _drawing_surface;
+        return drawing_surface;
     }
     
     void installForm(FormI form)
@@ -355,58 +384,49 @@ class Window : WindowI
     
     void setForm(FormI form)
     {
-        this._form = form;
+        this.form = form;
     }
     
     void unsetForm()
     {
-        this._form = null;
+        this.form = null;
     }
     
     FormI getForm()
     {
-        return _form;
+        return form;
     }
     
-    Position2D getPoint()
-    {
-        return _point;
-    }
-    
-    Tuple!(bool, Position2D) setPoint(Position2D point)
-    {
-        this._point = point;
-        return tuple(true, this._point);
-    }
-    
-    Size2D getSize()
-    {
-        return _size;
-    }
-    
-    Tuple!(bool, Size2D) setSize(Size2D size)
-    {
-        this._size = size;
-        return tuple(true, this._size);
-    }
+    // Position2D getPoint()
+    // {
+        // return _point;
+    // }
+    // 
+    // Tuple!(bool, Position2D) setPoint(Position2D point)
+    // {
+        // this._point = point;
+        // return tuple(true, this._point);
+    // }
+    // 
+    // Size2D getSize()
+    // {
+        // return _size;
+    // }
+    // 
+    // Tuple!(bool, Size2D) setSize(Size2D size)
+    // {
+        // this._size = size;
+        // return tuple(true, this._size);
+    // }
     
     string getTitle()
     {
-        return _title;
+        return title;
     }
     
     void setTitle(string value)
     {
-        _title = value;
-    }
+        title = value;
+    }     
     
-    ulong getFormWidth()
-    {
-    	return form_width;
-    }
-    
-    ulong getFormHeight()
-    {
-    	return form_height;
-    }
 }

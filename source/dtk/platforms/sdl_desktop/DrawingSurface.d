@@ -60,7 +60,7 @@ class DrawingSurface : DrawingSurfaceI
     {
         if (style.style == null)
         {
-            auto rndr = SDL_GetRenderer(w._sdl_window);
+            auto rndr = SDL_GetRenderer(w.sdl_window);
             SDL_SetRenderDrawColor(rndr, style.color.r, style.color.g,
                     style.color.b, style.color.a);
             SDL_RenderDrawLine(rndr, pos.x, pos.y, pos2.x, pos2.y);
@@ -98,7 +98,7 @@ class DrawingSurface : DrawingSurfaceI
         Nullable!FillStyle fill_style
         )
     {
-        auto rndr = SDL_GetRenderer(w._sdl_window);
+        auto rndr = SDL_GetRenderer(w.sdl_window);
         assert(rndr !is null);
 
         if (top_style == left_style
@@ -225,7 +225,7 @@ class DrawingSurface : DrawingSurfaceI
 
     void present()
     {
-        auto rndr = SDL_GetRenderer(w._sdl_window);
+        auto rndr = SDL_GetRenderer(w.sdl_window);
         SDL_RenderPresent(rndr);
     }
 

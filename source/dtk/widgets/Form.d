@@ -28,6 +28,7 @@ import dtk.widgets.Widget;
 
 class Form : FormI
 {
+	
 
     mixin mixin_install_multiple_properties!(
         cast(PropSetting[])[

@@ -29,16 +29,27 @@ interface WindowI
     void unsetForm();
     FormI getForm();
     
-    ulong getFormWidth();
-    ulong getFormHeight();
-
     DrawingSurfaceI getDrawingSurface();
 
-    Position2D getPoint();
-    Tuple!(bool, Position2D) setPoint(Position2D point);
-
-    Size2D getSize();
-    Tuple!(bool, Size2D) setSize(Size2D size);
+    int getX();
+    int getY();
+    ulong getWidth();
+    ulong getHeight();
+    
+    ulong getFormWidth();
+    ulong getFormHeight();
+    
+    WindowI setX(int v);
+    WindowI setY(int v);
+    
+    WindowI setWidth(ulong v);
+    WindowI setHeight(ulong v);
+    
+    // Position2D getPoint();
+    // Tuple!(bool, Position2D) setPoint(Position2D point);
+// 
+    // Size2D getSize();
+    // Tuple!(bool, Size2D) setSize(Size2D size);
 
     /* Position2D getFormPoint();
     Size2D getFormSize(); */

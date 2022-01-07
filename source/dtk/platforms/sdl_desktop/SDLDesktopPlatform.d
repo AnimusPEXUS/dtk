@@ -143,7 +143,7 @@ class SDLDesktopPlatform : PlatformI
         Window ret;
         foreach (Window w; windows)
         {
-            if (w._sdl_window_id == windowID)
+            if (w.sdl_window_id == windowID)
             {
                 ret = w;
                 break;
