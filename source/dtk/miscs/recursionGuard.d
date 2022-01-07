@@ -35,7 +35,8 @@ T2 recursionGuard(T2, T1...)(
 	ref bool already_called,
 	ref Mutex call_mutex,
 	T2 already_started_return,
-	T2 delegate(T1) target)
+	T2 delegate(T1) target
+	)
 {
     return recursionGuard(
     	already_called,

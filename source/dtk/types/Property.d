@@ -6,11 +6,13 @@ module dtk.types.Property;
 
 public import dtk.types.Property_mixins;
 
-import dtk.types.Signal;
-
+import core.sync.mutex;
 import observable.signal;
-
 /* import observable.signal.SignalConnection;  */
+
+import dtk.types.Signal;
+import dtk.miscs.recursionGuard;
+
 
 enum PropertyWhatToReturnIfValueIsUnset
 {
@@ -68,10 +70,9 @@ struct PropertySettings(T)
 
 struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 {
-	import observable.signal;
-	
 	static if (settings.recursiveChangeProtection)
 	{
+		
 		private {
 			bool changeCallInProgress;
 			// TODO: maybe this have to be shared or __gshared
@@ -85,7 +86,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
 				import std.stdio;
 				writeln(
 					"recursive change detected: ", 
-					collectException(throw new Exception("recursion"))
+					collectException({throw new Exception("recursion");}())
 					);
 			}
 			
@@ -191,7 +192,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         		recursionGuard(
         			changeCallInProgress,
         			changeCallMutex,
-        			void delegate() {
+        			delegate void() {
         				recursiveChangeReaction();
         			},
         			&reset_priv,
@@ -257,7 +258,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         		recursionGuard(
         			changeCallInProgress,
         			changeCallMutex,
-        			void delegate() {
+        			delegate void() {
         				recursiveChangeReaction();
         			},
         			&unset_priv,
@@ -391,7 +392,7 @@ struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
         		recursionGuard(
         			changeCallInProgress,
         			changeCallMutex,
-        			void delegate() {
+        			delegate void() {
         				recursiveChangeReaction();
         			},
         			&set_priv,
