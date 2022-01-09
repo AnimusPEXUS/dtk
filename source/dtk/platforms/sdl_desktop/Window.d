@@ -30,6 +30,15 @@ import dtk.types.Property;
 
 import dtk.miscs.WindowEventMgr;
 
+const auto WindowProperties = cast(PropSetting[]) [
+PropSetting("gs_w_d", "int", "x", "X", "0"),
+PropSetting("gs_w_d", "int", "y", "Y", "0"),
+PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
+PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
+PropSetting("gs_w_d", "ulong", "form_width", "FormWidth", "0"),
+PropSetting("gs_w_d", "ulong", "form_height", "FormHeight", "0"),
+];
+
 class Window : WindowI
 {
 	
@@ -64,21 +73,16 @@ class Window : WindowI
         typeof(SDL_WindowEvent.windowID) sdl_window_id;
     }
 
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])[
-        PropSetting("gs_w_d", "int", "x", "X", "0"),
-        PropSetting("gs_w_d", "int", "y", "Y", "0"),
-        PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
-        PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
-        PropSetting("gs_w_d", "ulong", "form_width", "FormWidth", "0"),
-        PropSetting("gs_w_d", "ulong", "form_height", "FormHeight", "0"),
-        ]
-        );
+
+	mixin mixin_multiple_properties_define!(WindowProperties);
+    mixin mixin_multiple_properties_forward!(WindowProperties);
     
     @disable this();
     
     this(WindowCreationSettings window_settings, SDLDesktopPlatform platform)
     {
+    	mixin(mixin_multiple_properties_inst(WindowProperties));
+    	
         platform = platform;
         title = window_settings.title;
         

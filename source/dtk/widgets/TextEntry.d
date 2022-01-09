@@ -27,44 +27,46 @@ import dtk.widgets.mixins;
 import dtk.miscs.TextProcessor;
 import dtk.miscs.DrawingSurfaceShift;
 
+const auto TextEntryProperties = cast(PropSetting[]) [
+PropSetting("gs", "dstring", "text", "Text"),
+// TODO: use fontconfig instead of this
+PropSetting("gs_w_d", "string", "font_family", "FontFamily", "\"Go\""),
+PropSetting("gs_w_d", "string", "font_style", "FontStyle", "\"Regular\""),
+PropSetting("gs_w_d", "Color", "font_color", "FontColor", q{Color(0)}),
+PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
+PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
+PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
+PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_lines", "LayoutLines", "GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"),
+PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_line_chars", "LayoutChars", "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"),
+PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "false"),
+PropSetting("gs_w_d", "Color", "bewel_background_color", "BewelBackgroundColor", q{Color(cast(ubyte[3])[255,255,255])}),
+PropSetting("gs_w_d", "bool", "multiline", "Multiline", "false"),
+PropSetting("gs_w_d", "bool", "virtual_wrap_by_char", "VirtualWrapByChar", "false"),
+PropSetting("gs_w_d", "bool", "virtual_wrap_by_word", "VirtualWrapByWord", "false"),
+PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
+PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
+PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
+PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
+];
+
 class TextEntry : Widget, ContainerableWidgetI
 {
     // Image textImage;
     
     TextView text_view;
     
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])[
-        PropSetting("gs", "dstring", "text", "Text"),
-        // TODO: use fontconfig instead of this
-        PropSetting("gs_w_d", "string", "font_family", "FontFamily", "\"Go\""),
-        PropSetting("gs_w_d", "string", "font_style", "FontStyle", "\"Regular\""),
-        PropSetting("gs_w_d", "Color", "font_color", "FontColor", q{Color(0)}),
-        PropSetting("gs_w_d", "ushort", "font_size", "FontSize", "9"),
-        PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
-        PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
-        PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_lines", "LayoutLines", "GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"),
-        PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_line_chars", "LayoutChars", "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"),
-        PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "false"),
-        PropSetting("gs_w_d", "Color", "bewel_background_color", "BewelBackgroundColor", q{Color(cast(ubyte[3])[255,255,255])}),
-        PropSetting("gs_w_d", "bool", "multiline", "Multiline", "false"),
-        PropSetting("gs_w_d", "bool", "virtual_wrap_by_char", "VirtualWrapByChar", "false"),
-        PropSetting("gs_w_d", "bool", "virtual_wrap_by_word", "VirtualWrapByWord", "false"),
-        PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
-        PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
-        PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
-        PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
-        ]
-        );
-    
     private {
         SignalConnectionContainer con_cont;
         SignalConnection textViewConnCon;
     }
     
+    mixin mixin_multiple_properties_define!(TextEntryProperties);
+    mixin mixin_multiple_properties_forward!(TextEntryProperties);
     
     this()
     {
+    	mixin mixin_multiple_properties_inst!(TextEntryProperties);
+    	
         text_view = new TextView();
         text_view.getForm = delegate FormI()
         {

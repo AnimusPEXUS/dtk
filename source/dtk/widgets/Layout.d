@@ -37,40 +37,50 @@ enum LayoutType : ubyte
     linearWrapped,
 }
 
+const auto LayoutChildProperties = cast(PropSetting[]) [
+// X, Y, Width and Height is for storring real effective values
+// users should not change those unless Layout is set to use
+// free positioning for widgets.
+PropSetting("gs_w_d", "ulong", "x", "X", "0"),
+PropSetting("gs_w_d", "ulong", "y", "Y", "0"),
+PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
+PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
+
+// CA stends for 'Child Asks'. through this properties, 
+// child widget can ask certain desirable settings for it,
+// but Layout can ignore those if it need so. Child can leave 
+// those properties unset if it not doesn't have need for them
+PropSetting("gsu", "ulong", "ca_x", "CAX", "0"),
+PropSetting("gsu", "ulong", "ca_y", "CAY", "0"),
+PropSetting("gsu", "ulong", "ca_width", "CAWidth", "0"),
+PropSetting("gsu", "ulong", "ca_height", "CAHeight", "0"),
+
+PropSetting("gs_w_d", "bool", "ca_hfill", "CAHFill", "false"),
+PropSetting("gs_w_d", "bool", "ca_vfill", "CAVFill", "false"),
+
+PropSetting("gs_w_d", "bool", "ca_hexpand", "CAHExpand", "false"),
+PropSetting("gs_w_d", "bool", "ca_vexpand", "CAVExpand", "false"),
+];
+  
+
 class LayoutChild
 {
 	ContainerableWidgetI widget;
 	// float halign;
 	// float valign;
 	
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])
-        [
-        // X, Y, Width and Height is for storring real effective values
-        // users should not change those unless Layout is set to use
-        // free positioning for widgets.
-        PropSetting("gs_w_d", "ulong", "x", "X", "0"),
-        PropSetting("gs_w_d", "ulong", "y", "Y", "0"),
-        PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
-        PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
-        
-        // CA stends for 'Child Asks'. through this properties, 
-        // child widget can ask certain desirable settings for it,
-        // but Layout can ignore those if it need so. Child can leave 
-        // those properties unset if it not doesn't have need for them
-        PropSetting("gsu", "ulong", "ca_x", "CAX", "0"),
-        PropSetting("gsu", "ulong", "ca_y", "CAY", "0"),
-        PropSetting("gsu", "ulong", "ca_width", "CAWidth", "0"),
-        PropSetting("gsu", "ulong", "ca_height", "CAHeight", "0"),
-        
-        PropSetting("gs_w_d", "bool", "ca_hfill", "CAHFill", "false"),
-        PropSetting("gs_w_d", "bool", "ca_vfill", "CAVFill", "false"),
-        
-        PropSetting("gs_w_d", "bool", "ca_hexpand", "CAHExpand", "false"),
-        PropSetting("gs_w_d", "bool", "ca_vexpand", "CAVExpand", "false"),
-        ]
-        );	
+    mixin mixin_multiple_properties_define!(LayoutChildProperties);	
+    mixin mixin_multiple_properties_forward!(LayoutChildProperties);	
+    this() {
+    	mixin(mixin_multiple_properties_inst(LayoutChildProperties));
+    }
 }
+
+
+const auto LayoutProperties = cast(PropSetting[]) [
+PropSetting("gs_w_d", "ulong", "vertical_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
+PropSetting("gs_w_d", "ulong", "horizontal_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
+];
 
 /++
 
@@ -90,32 +100,11 @@ class Layout : Widget, ContainerableWidgetI, LayoutI
     // array.
     LayoutChild[] children;
 	
-    private
-    {
-        
-        mixin Property_gs_w_d!(
-        	LayoutOverflowBehavior,
-        	"vertical_overflow_behavior", 
-        	LayoutOverflowBehavior.Resize
-        	);
-        
-        mixin Property_gs_w_d!(
-        	LayoutOverflowBehavior,
-        	"horizontal_overflow_behavior", 
-        	LayoutOverflowBehavior.Resize
-        	);
+    mixin mixin_multiple_properties_define!(LayoutProperties);	
+    mixin mixin_multiple_properties_forward!(LayoutProperties);	
+    this() {
+    	mixin mixin_multiple_properties_inst!(LayoutProperties);
     }
-    
-    mixin Property_forwarding!(
-    	LayoutOverflowBehavior,
-    	vertical_overflow_behavior, 
-    	"VerticalOverflowBehavior"
-    	);
-    mixin Property_forwarding!(
-    	LayoutOverflowBehavior,
-    	vertical_overflow_behavior, 
-    	"HorizontalOverflowBehavior"
-    	);
     
     void checkChildren()
     {

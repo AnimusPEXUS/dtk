@@ -20,3 +20,4 @@ dtk-test-*
 /KeyboardSourcesGenerator/EnumKeyboardKeyCode.d
 /KeyboardSourcesGenerator/EnumKeyboardModCode.d
 /KeyboardSourcesGenerator/sdlkeyconversion.d
+/examples/hello/before_property_convert.7z

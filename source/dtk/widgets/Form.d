@@ -26,29 +26,28 @@ import dtk.types.Property;
 import dtk.widgets.mixins;
 import dtk.widgets.Widget;
 
-class Form : FormI
-{
-	
-
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])[
+const auto FormProperties = cast(PropSetting[]) [
         PropSetting("gsun", "WindowI", "window", "Window", ""),
         PropSetting("gsun", "LafI", "laf", "Laf", ""),
         PropSetting("gsun", "LayoutI", "layout", "Layout", ""),
         
         PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
         PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
-        ]
-        );
-    
+];
+
+class Form : FormI
+{
     private {
     	SignalConnectionContainer con_cont;
     }
     
+    mixin mixin_multiple_properties_define!(FormProperties);
+    mixin mixin_multiple_properties_forward!(FormProperties);
+    
     this()
     {
+    	mixin(mixin_multiple_properties_inst(FormProperties));
     }
-    
     
     ulong getX()
     {

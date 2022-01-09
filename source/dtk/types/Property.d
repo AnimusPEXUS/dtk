@@ -4,9 +4,12 @@ module dtk.types.Property;
 
 // import std.stdio;
 
-public import dtk.types.Property_mixins;
+// public import dtk.types.Property_mixins;
+public import dtk.types.Property_prefabs;
 
 import core.sync.mutex;
+import std.exception;  
+
 import observable.signal;
 /* import observable.signal.SignalConnection;  */
 
@@ -22,39 +25,39 @@ enum PropertyWhatToReturnIfValueIsUnset
 }
 
 /++
-    TODO: notes is outdated. need to update
+TODO: notes is outdated. need to update
 
-    NOTE: no 'null' state - use unset for this
+NOTE: no 'null' state - use unset for this
 
-    NOTE: isDefault() function will return true only if previously reset()
-    called and no ant set() called in between.
+NOTE: isDefault() function will return true only if previously reset()
+called and no ant set() called in between.
 
-    NOTE: getting default value (using getDefault()) and using this value with
-    set() will not reset Property to default state. only reset() function resets
-    Property to default state; +/
+NOTE: getting default value (using getDefault()) and using this value with
+set() will not reset Property to default state. only reset() function resets
+Property to default state; +/
 struct PropertySettings(T)
 {
     // TODO: decide what to do with this. needs fixing
     /* T init_value = T.init;
     T default_value = T.init; /// value, to which variable is set on reset() call */
-
+    
     T init_value;
     T default_value; /// value, to which variable is set on reset() call
-
+    
     bool initially_value_is_default = true;
     bool initially_value_is_unset = true;
     bool default_is_unset = false; // if reset() called, property becomes unset
     /* alias resetting_value_makes_it_unset = default_is_unset; */
-
+    
     // TODO: complete this
     bool setting_to_default_value_makes_property_reset = false;
     bool setting_to_default_value_makes_property_unset = false;
-
+    
     bool on_unset_also_reset = false;
-
-    bool variable_define = true;
-    bool variable_private = true;
-
+    
+    // bool variable_define = true;
+    // bool variable_private = true;
+    
     bool gettable = true; /// define function to get value
     bool settable = true; /// define function to set value
     bool resettable = true; /// define function to reset value to default
@@ -63,464 +66,400 @@ struct PropertySettings(T)
     bool recursiveChangeProtection = true;
     bool recursiveChangeDebugWarn = false;
     bool recursiveChangeException = true;
-
+    
     PropertyWhatToReturnIfValueIsUnset whatToReturnIfUnset = PropertyWhatToReturnIfValueIsUnset
-        .typeInitValue;
+    .typeInitValue;
 }
 
-struct Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
+// class Property(alias T1, alias T2 = PropertySettings!T1, T2 settings)
+class Property(alias T1, alias T2 = PropertySettings!T1)
 {
-	static if (settings.recursiveChangeProtection)
-	{
-		
-		private {
-			bool changeCallInProgress;
-			// TODO: maybe this have to be shared or __gshared
-			Mutex changeCallMutex;
-		}
-		
-		private void recursiveChangeReaction()
-		{
-			debug static if (settings.recursiveChangeDebugWarn)
-			{
-				import std.stdio;
-				writeln(
-					"recursive change detected: ", 
-					collectException({throw new Exception("recursion");}())
-					);
-			}
-			
-			static if (settings.recursiveChangeException)
-			{
-				throw new Exception("recursion");
-			}
-		}
-	}
+	T2 settings;
 	
-    static if (settings.variable_define)
-    {
-        static if (settings.variable_private)
-        {
-            private T1 variable = settings.init_value;
-        }
-        else
-        {
-            public T1 variable = settings.init_value;
-        }
-    }
-
+	private T1 variable;
+	
     private
     {
-        static if (settings.unsettable)
-        {
-            bool value_is_unset = settings.initially_value_is_unset;
-        }
-
-        static if (settings.resettable)
-        {
-            bool value_is_default = settings.initially_value_is_default;
-        }
+    	bool value_is_unset;
+    	bool value_is_default;
     }
-
+    
     public
     {
-        static if (settings.gettable)
-        {
-            Signal!() onBeforeGet;
-            Signal!() onAfterGet;
-        }
-        static if (settings.settable)
-        {
-            Signal!(T1, T1) onBeforeSet;
-            Signal!(T1, T1) onAfterSet;
-        }
-        static if (settings.resettable)
-        {
-            Signal!(T1, T1) onBeforeReset;
-            Signal!(T1, T1) onAfterReset;
-        }
-        static if (settings.unsettable)
-        {
-            Signal!(T1, T1) onBeforeUnset;
-            Signal!(T1, T1) onAfterUnset;
-        }
-
-        Signal!(T1, T1) onBeforeChanged;
+    	Signal!() onBeforeGet;
+    	Signal!() onAfterGet;
+    	
+    	Signal!(T1, T1) onBeforeSet;
+    	Signal!(T1, T1) onAfterSet;
+    	
+    	Signal!(T1, T1) onBeforeReset;
+    	Signal!(T1, T1) onAfterReset;
+    	
+    	Signal!(T1, T1) onBeforeUnset;
+    	Signal!(T1, T1) onAfterUnset;
+    	
+    	Signal!(T1, T1) onBeforeChanged;
         Signal!(T1, T1) onAfterChanged;
     }
-
-    @disable this(this);
-
-    static if (settings.resettable)
+    
+    private {
+    	bool changeCallInProgress;
+    	// TODO: maybe this have to be shared or __gshared
+    	Mutex changeCallMutex;
+    }
+    
+    
+    // @disable this(this);
+    this(T2 settings)
     {
-    	private void reset_priv()
+    	this.settings = settings;
+    	this.variable = settings.init_value;
+    	this.value_is_unset = settings.initially_value_is_unset;
+    	this.value_is_default = settings.initially_value_is_default;
+    }
+    
+    private void recursiveChangeReaction()
+    {
+    	debug if (settings.recursiveChangeDebugWarn)
     	{
-    		T1 old_value;
-    		T1 new_value;
-    		
-    		static if (settings.variable_define)
+    		import std.stdio;
+    		writeln(
+    			"recursive change detected: ", 
+    			collectException({throw new Exception("recursion");}())
+    			);
+    	}
+    	
+    	if (settings.recursiveChangeException)
+    	{
+    		throw new Exception("recursion");
+    	}
+    }    
+    
+    private void reset_priv()
+    {
+    	if (!settings.resettable) {
+    		throw new Exception("not resettable");
+    	}
+    	
+    	T1 old_value;
+    	T1 new_value;
+    	
+    	old_value = variable;
+    	new_value = getUnsetValue();
+    	
+    	onBeforeChanged.emit(old_value, new_value);
+    	scope (success)
+    	onAfterChanged.emit(old_value, new_value);
+    	onBeforeReset.emit(old_value, new_value);
+    	scope (success)
+    	onAfterReset.emit(old_value, new_value);
+    	
+    	variable = settings.default_value;
+    	
+    	value_is_default = true;
+    	if (settings.unsettable)
+    	{
+    		if (settings.default_is_unset)
     		{
-    			old_value = variable;
-    			new_value = getUnsetValue();
+    			value_is_unset = true;
     		}
-    		
-    		onBeforeChanged.emit(old_value, new_value);
-    		scope (success)
-    		onAfterChanged.emit(old_value, new_value);
-    		onBeforeReset.emit(old_value, new_value);
-    		scope (success)
-    		onAfterReset.emit(old_value, new_value);
-    		
-    		static if (settings.variable_define)
-    		{
-    			value = settings.default_value;
-    		}
+    	}
+    }
+    
+    void reset()
+    {        	
+    	
+    	if (settings.recursiveChangeProtection)
+    	{
+    		recursionGuard(
+    			changeCallInProgress,
+    			changeCallMutex,
+    			delegate void() {
+    				recursiveChangeReaction();
+    			},
+    			&reset_priv,
+    			);
+    	} 
+    	else 
+    	{
+    		reset_priv();
+    	}
+    }
+    
+    bool isDefault()
+    {
+    	return value_is_default;
+    }    
+    
+    
+    private void unset_priv()
+    {
+    	if (!settings.unsettable) {
+    		throw new Exception("not unsettable");
+    	}
+    	
+    	T1 old_value;
+    	T1 new_value;
+    	
+    	old_value = variable;
+    	new_value = getUnsetValue();
+    	
+    	onBeforeChanged.emit(old_value, new_value);
+    	scope (success)
+    	onAfterChanged.emit(old_value, new_value);
+    	onBeforeUnset.emit(old_value, new_value);
+    	scope (success)
+    	onAfterUnset.emit(old_value, new_value);
+    	
+    	value_is_unset = true;
+    	
+    	if (settings.default_is_unset)
+    	{
     		value_is_default = true;
-    		static if (settings.unsettable)
+    	}
+    	
+    	if (settings.on_unset_also_reset)
+    	{
+    		if (settings.resettable)
     		{
-    			if (settings.default_is_unset)
-    			{
-    				value_is_unset = true;
-    			}
+    			reset_priv();
     		}
     	}
     	
-        void reset()
-        {        	
-        	static if (settings.recursiveChangeProtection)
-        	{
-        		recursionGuard(
-        			changeCallInProgress,
-        			changeCallMutex,
-        			delegate void() {
-        				recursiveChangeReaction();
-        			},
-        			&reset_priv,
-        			);
-        	} 
-        	else 
-        	{
-        		reset_priv();
-        	}
-        }
-
-        bool isDefault()
-        {
-            return value_is_default;
-        }
     }
-
-
-    static if (settings.unsettable)
+    
+    void unset()
+    {        	
+    	if (settings.recursiveChangeProtection)
+    	{
+    		recursionGuard(
+    			changeCallInProgress,
+    			changeCallMutex,
+    			delegate void() {
+    				recursiveChangeReaction();
+    			},
+    			&unset_priv,
+    			);
+    	} 
+    	else 
+    	{
+    		unset_priv();
+    	}
+    }        
+    
+    bool isUnset()
     {
-        private void unset_priv()
-        {
-            T1 old_value;
-            T1 new_value;
-
-            static if (settings.variable_define)
-            {
-                old_value = variable;
-                new_value = getUnsetValue();
-            }
-
-            onBeforeChanged.emit(old_value, new_value);
-            scope (success)
-                onAfterChanged.emit(old_value, new_value);
-            onBeforeUnset.emit(old_value, new_value);
-            scope (success)
-                onAfterUnset.emit(old_value, new_value);
-
-            static if (settings.variable_define)
-            {
-                value_is_unset = true;
-            }
-
-            static if (settings.default_is_unset)
-            {
-                value_is_default = true;
-            }
-
-            static if (settings.on_unset_also_reset)
-            {
-                static if (settings.resettable)
-                {
-                    reset_priv();
-                }
-            }
-
-        }
-
-        void unset()
-        {        	
-        	static if (settings.recursiveChangeProtection)
-        	{
-        		recursionGuard(
-        			changeCallInProgress,
-        			changeCallMutex,
-        			delegate void() {
-        				recursiveChangeReaction();
-        			},
-        			&unset_priv,
-        			);
-        	} 
-        	else 
-        	{
-        		unset_priv();
-        	}
-        }        
-
-        bool isUnset()
-        {
-            return value_is_unset;
-        }
-
-        bool isSet()
-        {
-            return !value_is_unset;
-        }        
+    	return value_is_unset;
     }
+    
+    bool isSet()
+    {
+    	return !value_is_unset;
+    }        
+    
     
     // NOTE: this must be defined anyway, because it can be used also for 
     //       getting default value
     // TODO: this, probably, have to be reworked
     T1 getUnsetValue()
     {
-    	static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.initValue)
+    	final switch (settings.whatToReturnIfUnset)
     	{
+    	case PropertyWhatToReturnIfValueIsUnset.initValue:
     		return settings.init_value;
-    	}
-    	static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.defaultValue)
-    	{
+    	case PropertyWhatToReturnIfValueIsUnset.defaultValue:
     		return settings.default_value;
-    	}
-    	static if (settings.whatToReturnIfUnset == PropertyWhatToReturnIfValueIsUnset.typeInitValue)
-    	{
+    	case PropertyWhatToReturnIfValueIsUnset.typeInitValue:
     		return T1.init;
     	}
     }    
     
-    static if (settings.gettable)
+    T1 get()
     {
-        T1 get()
-        {
-            onBeforeGet.emit();
-            scope (success)
-                onAfterGet.emit();
-
-            T1 ret = settings.default_value;
-
-            static if (settings.variable_define)
-            {
-                if ({
-                        static if (settings.unsettable)
-                        {
-                            return value_is_unset;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }())
-                {
-                    ret = getUnsetValue();
-                }
-                else
-                {
-                    ret = variable;
-                }
-            }
-
-            return ret;
-        }
+    	if (!settings.gettable) {
+    		throw new Exception("not unsettable");
+    	}
+    	
+    	onBeforeGet.emit();
+    	scope (success)
+    	onAfterGet.emit();
+    	
+    	T1 ret = settings.default_value;
+    	
+    	if (settings.unsettable && value_is_unset)
+    	{
+    		ret = getUnsetValue();
+    	}
+    	else
+    	{
+    		ret = variable;
+    	}
+    	
+    	return ret;
     }
-
-    static if (settings.settable)
+    
+    private void set_priv(T1 new_value)
     {
-        private void set_priv(T1 new_value)
-        {
-            T1 old_value;
-
-            static if (settings.variable_define)
-            {
-                old_value = variable;
-            }
-
-            onBeforeChanged.emit(old_value, new_value);
-            scope (success)
-                onAfterChanged.emit(old_value, new_value);
-            onBeforeSet.emit(old_value, new_value);
-            scope (success)
-                onAfterSet.emit(old_value, new_value);
-
-            static if (settings.variable_define)
-            {
-                variable = new_value;
-            }
-
-            static if (settings.resettable)
-            {
-                value_is_default = false;
-            }
-            static if (settings.unsettable)
-            {
-                value_is_unset = false;
-            }
-
-            static if (settings.resettable)
-            {
-                if (settings.setting_to_default_value_makes_property_reset
-                        && new_value == settings.default_value)
-                {
-                    reset_priv();
-                }
-            }
-            static if (settings.unsettable)
-            {
-                if (settings.setting_to_default_value_makes_property_unset
-                        && new_value == settings.default_value)
-                {
-                    unset_priv();
-                }
-            }
-        }
-        
-        void set(T1 new_value)
-        {        	
-        	static if (settings.recursiveChangeProtection)
-        	{
-        		recursionGuard(
-        			changeCallInProgress,
-        			changeCallMutex,
-        			delegate void() {
-        				recursiveChangeReaction();
-        			},
-        			&set_priv,
-        			);
-        	} 
-        	else 
-        	{
-        		set_priv();
-        	}
-        }        
+    	if (!settings.settable) {
+    		throw new Exception("not unsettable");
+    	}
+    	
+    	
+    	T1 old_value;
+    	
+    	old_value = variable;
+    	
+    	onBeforeChanged.emit(old_value, new_value);
+    	scope (success)
+    	onAfterChanged.emit(old_value, new_value);
+    	onBeforeSet.emit(old_value, new_value);
+    	scope (success)
+    	onAfterSet.emit(old_value, new_value);
+    	
+    	variable = new_value;
+    	
+    	if (settings.resettable)
+    	{
+    		value_is_default = false;
+    	}
+    	if (settings.unsettable)
+    	{
+    		value_is_unset = false;
+    	}
+    	
+    	if (settings.resettable)
+    	{
+    		if (settings.setting_to_default_value_makes_property_reset
+    			&& new_value == settings.default_value)
+    		{
+    			reset_priv();
+    		}
+    	}
+    	if (settings.unsettable)
+    	{
+    		if (settings.setting_to_default_value_makes_property_unset
+    			&& new_value == settings.default_value)
+    		{
+    			unset_priv();
+    		}
+    	}
     }
+    
+    void set(T1 new_value)
+    {        	
+    	if (settings.recursiveChangeProtection)
+    	{
+    		recursionGuard(
+    			changeCallInProgress,
+    			changeCallMutex,
+    			delegate void() {
+    				recursiveChangeReaction();
+    			},
+    			&set_priv,
+    			new_value
+    			);
+    	} 
+    	else 
+    	{
+    		set_priv(new_value);
+    	}
+    }        
+    
 }
 
 mixin template Property_forwarding(T, alias property, string new_suffix)
 {
     // ["get", "set", "reset", "unset", "isDefault", "isUnset"]
-
+    
     // TODO: refactor this
     import std.format;
-
+    
    	import observable.signal;
    	
    	static assert(__traits(identifier, property) != "");
     
-    static if (__traits(hasMember, property, "get"))
-    {
-        mixin(
-        	q{
-        		T get%1$s()
-        		{
-        			return this.%2$s.get();
-        		}
-        	}.format(new_suffix, __traits(identifier, property))
-        	);
-    }
-
+   	mixin(
+   		q{
+   			T get%1$s()
+   			{
+   				return this.%2$s.get();
+   			}
+   		}.format(new_suffix, __traits(identifier, property))
+   		);
+   	
     static foreach (func; ["set", "reset", "unset"])
     {
-    	static if (__traits(hasMember, property, func)) {
-    		static if (func == "set")
-    		{
-    			mixin(
-    				q{
-    					typeof(this) %1$s%2$s(T x) { 
-    						this.%3$s.%1$s(x);
-    						return this;
-    					}
-    				}.format(func, new_suffix, __traits(identifier, property))
-    				);
-    		} 
-    		else 
-    		{
-    			mixin(
-    				q{
-    					typeof(this) %1$s%2$s() { 
-    						this.%3$s.%1$s();
-    						return this;
-    					}
-    				}.format(func, new_suffix, __traits(identifier, property))
-    				);
-    		}
-    	}
-    }
-    
-    static foreach (func; ["isDefault", "isUnset", "isSet"])
-    {
-    	static if (__traits(hasMember, property, func)) {
+    	static if (func == "set")
+    	{
     		mixin(
     			q{
-    				bool %1$s%2$s() { 
-    					return this.%3$s.%1$s();
+    				typeof(this) %1$s%2$s(T x) { 
+    					this.%3$s.%1$s(x);
+    					return this;
+    				}
+    			}.format(func, new_suffix, __traits(identifier, property))
+    			);
+    	} 
+    	else 
+    	{
+    		mixin(
+    			q{
+    				typeof(this) %1$s%2$s() { 
+    					this.%3$s.%1$s();
+    					return this;
     				}
     			}.format(func, new_suffix, __traits(identifier, property))
     			);
     	}
     }
-
+    
+    static foreach (func; ["isDefault", "isUnset", "isSet"])
+    {
+    	mixin(
+    		q{
+    			bool %1$s%2$s() { 
+    				return this.%3$s.%1$s();
+    			}
+    		}.format(func, new_suffix, __traits(identifier, property))
+    		);
+    }
+    
     // =========== signals ===========
-
+    
     static foreach (v; ["onBeforeGet", "onAfterGet",])
     {
-        static if (__traits(hasMember, property, v))
-        {
-        	
-            mixin(
-            	q{
-            		SignalConnection connectTo%2$s_%1$s(void delegate() nothrow cb)
-            		{
-            			import observable.signal;
-            			SignalConnection conn;
-            			this.%3$s.%1$s.socket.connect(conn, cb);
-            			// this.%3$s.property_cc.add(conn);
-            			return conn;
-            		}
-            	}.format(v,new_suffix, __traits(identifier, property))
-            	);
-        }
-
+    	mixin(
+    		q{
+    			SignalConnection connectTo%2$s_%1$s(void delegate() nothrow cb)
+    			{
+    				import observable.signal;
+    				SignalConnection conn;
+    				this.%3$s.%1$s.socket.connect(conn, cb);
+    				// this.%3$s.property_cc.add(conn);
+    				return conn;
+    			}
+    		}.format(v,new_suffix, __traits(identifier, property))
+    		);
     }
-
+    
     static foreach (v; [
-            "onBeforeSet", "onAfterSet", "onBeforeReset", "onAfterReset",
-            "onBeforeUnset", "onAfterUnset", "onBeforeChanged", "onAfterChanged",
+    	"onBeforeSet", "onAfterSet", "onBeforeReset", "onAfterReset",
+    	"onBeforeUnset", "onAfterUnset", "onBeforeChanged", "onAfterChanged",
         ])
     {
-        static if (__traits(hasMember, property, v))
-        {
-        	 mixin(
-            	q{
-            		SignalConnection connectTo%2$s_%1$s(void delegate(T old_value, T new_value) nothrow cb)
-            		{
-            			import observable.signal;
-            			SignalConnection conn;
-            			this.%3$s.%1$s.socket.connect(conn, cb);
-            			// this.%3$s.property_cc.add(conn);
-            			return conn;
-            		}
-            	}.format(v,new_suffix, __traits(identifier, property))
-            	);
-        	
-             // mixin("void connectTo" ~ new_suffix ~ "_" ~ v ~ "( void delegate(T old_value, T new_value) nothrow  cb) { "
-             // ~ "import observable.signal;" ~ "SignalConnection conn;" ~ "this." ~ __traits(identifier,
-             // property) ~ "." ~ v ~ ".socket.connect(" ~ "conn," ~ "cb); " ~ "this." ~ __traits(identifier,
-             // property) ~ ".property_cc.add(conn);" ~ "}");
-        }
-
+    	mixin(
+    		q{
+    			SignalConnection connectTo%2$s_%1$s(void delegate(T old_value, T new_value) nothrow cb)
+    			{
+    				import observable.signal;
+    				SignalConnection conn;
+    				this.%3$s.%1$s.socket.connect(conn, cb);
+    				return conn;
+    			}
+    		}.format(v,new_suffix, __traits(identifier, property))
+    		);
+    	
     }
-
 }
 
 // TODO: add new unittests
@@ -534,62 +473,76 @@ struct PropSetting
     string default_value;
 }
 
-mixin template mixin_install_multiple_properties(PropSetting[] settings)
+mixin template mixin_multiple_properties_define(PropSetting[] settings) 
 {
-    import std.format;
-
+	import std.format;
+	
     static foreach (v; settings)
     {
-        static if (v.mode == "gs_w_d")
-        {
-            mixin(
-                q{
-                    private {
-                        mixin Property_%1$s!(%2$s, "%3$s", %5$s);
-                    }
-
-                    mixin Property_forwarding!(%2$s, %3$s, "%4$s");
-
-                }.format(
-                    v.mode,
-                    v.type,
-                    v.var_name,
-                    v.title_name,
-                    v.default_value,
-                    )
-                );
-        }
-
-        else static if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
-        {
-            mixin(
-                q{
-                    private {
-                        mixin Property_%1$s!(%2$s, "%3$s");
-                    }
-
-                    mixin Property_forwarding!(%2$s, %3$s, "%4$s");
-
-                }.format(
-                    v.mode,
-                    v.type,
-                    v.var_name,
-                    v.title_name,
-                    )
-                );
-        }
-        else 
-        {
-        	static assert(false, "invalid PropSetting.mode value");
-        }
-
+    	mixin(
+    		q{
+    			private {
+    				Property!%1$s %2$s;
+    			}
+    		}.format(
+    			v.type,
+    			v.var_name,
+    			)
+    		);
     }
 }
 
-// struct stname(PropSetting2[] settings) {
-	// string sname;
-	// string tname;
-// }
-// 
-// 
-// mixin template mixin_connect_multiple_properties
+string mixin_multiple_properties_inst(const PropSetting[] settings) 
+{
+	import std.format;
+	
+	string ret;
+	
+	foreach (v; settings)
+	{
+		if (v.mode == "gs_w_d")
+		{
+			ret ~= q{
+				this.%2$s = makeProperty_gs_w_d!(%1$s)(%3$s);
+			}.format(
+				v.type,
+				v.var_name,
+				v.default_value,
+				);				
+		}
+		else if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
+		{
+			ret ~= q{
+				this.%3$s = makeProperty_%1$s!(%2$s)();
+			}.format(
+				v.mode,
+				v.type,
+				v.var_name,
+				);
+		}
+		else 
+		{
+			throw new Exception("invalid PropSetting.mode value");
+		}
+	}
+	return ret;
+}
+
+mixin template mixin_multiple_properties_forward(PropSetting[] settings) 
+{
+	import std.format;
+	
+	static foreach (v; settings)
+	{
+		mixin(
+			q{
+				mixin Property_forwarding!(%1$s, %2$s, "%3$s");
+				
+			}.format(
+				v.type,
+				v.var_name,
+				v.title_name,
+				)
+			);
+	}
+}

@@ -14,7 +14,6 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Property;
-import dtk.types.Property_mixins;
 import dtk.types.MoveT;
 
 import dtk.types.Size2D;
@@ -28,58 +27,17 @@ import dtk.miscs.DrawingSurfaceShift;
 
 import dtk.widgets.Layout;
 
+const auto WidgetProperties = cast(PropSetting[]) [
+PropSetting("gsu", "LayoutI", "parent_layout", "ParentLayout", "null"),
+];
+
 class Widget : WidgetI
 {
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])
-        [
-            PropSetting("gsu", "LayoutI", "parent_layout", "ParentLayout", "null"),
-        ]
-        );
-    
-    // =====v===v===v===== [locator] =====v===v===v===== start
 
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])[
-            // PropSetting("gs_w_d", "bool", "vertical_expand", "VerticalExpand", "false"),
-            // PropSetting("gs_w_d", "bool", "horizontal_expand", "HorizontalExpand", "false"),
-            // PropSetting("gs_w_d", "bool", "vertical_fill", "VerticalFill", "false"),
-            // PropSetting("gs_w_d", "bool", "horizontal_fill", "HorizontalFill", "false"),
-            // PropSetting("gs", "Position2D", "position", "Position", ""),
-            // PropSetting("gs_w_d", "Size2D", "size", "Size", q{Size2D(10, 10)}),
-            // PropSetting("gs", "Size2D", "size", "Size", ""),
-            // PropSetting("gsu", "Size2D", "minimal_size", "MinimalSize", ""),
-            // PropSetting("gsu", "Size2D", "maximal_size", "MaximalSize", ""),
-        ]
-        );
-
-    // NOTE: those two properties are really a synonym for their //Horizontal//
-    //       analogs
-    // mixin Property_forwarding!(bool, horizontal_expand, "Expand");
-    // mixin Property_forwarding!(bool, horizontal_fill, "Fill");
-
-
-    // =====^===^===^===== [locator] =====^===^===^===== end
-
-    // =====v===v===v===== [info] =====v===v===v===== start
-
-    mixin mixin_install_multiple_properties!(
-        cast(PropSetting[])[
-            PropSetting("gs_w_d", "bool", "visible", "Visible", "false"),
-            PropSetting("gs_w_d", "bool", "enabled", "Enabled", "false"),
-            // PropSetting("gs_w_d", "bool", "focusable", "Focusable", "false"),
-            // PropSetting("gs_w_d", "bool", "focus_kb_capture", "FocusKeyboardCapture", "false"),
-            // PropSetting("gs_w_d", "bool", "uses_text_input", "UsesTextInput", "false"),
-            // PropSetting("gs_w_d", "MoveT", "move_type", "MoveType", "MoveT.none"),
-        ]
-        );
-
-    // =====^===^===^===== [info] =====^===^===^===== end
-
-    // TODO: ensure all subclasses calls for super();
-    // NOTE: ensured. init called implicitly by dlang
-    this()
-    {
+	mixin mixin_multiple_properties_define!(WidgetProperties);
+    mixin mixin_multiple_properties_forward!(WidgetProperties);
+    this() {
+    	mixin(mixin_multiple_properties_inst(WidgetProperties));
     }
 
     /++ return FormI on which this Widget is placed. returns null in case if
@@ -158,7 +116,7 @@ class Widget : WidgetI
             {
                 __traits(getMember, theme, drawid)(new_this);
             }
-        }        
+        }
     }
 
     void positionAndSizeRequest(Position2D position, Size2D size)
@@ -191,7 +149,7 @@ class Widget : WidgetI
     {
         return tuple(cast(WidgetI)this, 0UL, 0UL);
     }
-    
+
     WidgetI getNextFocusableWidget()
     {
         return null;
@@ -201,7 +159,7 @@ class Widget : WidgetI
     {
         return null;
     }
-    
+
     static foreach(v; ["Keyboard", "Mouse", "TextInput"])
     {
     	import std.format;
@@ -211,9 +169,9 @@ class Widget : WidgetI
 					Event%1$s *e,
     				ulong mouse_widget_local_x,
     				ulong mouse_widget_local_y,
-					)[string] handlers%1$s;     			    			
+					)[string] handlers%1$s;
     			void set%1$sEvent(
-    				string name, 
+    				string name,
     				void delegate(
     					Event%1$s *e,
     					ulong mouse_widget_local_x,
@@ -223,9 +181,9 @@ class Widget : WidgetI
     			{
     				handlers%1$s[name] = handler;
     			}
-    			
+
     			void call%1$sEvent(
-    				string name, 
+    				string name,
     				Event%1$s* e,
     				ulong mouse_widget_local_x,
     				ulong mouse_widget_local_y,
@@ -237,7 +195,7 @@ class Widget : WidgetI
     					ev(e,mouse_widget_local_x,mouse_widget_local_y);
     				}
     			}
-    			
+
     			void unset%1$sEvent(string name)
     			{
     				handlers%1$s.remove(name);
@@ -257,7 +215,7 @@ class Widget : WidgetI
     		throw new Exception("parent not set: null");
     	}
     }
-    
+
     LayoutChild getLayoutChildE()
     {
     	exceptionIfParentNotSet();
@@ -269,13 +227,13 @@ class Widget : WidgetI
     	}
     	return lc;
     }
-    
+
     ulong getX()
     {
     	auto lc = getLayoutChildE();
     	return lc.getX();
     }
-    
+
     ulong getY()
     {
     	auto lc = getLayoutChildE();
@@ -287,7 +245,7 @@ class Widget : WidgetI
     	auto lc = getLayoutChildE();
     	return lc.getWidth();
     }
-    
+
     ulong getHeight()
     {
     	auto lc = getLayoutChildE();
@@ -299,9 +257,9 @@ class Widget : WidgetI
     	auto lc = getLayoutChildE();
     	return lc.getHeight();
     }
-    
+
     typeof(this) setY(ulong v);
     typeof(this) setWidth(ulong v);
-    typeof(this) setHeight(ulong v);    
+    typeof(this) setHeight(ulong v);
 
 }

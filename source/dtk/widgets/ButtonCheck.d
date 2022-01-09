@@ -7,18 +7,20 @@ import dtk.types.Property;
 
 import dtk.widgets.Button;
 
+const auto ButtonCheckProperties = cast(PropSetting[]) [
+PropSetting("gs_w_d", "bool", "checked", "Checked", "null"),
+];
+
+
 class ButtonCheck : Button
 {
-    private
-    {
-        mixin Property_gs_w_d!(bool, "checked", false);
-    }
 
-    mixin Property_forwarding!(bool, checked, "Checked");
-
+	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
+    mixin mixin_multiple_properties_forward!(ButtonCheckProperties);
+    
     this()
     {
-        // setFocusable(true);
+    	mixin(mixin_multiple_properties_inst(ButtonCheckProperties));
         
         setMouseEvent("button-click", &on_mouse_click_internal);
         setMouseEvent("button-down", &on_mouse_down_internal);

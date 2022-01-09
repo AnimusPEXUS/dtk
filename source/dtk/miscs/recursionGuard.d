@@ -9,7 +9,8 @@ T2 recursionGuard(T2, T1...)
 	ref bool already_called,
 	ref Mutex call_mutex,
 	T2 delegate() already_started_call,
-	T2 delegate(T1) target
+	T2 delegate(T1) target,
+	T1 args
 	)
 {
     synchronized (call_mutex)
@@ -27,7 +28,7 @@ T2 recursionGuard(T2, T1...)
         already_called = true;
         scope (exit) {already_called = false;}
         
-        return target(T1);
+        return target(args);
     }
 }
 
@@ -35,7 +36,8 @@ T2 recursionGuard(T2, T1...)(
 	ref bool already_called,
 	ref Mutex call_mutex,
 	T2 already_started_return,
-	T2 delegate(T1) target
+	T2 delegate(T1) target,
+	T1 args
 	)
 {
     return recursionGuard(
@@ -45,6 +47,7 @@ T2 recursionGuard(T2, T1...)(
     		return already_started_return;
     	},
     	target,
+    	args,
     	);
 }
 

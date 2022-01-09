@@ -12,49 +12,47 @@ import dtk.miscs.RadioGroup;
 
 import dtk.widgets.Button;
 
+const auto ButtonRadioProperties = cast(PropSetting[]) [
+PropSetting("gsun", "RadioGroup", "radio_group", "RadioGroup", "null"),
+PropSetting("gs_w_d", "bool", "checked", "Checked", "null"),
+];
+
+
 class ButtonRadio : Button
 {
 	private {
     	SignalConnectionContainer con_cont;
     }
-    
-    private
-    {
-        mixin Property_gsun!(RadioGroup, "radio_group");
-        mixin Property_gs_w_d!(bool, "checked", false);
-    }
 
-    mixin Property_forwarding!(RadioGroup, radio_group, "RadioGroup");
-    mixin Property_forwarding!(bool, checked, "Checked");
-
-    /* public bool checked; */
+	mixin mixin_multiple_properties_define!(ButtonRadioProperties);
+    mixin mixin_multiple_properties_forward!(ButtonRadioProperties);
 
     this()
     {
-        // setFocusable(true);
-        
+    	mixin(mixin_multiple_properties_inst(ButtonRadioProperties));
+
         setMouseEvent("button-click", &on_mouse_click_internal);
         setMouseEvent("button-down", &on_mouse_down_internal);
         setMouseEvent("button-up", &on_mouse_up_internal);
-        
+
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
     }
 
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
-        
+
         collectException({
             if (old_v !is null)
                 if (old_v.isIn(this))
                     old_v.remove(this);
         }());
-        
+
     }
 
     private void handleRadioGroup_onAfterChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
-        
+
         collectException({
             if (new_v !is null)
                 if (!new_v.isIn(this))
