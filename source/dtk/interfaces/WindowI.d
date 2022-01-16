@@ -4,6 +4,8 @@ import std.typecons;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
+
+import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
@@ -13,20 +15,22 @@ import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WindowEventMgrI;
-import dtk.interfaces.event_receivers;
+// import dtk.interfaces.event_receivers;
+
+import dtk.miscs.mixin_event_handler_reg;
 
 interface WindowI
 {
     PlatformI getPlatform();
 
-    void setEventManager(WindowEventMgrI mgr);
-    WindowEventMgrI getEventManager();
+    WindowI setWindowEventMgr(WindowEventMgrI mgr);
+    WindowEventMgrI getWindowEventMgr();
 
-    void installForm(FormI form);
-    void uninstallForm();
+    //void installForm(FormI form);
+    //void uninstallForm();
 
-    void setForm(FormI form);
-    void unsetForm();
+    WindowI setForm(FormI form);
+    WindowI unsetForm();
     FormI getForm();
     
     DrawingSurfaceI getDrawingSurface();
@@ -41,30 +45,18 @@ interface WindowI
     
     WindowI setX(int v);
     WindowI setY(int v);
-    
     WindowI setWidth(ulong v);
     WindowI setHeight(ulong v);
+
+    static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
+    {    	
+    	mixin(mixin_event_handler_reg(v, true));
+    }
     
-    // Position2D getPoint();
-    // Tuple!(bool, Position2D) setPoint(Position2D point);
-// 
-    // Size2D getSize();
-    // Tuple!(bool, Size2D) setSize(Size2D size);
-
-    /* Position2D getFormPoint();
-    Size2D getFormSize(); */
-
-    string getTitle();
-    void setTitle(string value);
+    dstring getTitle();
+    WindowI setTitle(dstring value);
 
     void redraw();
-
-    /* void setWindowEventCB(void delegate(EventWindow event));
-    void unsetWindowEventCB();
-
-    void setKeyboardEventCB(void delegate(EventKeyboard event));
-    void unsetKeyboardEventCB();
-
-    void setMouseEventCB(void delegate(EventMouse event));
-    void unsetMouseEventCB(); */
+    
+    // void handleEvent(Event* event);
 }

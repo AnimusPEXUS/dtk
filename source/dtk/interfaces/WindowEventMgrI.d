@@ -1,19 +1,28 @@
 module dtk.interfaces.WindowEventMgrI;
 
-import dtk.interfaces.event_receivers;
+import std.format;
+
+// import dtk.interfaces.event_receivers;
 import dtk.interfaces.WindowI;
 
-import dtk.types.EventXAction;
+import dtk.types.Event;
+import dtk.types.WindowEventMgrHandler;
 
-interface WindowEventMgrI : EventReceiverWindowI
+interface WindowEventMgrI // : EventReceiverWindowI
 {
-
+	
     WindowI getWindow();
-
-    void removeAllActions();
-
+    
+    void removeAllHandlers();
+    
     static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
-        mixin("void add" ~ v ~ "Action(Event" ~ v ~ "Action eva);");
+        mixin(
+        	q{
+        		void add%1$sHandler(WindowEventMgr%1$sHandler eva);
+        	}.format(v)
+        	);
     }
+    
+    void handleEvent(Event* event);
 }

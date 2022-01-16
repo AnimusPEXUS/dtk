@@ -12,11 +12,12 @@ import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.WindowEventMgrI;
 
+import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
-import dtk.types.EventXAction;
+import dtk.types.WindowEventMgrHandler;
 
 union XEvent
 {
@@ -53,7 +54,7 @@ class WindowEventMgr : WindowEventMgrI
         return window;
     }
     
-    private bool handle_event_x_search_and_call(alias listXActions, T1,)(T1 event)
+    private bool handle_event_search_and_call(alias listXActions, T1)(T1 event)
     {
         WidgetI focusedWidget;
         WidgetI mouseWidget;
@@ -118,32 +119,34 @@ class WindowEventMgr : WindowEventMgrI
         return processed;
     }
     
-    bool handle_event_window(EventWindow* e)
+    void handleEvent(Event* event)
     {
-        return handle_event_x_search_and_call!listWindowActions(e);
-    }
-    
-    bool handle_event_keyboard(EventKeyboard* e)
-    {
-        return handle_event_x_search_and_call!listKeyboardActions(e);
-    }
-    
-    bool handle_event_mouse(EventMouse* e)
-    {
-        return handle_event_x_search_and_call!listMouseActions(e);
-    }
-    
-    bool handle_event_textinput(EventTextInput* e)
-    {
-        return handle_event_x_search_and_call!listTextInputActions(e);
+    	final switch (event.eventType)
+    	{
+    	case EventType.none:
+    		break;
+    		
+    	case EventType.window:
+    		handle_event_search_and_call!listWindowHandlers(event.ew);
+    		break;
+    	case EventType.keyboard:
+    		handle_event_search_and_call!listKeyboardHandlers(event.ek);
+    		break;
+    	case EventType.mouse:
+    		handle_event_search_and_call!listMouseHandlers(event.em);
+    		break;
+    	case EventType.textInput:
+    		handle_event_search_and_call!listTextInputHandlers(event.eti);
+    		break;
+    	}
     }
     
     Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point)
     {
-        FormI _form = window.getForm();
-        if (_form !is null)
+        FormI form = window.getForm();
+        if (form !is null)
         {
-            return _form.getWidgetAtPosition(point);
+            return form.getWidgetAtPosition(point);
         }
         return tuple(cast(WidgetI) null, 0UL, 0UL);
     }
@@ -152,21 +155,23 @@ class WindowEventMgr : WindowEventMgrI
     {
     	mixin(
     		q{
-    			private Event%1$sAction[] list%1$sActions;
-    			void add%1$sAction(Event%1$sAction eva) { 
-    				list%1$sActions ~= eva; 
+    			private WindowEventMgr%1$sHandler[] list%1$sHandlers;
+    			void add%1$sHandler(WindowEventMgr%1$sHandler eva) { 
+    				list%1$sHandlers ~= eva; 
     			}
     		}.format(v)
     		);    	
     }
     
-    void removeAllActions()
+    void removeAllHandlers()
     {
-    	// TODO: use q{}
         static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
         {
-            mixin("list%1$sActions = []; ".format(v));
+            mixin(q{list%1$sHandlers = [];}.format(v));
         }
     }
     
 }
+
+
+

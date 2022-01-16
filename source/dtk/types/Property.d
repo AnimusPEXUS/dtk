@@ -1,5 +1,7 @@
 module dtk.types.Property;
 
+// TODO: move Property to miscs
+
 // TODO: Property requires clarification and determination
 
 // import std.stdio;
@@ -13,7 +15,7 @@ import std.exception;
 import observable.signal;
 /* import observable.signal.SignalConnection;  */
 
-import dtk.types.Signal;
+import dtk.miscs.signal_tools;
 import dtk.miscs.recursionGuard;
 
 

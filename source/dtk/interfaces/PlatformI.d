@@ -1,12 +1,17 @@
 module dtk.interfaces.PlatformI;
 
-import observable.signal;
 
 import dtk.interfaces.WindowI;
 import dtk.interfaces.LafI;
 import dtk.interfaces.FontMgrI;
 
 import dtk.types.WindowCreationSettings;
+import dtk.types.Event;
+
+import dtk.miscs.signal_tools;
+
+import dtk.signal_mixins.Platform;
+
 
 interface PlatformI
 {
@@ -15,8 +20,8 @@ interface PlatformI
     string getSystemTriplet();
 
     LafI getLaf();
-    void setLaf(LafI);
-    void unsetLaf();
+    PlatformI setLaf(LafI);
+    PlatformI unsetLaf();
 
     FontMgrI getFontManager();
 
@@ -29,5 +34,8 @@ interface PlatformI
     void mainLoop();
     void destroy();
     
-    SignalConnection connectTo_Timer500( void delegate() nothrow );
+    mixin(mixin_PlatformSignals(true));
+    
+    //SignalConnection connectToSignal_Timer500( void delegate() nothrow );
+    //SignalConnection connectToSignal_Event( void delegate(Event*) nothrow );
 }

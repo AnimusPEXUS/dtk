@@ -8,7 +8,6 @@ import std.format;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 import dtk.types.Property;
-import dtk.types.Signal;
 import dtk.types.Image;
 import dtk.types.Color;
 import dtk.types.EventKeyboard;
@@ -26,6 +25,7 @@ import dtk.widgets.mixins;
 
 import dtk.miscs.TextProcessor;
 import dtk.miscs.DrawingSurfaceShift;
+import dtk.miscs.signal_tools;
 
 const auto TextEntryProperties = cast(PropSetting[]) [
 PropSetting("gs", "dstring", "text", "Text"),

@@ -1,0 +1,8 @@
+module dtk.interfaces.event_receivers;
+
+import dtk.types.Event;
+
+interface EventReceiverWidgetI
+{
+}
+

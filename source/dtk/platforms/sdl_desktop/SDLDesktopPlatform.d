@@ -14,13 +14,17 @@ import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
 
+import dtk.types.Event;
+import dtk.types.Property;
 import dtk.types.WindowCreationSettings;
-import dtk.types.Signal;
 
 import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
 
+import dtk.miscs.signal_tools;
 import dtk.miscs.WindowEventMgr;
+
+import dtk.signal_mixins.Platform;
 
 // TODO: ensure those events are not needed
 immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
@@ -29,56 +33,103 @@ SDL_WINDOWEVENT_SIZE_CHANGED,
 cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
 ];
 
+const auto SDLDesktopPlatformProperties = cast(PropSetting[]) [
+PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
+PropSetting("gsun", "LafI", "laf", "Laf", "null"),
+];
+
 class SDLDesktopPlatform : PlatformI
 {
-
-    private
-    {
-        Window[] windows;
-        LafI laf;
-        FontMgrI font_mgr;
-
-        // bool exit;
-        bool stop_flag;
-        // alias exit = stop_flag;
-
-        SDL_EventType timer500_event_id;
-    }
 
     string getName()
     {
         return "SDL-Desktop";
     }
-
+    
     string getDescription()
     {
         return "DTK (D ToolKit). on SDL Platform";
     }
-
+    
     string getSystemTriplet()
     {
         return "x86_64-pc-linux-gnu"; // TODO: fix this
     }
-
+    
     bool canCreateWindow()
     {
         return true;
     }
+    
+    bool getFormCanResizeWindow()
+    {
+        return true;
+    }
+    
+	mixin mixin_multiple_properties_define!(SDLDesktopPlatformProperties);
+    mixin mixin_multiple_properties_forward!(SDLDesktopPlatformProperties);
+    
+    mixin(mixin_PlatformSignals(false));
+    
+    private
+    {
+        Window[] windows;
 
+        bool stop_flag;
+
+        SDL_EventType timer500_event_id;
+    }
+
+    void init()
+    {
+    	mixin(mixin_multiple_properties_inst(SDLDesktopPlatformProperties));
+    	
+        SDL_Init(SDL_INIT_VIDEO);
+        SDL_version v;
+        SDL_GetVersion(&v);
+        
+        {
+        	timer500_event_id = cast(SDL_EventType)SDL_RegisterEvents(1);
+        	if (timer500_event_id == -1)
+        		throw new Exception("Couldn't register 500 ms timer event");
+        	
+        }
+        
+        version (linux)
+        {
+            import dtk.platforms.sdl_desktop.FontMgrLinux;
+            
+            setFontManager(new FontMgrLinux());
+            // font_mgr = cast(FontMgrI) ;
+        }
+        else
+        {
+            static assert(false, "Couldn't select Font Manager for platform");
+        }
+    }
+    
+    void destroy()
+    {
+        SDL_Quit();
+    }
+    
     WindowI createWindow(WindowCreationSettings window_settings)
     {
-        auto w = new Window(window_settings, this);
+        auto w = new Window(window_settings);
+        w.setPlatform(this);
         return w;
     }
 
     void registerWindow(Window win)
     {
+    	unregisterWindow(win);
         foreach (ref Window w; windows)
         {
             if (w == win)
                 break;
         }
         windows ~= win;
+        win.setPlatform(this);
     }
 
     void unregisterWindow(Window win)
@@ -94,48 +145,8 @@ class SDLDesktopPlatform : PlatformI
         {
             windows = windows[0 .. i] ~ windows[i + 1 .. $];
         }
-    }
 
-    bool getFormCanResizeWindow()
-    {
-        return true;
-    }
-
-    void init()
-    {
-        SDL_Init(SDL_INIT_VIDEO);
-        SDL_version v;
-        SDL_GetVersion(&v);
-
-        {
-        	timer500_event_id = cast(SDL_EventType)SDL_RegisterEvents(1);
-        	if (timer500_event_id == -1)
-        		throw new Exception("Couldn't register 500 ms timer event");
-
-        }
-
-        version (linux)
-        {
-            import dtk.platforms.sdl_desktop.FontMgrLinux;
-
-            font_mgr = cast(FontMgrI) new FontMgrLinux;
-        }
-        else
-        {
-            static assert(false, "Couldn't select Font Manager for platform");
-        }
-    }
-
-    void destroy()
-    {
-        SDL_Quit();
-    }
-
-    mixin installSignal!("Timer500", "signal_timer500");
-
-    FontMgrI getFontManager()
-    {
-        return font_mgr;
+        win.unsetPlatform();
     }
 
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)
@@ -219,7 +230,8 @@ class SDLDesktopPlatform : PlatformI
             }
             else
             {
-            	typeof(SDL_WindowEvent.windowID) windowID;
+            	// typeof(SDL_WindowEvent.windowID) windowID;
+            	Window w;
 
             	event_type_switch:
             	switch (event.type)
@@ -228,7 +240,7 @@ class SDLDesktopPlatform : PlatformI
             		debug writeln("unsupported event: ", event.type);
             		continue main_loop;
             	case SDL_WINDOWEVENT:
-            		windowID = event.window.windowID;
+            		w = getWindowByWindowID(event.window.windowID);
             		if (ignoredSDLWindowEvents.canFind(event.window.event))
             		{
             			continue main_loop;
@@ -236,54 +248,38 @@ class SDLDesktopPlatform : PlatformI
             		break;
             	case SDL_KEYDOWN:
             	case SDL_KEYUP:
-            		windowID = event.key.windowID;
+            		w = getWindowByWindowID(event.key.windowID);
             		break;
             	case SDL_MOUSEMOTION:
-            		windowID = event.motion.windowID;
+            		w = getWindowByWindowID(event.motion.windowID);
             		break;
             	case SDL_MOUSEBUTTONDOWN:
             	case SDL_MOUSEBUTTONUP:
-            		windowID = event.button.windowID;
+            		w = getWindowByWindowID(event.button.windowID);
             		break;
             	case SDL_MOUSEWHEEL:
-            		windowID = event.wheel.windowID;
+            		w = getWindowByWindowID(event.wheel.windowID);
             		break;
             	case SDL_TEXTINPUT:
-            		windowID = event.text.windowID;
+            		w = getWindowByWindowID(event.text.windowID);
             		break;
             	case SDL_QUIT:
             		break main_loop;
             	}
 
-            	// writeln(1);
-            	auto w = getWindowByWindowID(event.window.windowID);
-            	// writeln(2);
-
-            	// NOTE: window have to recieve all events, because not all
-            	// platforms have same set of events, and so, Window may be required
-            	// to emitate event emission in some curcumstances based on it's
-            	// current state.
-            	w.handle_SDL_Event(event);
-            	// writeln(3);
+            	auto e = convertSDLEventToEvent(event);
+            	if (e is null)
+            	{
+            		debug writeln("convertSDLEventToEvent returned null: ignoring");
+            		continue main_loop; 
+            	}
+            	e.window = w;
+            	
+            	signal_event.emit(e);
             }
         }
-
 
         return;
     }
 
-    LafI getLaf()
-    {
-        return laf;
-    }
-
-    void setLaf(LafI t)
-    {
-        laf = t;
-    }
-
-    void unsetLaf()
-    {
-        laf = null;
-    }
 }

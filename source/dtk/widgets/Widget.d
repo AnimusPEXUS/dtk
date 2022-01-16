@@ -20,6 +20,7 @@ import dtk.types.Size2D;
 import dtk.types.Position2D;
 
 import dtk.miscs.DrawingSurfaceShift;
+import dtk.miscs.mixin_event_handler_reg;
 
 /* import dtk.widgets.WidgetLocator; */
 // import dtk.widgets;
@@ -159,51 +160,12 @@ class Widget : WidgetI
     {
         return null;
     }
-
+    
     static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    {
-    	import std.format;
-    	mixin(
-    		q{
-				private void delegate(
-					Event%1$s *e,
-    				ulong mouse_widget_local_x,
-    				ulong mouse_widget_local_y,
-					)[string] handlers%1$s;
-    			void set%1$sEvent(
-    				string name,
-    				void delegate(
-    					Event%1$s *e,
-    					ulong mouse_widget_local_x,
-    					ulong mouse_widget_local_y,
-    					) handler
-    				)
-    			{
-    				handlers%1$s[name] = handler;
-    			}
-
-    			void call%1$sEvent(
-    				string name,
-    				Event%1$s* e,
-    				ulong mouse_widget_local_x,
-    				ulong mouse_widget_local_y,
-    				)
-    			{
-    				if (name in handlers%1$s)
-    				{
-    					auto ev = handlers%1$s[name];
-    					ev(e,mouse_widget_local_x,mouse_widget_local_y);
-    				}
-    			}
-
-    			void unset%1$sEvent(string name)
-    			{
-    				handlers%1$s.remove(name);
-    			}
-    		}.format(v)
-    		);
+    {    	
+    	mixin(mixin_event_handler_reg(v));
     }
-
+    
     void exceptionIfParentNotSet()
     {
     	if (!isSetParent())

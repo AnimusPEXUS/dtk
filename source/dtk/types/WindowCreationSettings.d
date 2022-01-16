@@ -9,7 +9,7 @@ import dtk.types.Size2D;
 
 struct WindowCreationSettings
 {
-    string title;
+    dstring title;
 
     LafI laf;
 

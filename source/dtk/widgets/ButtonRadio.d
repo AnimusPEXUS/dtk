@@ -14,7 +14,7 @@ import dtk.widgets.Button;
 
 const auto ButtonRadioProperties = cast(PropSetting[]) [
 PropSetting("gsun", "RadioGroup", "radio_group", "RadioGroup", "null"),
-PropSetting("gs_w_d", "bool", "checked", "Checked", "null"),
+PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
 ];
 
 
@@ -31,9 +31,9 @@ class ButtonRadio : Button
     {
     	mixin(mixin_multiple_properties_inst(ButtonRadioProperties));
 
-        setMouseEvent("button-click", &on_mouse_click_internal);
-        setMouseEvent("button-down", &on_mouse_down_internal);
-        setMouseEvent("button-up", &on_mouse_up_internal);
+        setMouseHandler("button-click", &on_mouse_click_internal);
+        setMouseHandler("button-down", &on_mouse_down_internal);
+        setMouseHandler("button-up", &on_mouse_up_internal);
 
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));

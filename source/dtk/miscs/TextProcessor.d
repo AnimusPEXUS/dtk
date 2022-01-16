@@ -23,9 +23,10 @@ import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.fontinfo;
-import dtk.types.Signal;
 import dtk.types.Property;
 import dtk.types.EventKeyboard;
+
+import dtk.miscs.signal_tools;
 
 
 
@@ -1336,9 +1337,24 @@ class Text
     // NOTE: lines should remain here, not to be moved into State
     TextLine[] lines;
     
-    mixin installSignal!("LinesRecalcRequired", "signal_linesRecalcRequired");
-    mixin installSignal!("VisibilityMapRecalcRequired", "signal_visibilityMapRecalcRequired");
-    mixin installSignal!("ImageRegenRequired", "signal_imageRegenRequired");
+    mixin mixin_installSignal!(
+    	"LinesRecalcRequired", 
+    	"signal_linesRecalcRequired",
+    	false,
+    	false,
+    	);
+    mixin mixin_installSignal!(
+    	"VisibilityMapRecalcRequired", 
+    	"signal_visibilityMapRecalcRequired",
+    	false,
+    	false,
+    	);
+    mixin mixin_installSignal!(
+    	"ImageRegenRequired", 
+    	"signal_imageRegenRequired",
+    	false,
+    	false,
+    	);
     
     mixin mixin_multiple_properties_define!(TextProperties);
     mixin mixin_multiple_properties_forward!(TextProperties);
@@ -2073,7 +2089,7 @@ class TextView
         if (!timer500_signal_connection.connected)
         {
             auto p = getPlatform();
-            timer500_signal_connection = p.connectTo_Timer500(
+            timer500_signal_connection = p.connectToSignal_Timer500(
                 delegate void() nothrow{
                     collectException(
                         {
@@ -2119,7 +2135,7 @@ class TextView
     void setText(Text txt)
     {
         text = txt;
-        text_linesRecalcRequired_sc = text.connectTo_LinesRecalcRequired(
+        text_linesRecalcRequired_sc = text.connectToSignal_LinesRecalcRequired(
             delegate void() nothrow
             {
                 linesRecalcRequired=true;

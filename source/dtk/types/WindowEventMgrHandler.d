@@ -1,6 +1,8 @@
-module dtk.types.EventXAction;
+module dtk.types.WindowEventMgrHandler;
 
-mixin template mixin_EventXAction(string subject)
+import dtk.types.Event;
+
+mixin template mixin_WindowEventMgrXHandler(string subject)
 {
 	import std.format;
 	
@@ -12,7 +14,7 @@ mixin template mixin_EventXAction(string subject)
     		
     		import dtk.types.Event%1$s;
     		
-    		struct Event%1$sAction
+    		struct WindowEventMgr%1$sHandler
     		{
     			// if not matched prefilter - checkMatch call will not happen
     			// ------- prefilter start -------
@@ -57,14 +59,19 @@ mixin template mixin_EventXAction(string subject)
 
 static foreach (v; ["Window", "Keyboard", "Mouse", "TextInput"])
 {
-    mixin mixin_EventXAction!v;
+    mixin mixin_WindowEventMgrXHandler!v;
 }
 
 // TODO: remove this?
-union EventXAction
+/*
+struct WindowEventMgrHandler
 {
-    EventWindowAction ewa;
-    EventKeyboardAction eka;
-    EventMouseAction ema;
-    EventTextInputAction etia;
+	EventType eventType;
+	union {
+		WindowEventMgrWindowHandler ewa;
+		WindowEventMgrKeyboardHandler eka;
+		WindowEventMgrMouseHandler ema;
+		WindowEventMgrTextInputHandler etia;
+	}
 }
+*/
