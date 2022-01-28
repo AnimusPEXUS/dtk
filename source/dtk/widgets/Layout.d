@@ -11,7 +11,7 @@ import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
-import dtk.interfaces.LayoutI;
+// import dtk.interfaces.LayoutI;
 
 
 import dtk.types.Position2D;
@@ -28,8 +28,6 @@ enum LayoutOverflowBehavior
     Clip, // don't draw overflow areas
     Resize, // resize self to fit everything
 }
-
-
 
 enum LayoutType : ubyte
 {
@@ -93,7 +91,7 @@ NOTE: Layout should not do any changes to any positions and sizes of it's
 own children.
 
 +/
-class Layout : Widget, ContainerI, LayoutI
+class Layout : Widget, ContainerI //, LayoutI
 {
 
     // children field is public and is a normal array. you can use it to
@@ -135,7 +133,7 @@ class Layout : Widget, ContainerI, LayoutI
     
     void checkChildren()
     {
-    	/* foreach_reverse (i, v; children)
+    	foreach_reverse (i, v; children)
     	{
     		if (v.widget is null)
     		{
@@ -146,18 +144,18 @@ class Layout : Widget, ContainerI, LayoutI
     		{
     			v.widget.setParent(this);
     		}
-    	} */
+    	} 
     }
     
-    LayoutChildI getLayoutChildByWidget(ContainerableI widget)
+    LayoutChild getLayoutChildByWidget(ContainerableI widget)
     {
-    	/* foreach (v; children)
+    	foreach (v; children)
     	{
     		if (v.widget == widget)
     		{
     			return v;
     		}
-    	} */
+    	}
     	return null;
     }
     
@@ -165,7 +163,7 @@ class Layout : Widget, ContainerI, LayoutI
     {
     	/* foreach (size_t counter, v; children)
         {
-            v.propagatePosAndSizeRecalc();
+        v.propagatePosAndSizeRecalc();
         } */
     }
     

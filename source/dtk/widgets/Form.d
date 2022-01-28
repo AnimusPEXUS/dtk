@@ -14,7 +14,7 @@ import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
-import dtk.interfaces.LayoutI;
+// import dtk.interfaces.LayoutI;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;

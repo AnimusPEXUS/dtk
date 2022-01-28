@@ -3,7 +3,7 @@ module dtk.interfaces.WidgetI;
 import std.typecons;
 
 import dtk.interfaces.FormI;
-import dtk.interfaces.LayoutI;
+// import dtk.interfaces.LayoutI;
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
 import dtk.interfaces.DrawingSurfaceI;
