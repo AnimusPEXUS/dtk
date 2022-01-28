@@ -19,7 +19,7 @@ import dtk.types.Position2D;
 
 import dtk.widgets.Layout;
 
-import dtk.miscs.mixin_event_handler_reg;
+// import dtk.miscs.mixin_event_handler_reg;
 
 interface WidgetI : ContainerableI
 {
@@ -47,8 +47,8 @@ interface WidgetI : ContainerableI
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
     
-    static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    {
-    	mixin(mixin_event_handler_reg(v, true));
-    }
+    // static foreach(v; ["Keyboard", "Mouse", "TextInput"])
+    // {
+    	// mixin(mixin_event_handler_reg(v, true));
+    // }
 }

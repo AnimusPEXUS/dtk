@@ -21,7 +21,7 @@ import dtk.types.Size2D;
 import dtk.types.Position2D;
 
 import dtk.miscs.DrawingSurfaceShift;
-import dtk.miscs.mixin_event_handler_reg;
+// import dtk.miscs.mixin_event_handler_reg;
 
 /* import dtk.widgets.WidgetLocator; */
 // import dtk.widgets;
@@ -165,10 +165,10 @@ class Widget : WidgetI
         return null;
     }
     
-    static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    {
-    	mixin(mixin_event_handler_reg(v));
-    }
+    // static foreach(v; ["Keyboard", "Mouse", "TextInput"])
+    // {
+    	// mixin(mixin_event_handler_reg(v));
+    // }
     
     void exceptionIfParentNotSet()
     {

@@ -30,7 +30,7 @@ import dtk.types.EventTextInput;
 import dtk.types.Property;
 
 // import dtk.miscs.WindowEventMgr;
-import dtk.miscs.mixin_event_handler_reg;
+// import dtk.miscs.mixin_event_handler_reg;
 import dtk.miscs.signal_tools;
 
 import dtk.signal_mixins.Window;

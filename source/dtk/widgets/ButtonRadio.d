@@ -31,9 +31,9 @@ class ButtonRadio : Button
     {
     	mixin(mixin_multiple_properties_inst(ButtonRadioProperties));
 
-        setMouseHandler("button-click", &on_mouse_click_internal);
-        setMouseHandler("button-down", &on_mouse_down_internal);
-        setMouseHandler("button-up", &on_mouse_up_internal);
+        // setMouseHandler("button-click", &on_mouse_click_internal);
+        // setMouseHandler("button-down", &on_mouse_down_internal);
+        // setMouseHandler("button-up", &on_mouse_up_internal);
 
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));

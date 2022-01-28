@@ -22,9 +22,9 @@ class ButtonCheck : Button
     {
     	mixin(mixin_multiple_properties_inst(ButtonCheckProperties));
         
-        setMouseHandler("button-click", &on_mouse_click_internal);
-        setMouseHandler("button-down", &on_mouse_down_internal);
-        setMouseHandler("button-up", &on_mouse_up_internal);
+        // setMouseHandler("button-click", &on_mouse_click_internal);
+        // setMouseHandler("button-down", &on_mouse_down_internal);
+        // setMouseHandler("button-up", &on_mouse_up_internal);
     }
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)

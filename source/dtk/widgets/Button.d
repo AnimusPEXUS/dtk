@@ -35,9 +35,9 @@ class Button : Widget, ContainerableI
     {
         // setFocusable(true);
         
-        setMouseHandler("button-click", &on_mouse_click_internal);
-        setMouseHandler("button-down", &on_mouse_down_internal);
-        setMouseHandler("button-up", &on_mouse_up_internal);
+        // setMouseHandler("button-click", &on_mouse_click_internal);
+        // setMouseHandler("button-down", &on_mouse_down_internal);
+        // setMouseHandler("button-up", &on_mouse_up_internal);
     }
     
     // mixin mixin_getWidgetAtPosition;
