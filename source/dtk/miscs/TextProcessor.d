@@ -1341,23 +1341,20 @@ class Text
     	"LinesRecalcRequired", 
     	"signal_linesRecalcRequired",
     	false,
-    	false,
     	);
     mixin mixin_installSignal!(
     	"VisibilityMapRecalcRequired", 
     	"signal_visibilityMapRecalcRequired",
-    	false,
     	false,
     	);
     mixin mixin_installSignal!(
     	"ImageRegenRequired", 
     	"signal_imageRegenRequired",
     	false,
-    	false,
     	);
     
     mixin mixin_multiple_properties_define!(TextProperties);
-    mixin mixin_multiple_properties_forward!(TextProperties);
+    mixin mixin_multiple_properties_forward!(TextProperties, false);
     
     this()
     {
@@ -1893,7 +1890,7 @@ class TextView
 {
 	
 	mixin mixin_multiple_properties_define!(TextViewProperties);
-    mixin mixin_multiple_properties_forward!(TextViewProperties);
+    mixin mixin_multiple_properties_forward!(TextViewProperties, false);
     
     // NOTE: this is instead of property
     bool cursor_animation_iteration_visible;

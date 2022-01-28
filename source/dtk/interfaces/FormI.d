@@ -9,28 +9,35 @@ import dtk.interfaces.WidgetI;
 
 import dtk.types.Size2D;
 import dtk.types.Position2D;
+import dtk.types.FormEvent;
+
+import dtk.miscs.signal_tools;
+
+import dtk.signal_mixins.Form;
+
 
 interface FormI
 {
+    mixin(mixin_FormSignals(true));
+	
     WindowI getWindow();
-    typeof(this) setWindow(WindowI window);
-    typeof(this) unsetWindow();
+    FormI setWindow(WindowI window);
+    FormI unsetWindow();
 
     DrawingSurfaceI getDrawingSurface();
 
     LafI getLaf();
-    typeof(this) setLaf(LafI theme);
-    typeof(this) unsetLaf();
+    FormI setLaf(LafI theme);
+    FormI unsetLaf();
 
-    void positionAndSizeRequest(Position2D, Size2D);
-    void recalculateChildrenPositionsAndSizes();
+    void propagatePosAndSizeRecalc();
 
     void redraw();
 
-    Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point);
+    Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point);
 
     WidgetI getDefaultWidget();
-    typeof(this) setDefaultWidget(WidgetI);
+    FormI setDefaultWidget(WidgetI);
 
     void focusTo(WidgetI);
 

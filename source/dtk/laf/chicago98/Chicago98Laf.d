@@ -11,7 +11,7 @@ import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 import dtk.types.fontinfo;
 import dtk.types.TextStyle;
-import dtk.types.WindowEventMgrHandler;
+// import dtk.types.WindowEventMgrHandler;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
@@ -23,7 +23,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.WindowEventMgrI;
+// import dtk.interfaces.WindowEventMgrI;
 
 import dtk.widgets.Form;
 import dtk.widgets.Button;
@@ -366,397 +366,290 @@ class Chicago98Laf : LafI
         }
     }
     
-    void addEventHandling(WindowEventMgrI mgr)
+    /*     void addEventHandling(WindowEventMgrI mgr)
     {
-        {
-            WindowEventMgrKeyboardHandler ea = {
-                any_focusedWidget: true, 
-                any_mouseWidget: true, 
-                checkMatch: delegate bool(
-                	WindowEventMgrI mgr, 
-                	WindowI window,
-                	EventKeyboard* e, 
-                	WidgetI focusedWidget, 
-                	WidgetI mouseWidget, 
-    				ulong mouseWidget_x, 
-    				ulong mouseWidget_y
-                	) 
-                {
-                	return true;
-                }, 
-                action: delegate bool(
-                	WindowEventMgrI mgr, 
-                	WindowI window,
-                	EventKeyboard* e, 
-                	WidgetI focusedWidget, 
-                	WidgetI mouseWidget, 
-                	ulong mouseWidget_x, 
-                	ulong mouseWidget_y
-                	) 
-                {
-                	// auto mc = e.keysym.modcode;
-                    // mc &= EnumKeyboardModCodeNOT.Locks;
-                    if (focusedWidget is null)
-    				{
-    					return false;
-    				}
-    				
-    				if (e.key_state == EnumKeyboardKeyState.pressed)
-    				{
-    					focusedWidget.callKeyboardHandler(
-    						"key-down", 
-    						e,
-    						mouseWidget_x,
-    						mouseWidget_y
-    						);
-    				}
-    				
-    				if (e.key_state == EnumKeyboardKeyState.released)
-    				{
-    					focusedWidget.callKeyboardHandler(
-    						"key-up", 
-    						e,
-    						mouseWidget_x,
-    						mouseWidget_y
-    						);
-    					
-    					// TODO: fix this..?
-    					// if (e.button.clicks != 0)
-    					// {
-    						// focusedWidget.callKeyboardHandler(
-    							// "key-click", 
-    							// e,
-    							// mouseWidget_x,
-    							// mouseWidget_y
-    							// );
-    					// }
-    				}
-    				
-                    return true;
-                },
-            };
-            
-            mgr.addKeyboardHandler(ea);
-        }
-        
-        {
-        	WindowEventMgrMouseHandler ea = {
-        		any_focusedWidget: true, 
-        		any_mouseWidget: true, 
-        		checkMatch: delegate bool(
-        			WindowEventMgrI mgr,
-        			WindowI window,
-        			EventMouse* e, 
-        			WidgetI focusedWidget,
-        			WidgetI mouseWidget, 
-    				ulong mouseWidget_x, 
-    				ulong mouseWidget_y
-    				) 
-    			{
-    				return e.type == EventMouseType.button;
-    			}, 
-    			action: delegate bool(
-    				WindowEventMgrI mgr, 
-    				WindowI window,
-    				EventMouse* e, 
-    				WidgetI focusedWidget, 
-    				WidgetI mouseWidget, 
-    				ulong mouseWidget_x, 
-    				ulong mouseWidget_y
-    				) 
-    			{
-    				if (mouseWidget is null)
-    				{
-    					return false;
-    				}
-    				
-    				if (e.button.buttonState 
-    					== EnumMouseButtonState.pressed)
-    				{
-    					mouseWidget.callMouseHandler(
-    						"button-down", 
-    						e,
-    						mouseWidget_x,
-    						mouseWidget_y
-    						);
-    				}
-    				
-    				if (e.button.buttonState 
-    					== EnumMouseButtonState.released)
-    				{
-    					mouseWidget.callMouseHandler(
-    						"button-up", 
-    						e,
-    						mouseWidget_x,
-    						mouseWidget_y
-    						);
-    					
-    					if (e.button.clicks != 0)
-    					{
-    						mouseWidget.callMouseHandler(
-    							"button-click", 
-    							e,
-    							mouseWidget_x,
-    							mouseWidget_y
-    							);
-    					}
-    				}
-    				
-    				return true;
-    			},
-            };
-            
-            mgr.addMouseHandler(ea);
-        }
-        
-        {
-        	WindowEventMgrWindowHandler ea = {
-        		any_focusedWidget: true, 
-        		any_mouseWidget: true, 
-        		checkMatch: delegate bool(
-        			WindowEventMgrI mgr,
-        			WindowI window,
-        			EventWindow* e, 
-        			WidgetI focusedWidget,
-        			WidgetI mouseWidget, 
-    				ulong mouseWidget_x, 
-    				ulong mouseWidget_y
-        			) 
-        		{
-        			return true;
-        		}, 
-        		action: delegate bool(
-        			WindowEventMgrI mgr, 
-        			WindowI window,
-        			EventWindow* e, 
-        			WidgetI focusedWidget, 
-        			WidgetI mouseWidget, 
-        			ulong mouseWidget_x, 
-        			ulong mouseWidget_y
-        			) 
-        		{
-        			
-        			switch (e.eventId)
-        			{
-        			default:
-        				debug writeln(
-        					"Chicago98Laf window event id not supported:",
-        					e.eventId
-        					);
-        				return false;
-        			case EnumWindowEvent.close:
-        				window.callWindowHandler(
-        				"close",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-        				
-        			case EnumWindowEvent.move:
-        				window.callWindowHandler(
-        				"move",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-        				
-        			case EnumWindowEvent.resize:
-        				window.callWindowHandler(
-        				"resize",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-        				
-        			case EnumWindowEvent.maximize:
-        				window.callWindowHandler(
-        				"maximize",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-        				
-        			case EnumWindowEvent.unmaximize:
-        				window.callWindowHandler(
-        				"unmaximize",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.minimize:
-        				window.callWindowHandler(
-        				"minimize",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.unminimize:
-        				window.callWindowHandler(
-        				"unminimize",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.restore:
-        				window.callWindowHandler(
-        				"restore",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.show:
-        				window.callWindowHandler(
-        				"show",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.hide:
-        				window.callWindowHandler(
-        				"hide",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.expose:
-        				window.callWindowHandler(
-        				"expose",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.keyboardFocus:
-        				window.callWindowHandler(
-        				"keyboardFocus",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.keyboardUnFocus:
-        				window.callWindowHandler(
-        				"keyboardUnFocus",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.mouseFocus:
-        				window.callWindowHandler(
-        				"mouseFocus",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.mouseUnFocus:
-        				window.callWindowHandler(
-        				"mouseUnFocus",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.focus:
-        				window.callWindowHandler(
-        				"focus",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.unFocus:
-        				window.callWindowHandler(
-        				"unFocus",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-
-        			case EnumWindowEvent.focusProposed:
-        				window.callWindowHandler(
-        				"focusProposed",
-        				e,
-        				mouseWidget_x,
-        				mouseWidget_y
-        				);
-        				return false;
-        			}
-        	
-        		},
-        	};
-        	
-        	mgr.addWindowHandler(ea);
-        }
-        
-        {
-        	WindowEventMgrTextInputHandler ea = {
-        		any_focusedWidget: true, 
-        		any_mouseWidget: true, 
-        		checkMatch: delegate bool(
-        			WindowEventMgrI mgr,
-        			WindowI window,
-        			EventTextInput* e, 
-        			WidgetI focusedWidget,
-        			WidgetI mouseWidget, 
-    				ulong mouseWidget_x, 
-    				ulong mouseWidget_y
-        			) 
-        		{
-        			return true;
-        		}, 
-        		action: delegate bool(
-        			WindowEventMgrI mgr, 
-        			WindowI window,
-        			EventTextInput* e, 
-        			WidgetI focusedWidget, 
-        			WidgetI mouseWidget, 
-        			ulong mouseWidget_x, 
-        			ulong mouseWidget_y
-        			) 
-        		{
-        			
-        			if (focusedWidget is null)
-                    {
-                    	return false;
-                    }
-                    
-                    focusedWidget.callTextInputHandler(
-                    	"text-input", 
-                    	e,
-                    	mouseWidget_x,
-                    	mouseWidget_y
-                    	);
-        			
-        			return true;
-        		},
-        	};
-        	
-        	mgr.addTextInputHandler(ea);
-        }
+    {
+    WindowEventMgrKeyboardHandler ea = {
+    any_focusedWidget: true, 
+    any_mouseWidget: true, 
+    checkMatch: delegate bool(
+    WindowEventMgrI mgr, 
+    WindowI window,
+    EventKeyboard* e, 
+    WidgetI focusedWidget, 
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    return true;
+    }, 
+    action: delegate bool(
+    WindowEventMgrI mgr, 
+    WindowI window,
+    EventKeyboard* e, 
+    WidgetI focusedWidget, 
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    // auto mc = e.keysym.modcode;
+    // mc &= EnumKeyboardModCodeNOT.Locks;
+    if (focusedWidget is null)
+    {
+    return false;
     }
+    
+    if (e.key_state == EnumKeyboardKeyState.pressed)
+    {
+    focusedWidget.callKeyboardHandler(
+    "key-down", 
+    e,
+    mouseWidget_x,
+    mouseWidget_y
+    );
+    }
+    
+    if (e.key_state == EnumKeyboardKeyState.released)
+    {
+    focusedWidget.callKeyboardHandler(
+    "key-up", 
+    e,
+    mouseWidget_x,
+    mouseWidget_y
+    );
+    
+    // TODO: fix this..?
+    // if (e.button.clicks != 0)
+    // {
+    // focusedWidget.callKeyboardHandler(
+    // "key-click", 
+    // e,
+    // mouseWidget_x,
+    // mouseWidget_y
+    // );
+    // }
+    }
+    
+    return true;
+    },
+    };
+    
+    mgr.addKeyboardHandler(ea);
+    }
+    
+    {
+    WindowEventMgrMouseHandler ea = {
+    any_focusedWidget: true, 
+    any_mouseWidget: true, 
+    checkMatch: delegate bool(
+    WindowEventMgrI mgr,
+    WindowI window,
+    EventMouse* e, 
+    WidgetI focusedWidget,
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    return e.type == EventMouseType.button;
+    }, 
+    action: delegate bool(
+    WindowEventMgrI mgr, 
+    WindowI window,
+    EventMouse* e, 
+    WidgetI focusedWidget, 
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    if (mouseWidget is null)
+    {
+    return false;
+    }
+    
+    if (e.button.buttonState 
+    == EnumMouseButtonState.pressed)
+    {
+    mouseWidget.callMouseHandler(
+    "button-down", 
+    e,
+    mouseWidget_x,
+    mouseWidget_y
+    );
+    }
+    
+    if (e.button.buttonState 
+    == EnumMouseButtonState.released)
+    {
+    mouseWidget.callMouseHandler(
+    "button-up", 
+    e,
+    mouseWidget_x,
+    mouseWidget_y
+    );
+    
+    if (e.button.clicks != 0)
+    {
+    mouseWidget.callMouseHandler(
+    "button-click", 
+    e,
+    mouseWidget_x,
+    mouseWidget_y
+    );
+    }
+    }
+    
+    return true;
+    },
+    };
+    
+    mgr.addMouseHandler(ea);
+    }
+    
+    {
+    WindowEventMgrWindowHandler ea = {
+    any_focusedWidget: true, 
+    any_mouseWidget: true, 
+    checkMatch: delegate bool(
+    WindowEventMgrI mgr,
+    WindowI window,
+    EventWindow* e, 
+    WidgetI focusedWidget,
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    return true;
+    }, 
+    action: delegate bool(
+    WindowEventMgrI mgr, 
+    WindowI window,
+    EventWindow* e, 
+    WidgetI focusedWidget, 
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    
+    switch (e.eventId)
+    {
+    default:
+    debug writeln(
+    "Chicago98Laf window event id not supported:",
+    e.eventId
+    );
+    return false;
+    case EnumWindowEvent.close:
+    window.emitSignal_Close(e);
+    return false;
+    case EnumWindowEvent.move:
+    window.emitSignal_Move(e);
+    return false;
+    case EnumWindowEvent.resize:
+    window.emitSignal_Resize(e);
+    return false;
+    case EnumWindowEvent.maximize:
+    window.emitSignal_Maximize(e);
+    return false;
+    case EnumWindowEvent.unmaximize:
+    window.emitSignal_Unmaximize(e);
+    return false;
+    case EnumWindowEvent.minimize:
+    window.emitSignal_Minimize(e);
+    return false;
+    case EnumWindowEvent.unminimize:
+    window.emitSignal_Unminimize(e);
+    return false;
+    case EnumWindowEvent.restore:
+    window.emitSignal_Restore(e);
+    return false;
+    case EnumWindowEvent.show:
+    window.emitSignal_Show(e);
+    return false;
+    case EnumWindowEvent.hide:
+    window.emitSignal_Hide(e);
+    return false;
+    case EnumWindowEvent.expose:
+    window.emitSignal_Expose(e);
+    return false;
+    case EnumWindowEvent.keyboardFocus:
+    window.emitSignal_KeyboardFocus(e);
+    return false;
+    case EnumWindowEvent.keyboardUnFocus:
+    window.emitSignal_KeyboardUnFocus(e);
+    return false;
+    case EnumWindowEvent.mouseFocus:
+    window.emitSignal_MouseFocus(e);
+    return false;
+    case EnumWindowEvent.mouseUnFocus:
+    window.emitSignal_MouseUnFocus(e);
+    return false;
+    case EnumWindowEvent.focus:
+    window.emitSignal_Focus(e);
+    return false;
+    case EnumWindowEvent.unFocus:
+    window.emitSignal_UnFocus(e);
+    return false;
+    case EnumWindowEvent.focusProposed:
+    window.emitSignal_FocusProposed(e);
+    return false;
+    }
+    
+    },
+    };
+    
+    mgr.addWindowHandler(ea);
+    }
+    
+    {
+    WindowEventMgrTextInputHandler ea = {
+    any_focusedWidget: true, 
+    any_mouseWidget: true, 
+    checkMatch: delegate bool(
+    WindowEventMgrI mgr,
+    WindowI window,
+    EventTextInput* e, 
+    WidgetI focusedWidget,
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    return true;
+    }, 
+    action: delegate bool(
+    WindowEventMgrI mgr, 
+    WindowI window,
+    EventTextInput* e, 
+    WidgetI focusedWidget, 
+    WidgetI mouseWidget, 
+    ulong mouseWidget_x, 
+    ulong mouseWidget_y
+    ) 
+    {
+    
+    if (focusedWidget is null)
+    {
+    return false;
+    }
+    
+    focusedWidget.callTextInputHandler(
+    "text-input", 
+    e,
+    mouseWidget_x,
+    mouseWidget_y
+    );
+    
+    return true;
+    },
+    };
+    
+    mgr.addTextInputHandler(ea);
+    }
+    } */
 }

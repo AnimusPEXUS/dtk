@@ -12,7 +12,7 @@ import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.WidgetI;
-import dtk.interfaces.WindowEventMgrI;
+// import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.LafI;
 
 import dtk.platforms.sdl_desktop.DrawingSurface;
@@ -29,15 +29,17 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Property;
 
-import dtk.miscs.WindowEventMgr;
+// import dtk.miscs.WindowEventMgr;
 import dtk.miscs.mixin_event_handler_reg;
 import dtk.miscs.signal_tools;
+
+import dtk.signal_mixins.Window;
 
 const auto WindowProperties = cast(PropSetting[]) [
 PropSetting("gsun", "SDLDesktopPlatform", "platform", "Platform", "null"),
 PropSetting("gsun", "FormI", "form", "Form", "null"),
 PropSetting("gsun", "LafI", "laf", "Laf", "null"),
-PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
+// PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
 PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
 PropSetting("gs_w_d", "dstring", "title", "Title", q{""d}),
@@ -65,7 +67,9 @@ class Window : WindowI
     }
     
 	mixin mixin_multiple_properties_define!(WindowProperties);
-    mixin mixin_multiple_properties_forward!(WindowProperties);
+    mixin mixin_multiple_properties_forward!(WindowProperties, false);
+    
+    mixin(mixin_WindowSignals(false));
     
     @disable this();
     
@@ -134,7 +138,7 @@ class Window : WindowI
             throw new Exception("error getting SDL window id");
         }
         
-        setWindowEventMgr(new WindowEventMgr(this));
+        // setWindowEventMgr(new WindowEventMgr(this));
         
         connectToPlatform_onAfterChanged(
         	delegate void(
@@ -196,14 +200,14 @@ class Window : WindowI
         		)
         	{
         		collectException(
-        			{ ensurePlatformEventManangerAndLafConnection(); }()
+        			{ /* ensurePlatformEventManangerAndLafConnection(); */ }()
         			);
         	}
         	);
         
         // TODO: either everywhere rename 'Manager' to 'Mgr', either viseversia
         
-        connectToWindowEventMgr_onAfterChanged(
+       /*  connectToWindowEventMgr_onAfterChanged(
         	delegate void(
         		WindowEventMgrI old_value,
         		WindowEventMgrI new_value
@@ -213,27 +217,25 @@ class Window : WindowI
         			{ ensurePlatformEventManangerAndLafConnection(); }()
         			);
         	}
-        	);
+        	); */
         
-        setWindowHandler(
-        	"resize",
-        	delegate void (
-				EventWindow *e,
-				ulong mouse_widget_local_x,
-				ulong mouse_widget_local_y,
-				) {
-				writeln("window resized");
-				}
+        connectToSignal_WindowEvent(
+        	delegate void (EventWindow *e) nothrow {
+        		collectException(
+        			{
+        				writeln("window event");
+					}()
+					);
+			}
         	);
-        
     }
     
     ~this()
     {
-    	ensurePlatformEventManangerAndLafConnection(true);
+    	/* ensurePlatformEventManangerAndLafConnection(true); */
     }
     
-    private void ensurePlatformEventManangerAndLafConnection(bool disconnect=false)
+/*     private void ensurePlatformEventManangerAndLafConnection(bool disconnect=false)
     {
     	auto emgr = getWindowEventMgr();
     	auto laf = getLaf();
@@ -257,21 +259,13 @@ class Window : WindowI
     			emgr.removeAllHandlers();
     		}
     	}
-    }
+    } */
     
     void onPlatformEvent(Event* event) nothrow
     {
     	collectException(
     		{
-    			if (event.window != this)
-    			{
-    				return;
-    			}
-    			auto mgr = getWindowEventMgr();
-    			if (mgr !is null)
-    			{
-    				mgr.handleEvent(event);
-    			}
+    			
     		}()
     		);
         return;
@@ -335,9 +329,9 @@ form_height: %d
         this.unsetForm();
     }
     
-    static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
+    /* static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
     	mixin(mixin_event_handler_reg(v));
-    }
+    } */ 
     
 }

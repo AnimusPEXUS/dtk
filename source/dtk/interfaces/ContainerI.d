@@ -1,6 +1,6 @@
 module dtk.interfaces.ContainerI;
 
-/* import dtk.interfaces.ContainerableI; */
+import dtk.interfaces.ContainerableI;
 
 /* interface ContainerI
 {
@@ -17,3 +17,15 @@ module dtk.interfaces.ContainerI;
     /* ContainerableI popChildFromStart();
     ContainerableI popChildFromEnd(); /
 } */
+
+interface ContainerI
+{
+	ulong getChildX(ContainerableI child);
+	ulong getChildY(ContainerableI child);
+	ulong getChildWidth(ContainerableI child);
+	ulong getChildHeight(ContainerableI child);
+	void setChildX(ContainerableI child, ulong v);
+	void setChildY(ContainerableI child, ulong v);
+	void setChildWidth(ContainerableI child, ulong v);
+	void setChildHeight(ContainerableI child, ulong v);
+}

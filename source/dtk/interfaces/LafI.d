@@ -1,7 +1,7 @@
 module dtk.interfaces.LafI;
 
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.WindowEventMgrI;
+// import dtk.interfaces.WindowEventMgrI;
 
 import dtk.types.Image;
 
@@ -33,5 +33,5 @@ interface LafI
     void drawTextEntry(TextEntry widget);
     /* void drawTextArea(TextArea widget); */
 
-    void addEventHandling(WindowEventMgrI mgr);
+    //void addEventHandling(WindowEventMgrI mgr);
 }

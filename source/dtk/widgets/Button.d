@@ -9,22 +9,28 @@ module dtk.widgets.Button;
 import std.stdio;
 import std.typecons;
 
-import dtk.miscs.RadioGroup;
-import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.ContainerI;
+import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 
 import dtk.types.Size2D;
 import dtk.types.EventMouse;
+import dtk.types.Property;
 
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-/// Button class
-class Button : Widget, ContainerableWidgetI
-{
-    bool button_is_down;
+import dtk.miscs.RadioGroup;
 
+/// Button class
+class Button : Widget, ContainerableI
+{
+    mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    mixin mixin_forwardXYWH_from_Widget!();
+    
+    bool button_is_down;
+    
     this()
     {
         // setFocusable(true);
@@ -34,13 +40,13 @@ class Button : Widget, ContainerableWidgetI
         setMouseHandler("button-up", &on_mouse_up_internal);
     }
     
-    mixin mixin_getWidgetAtPosition;
-
+    // mixin mixin_getWidgetAtPosition;
+    
     void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         return ;
     }
-
+    
     void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         button_is_down = true;
@@ -52,17 +58,22 @@ class Button : Widget, ContainerableWidgetI
         redraw();
         return ;
     }
-
+    
     void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         button_is_down = false;
         redraw();
         return ;
     }
-
+    
     override void redraw()
     {
         this.redraw_x(this);
     }
-
+    
+    override void propagatePosAndSizeRecalc()
+    {
+    }
+    
+    
 }

@@ -4,7 +4,7 @@ import std.stdio;
 
 // import dtk.widgets;
 
-mixin template mixin_getWidgetAtPosition()
+/* mixin template mixin_getWidgetAtPosition()
 {
 	import std.typecons;
 	import dtk.types.Position2D;
@@ -78,3 +78,27 @@ mixin template mixin_getWidgetAtPosition()
     }
 }
 
+ */
+ 
+mixin template mixin_forwardXYWH_from_Widget()
+{
+	    static foreach (v; ["X", "Y", "Width", "Height"])
+    {
+    	import std.format;
+    	mixin(
+    		q{
+    			override ulong get%1$s()
+    			{
+    				return super.get%1$s();
+    			}
+    			
+    			override typeof(this) set%1$s(ulong v)
+    			{
+    				super.set%1$s(v);
+    				return this;
+    			}
+    			
+    		}.format(v)
+    		);
+    }
+}

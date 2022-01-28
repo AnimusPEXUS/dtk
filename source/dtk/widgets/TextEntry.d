@@ -14,7 +14,8 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
-import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.ContainerI;
+import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.FontMgrI;
@@ -49,8 +50,14 @@ PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
 PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
 ];
 
-class TextEntry : Widget, ContainerableWidgetI
+class TextEntry : Widget, ContainerableI
 {
+	
+    mixin mixin_multiple_properties_define!(TextEntryProperties);
+    mixin mixin_multiple_properties_forward!(TextEntryProperties, false);
+    mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    mixin mixin_forwardXYWH_from_Widget!();
+    
     // Image textImage;
     
     TextView text_view;
@@ -60,12 +67,9 @@ class TextEntry : Widget, ContainerableWidgetI
         SignalConnection textViewConnCon;
     }
     
-    mixin mixin_multiple_properties_define!(TextEntryProperties);
-    mixin mixin_multiple_properties_forward!(TextEntryProperties);
-    
     this()
     {
-    	mixin mixin_multiple_properties_inst!(TextEntryProperties);
+    	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	
         text_view = new TextView();
         text_view.getForm = delegate FormI()
@@ -143,7 +147,7 @@ class TextEntry : Widget, ContainerableWidgetI
                 }.format(v.sname, v.tname));
         }
         
-        con_cont.add(
+        /* con_cont.add(
             connectToSize_onAfterChanged(
                 delegate void(Size2D old_value, Size2D new_value)
                 {
@@ -160,15 +164,15 @@ class TextEntry : Widget, ContainerableWidgetI
                         );
                 }
                 )
-            );
+            ); */
         
-        con_cont.add(connectToText_onAfterChanged(&afterTextChanged));
+       /*  con_cont.add(connectToText_onAfterChanged(&afterTextChanged)); */
         
-        setMouseEvent("button-click", &on_mouse_click_internal);
+       /*  setMouseEvent("button-click", &on_mouse_click_internal);
         setTextInputEvent("text-input", &on_text_input_internal);
 
         setKeyboardEvent("key-down", &on_keyboard_down_internal);
-        setKeyboardEvent("key-up", &on_keyboard_up_internal);
+        setKeyboardEvent("key-up", &on_keyboard_up_internal); */
         
         // textViewConnCon = text_view.connectTo_PerformRedraw(
         // &on_textview_redraw_request
@@ -180,13 +184,14 @@ class TextEntry : Widget, ContainerableWidgetI
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
     {
-        auto p = getPosition();
+ /*        auto p = getPosition();
         if (getDrawBewelAndBackground())
         {
             p.x+=2;
             p.y+=2;
         }
-        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y);
+        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y); */
+        return null;
     }
     
     void on_mouse_click_internal(
@@ -280,7 +285,7 @@ class TextEntry : Widget, ContainerableWidgetI
     void applySettingsToTextProcessor()
     {
         /* text_view.setText(getText()); */ // NOTE: too expansive probably
-        
+/*         
         auto tvt = text_view.getText();
         
         tvt.setFaceFamily(getFontFamily());
@@ -310,13 +315,18 @@ class TextEntry : Widget, ContainerableWidgetI
         
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
-        text_view.setCursorEnabled(getCursorEnabled());
+        text_view.setCursorEnabled(getCursorEnabled()); */
     }
     
-    mixin mixin_getWidgetAtPosition;
+    //mixin mixin_getWidgetAtPosition;
     
     override void redraw()
     {
         this.redraw_x(this);
     }
+    
+    override void propagatePosAndSizeRecalc()
+    {
+    }
+    
 }

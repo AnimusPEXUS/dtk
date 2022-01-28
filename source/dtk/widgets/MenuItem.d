@@ -5,20 +5,30 @@ module dtk.widgets.MenuItem;
 
 import std.typecons;
 
-import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.ContainerI;
+import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.FormI;
 
 import dtk.types.Size2D;
+import dtk.types.Property;
+
 
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
-class MenuItem : Widget, ContainerableWidgetI
+class MenuItem : Widget, ContainerableI
 {
+	mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    mixin mixin_forwardXYWH_from_Widget!();
+	
     private
     {
-        ContainerableWidgetI _contained;
+        ContainerableI _contained;
     }
-
+    
+    override void propagatePosAndSizeRecalc()
+    {
+    }
+    
 }

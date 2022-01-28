@@ -23,7 +23,7 @@ class LinearLayoutMgr : LayoutMgrI
 	
 	void performLayout()
 	{
-		ulong max_size = 
+		/* ulong max_size = 
 			(direction == horizontal? 
 				layout_widget.getInnerWidth() 
 				: layout_widget.getInnerHeight());
@@ -59,7 +59,7 @@ class LinearLayoutMgr : LayoutMgrI
 		}
 		
 		children_without_expand_size += (children_without_expand.length-1) * spacing;
-		
+		 */
 		
 	}
 }

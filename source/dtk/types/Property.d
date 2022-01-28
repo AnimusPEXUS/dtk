@@ -272,7 +272,14 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     	case PropertyWhatToReturnIfValueIsUnset.defaultValue:
     		return settings.default_value;
     	case PropertyWhatToReturnIfValueIsUnset.typeInitValue:
-    		return T1.init;
+    		static if (is(T1 == class))
+    		{
+    			return cast(T1) null;
+    		}
+    		else
+    		{
+    			return T1.init;
+    		}
     	}
     }    
     
@@ -369,7 +376,12 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     
 }
 
-mixin template Property_forwarding(T, alias property, string new_suffix)
+mixin template Property_forwarding(
+	T, 
+	string property, 
+	string new_suffix, 
+	bool super_forward
+	)
 {
     // ["get", "set", "reset", "unset", "isDefault", "isUnset"]
     
@@ -379,69 +391,133 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
    	import observable.signal;
    	
    	static assert(__traits(identifier, property) != "");
-    
-   	mixin(
-   		q{
-   			T get%1$s()
-   			{
-   				return this.%2$s.get();
-   			}
-   		}.format(new_suffix, __traits(identifier, property))
-   		);
+
+   	static if (!super_forward){
+   		mixin(
+   			q{
+   				T get%1$s()
+   				{
+   					return this.%2$s.get();
+   				}
+   			}.format(new_suffix, property)
+   			);
+   	}
+   	else
+   	{
+   		mixin(
+   			q{
+   				override T get%1$s()
+   				{
+   					return super.get%1$s();
+   				}
+   			}.format(new_suffix)
+   			);
+   	}
    	
     static foreach (func; ["set", "reset", "unset"])
     {
     	static if (func == "set")
     	{
-    		mixin(
-    			q{
-    				typeof(this) %1$s%2$s(T x) { 
-    					this.%3$s.%1$s(x);
-    					return this;
-    				}
-    			}.format(func, new_suffix, __traits(identifier, property))
-    			);
+    		static if (!super_forward) {
+    			mixin(
+    				q{
+    					typeof(this) %1$s%2$s(T x) { 
+    						this.%3$s.%1$s(x);
+    						return this;
+    					}
+    				}.format(func, new_suffix, property)
+    				);
+    		}
+    		else
+    		{
+    			override mixin(
+    				q{
+    					typeof(this) %1$s%2$s(T x) { 
+    						super.%1$s%2$s(x);
+    						return this;
+    					}
+    				}.format(func, new_suffix)
+    				);
+    		}
     	} 
     	else 
     	{
-    		mixin(
-    			q{
-    				typeof(this) %1$s%2$s() { 
-    					this.%3$s.%1$s();
-    					return this;
-    				}
-    			}.format(func, new_suffix, __traits(identifier, property))
-    			);
+    		static if (!super_forward) {
+    			mixin(
+    				q{
+    					typeof(this) %1$s%2$s() { 
+    						this.%3$s.%1$s();
+    						return this;
+    					}
+    				}.format(func, new_suffix, property)
+    				);
+    		}
+    		else
+    		{
+    			override mixin(
+    				q{
+    					typeof(this) %1$s%2$s() { 
+    						super.%1$s%2$s();
+    						return this;
+    					}
+    				}.format(func, new_suffix)
+    				);
+    		}
     	}
     }
     
     static foreach (func; ["isDefault", "isUnset", "isSet"])
     {
-    	mixin(
-    		q{
-    			bool %1$s%2$s() { 
-    				return this.%3$s.%1$s();
-    			}
-    		}.format(func, new_suffix, __traits(identifier, property))
-    		);
+    	static if (!super_forward) {
+    		mixin(
+    			q{
+    				bool %1$s%2$s() { 
+    					return this.%3$s.%1$s();
+    				}
+    			}.format(func, new_suffix, property)
+    			);
+    	}
+    	else
+    	{
+    		mixin(
+    			q{
+    				override bool %1$s%2$s() { 
+    					return super.%1$s%2$s();
+    				}
+    			}.format(func, new_suffix)
+    			);
+    	}
     }
     
     // =========== signals ===========
     
     static foreach (v; ["onBeforeGet", "onAfterGet",])
     {
-    	mixin(
-    		q{
-    			SignalConnection connectTo%2$s_%1$s(void delegate() nothrow cb)
-    			{
-    				import observable.signal;
-    				SignalConnection conn;
-    				this.%3$s.%1$s.socket.connect(conn, cb);
-    				// this.%3$s.property_cc.add(conn);
-    				return conn;
-    			}
-    		}.format(v,new_suffix, __traits(identifier, property))
-    		);
+    	static if (!super_forward) {
+    		mixin(
+    			q{
+    				SignalConnection connectTo%2$s_%1$s(void delegate() nothrow cb)
+    				{
+    					import observable.signal;
+    					SignalConnection conn;
+    					this.%3$s.%1$s.socket.connect(conn, cb);
+    					// this.%3$s.property_cc.add(conn);
+    					return conn;
+    				}
+    			}.format(v,new_suffix, property)
+    			);
+    	}
+    	else
+    	{
+    		mixin(
+    			q{
+    				override SignalConnection connectTo%2$s_%1$s(void delegate() nothrow cb)
+    				{
+    					return super.connectTo%2$s_%1$s(cb);
+    				}
+    			}.format(v,new_suffix)
+    			);
+    	}
     }
     
     static foreach (v; [
@@ -449,20 +525,35 @@ mixin template Property_forwarding(T, alias property, string new_suffix)
     	"onBeforeUnset", "onAfterUnset", "onBeforeChanged", "onAfterChanged",
         ])
     {
-    	mixin(
-    		q{
-    			SignalConnection connectTo%2$s_%1$s(void delegate(T old_value, T new_value) nothrow cb)
-    			{
-    				import observable.signal;
-    				SignalConnection conn;
-    				this.%3$s.%1$s.socket.connect(conn, cb);
-    				return conn;
-    			}
-    		}.format(v,new_suffix, __traits(identifier, property))
-    		);
-    	
+    	static if (!super_forward) 
+    	{
+    		mixin(
+    			q{
+    				SignalConnection connectTo%2$s_%1$s(void delegate(T old_value, T new_value) nothrow cb)
+    				{
+    					import observable.signal;
+    					SignalConnection conn;
+    					this.%3$s.%1$s.socket.connect(conn, cb);
+    					return conn;
+    				}
+    			}.format(v,new_suffix, property)
+    			);
+    	}
+    	else
+    	{
+    		mixin(
+    			q{
+    				override SignalConnection connectTo%2$s_%1$s(void delegate(T old_value, T new_value) nothrow cb)
+    				{
+    					return super.connectTo%2$s_%1$s(cb);
+    				}
+    			}.format(v,new_suffix)
+    			);
+    	}
     }
 }
+
+
 
 // TODO: add new unittests
 
@@ -481,6 +572,16 @@ mixin template mixin_multiple_properties_define(PropSetting[] settings)
 	
     static foreach (v; settings)
     {
+    	/* pragma(msg,
+    		q{
+    			private {
+    				Property!%1$s %2$s;
+    			}
+    		}.format(
+    			v.type,
+    			v.var_name,
+    			)
+    		); */
     	mixin(
     		q{
     			private {
@@ -530,7 +631,15 @@ string mixin_multiple_properties_inst(const PropSetting[] settings)
 	return ret;
 }
 
-mixin template mixin_multiple_properties_forward(PropSetting[] settings) 
+// on super_forward
+// from Dlang interface documentation: 
+//           A reimplemented interface must implement all the interface 
+//           functions, it does not inherit them from a super class.
+// this mixin is to /forward/ properties in widgets
+mixin template mixin_multiple_properties_forward(
+	PropSetting[] settings, 
+	bool super_forward
+	) 
 {
 	import std.format;
 	
@@ -538,12 +647,12 @@ mixin template mixin_multiple_properties_forward(PropSetting[] settings)
 	{
 		mixin(
 			q{
-				mixin Property_forwarding!(%1$s, %2$s, "%3$s");
-				
+				mixin Property_forwarding!(%1$s, "%2$s", "%3$s", %4$s);
 			}.format(
 				v.type,
 				v.var_name,
 				v.title_name,
+				super_forward
 				)
 			);
 	}

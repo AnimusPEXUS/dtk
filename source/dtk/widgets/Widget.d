@@ -8,6 +8,7 @@ import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LayoutI;
+import dtk.interfaces.ContainerI;
 
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
@@ -29,86 +30,89 @@ import dtk.miscs.mixin_event_handler_reg;
 import dtk.widgets.Layout;
 
 const auto WidgetProperties = cast(PropSetting[]) [
-PropSetting("gsu", "LayoutI", "parent_layout", "ParentLayout", "null"),
+PropSetting("gsun", "ContainerI", "parent_container", "Parent", "null"),
 ];
 
 class Widget : WidgetI
 {
-
+	
 	mixin mixin_multiple_properties_define!(WidgetProperties);
-    mixin mixin_multiple_properties_forward!(WidgetProperties);
+    mixin mixin_multiple_properties_forward!(WidgetProperties, false);
     this() {
     	mixin(mixin_multiple_properties_inst(WidgetProperties));
     }
-
+    
+    
     /++ return FormI on which this Widget is placed. returns null in case if
     there is no attached form or if this widget is deeper than 200 levels to
     FormI instance (too deep); +/
     FormI getForm()
     {
-        WidgetI w = this;
+        /* WidgetI w = this;
         Form ret;
-
+        
         for (auto failure_countdown = cast(byte) 200; failure_countdown != -1; failure_countdown--)
         {
-
-            ret = cast(Form) w;
-            if (ret !is null)
-            {
-                return ret;
-            }
-
-            if (w.isUnsetParent())
-            {
-                return null;
-            }
-
-            w = w.getParent();
-            if (w is null)
-            {
-                return null;
-            }
-        }
-
+        
+        ret = cast(Form) w;
+        if (ret !is null)
+        {
         return ret;
+        }
+        
+        if (w.isUnsetParent())
+        {
+        return null;
+        }
+        
+        w = w.getParent();
+        if (w is null)
+        {
+        return null;
+        }
+        }
+        
+        return ret; */
+        return null;
     }
-
+    
     DrawingSurfaceI getDrawingSurface()
     {
-        auto p = getPosition();
-        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x, p.y);
+        /* auto p = getPosition();
+        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x, p.y); */
+        return null;
     }
-
+    
     void redraw()
     {
         this.redraw_x(this);
     }
-
+    
     void redraw_x(T)(T new_this)
     {
-
+    	
         /* alias A1 = typeof(new_this); */
-
+        
         const id = __traits(identifier, new_this);
         const id_t = __traits(identifier, T);
-
+        
         static if (!is(T == Widget))
         {
             const drawid = "draw" ~ id_t;
-
+            
             FormI form = new_this.getForm();
             if (form is null)
             {
                 throw new Exception("error: redraw() function couldn't get Form");
             }
-
+            
             auto theme = form.getLaf();
-
+            
             if (theme is null)
             {
                 throw new Exception("theme not set");
             }
-
+            
             static if (!__traits(hasMember, theme, drawid))
             {
                 return;
@@ -119,56 +123,56 @@ class Widget : WidgetI
             }
         }
     }
-
+    
     void positionAndSizeRequest(Position2D position, Size2D size)
     {
-        setPosition(position);
-        setSize(size);
+        /* setPosition(position);
+        setSize(size); */
     }
-
+    
     void recalculateChildrenPositionsAndSizes()
     {
         return;
     }
-
+    
     bool handle_event_keyboard(EventKeyboard* e)
     {
         return false;
     }
-
+    
     bool handle_event_mouse(EventMouse* e)
     {
         return false;
     }
-
+    
     bool handle_event_textinput(EventTextInput* e)
     {
         return false;
     }
-
-    Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point)
+    
+    Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
-        return tuple(cast(WidgetI)this, 0UL, 0UL);
+        return tuple(cast(WidgetI)this, Position2D(0, 0));
     }
-
+    
     WidgetI getNextFocusableWidget()
     {
         return null;
     }
-
+    
     WidgetI getPrevFocusableWidget()
     {
         return null;
     }
     
     static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    {    	
+    {
     	mixin(mixin_event_handler_reg(v));
     }
     
     void exceptionIfParentNotSet()
     {
-    	if (!isSetParent())
+    	if (isUnsetParent())
     	{
     		throw new Exception("parent not set");
     	}
@@ -177,51 +181,30 @@ class Widget : WidgetI
     		throw new Exception("parent not set: null");
     	}
     }
-
-    LayoutChild getLayoutChildE()
+    
+    static foreach (v; ["X", "Y", "Width", "Height"])
     {
-    	exceptionIfParentNotSet();
-    	auto p = getParentLayout();
-    	auto lc = p.getLayoutChildByWidget(this);
-    	if (lc is null)
-    	{
-    		throw new Exception("layout has no child for this widget");
-    	}
-    	return lc;
+    	import std.format;
+    	mixin(
+    		q{
+    			ulong get%1$s()
+    			{
+    				exceptionIfParentNotSet();
+    				return getParent().getChild%1$s(this);
+    			}
+    			
+    			typeof(this) set%1$s(ulong v)
+    			{
+    				exceptionIfParentNotSet();
+    				getParent().setChild%1$s(this, v);
+    				return this;
+    			}
+    			
+    		}.format(v)
+    		);
     }
-
-    ulong getX()
+    
+    void propagatePosAndSizeRecalc()
     {
-    	auto lc = getLayoutChildE();
-    	return lc.getX();
     }
-
-    ulong getY()
-    {
-    	auto lc = getLayoutChildE();
-    	return lc.getY();
-    }
-
-    ulong getWidth()
-    {
-    	auto lc = getLayoutChildE();
-    	return lc.getWidth();
-    }
-
-    ulong getHeight()
-    {
-    	auto lc = getLayoutChildE();
-    	return lc.getHeight();
-    }
-
-    typeof(this) setX(ulong v)
-    {
-    	auto lc = getLayoutChildE();
-    	return lc.getHeight();
-    }
-
-    typeof(this) setY(ulong v);
-    typeof(this) setWidth(ulong v);
-    typeof(this) setHeight(ulong v);
-
 }

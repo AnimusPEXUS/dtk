@@ -4,6 +4,8 @@ import std.typecons;
 
 import dtk.interfaces.FormI;
 import dtk.interfaces.LayoutI;
+import dtk.interfaces.ContainerI;
+import dtk.interfaces.ContainerableI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.event_receivers;
 
@@ -19,19 +21,15 @@ import dtk.widgets.Layout;
 
 import dtk.miscs.mixin_event_handler_reg;
 
-interface WidgetI
+interface WidgetI : ContainerableI
 {
-    WidgetI setParentLayout(LayoutI layout);
-    WidgetI unsetParentLayout();
-    bool isUnsetParentLayout();
-    LayoutI getParentLayout();
-    
     FormI getForm();
     
     DrawingSurfaceI getDrawingSurface();
     
-    void positionAndSizeRequest(Position2D, Size2D);
-    void recalculateChildrenPositionsAndSizes();
+    //void positionAndSizeRequest(Position2D, Size2D);
+    void propagatePosAndSizeRecalc();
+    
     void redraw();
     
     ulong getX();
@@ -44,13 +42,13 @@ interface WidgetI
     WidgetI setWidth(ulong);
     WidgetI setHeight(ulong);
     
-    Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point);
+    Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point);
     
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
     
     static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    {    	
+    {
     	mixin(mixin_event_handler_reg(v, true));
     }
 }

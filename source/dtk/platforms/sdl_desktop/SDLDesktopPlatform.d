@@ -22,7 +22,7 @@ import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
 
 import dtk.miscs.signal_tools;
-import dtk.miscs.WindowEventMgr;
+// import dtk.miscs.WindowEventMgr;
 
 import dtk.signal_mixins.Platform;
 
@@ -67,7 +67,7 @@ class SDLDesktopPlatform : PlatformI
     }
     
 	mixin mixin_multiple_properties_define!(SDLDesktopPlatformProperties);
-    mixin mixin_multiple_properties_forward!(SDLDesktopPlatformProperties);
+    mixin mixin_multiple_properties_forward!(SDLDesktopPlatformProperties, false);
     
     mixin(mixin_PlatformSignals(false));
     
@@ -116,7 +116,7 @@ class SDLDesktopPlatform : PlatformI
     WindowI createWindow(WindowCreationSettings window_settings)
     {
         auto w = new Window(window_settings);
-        w.setPlatform(this);
+        // w.setPlatform(this);
         return w;
     }
 

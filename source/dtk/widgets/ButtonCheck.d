@@ -16,7 +16,7 @@ class ButtonCheck : Button
 {
 
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
-    mixin mixin_multiple_properties_forward!(ButtonCheckProperties);
+    mixin mixin_multiple_properties_forward!(ButtonCheckProperties, false);
     
     this()
     {

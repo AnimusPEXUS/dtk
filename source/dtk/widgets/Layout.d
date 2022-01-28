@@ -7,7 +7,8 @@ import std.algorithm;
 import std.typecons;
 import std.array;
 
-import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.ContainerI;
+import dtk.interfaces.ContainerableI;
 import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.LayoutI;
@@ -65,13 +66,13 @@ PropSetting("gs_w_d", "bool", "ca_vexpand", "CAVExpand", "false"),
 
 class LayoutChild
 {
-	ContainerableWidgetI widget;
+	ContainerableI widget;
 	// float halign;
 	// float valign;
 	
     mixin mixin_multiple_properties_define!(LayoutChildProperties);	
-    mixin mixin_multiple_properties_forward!(LayoutChildProperties);	
-    this() {
+    mixin mixin_multiple_properties_forward!(LayoutChildProperties, false);	
+    this(ContainerableI widget) {
     	mixin(mixin_multiple_properties_inst(LayoutChildProperties));
     }
 }
@@ -80,6 +81,7 @@ class LayoutChild
 const auto LayoutProperties = cast(PropSetting[]) [
 PropSetting("gs_w_d", "ulong", "vertical_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
 PropSetting("gs_w_d", "ulong", "horizontal_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
+// PropSetting("gsun", "ContainerI", "parent_container", "Parent", "null")
 ];
 
 /++
@@ -91,7 +93,7 @@ NOTE: Layout should not do any changes to any positions and sizes of it's
 own children.
 
 +/
-class Layout : Widget, ContainerableWidgetI, LayoutI
+class Layout : Widget, ContainerI, LayoutI
 {
 
     // children field is public and is a normal array. you can use it to
@@ -101,14 +103,39 @@ class Layout : Widget, ContainerableWidgetI, LayoutI
     LayoutChild[] children;
 	
     mixin mixin_multiple_properties_define!(LayoutProperties);	
-    mixin mixin_multiple_properties_forward!(LayoutProperties);	
-    this() {
-    	mixin mixin_multiple_properties_inst!(LayoutProperties);
+    mixin mixin_multiple_properties_forward!(LayoutProperties, false);	
+    mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    
+    this()
+    {
+    	this([]);
     }
+    
+    this(LayoutChild[] children) {
+    	mixin(mixin_multiple_properties_inst(LayoutProperties));
+    	this.children = children;
+    }
+
+    /*
+    override Layout setParent(ContainerI container)
+    {
+    	return super().setParent(container);
+    }
+    
+    override Layout unsetParent()
+    {
+    	return super().unsetParent();
+    }
+    
+    override ContainerI getParent()
+    {
+    	return super().getParent();
+    } */
+
     
     void checkChildren()
     {
-    	foreach_reverse (i, v; children)
+    	/* foreach_reverse (i, v; children)
     	{
     		if (v.widget is null)
     		{
@@ -119,39 +146,33 @@ class Layout : Widget, ContainerableWidgetI, LayoutI
     		{
     			v.widget.setParent(this);
     		}
-    	}
+    	} */
     }
     
-    LayoutChildI getLayoutChildByWidget(ContainerableWidgetI widget)
+    LayoutChildI getLayoutChildByWidget(ContainerableI widget)
     {
-    	foreach (v; children)
+    	/* foreach (v; children)
     	{
     		if (v.widget == widget)
     		{
     			return v;
     		}
-    	}
+    	} */
     	return null;
     }
     
-    override void positionAndSizeRequest(Position2D position, Size2D size)
+    override void propagatePosAndSizeRecalc()
     {
-        super.positionAndSizeRequest(position, size);
-        this.recalculateChildrenPositionsAndSizes();
-    }
-    
-    override void recalculateChildrenPositionsAndSizes()
-    {
-        foreach (size_t counter, v; children)
+    	/* foreach (size_t counter, v; children)
         {
-            v.recalculateChildrenPositionsAndSizes();
-        }
+            v.propagatePosAndSizeRecalc();
+        } */
     }
     
     override void redraw()
     {
     	
-        super.redraw();
+/*         super.redraw();
         
         this.redraw_x(this);
         
@@ -159,8 +180,84 @@ class Layout : Widget, ContainerableWidgetI, LayoutI
         foreach (size_t i, v; children)
         {
             v.redraw();
-        }
+        } */
     }
     
-    mixin mixin_getWidgetAtPosition;
+    // mixin mixin_getWidgetAtPosition;
+    
+    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    {
+/*     	auto x = point.x;
+        auto y = point.y;
+        
+        ulong local_x;
+        ulong local_y;
+        {
+        	// auto pos = this.getPosition();
+        	local_x=x;
+        	local_y=y;
+        }
+        
+    	auto children = getChildren();
+    	
+    	if (children.length == 0)
+    	{
+    		return tuple(cast(WidgetI)this, Position2D(local_x, local_y));
+    	}
+    	
+    	// TODO: optimize for visible part
+    	foreach (c; children)
+    	{
+    		auto c_pos = c.getPosition();
+    		auto c_size = c.getSize();
+    		int c_pos_x = c_pos_x;
+    		int c_pos_y = c_pos_y;
+    		auto c_size_w = c_size.width;
+    		auto c_size_h = c_size.height;
+    		
+    		if (x >= c_pos_x && x <= (c_pos_x + c_size_w) 
+    			&& y >= c_pos_y && y <= (c_pos_y + c_size_h))
+    		{
+    			return c.getWidgetAtPosition(Position2D(x - c_pos_x, y - c_pos_y));
+    			}
+    			}
+    			return tuple(cast(WidgetI)this, Position2D(local_x, local_y)); */
+    			return tuple(cast(WidgetI)null, Position2D(0, 0));
+    }
+    
+    ulong getChildX(ContainerableI child)
+    {
+    	return 0;
+    }
+    
+    ulong getChildY(ContainerableI child)
+    {
+    	return 0;
+    }
+    
+    ulong getChildWidth(ContainerableI child)
+    {
+    	return 0;
+    }
+    
+    ulong getChildHeight(ContainerableI child)
+    {
+    	return 0;
+    }
+    
+    void setChildX(ContainerableI child, ulong v)
+    {
+    }
+    
+    void setChildY(ContainerableI child, ulong v)
+    {
+    }
+    
+    void setChildWidth(ContainerableI child, ulong v)
+    {
+    }
+    
+    void setChildHeight(ContainerableI child, ulong v)
+    {
+    }
 }

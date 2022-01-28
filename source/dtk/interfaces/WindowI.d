@@ -14,17 +14,19 @@ import dtk.types.EventTextInput;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FormI;
-import dtk.interfaces.WindowEventMgrI;
+// import dtk.interfaces.WindowEventMgrI;
 // import dtk.interfaces.event_receivers;
 
 import dtk.miscs.mixin_event_handler_reg;
+
+import dtk.signal_mixins.Window;
 
 interface WindowI
 {
     PlatformI getPlatform();
 
-    WindowI setWindowEventMgr(WindowEventMgrI mgr);
-    WindowEventMgrI getWindowEventMgr();
+    // WindowI setWindowEventMgr(WindowEventMgrI mgr);
+    // WindowEventMgrI getWindowEventMgr();
 
     //void installForm(FormI form);
     //void uninstallForm();
@@ -48,14 +50,16 @@ interface WindowI
     WindowI setWidth(ulong v);
     WindowI setHeight(ulong v);
 
-    static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
+    /* static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {    	
     	mixin(mixin_event_handler_reg(v, true));
-    }
+    } */
     
     dstring getTitle();
     WindowI setTitle(dstring value);
 
+    mixin(mixin_WindowSignals(true));
+    
     void redraw();
     
     // void handleEvent(Event* event);

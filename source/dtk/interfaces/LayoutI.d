@@ -1,11 +1,12 @@
 module dtk.interfaces.LayoutI;
 
-import dtk.interfaces.ContainerableWidgetI;
+import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.WidgetI;
 
-interface LayoutI : ContainerableWidgetI
+interface LayoutI // : ContainerableI //, WidgetI
 {
 	void checkChildren();
-	LayoutChildI getLayoutChildByWidget(ContainerableWidgetI widget);
+	LayoutChildI getLayoutChildByWidget(ContainerableI widget);
 }
 
 interface LayoutChildI

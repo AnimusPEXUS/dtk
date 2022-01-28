@@ -25,7 +25,7 @@ class ButtonRadio : Button
     }
 
 	mixin mixin_multiple_properties_define!(ButtonRadioProperties);
-    mixin mixin_multiple_properties_forward!(ButtonRadioProperties);
+    mixin mixin_multiple_properties_forward!(ButtonRadioProperties, false);
 
     this()
     {
