@@ -14,7 +14,6 @@ interface ContainerableI // : WidgetI
 	 typeof(this) setParent(ContainerI container);
 	 typeof(this) unsetParent();
 	 ContainerI getParent();
-	 void propagatePosAndSizeRecalc();
 	 
 	 static foreach (v; ["X", "Y", "Width", "Height"])
 	 {
@@ -26,4 +25,7 @@ interface ContainerableI // : WidgetI
 	 	 	 }.format(v)
 	 	 	 );
 	 }
+	 
+	 void redraw();
+	 void propagatePosAndSizeRecalc();
 }

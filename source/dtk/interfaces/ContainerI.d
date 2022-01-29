@@ -28,4 +28,8 @@ interface ContainerI
 	void setChildY(ContainerableI child, ulong v);
 	void setChildWidth(ContainerableI child, ulong v);
 	void setChildHeight(ContainerableI child, ulong v);
+	
+	void addChild(ContainerableI child);
+	void removeChild(ContainerableI child);
+	bool haveChild(ContainerableI child);
 }

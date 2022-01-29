@@ -9,7 +9,7 @@ import bindbc.sdl;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.WidgetI;
 // import dtk.interfaces.WindowEventMgrI;
@@ -35,9 +35,12 @@ import dtk.miscs.signal_tools;
 
 import dtk.signal_mixins.Window;
 
+import dtk.widgets.Form;
+
+
 const auto WindowProperties = cast(PropSetting[]) [
 PropSetting("gsun", "SDLDesktopPlatform", "platform", "Platform", "null"),
-PropSetting("gsun", "FormI", "form", "Form", "null"),
+PropSetting("gsun", "Form", "form", "Form", "null"),
 PropSetting("gsun", "LafI", "laf", "Laf", "null"),
 // PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
 PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
@@ -63,6 +66,11 @@ class Window : WindowI
     
     private
     {
+    	SignalConnection cs_PlatformChange;
+    	SignalConnection cs_LafChange;
+    	
+    	SignalConnection cs_WindowEvents;
+
     	SignalConnection platform_signal_connection;
     }
     
@@ -140,7 +148,7 @@ class Window : WindowI
         
         // setWindowEventMgr(new WindowEventMgr(this));
         
-        connectToPlatform_onAfterChanged(
+        cs_PlatformChange = connectToPlatform_onAfterChanged(
         	delegate void(
         		SDLDesktopPlatform old_value,
         		SDLDesktopPlatform new_value
@@ -193,7 +201,7 @@ class Window : WindowI
         	}
         	);
         
-        connectToLaf_onAfterChanged(
+        cs_LafChange = connectToLaf_onAfterChanged(
         	delegate void(
         		LafI old_value,
         		LafI new_value
@@ -219,7 +227,7 @@ class Window : WindowI
         	}
         	); */
         
-        connectToSignal_WindowEvent(
+        cs_WindowEvents = connectToSignal_WindowEvents(
         	delegate void (EventWindow *e) nothrow {
         		collectException(
         			{
@@ -305,29 +313,29 @@ form_height: %d
         	);
     }
     
-    private void installForm(FormI form)
-    {
-        uninstallForm();
-        
-        setForm(form);
-        auto x = getForm();
-        assert(x !is null);
-        x.setWindow(this);
-        /* x.setDrawingSurface(this._drawing_surface); */
-        x.setLaf(getPlatform().getLaf());
-    }
-    
-    private void uninstallForm()
-    {
-        auto x = getForm();
-        if (x !is null)
-        {
-            x.unsetLaf();
-            /* x.unsetDrawingSurface(); */
-            x.unsetWindow();
-        }
-        this.unsetForm();
-    }
+    // private void installForm(Form form)
+    // {
+        // uninstallForm();
+        // 
+        // setForm(form);
+        // auto x = getForm();
+        // assert(x !is null);
+        // x.setWindow(this);
+        // /* x.setDrawingSurface(this._drawing_surface); */
+        // x.setLaf(getPlatform().getLaf());
+    // }
+    // 
+    // private void uninstallForm()
+    // {
+        // auto x = getForm();
+        // if (x !is null)
+        // {
+            // x.unsetLaf();
+            // /* x.unsetDrawingSurface(); */
+            // x.unsetWindow();
+        // }
+        // this.unsetForm();
+    // }
     
     /* static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {

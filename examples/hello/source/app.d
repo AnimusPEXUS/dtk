@@ -48,7 +48,10 @@ void main()
     w.setForm(form);
 
     Layout lo = new Layout();
+    
+    writeln("before form.setChild");
     form.setChild(lo);
+    writeln("after form.setChild");
     
     lo.setX(10).setY(10).setWidth(290).setHeight(290);
 

@@ -12,13 +12,14 @@ import std.typecons;
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 
 import dtk.types.Size2D;
 import dtk.types.EventMouse;
 import dtk.types.Property;
 
 import dtk.widgets.Widget;
+import dtk.widgets.Form;
 import dtk.widgets.mixins;
 
 import dtk.miscs.RadioGroup;
@@ -27,7 +28,7 @@ import dtk.miscs.RadioGroup;
 class Button : Widget, ContainerableI
 {
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
-    mixin mixin_forwardXYWH_from_Widget!();
+    mixin mixin_forwardXYWH_from_Widget!();    
     
     bool button_is_down;
     
@@ -68,7 +69,7 @@ class Button : Widget, ContainerableI
     
     override void redraw()
     {
-        this.redraw_x(this);
+        mixin(mixin_widget_redraw("Button"));
     }
     
     override void propagatePosAndSizeRecalc()

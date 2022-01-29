@@ -10,7 +10,7 @@ module dtk.types.Property;
 public import dtk.types.Property_prefabs;
 
 import core.sync.mutex;
-import std.exception;  
+import std.exception;
 
 import observable.signal;
 /* import observable.signal.SignalConnection;  */
@@ -118,6 +118,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     	this.variable = settings.init_value;
     	this.value_is_unset = settings.initially_value_is_unset;
     	this.value_is_default = settings.initially_value_is_default;
+    	changeCallMutex = new Mutex();
     }
     
     private void recursiveChangeReaction()
@@ -126,7 +127,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     	{
     		import std.stdio;
     		writeln(
-    			"recursive change detected: ", 
+    			"recursive change detected: ",
     			collectException({throw new Exception("recursion");}())
     			);
     	}
@@ -135,7 +136,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     	{
     		throw new Exception("recursion");
     	}
-    }    
+    }
     
     private void reset_priv()
     {
@@ -169,8 +170,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     }
     
     void reset()
-    {        	
-    	
+    {
     	if (settings.recursiveChangeProtection)
     	{
     		recursionGuard(
@@ -181,8 +181,8 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     			},
     			&reset_priv,
     			);
-    	} 
-    	else 
+    	}
+    	else
     	{
     		reset_priv();
     	}
@@ -191,7 +191,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     bool isDefault()
     {
     	return value_is_default;
-    }    
+    }
     
     
     private void unset_priv()
@@ -231,7 +231,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     }
     
     void unset()
-    {        	
+    {
     	if (settings.recursiveChangeProtection)
     	{
     		recursionGuard(
@@ -242,12 +242,12 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     			},
     			&unset_priv,
     			);
-    	} 
-    	else 
+    	}
+    	else
     	{
     		unset_priv();
     	}
-    }        
+    }
     
     bool isUnset()
     {
@@ -257,10 +257,10 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     bool isSet()
     {
     	return !value_is_unset;
-    }        
+    }
     
     
-    // NOTE: this must be defined anyway, because it can be used also for 
+    // NOTE: this must be defined anyway, because it can be used also for
     //       getting default value
     // TODO: this, probably, have to be reworked
     T1 getUnsetValue()
@@ -281,7 +281,7 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     			return T1.init;
     		}
     	}
-    }    
+    }
     
     T1 get()
     {
@@ -355,7 +355,8 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     }
     
     void set(T1 new_value)
-    {        	
+    {
+    	assert(this !is null);
     	if (settings.recursiveChangeProtection)
     	{
     		recursionGuard(
@@ -367,19 +368,19 @@ class Property(alias T1, alias T2 = PropertySettings!T1)
     			&set_priv,
     			new_value
     			);
-    	} 
-    	else 
+    	}
+    	else
     	{
     		set_priv(new_value);
     	}
-    }        
+    }
     
 }
 
 mixin template Property_forwarding(
-	T, 
-	string property, 
-	string new_suffix, 
+	T,
+	string property,
+	string new_suffix,
 	bool super_forward
 	)
 {
@@ -391,7 +392,7 @@ mixin template Property_forwarding(
    	import observable.signal;
    	
    	static assert(__traits(identifier, property) != "");
-
+   	
    	static if (!super_forward){
    		mixin(
    			q{
@@ -421,7 +422,7 @@ mixin template Property_forwarding(
     		static if (!super_forward) {
     			mixin(
     				q{
-    					typeof(this) %1$s%2$s(T x) { 
+    					typeof(this) %1$s%2$s(T x) {
     						this.%3$s.%1$s(x);
     						return this;
     					}
@@ -432,20 +433,20 @@ mixin template Property_forwarding(
     		{
     			override mixin(
     				q{
-    					typeof(this) %1$s%2$s(T x) { 
+    					typeof(this) %1$s%2$s(T x) {
     						super.%1$s%2$s(x);
     						return this;
     					}
     				}.format(func, new_suffix)
     				);
     		}
-    	} 
-    	else 
+    	}
+    	else
     	{
     		static if (!super_forward) {
     			mixin(
     				q{
-    					typeof(this) %1$s%2$s() { 
+    					typeof(this) %1$s%2$s() {
     						this.%3$s.%1$s();
     						return this;
     					}
@@ -456,7 +457,7 @@ mixin template Property_forwarding(
     		{
     			override mixin(
     				q{
-    					typeof(this) %1$s%2$s() { 
+    					typeof(this) %1$s%2$s() {
     						super.%1$s%2$s();
     						return this;
     					}
@@ -471,7 +472,7 @@ mixin template Property_forwarding(
     	static if (!super_forward) {
     		mixin(
     			q{
-    				bool %1$s%2$s() { 
+    				bool %1$s%2$s() {
     					return this.%3$s.%1$s();
     				}
     			}.format(func, new_suffix, property)
@@ -481,7 +482,7 @@ mixin template Property_forwarding(
     	{
     		mixin(
     			q{
-    				override bool %1$s%2$s() { 
+    				override bool %1$s%2$s() {
     					return super.%1$s%2$s();
     				}
     			}.format(func, new_suffix)
@@ -525,7 +526,7 @@ mixin template Property_forwarding(
     	"onBeforeUnset", "onAfterUnset", "onBeforeChanged", "onAfterChanged",
         ])
     {
-    	static if (!super_forward) 
+    	static if (!super_forward)
     	{
     		mixin(
     			q{
@@ -566,22 +567,22 @@ struct PropSetting
     string default_value;
 }
 
-mixin template mixin_multiple_properties_define(PropSetting[] settings) 
+mixin template mixin_multiple_properties_define(PropSetting[] settings)
 {
 	import std.format;
 	
     static foreach (v; settings)
     {
     	/* pragma(msg,
-    		q{
-    			private {
-    				Property!%1$s %2$s;
-    			}
-    		}.format(
-    			v.type,
-    			v.var_name,
-    			)
-    		); */
+    	q{
+    	private {
+    	Property!%1$s %2$s;
+    	}
+    	}.format(
+    	v.type,
+    	v.var_name,
+    	)
+    	); */
     	mixin(
     		q{
     			private {
@@ -595,7 +596,7 @@ mixin template mixin_multiple_properties_define(PropSetting[] settings)
     }
 }
 
-string mixin_multiple_properties_inst(const PropSetting[] settings) 
+string mixin_multiple_properties_inst(const PropSetting[] settings)
 {
 	import std.format;
 	
@@ -611,7 +612,7 @@ string mixin_multiple_properties_inst(const PropSetting[] settings)
 				v.type,
 				v.var_name,
 				v.default_value,
-				);				
+				);
 		}
 		else if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
 		{
@@ -623,7 +624,7 @@ string mixin_multiple_properties_inst(const PropSetting[] settings)
 				v.var_name,
 				);
 		}
-		else 
+		else
 		{
 			throw new Exception("invalid PropSetting.mode value");
 		}
@@ -632,14 +633,14 @@ string mixin_multiple_properties_inst(const PropSetting[] settings)
 }
 
 // on super_forward
-// from Dlang interface documentation: 
-//           A reimplemented interface must implement all the interface 
+// from Dlang interface documentation:
+//           A reimplemented interface must implement all the interface
 //           functions, it does not inherit them from a super class.
 // this mixin is to /forward/ properties in widgets
 mixin template mixin_multiple_properties_forward(
-	PropSetting[] settings, 
+	PropSetting[] settings,
 	bool super_forward
-	) 
+	)
 {
 	import std.format;
 	

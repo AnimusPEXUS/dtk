@@ -2,7 +2,7 @@ module dtk.interfaces.WidgetI;
 
 import std.typecons;
 
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 // import dtk.interfaces.LayoutI;
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
@@ -17,13 +17,14 @@ import dtk.types.EventTextInput;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 
+import dtk.widgets.Form;
 import dtk.widgets.Layout;
 
 // import dtk.miscs.mixin_event_handler_reg;
 
 interface WidgetI : ContainerableI
 {
-    FormI getForm();
+    Form getForm();
     
     DrawingSurfaceI getDrawingSurface();
     

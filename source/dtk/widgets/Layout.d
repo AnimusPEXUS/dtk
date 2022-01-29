@@ -9,7 +9,7 @@ import std.array;
 
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 // import dtk.interfaces.LayoutI;
 
@@ -18,6 +18,7 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
 
+import dtk.widgets.Form;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
@@ -64,7 +65,7 @@ PropSetting("gs_w_d", "bool", "ca_vexpand", "CAVExpand", "false"),
 
 class LayoutChild
 {
-	ContainerableI widget;
+	ContainerableI child;
 	// float halign;
 	// float valign;
 	
@@ -135,23 +136,24 @@ class Layout : Widget, ContainerI //, LayoutI
     {
     	foreach_reverse (i, v; children)
     	{
-    		if (v.widget is null)
+    		if (v.child is null)
     		{
     			children = children[0 .. i] ~ children[i+1 .. $];
     			continue;
     		}
-    		if (v.widget.getParent() != this)
+    		
+    		if (v.child.getParent() != this)
     		{
-    			v.widget.setParent(this);
+    			v.child.setParent(this);
     		}
     	} 
     }
     
-    LayoutChild getLayoutChildByWidget(ContainerableI widget)
+    LayoutChild getLayoutChildByWidget(ContainerableI child)
     {
     	foreach (v; children)
     	{
-    		if (v.widget == widget)
+    		if (v.child == child)
     		{
     			return v;
     		}
@@ -161,24 +163,20 @@ class Layout : Widget, ContainerI //, LayoutI
     
     override void propagatePosAndSizeRecalc()
     {
-    	/* foreach (size_t counter, v; children)
+    	foreach (v; children)
         {
-        v.propagatePosAndSizeRecalc();
-        } */
+        	v.child.propagatePosAndSizeRecalc();
+        }
     }
     
     override void redraw()
     {
-    	
-/*         super.redraw();
+    	mixin(mixin_widget_redraw("Layout"));
         
-        this.redraw_x(this);
-        
-        
-        foreach (size_t i, v; children)
+        foreach (v; children)
         {
-            v.redraw();
-        } */
+            v.child.redraw();
+        } 
     }
     
     // mixin mixin_getWidgetAtPosition;
@@ -258,4 +256,49 @@ class Layout : Widget, ContainerI //, LayoutI
     void setChildHeight(ContainerableI child, ulong v)
     {
     }
+    
+    void addChild(ContainerableI child)
+    {
+    	if (!haveChild(child))
+    	{
+    		children ~= new LayoutChild(child);
+    		if (child.getParent() != this)
+    		{
+    			child.setParent(this);
+    		}
+    	}
+    }
+    
+    void removeChild(ContainerableI child)
+    {
+    	if (!haveChild(child))
+    		return;
+    		
+    	ContainerableI[] removed;
+    	
+    	foreach_reverse (i, v; children)
+    	{
+    		if (v.child == child)
+    		{
+    			removed~=v.child;
+    			children = children[0 .. i] ~ children[i+1 .. $]; 
+    		}
+    	}
+    	
+    	foreach(v;removed)
+    	{
+    		v.unsetParent();
+    	}
+    }
+    
+    bool haveChild(ContainerableI child)
+    {
+    	foreach(v;children)
+    	{
+    		if (v.child == child)
+    			return true;
+    	}
+    	return false;
+    }
+
 }

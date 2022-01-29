@@ -13,11 +13,13 @@ import dtk.types.EventTextInput;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 // import dtk.interfaces.WindowEventMgrI;
 // import dtk.interfaces.event_receivers;
 
 // import dtk.miscs.mixin_event_handler_reg;
+
+import dtk.widgets.Form;
 
 import dtk.signal_mixins.Window;
 
@@ -31,9 +33,9 @@ interface WindowI
     //void installForm(FormI form);
     //void uninstallForm();
 
-    WindowI setForm(FormI form);
+    WindowI setForm(Form form);
     WindowI unsetForm();
-    FormI getForm();
+    Form getForm();
     
     DrawingSurfaceI getDrawingSurface();
 

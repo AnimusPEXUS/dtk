@@ -6,6 +6,10 @@ import dtk.types.EventMouse;
 import dtk.types.Property;
 
 import dtk.widgets.Button;
+import dtk.widgets.Form;
+
+import dtk.widgets.mixins;
+
 
 const auto ButtonCheckProperties = cast(PropSetting[]) [
 PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
@@ -53,7 +57,7 @@ class ButtonCheck : Button
 
     override void redraw()
     {
-        this.redraw_x(this);
+        mixin(mixin_widget_redraw("ButtonCheck"));
     }
-
+    
 }

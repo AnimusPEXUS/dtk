@@ -11,7 +11,7 @@ import std.typecons;
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 
 import dtk.types.Size2D;
 import dtk.types.Property;
@@ -36,5 +36,12 @@ class Bar : Widget, ContainerableI
     override void propagatePosAndSizeRecalc()
     {
     }
+    
+        
+    override void redraw()
+    {
+    }
+
+
     
 }

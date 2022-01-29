@@ -17,10 +17,11 @@ import dtk.types.EventTextInput;
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.DrawingSurfaceI;
 
+import dtk.widgets.Form;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
@@ -72,7 +73,7 @@ class TextEntry : Widget, ContainerableI
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	
         text_view = new TextView();
-        text_view.getForm = delegate FormI()
+        text_view.getForm = delegate Form()
         {
             auto f = getForm();
             if (f is null)
@@ -322,7 +323,7 @@ class TextEntry : Widget, ContainerableI
     
     override void redraw()
     {
-        this.redraw_x(this);
+         mixin(mixin_widget_redraw("TextEntry"));
     }
     
     override void propagatePosAndSizeRecalc()

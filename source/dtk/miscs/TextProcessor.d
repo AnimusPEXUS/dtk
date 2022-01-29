@@ -13,7 +13,6 @@ import observable.signal;
 
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.WindowI;
-import dtk.interfaces.FormI;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.FaceI;
@@ -25,6 +24,8 @@ import dtk.types.Size2D;
 import dtk.types.fontinfo;
 import dtk.types.Property;
 import dtk.types.EventKeyboard;
+
+import dtk.widgets.Form;
 
 import dtk.miscs.signal_tools;
 
@@ -1899,7 +1900,7 @@ class TextView
     
     Text text;
     
-    FormI delegate() getForm;
+    Form delegate() getForm;
     DrawingSurfaceI delegate() getDrawingSurface;
     bool delegate() isFocused;
     

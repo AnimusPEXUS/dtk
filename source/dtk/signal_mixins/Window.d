@@ -11,14 +11,14 @@ string mixin_WindowSignals(bool for_interface)
 		import dtk.miscs.signal_tools;
 		
 	    mixin mixin_installSignal!(
-	    	"WindowEvent", 
-	    	"signal_window_event",
+	    	"WindowEvents", 
+	    	"signal_window_events",
 	    	%1$s,
 	    	EventWindow*
 	    	);
 	    mixin mixin_installSignal!(
-	    	"FormEvents", 
-	    	"signal_form_events",
+	    	"OtherEvents", 
+	    	"signal_other_events",
 	    	%1$s,
 	    	Event*
 	    	);

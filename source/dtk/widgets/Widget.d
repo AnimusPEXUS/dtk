@@ -1,10 +1,12 @@
 module dtk.widgets.Widget;
 
+import core.sync.mutex;
+
 import std.stdio;
 import std.conv;
 import std.typecons;
 
-import dtk.interfaces.FormI;
+// import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.LayoutI;
@@ -21,12 +23,14 @@ import dtk.types.Size2D;
 import dtk.types.Position2D;
 
 import dtk.miscs.DrawingSurfaceShift;
+import dtk.miscs.recursionGuard;
 // import dtk.miscs.mixin_event_handler_reg;
 
 /* import dtk.widgets.WidgetLocator; */
 // import dtk.widgets;
 /* import dtk.widgets.WidgetDrawingSurface; */
 
+import dtk.widgets.Form;
 import dtk.widgets.Layout;
 
 const auto WidgetProperties = cast(PropSetting[]) [
@@ -38,42 +42,50 @@ class Widget : WidgetI
 	
 	mixin mixin_multiple_properties_define!(WidgetProperties);
     mixin mixin_multiple_properties_forward!(WidgetProperties, false);
-    this() {
-    	mixin(mixin_multiple_properties_inst(WidgetProperties));
+    
+    private
+    {
+    	bool form_recursion_protection_bool;
+    	Mutex form_recursion_protection_mutex;
     }
     
+    this() {
+    	mixin(mixin_multiple_properties_inst(WidgetProperties));
+    	form_recursion_protection_mutex = new Mutex();
+    }
     
-    /++ return FormI on which this Widget is placed. returns null in case if
-    there is no attached form or if this widget is deeper than 200 levels to
-    FormI instance (too deep); +/
-    FormI getForm()
+    Form getForm()
     {
-        /* WidgetI w = this;
-        Form ret;
-        
-        for (auto failure_countdown = cast(byte) 200; failure_countdown != -1; failure_countdown--)
-        {
-        
-        ret = cast(Form) w;
-        if (ret !is null)
-        {
+    	auto ret = recursionGuard(
+    		form_recursion_protection_bool,
+    		form_recursion_protection_mutex,
+    		delegate Form()
+    		{
+    			throw new Exception("parent-children circul detected: this is wrong");
+    		},
+    		delegate Form()
+    		{
+    			WidgetI p = this;
+    			Form res;
+    			
+    			while (true)
+    			{
+    				p = cast(WidgetI)p.getParent();
+    				
+    				if (p is null)
+    				{
+    					return null;
+    				}
+    				
+    				res = cast(Form) p;
+    				if (res !is null)
+    				{
+    					return res;
+    				}
+    			}
+    		}
+    		);
         return ret;
-        }
-        
-        if (w.isUnsetParent())
-        {
-        return null;
-        }
-        
-        w = w.getParent();
-        if (w is null)
-        {
-        return null;
-        }
-        }
-        
-        return ret; */
-        return null;
     }
     
     DrawingSurfaceI getDrawingSurface()
@@ -85,44 +97,44 @@ class Widget : WidgetI
     
     void redraw()
     {
-        this.redraw_x(this);
+        throw new Exception("this function must be overriden");
     }
     
-    void redraw_x(T)(T new_this)
-    {
-    	
-        /* alias A1 = typeof(new_this); */
-        
-        const id = __traits(identifier, new_this);
-        const id_t = __traits(identifier, T);
-        
-        static if (!is(T == Widget))
-        {
-            const drawid = "draw" ~ id_t;
-            
-            FormI form = new_this.getForm();
-            if (form is null)
-            {
-                throw new Exception("error: redraw() function couldn't get Form");
-            }
-            
-            auto theme = form.getLaf();
-            
-            if (theme is null)
-            {
-                throw new Exception("theme not set");
-            }
-            
-            static if (!__traits(hasMember, theme, drawid))
-            {
-                return;
-            }
-            else
-            {
-                __traits(getMember, theme, drawid)(new_this);
-            }
-        }
-    }
+    // void redraw_x(T)(T new_this)
+    // {
+    	// 
+        // /* alias A1 = typeof(new_this); */
+        // 
+        // const id = __traits(identifier, new_this);
+        // const id_t = __traits(identifier, T);
+        // 
+        // static if (!is(T == Widget))
+        // {
+            // const drawid = "draw" ~ id_t;
+            // 
+            // FormI form = new_this.getForm();
+            // if (form is null)
+            // {
+                // throw new Exception("error: redraw() function couldn't get Form");
+            // }
+            // 
+            // auto theme = form.getLaf();
+            // 
+            // if (theme is null)
+            // {
+                // throw new Exception("theme not set");
+            // }
+            // 
+            // static if (!__traits(hasMember, theme, drawid))
+            // {
+                // return;
+            // }
+            // else
+            // {
+                // __traits(getMember, theme, drawid)(new_this);
+            // }
+        // }
+    // }
     
     void positionAndSizeRequest(Position2D position, Size2D size)
     {

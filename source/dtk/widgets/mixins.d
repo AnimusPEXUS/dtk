@@ -102,3 +102,56 @@ mixin template mixin_forwardXYWH_from_Widget()
     		);
     }
 }
+
+string mixin_simple_parent_change_action()
+{
+	string ret = q{
+		con_cont.add(
+    		connectToParent_onAfterChanged(
+    			delegate void(
+    				ContainerI o, 
+    				ContainerI n
+    				)
+    			{
+    				collectException(
+    					{
+    						if (o !is null && o.haveChild(this)) 
+    						{
+    							o.removeChild();
+    						}
+    						
+    						if (n !is null && !n.haveChild(this)) 
+    						{
+    							n.addChild(this);
+    						}
+    					}()
+    					);
+    			}
+    			)
+    		);
+    	
+	};
+	return ret;
+}
+
+string mixin_widget_redraw(string widgetType)
+{
+	import std.format;
+	
+	string ret = q{
+		Form form = this.getForm();
+		if (form is null)
+		{
+			throw new Exception("redraw() requires Form to be set");
+		}
+		
+		auto laf = form.getLaf();
+		if (laf is null)
+		{
+			throw new Exception("Laf not set");
+		}
+		
+		laf.draw%1$s(this);
+	}.format(widgetType);
+	return ret;
+}

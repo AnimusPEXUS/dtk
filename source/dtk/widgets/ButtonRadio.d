@@ -11,6 +11,10 @@ import dtk.types.Property;
 import dtk.miscs.RadioGroup;
 
 import dtk.widgets.Button;
+import dtk.widgets.Form;
+
+import dtk.widgets.mixins;
+
 
 const auto ButtonRadioProperties = cast(PropSetting[]) [
 PropSetting("gsun", "RadioGroup", "radio_group", "RadioGroup", "null"),
@@ -90,9 +94,7 @@ class ButtonRadio : Button
 
     override void redraw()
     {
-    	if (getForm() is null)
-    		return;
-        this.redraw_x(this);
+        mixin(mixin_widget_redraw("ButtonRadio"));
     }
 
 }
