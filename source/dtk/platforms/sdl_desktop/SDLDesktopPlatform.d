@@ -40,7 +40,7 @@ PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
 
 class SDLDesktopPlatform : PlatformI
 {
-
+	
     string getName()
     {
         return "SDL-Desktop";
@@ -74,13 +74,13 @@ class SDLDesktopPlatform : PlatformI
     private
     {
         Window[] windows;
-
+        
         bool stop_flag;
-
+        
         SDL_EventType timer500_event_id;
     }
-
-    void init() // TODO: check whatever this function name have special meaning in D 
+    
+    void init() // TODO: check whatever this function name have special meaning in D
     {
     	mixin(mixin_multiple_properties_inst(SDLDesktopPlatformProperties));
     	
@@ -140,10 +140,10 @@ class SDLDesktopPlatform : PlatformI
     	if (sdl_window is null)
     	{
     		throw new Exception("not an SDL window");
-    	}    	
+    	}
     	return sdl_window;
     }
-
+    
     void addWindow(WindowI win)
     {
     	auto sdl_win = convertWindowItoSDLWindow(win);
@@ -157,7 +157,7 @@ class SDLDesktopPlatform : PlatformI
         windows ~= sdl_win;
         sdl_win.setPlatform(this);
     }
-
+    
     void removeWindow(WindowI win)
     {
     	auto sdl_win = convertWindowItoSDLWindow(win);
@@ -169,21 +169,21 @@ class SDLDesktopPlatform : PlatformI
             if (w == sdl_win)
                 indexes ~= i;
         }
-
+        
         foreach_reverse (size_t i; indexes)
         {
             windows = windows[0 .. i] ~ windows[i + 1 .. $];
         }
-
+        
         sdl_win.unsetPlatform();
     }
     
     bool haveWindow(WindowI win)
     {
-    	auto sdl_win = convertWindowItoSDLWindow(win);    	
+    	auto sdl_win = convertWindowItoSDLWindow(win);
         return haveWindow(sdl_win);
     }
-
+    
     bool haveWindow(Window win)
     {
     	foreach (ref Window w; windows)
@@ -193,7 +193,7 @@ class SDLDesktopPlatform : PlatformI
         }
         return false;
     }
-
+    
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)
     {
         Window ret;
@@ -211,12 +211,12 @@ class SDLDesktopPlatform : PlatformI
         }
         return ret;
     }
-
+    
     void timer500Loop()
     {
     	import core.thread;
     	import core.time;
-
+    	
     	//    	auto sleep_f = core.thread.osthread.Thread.getThis.sleep;
     	auto m500 = msecs(500);
     	while(!stop_flag)
@@ -229,15 +229,15 @@ class SDLDesktopPlatform : PlatformI
     		SDL_PushEvent(e);
     	}
     }
-
+    
     void mainLoop()
     {
     	import std.parallelism;
     	
     	ulong main_thread_id = core.thread.osthread.Thread.getThis().id;
-
+    	
         SDL_Event* event = new SDL_Event;
-
+        
         auto timer500 = task(&timer500Loop);
         timer500.executeInNewThread();
         scope(exit) {
@@ -246,12 +246,12 @@ class SDLDesktopPlatform : PlatformI
         	timer500.workForce();
         	writeln("mainLoop exited.");
         }
-
+        
         main_loop: while (!stop_flag)
         {
-
+        	
             auto res = SDL_WaitEvent(event);
-
+            
             if (res == 0) // TODO: use GetError()
             {
                 throw new Exception("got error on SDL_WaitEvent");
@@ -261,10 +261,10 @@ class SDLDesktopPlatform : PlatformI
             {
             	throw new Exception("SDL_WaitEvent exited into invalid thread");
             }
-
+            
             // TODO: probably, at this point, things have to become asynchronous
             //       in environments which supports this
-
+            
             if (event.type == SDL_USEREVENT)
             {
             	if (cast(SDL_EventType)event.user.type
@@ -277,7 +277,7 @@ class SDLDesktopPlatform : PlatformI
             {
             	// typeof(SDL_WindowEvent.windowID) windowID;
             	Window w;
-
+            	
             	event_type_switch:
             	switch (event.type)
             	{
@@ -311,20 +311,20 @@ class SDLDesktopPlatform : PlatformI
             	case SDL_QUIT:
             		break main_loop;
             	}
-
+            	
             	auto e = convertSDLEventToEvent(event);
             	if (e is null)
             	{
             		debug writeln("convertSDLEventToEvent returned null: ignoring");
-            		continue main_loop; 
+            		continue main_loop;
             	}
             	e.window = w;
             	
             	signal_event.emit(e);
             }
         }
-
+        
         return;
     }
-
+    
 }
