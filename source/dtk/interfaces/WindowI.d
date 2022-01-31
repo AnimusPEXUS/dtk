@@ -13,6 +13,7 @@ import dtk.types.EventTextInput;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.LafI;
 // import dtk.interfaces.FormI;
 // import dtk.interfaces.WindowEventMgrI;
 // import dtk.interfaces.event_receivers;
@@ -33,6 +34,12 @@ interface WindowI
     //void installForm(FormI form);
     //void uninstallForm();
 
+    LafI getLaf();
+
+    LafI getForcedLaf();
+    typeof(this) setForcedLaf(LafI);
+    typeof(this) unsetForcedLaf();    
+    
     WindowI setForm(Form form);
     WindowI unsetForm();
     Form getForm();

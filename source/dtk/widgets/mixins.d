@@ -142,7 +142,7 @@ string mixin_widget_redraw(string widgetType)
 		Form form = this.getForm();
 		if (form is null)
 		{
-			throw new Exception("redraw() requires Form to be set");
+			throw new Exception(this.toString() ~ ".redraw() requires Form to be set");
 		}
 		
 		auto laf = form.getLaf();

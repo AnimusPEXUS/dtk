@@ -41,7 +41,7 @@ import dtk.widgets.Form;
 const auto WindowProperties = cast(PropSetting[]) [
 PropSetting("gsun", "SDLDesktopPlatform", "platform", "Platform", "null"),
 PropSetting("gsun", "Form", "form", "Form", "null"),
-PropSetting("gsun", "LafI", "laf", "Laf", "null"),
+PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", "null"),
 // PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
 PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
@@ -67,10 +67,11 @@ class Window : WindowI
     private
     {
     	SignalConnection cs_PlatformChange;
-    	SignalConnection cs_LafChange;
+    	// SignalConnection cs_LafChange;
+    	SignalConnection cs_FormChange;
     	
     	SignalConnection cs_WindowEvents;
-
+    	
     	SignalConnection platform_signal_connection;
     }
     
@@ -156,76 +157,60 @@ class Window : WindowI
         	{
         		collectException(
         			{
-        				SDLDesktopPlatform new_value2;
-        				LafI laf2;
+        				if (old_value == new_value)
+        					return;
         				
-        				if (window_settings.laf !is null)
-        				{
-        					laf2 = window_settings.laf;
-        				}
-        				else
-        				{
-        					laf2 = getLaf();
-        				}
+        				platform_signal_connection.disconnect();
         				
         				if (old_value !is null)
-        					old_value.unregisterWindow(this);
+        					old_value.removeWindow(this);
         				
-        				
-        				if (new_value is null && window_settings.laf is null)
+        				if (new_value !is null)
         				{
-        					unsetLaf();
-        				}
-        				
-        				if (window_settings.laf !is null && isUnsetLaf())
-        				{
-        					setLaf(window_settings.laf);
-        				}
-        				
-        				if (window_settings.laf is null)
-        				{
-        					platform_signal_connection.disconnect();
-        					if (new_value !is null)
-        					{
-        						platform_signal_connection=
-        						new_value.connectToSignal_Event(
-        							&onPlatformEvent
-        							);
-        						setLaf(new_value.getLaf());
-        					}
-        					else
-        						unsetLaf();
+        					platform_signal_connection=
+        					new_value.connectToSignal_Event(
+        						&onPlatformEvent
+        						);
         				}
         			}()
         			);
         	}
         	);
         
-        cs_LafChange = connectToLaf_onAfterChanged(
+        cs_FormChange = connectToForm_onAfterChanged(
         	delegate void(
-        		LafI old_value,
-        		LafI new_value
+        		Form old_value,
+        		Form new_value
         		)
         	{
         		collectException(
-        			{ /* ensurePlatformEventManangerAndLafConnection(); */ }()
+        			{
+        				if (old_value == new_value)
+        					return;
+        				
+        				if (old_value !is null)
+        					old_value.unsetWindow();
+        				
+        				if (new_value !is null && new_value.getWindow() != this)
+        					new_value.setWindow(this);
+        			}()
         			);
         	}
         	);
         
         // TODO: either everywhere rename 'Manager' to 'Mgr', either viseversia
         
-       /*  connectToWindowEventMgr_onAfterChanged(
-        	delegate void(
-        		WindowEventMgrI old_value,
-        		WindowEventMgrI new_value
-        		)
-        	{
-        		collectException(
-        			{ ensurePlatformEventManangerAndLafConnection(); }()
-        			);
-        	}
-        	); */
+        /*  connectToWindowEventMgr_onAfterChanged(
+        delegate void(
+        WindowEventMgrI old_value,
+        WindowEventMgrI new_value
+        )
+        {
+        collectException(
+        { ensurePlatformEventManangerAndLafConnection(); }()
+        );
+        }
+        ); */
         
         cs_WindowEvents = connectToSignal_WindowEvents(
         	delegate void (EventWindow *e) nothrow {
@@ -238,42 +223,41 @@ class Window : WindowI
         	);
     }
     
-    ~this()
+    LafI getLaf()
     {
-    	/* ensurePlatformEventManangerAndLafConnection(true); */
+    	auto l = getForcedLaf();
+    	if (l !is null)
+    		return l;
+    	auto p = getPlatform();
+    	if (p is null)
+    	{
+    		throw new Exception("getLaf(): both ForcedLaf and Platform is not set");
+    	}
+    	l = p.getLaf();
+    	if (l is null)
+    	{
+    		throw new Exception("Platform returned null Laf");
+    	}
+    	return l;
     }
-    
-/*     private void ensurePlatformEventManangerAndLafConnection(bool disconnect=false)
-    {
-    	auto emgr = getWindowEventMgr();
-    	auto laf = getLaf();
-    	if (!disconnect && (emgr is null || laf is null))
-    		disconnect = true;
-    	if (!disconnect)
-    	{
-    		if (emgr !is null)
-    		{
-    			emgr.removeAllHandlers();
-    		}
-    		if (emgr !is null && laf !is null)
-    		{
-    			laf.addEventHandling(emgr);
-    		}
-    	}
-    	else
-    	{
-    		if (emgr !is null)
-    		{
-    			emgr.removeAllHandlers();
-    		}
-    	}
-    } */
     
     void onPlatformEvent(Event* event) nothrow
     {
     	collectException(
     		{
+    			debug if (event.eventType == EventType.none)
+    			{
+    				writeln("event.type == EventType.none");
+    			}
     			
+    			if (event.eventType == EventType.window)
+    			{
+    				emitSignal_WindowEvents(event.ew);
+    			}
+    			else
+    			{
+    				emitSignal_OtherEvents(event);
+    			}
     		}()
     		);
         return;
@@ -294,13 +278,13 @@ class Window : WindowI
     	import std.format;
         writeln(
         	q{
-title      : %s
-x          : %d
-y          : %d
-width      : %d
-height     : %d
-form_width : %d
-form_height: %d
+        		title      : %s
+        		x          : %d
+        		y          : %d
+        		width      : %d
+        		height     : %d
+        		form_width : %d
+        		form_height: %d
         	}.format(
         		title,
         		getX(),
@@ -315,31 +299,31 @@ form_height: %d
     
     // private void installForm(Form form)
     // {
-        // uninstallForm();
-        // 
-        // setForm(form);
-        // auto x = getForm();
-        // assert(x !is null);
-        // x.setWindow(this);
-        // /* x.setDrawingSurface(this._drawing_surface); */
-        // x.setLaf(getPlatform().getLaf());
+    // uninstallForm();
+    //
+    // setForm(form);
+    // auto x = getForm();
+    // assert(x !is null);
+    // x.setWindow(this);
+    // /* x.setDrawingSurface(this._drawing_surface); */
+    // x.setLaf(getPlatform().getLaf());
     // }
-    // 
+    //
     // private void uninstallForm()
     // {
-        // auto x = getForm();
-        // if (x !is null)
-        // {
-            // x.unsetLaf();
-            // /* x.unsetDrawingSurface(); */
-            // x.unsetWindow();
-        // }
-        // this.unsetForm();
+    // auto x = getForm();
+    // if (x !is null)
+    // {
+    // x.unsetLaf();
+    // /* x.unsetDrawingSurface(); */
+    // x.unsetWindow();
+    // }
+    // this.unsetForm();
     // }
     
     /* static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
     {
-    	mixin(mixin_event_handler_reg(v));
-    } */ 
+    mixin(mixin_event_handler_reg(v));
+    } */
     
 }

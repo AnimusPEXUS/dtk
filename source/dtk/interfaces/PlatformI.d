@@ -18,16 +18,19 @@ interface PlatformI
     string getName();
     string getDescription();
     string getSystemTriplet();
-
+    
+    void setOnGetLaf(LafI delegate());
     LafI getLaf();
-    PlatformI setLaf(LafI);
-    PlatformI unsetLaf();
-
+    
     FontMgrI getFontManager();
-
+    
     bool canCreateWindow();
     WindowI createWindow(WindowCreationSettings window_settings);
-
+    
+    void addWindow(WindowI win);
+    void removeWindow(WindowI win);
+    bool haveWindow(WindowI win);
+    
     bool getFormCanResizeWindow();
     
     void init();
@@ -35,7 +38,4 @@ interface PlatformI
     void destroy();
     
     mixin(mixin_PlatformSignals(true));
-    
-    //SignalConnection connectToSignal_Timer500( void delegate() nothrow );
-    //SignalConnection connectToSignal_Event( void delegate(Event*) nothrow );
 }

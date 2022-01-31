@@ -11,7 +11,7 @@ struct WindowCreationSettings
 {
     dstring title;
 
-    LafI laf;
+    // LafI laf;
 
     Nullable!int x;
     Nullable!int y;

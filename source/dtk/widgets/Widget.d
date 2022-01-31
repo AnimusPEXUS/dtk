@@ -56,6 +56,7 @@ class Widget : WidgetI
     
     Form getForm()
     {
+    	debug writeln("getForm() called at ", this);
     	auto ret = recursionGuard(
     		form_recursion_protection_bool,
     		form_recursion_protection_mutex,
@@ -65,13 +66,12 @@ class Widget : WidgetI
     		},
     		delegate Form()
     		{
-    			WidgetI p = this;
+    			ContainerI p = this.getParent();
     			Form res;
     			
     			while (true)
     			{
-    				p = cast(WidgetI)p.getParent();
-    				
+    				debug writeln("p == ", p);
     				if (p is null)
     				{
     					return null;
@@ -82,12 +82,15 @@ class Widget : WidgetI
     				{
     					return res;
     				}
+    				
+    				p = p.getParent();
+    				debug writeln("(2) p == ", p);
     			}
     		}
     		);
         return ret;
     }
-    
+
     DrawingSurfaceI getDrawingSurface()
     {
         /* auto p = getPosition();

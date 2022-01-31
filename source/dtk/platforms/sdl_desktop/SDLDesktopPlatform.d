@@ -35,7 +35,7 @@ cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
 
 const auto SDLDesktopPlatformProperties = cast(PropSetting[]) [
 PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
-PropSetting("gsun", "LafI", "laf", "Laf", "null"),
+// PropSetting("gsun", "LafI", "laf", "Laf", "null"),
 ];
 
 class SDLDesktopPlatform : PlatformI
@@ -80,7 +80,7 @@ class SDLDesktopPlatform : PlatformI
         SDL_EventType timer500_event_id;
     }
 
-    void init()
+    void init() // TODO: check whatever this function name have special meaning in D 
     {
     	mixin(mixin_multiple_properties_inst(SDLDesktopPlatformProperties));
     	
@@ -119,25 +119,54 @@ class SDLDesktopPlatform : PlatformI
         // w.setPlatform(this);
         return w;
     }
-
-    void registerWindow(Window win)
+    
+    LafI delegate() onGetLaf;
+    
+    void setOnGetLaf(LafI delegate() cb)
     {
-    	unregisterWindow(win);
-        foreach (ref Window w; windows)
-        {
-            if (w == win)
-                break;
-        }
-        windows ~= win;
-        win.setPlatform(this);
+    	onGetLaf=cb;
+    }
+    
+    LafI getLaf()
+    {
+    	if (onGetLaf is null)
+    		throw new Exception("onGetLaf is not set");
+    	return onGetLaf();
+    }
+    
+    private Window convertWindowItoSDLWindow(WindowI win)
+    {
+    	auto sdl_window = cast(Window) win;
+    	if (sdl_window is null)
+    	{
+    		throw new Exception("not an SDL window");
+    	}    	
+    	return sdl_window;
     }
 
-    void unregisterWindow(Window win)
+    void addWindow(WindowI win)
     {
+    	auto sdl_win = convertWindowItoSDLWindow(win);
+    	if (haveWindow(sdl_win))
+    		return;
+        foreach (ref Window w; windows)
+        {
+            if (w == sdl_win)
+                break;
+        }
+        windows ~= sdl_win;
+        sdl_win.setPlatform(this);
+    }
+
+    void removeWindow(WindowI win)
+    {
+    	auto sdl_win = convertWindowItoSDLWindow(win);
+    	if (!haveWindow(sdl_win))
+    		return;
         size_t[] indexes;
         foreach (size_t i, ref Window w; windows)
         {
-            if (w == win)
+            if (w == sdl_win)
                 indexes ~= i;
         }
 
@@ -146,7 +175,23 @@ class SDLDesktopPlatform : PlatformI
             windows = windows[0 .. i] ~ windows[i + 1 .. $];
         }
 
-        win.unsetPlatform();
+        sdl_win.unsetPlatform();
+    }
+    
+    bool haveWindow(WindowI win)
+    {
+    	auto sdl_win = convertWindowItoSDLWindow(win);    	
+        return haveWindow(sdl_win);
+    }
+
+    bool haveWindow(Window win)
+    {
+    	foreach (ref Window w; windows)
+        {
+            if (w == win)
+                return true;
+        }
+        return false;
     }
 
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)

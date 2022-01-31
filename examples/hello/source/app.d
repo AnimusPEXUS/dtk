@@ -4,6 +4,8 @@ import std.math;
 
 import dtk.main;
 
+import dtk.interfaces.LafI;
+
 import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
@@ -30,9 +32,16 @@ void main()
     auto pl = instantiatePlatform();
 
     pl.init();
-
-    pl.setLaf(new Chicago98Laf);
-
+    
+    auto laf = new Chicago98Laf;
+    
+    pl.setOnGetLaf(
+    	delegate LafI()
+    	{
+    		return laf;
+    	}
+    	);
+    
     WindowCreationSettings wcs = {
         title: "123",
         x: 500,
@@ -61,6 +70,14 @@ void main()
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new TextEntry();
+
+    foreach(v; [btn, btn2, btn3,
+    	btn4, btn5, lbl1
+    	])
+    {
+    	lo.addChild(v);
+    }        
+    
     lbl1.setText(
         "1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑\n"
         ~"вторая строка\n"
@@ -87,15 +104,6 @@ void main()
     btn4.setX(10).setY(100).setWidth(12).setHeight(12);
     btn5.setX(10).setY(120).setWidth(12).setHeight(12);
     lbl1.setX(10).setY(140).setWidth(500).setHeight(100);
-
-    lo.children = [
-    	new LayoutChild(btn),
-    	new LayoutChild(btn2),
-    	new LayoutChild(btn3),
-    	new LayoutChild(btn4),
-    	new LayoutChild(btn5),
-    	new LayoutChild(lbl1)
-    ];
     
     pl.mainLoop();
 

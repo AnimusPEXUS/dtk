@@ -32,4 +32,6 @@ interface ContainerI
 	void addChild(ContainerableI child);
 	void removeChild(ContainerableI child);
 	bool haveChild(ContainerableI child);
+	
+	ContainerI getParent();
 }

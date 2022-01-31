@@ -6,6 +6,7 @@ import std.container;
 import std.algorithm;
 import std.typecons;
 import std.array;
+import std.exception;
 
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
@@ -21,6 +22,8 @@ import dtk.types.Property;
 import dtk.widgets.Form;
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
+
+import dtk.miscs.signal_tools;
 
 enum LayoutOverflowBehavior
 {
@@ -105,6 +108,11 @@ class Layout : Widget, ContainerI //, LayoutI
     mixin mixin_multiple_properties_forward!(LayoutProperties, false);	
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     
+    private {
+    	SignalConnection sc_parentChange;
+    }
+
+    
     this()
     {
     	this([]);
@@ -113,25 +121,18 @@ class Layout : Widget, ContainerI //, LayoutI
     this(LayoutChild[] children) {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
     	this.children = children;
+    	
+    	sc_parentChange = connectToParent_onAfterChanged(
+    		delegate void(
+    			ContainerI o,
+    			ContainerI n,
+    			)
+    		{
+    			collectException(writeln("Layout parent change form ", o, " to ", n));
+    		}
+    		);
     }
 
-    /*
-    override Layout setParent(ContainerI container)
-    {
-    	return super().setParent(container);
-    }
-    
-    override Layout unsetParent()
-    {
-    	return super().unsetParent();
-    }
-    
-    override ContainerI getParent()
-    {
-    	return super().getParent();
-    } */
-
-    
     void checkChildren()
     {
     	foreach_reverse (i, v; children)
@@ -183,42 +184,42 @@ class Layout : Widget, ContainerI //, LayoutI
     
     override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
-/*     	auto x = point.x;
+    	/*     	auto x = point.x;
         auto y = point.y;
         
         ulong local_x;
         ulong local_y;
         {
-        	// auto pos = this.getPosition();
-        	local_x=x;
-        	local_y=y;
+        // auto pos = this.getPosition();
+        local_x=x;
+        local_y=y;
         }
         
     	auto children = getChildren();
     	
     	if (children.length == 0)
     	{
-    		return tuple(cast(WidgetI)this, Position2D(local_x, local_y));
+    	return tuple(cast(WidgetI)this, Position2D(local_x, local_y));
     	}
     	
     	// TODO: optimize for visible part
     	foreach (c; children)
     	{
-    		auto c_pos = c.getPosition();
-    		auto c_size = c.getSize();
-    		int c_pos_x = c_pos_x;
-    		int c_pos_y = c_pos_y;
-    		auto c_size_w = c_size.width;
-    		auto c_size_h = c_size.height;
-    		
-    		if (x >= c_pos_x && x <= (c_pos_x + c_size_w) 
-    			&& y >= c_pos_y && y <= (c_pos_y + c_size_h))
-    		{
-    			return c.getWidgetAtPosition(Position2D(x - c_pos_x, y - c_pos_y));
-    			}
-    			}
-    			return tuple(cast(WidgetI)this, Position2D(local_x, local_y)); */
-    			return tuple(cast(WidgetI)null, Position2D(0, 0));
+    	auto c_pos = c.getPosition();
+    	auto c_size = c.getSize();
+    	int c_pos_x = c_pos_x;
+    	int c_pos_y = c_pos_y;
+    	auto c_size_w = c_size.width;
+    	auto c_size_h = c_size.height;
+    	
+    	if (x >= c_pos_x && x <= (c_pos_x + c_size_w) 
+    	&& y >= c_pos_y && y <= (c_pos_y + c_size_h))
+    	{
+    	return c.getWidgetAtPosition(Position2D(x - c_pos_x, y - c_pos_y));
+    	}
+    	}
+    	return tuple(cast(WidgetI)this, Position2D(local_x, local_y)); */
+    	return tuple(cast(WidgetI)null, Position2D(0, 0));
     }
     
     ulong getChildX(ContainerableI child)

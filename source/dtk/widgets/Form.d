@@ -34,7 +34,7 @@ import dtk.signal_mixins.Form;
 
 const auto FormProperties = cast(PropSetting[]) [
 PropSetting("gsun", "WindowI", "window", "Window", ""),
-PropSetting("gsun", "LafI", "laf", "Laf", ""),
+PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", ""),
 PropSetting("gsun", "ContainerableI", "child", "Child", ""),
 
 PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
@@ -43,15 +43,15 @@ PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
 
 class Form : ContainerI
 {
+    mixin(mixin_FormSignals(false));
+    mixin mixin_multiple_properties_define!(FormProperties);
+    mixin mixin_multiple_properties_forward!(FormProperties, false);
+    
     private {
     	SignalConnection sc_childChange;
     	SignalConnection sc_windowChange;
     	SignalConnection sc_windowOtherEvents;
     }
-    
-    mixin(mixin_FormSignals(false));
-    mixin mixin_multiple_properties_define!(FormProperties);
-    mixin mixin_multiple_properties_forward!(FormProperties, false);
     
     this()
     {
@@ -68,7 +68,10 @@ class Form : ContainerI
     					if (o !is null)
     						o.unsetParent();
     					if (n !is null && n.getParent() != this)
+    					{
     						n.setParent(this);
+    						debug writeln(n, " setParent ", this);
+    					}
     				}()
     				);
     		}
@@ -83,60 +86,98 @@ class Form : ContainerI
     			// TODO: simplify this
     			collectException(
     				{
+    					debug writeln("Form window changed from ",o," to ",n);
+    					
+    					if (o == n)
+    						return;
+
     					sc_windowOtherEvents.disconnect();
+    					
+    					if (o !is null)
+    					{
+    						o.unsetForm();
+    					}
+    					
     					if (n !is null)
     					{
     						sc_windowOtherEvents = n.connectToSignal_OtherEvents(
-    							delegate void(Event* e) 
-    							{
-    								collectException(
-    									{
-    										FormEvent* fe = new FormEvent();
-    										
-    										WidgetI focusedWidget = this.getFocusedWidget();
-    										WidgetI mouseFocusedWidget;
-    										
-    										ulong mouseFocusedWidget_x = 0;
-    										ulong mouseFocusedWidget_y = 0;
-    										
-    										{
-    											if (e.eventType == EventType.mouse)
-    											{
-    												auto res = this.getWidgetAtPosition(
-    													Position2D(
-    														e.em.x,
-    														e.em.y
-    														)
-    													);
-    												mouseFocusedWidget = res[0];
-    												auto pos = res[1];
-    												mouseFocusedWidget_x = pos.x;
-    												mouseFocusedWidget_y = pos.y;
-    											}
-    											else
-    											{
-    												// TODO: todo
-    											}
-    										}
-    										
-    										fe.event = e;
-    										fe.focusedWidget = focusedWidget;
-    										fe.mouseFocusedWidget = mouseFocusedWidget;
-    										fe.mouseFocusedWidget_x = mouseFocusedWidget_x;
-    										fe.mouseFocusedWidget_y = mouseFocusedWidget_y;
-    										
-    										this.emitSignal_Event(fe);
-    									}()
-    									);
-    							}
+    							&onWindowOtherEvent
     							);
     					}
+    							
     				}()
     				);
     		}
     		);
     }
     
+    void onWindowOtherEvent(Event* event) nothrow
+    {
+    	collectException(
+    		{
+    			FormEvent* fe = new FormEvent();
+    			
+    			WidgetI focusedWidget = this.getFocusedWidget();
+    			WidgetI mouseFocusedWidget;
+    			
+    			ulong mouseFocusedWidget_x = 0;
+    			ulong mouseFocusedWidget_y = 0;
+    			
+    			{
+    				if (event.eventType == EventType.mouse)
+    				{
+    					auto res = this.getWidgetAtPosition(
+    						Position2D(
+    							event.em.x,
+    							event.em.y
+    							)
+    						);
+    					mouseFocusedWidget = res[0];
+    					auto pos = res[1];
+    					mouseFocusedWidget_x = pos.x;
+    					mouseFocusedWidget_y = pos.y;
+    				}
+    				else
+    				{
+    					// TODO: todo
+    				}
+    			}
+    			
+    			fe.event = event;
+    			fe.focusedWidget = focusedWidget;
+    			fe.mouseFocusedWidget = mouseFocusedWidget;
+    			fe.mouseFocusedWidget_x = mouseFocusedWidget_x;
+    			fe.mouseFocusedWidget_y = mouseFocusedWidget_y;
+    			
+    			this.emitSignal_Event(fe);
+    		}()
+    		);
+    }
+
+    ContainerI getParent()
+    {
+    	return null;
+    }
+    
+
+    LafI getLaf()
+    {
+    	auto l = getForcedLaf();
+    	if (l !is null)
+    		return l;
+    	auto w = getWindow();
+    	if (w is null)
+    	{
+    		throw new Exception("getLaf(): both ForcedLaf and Window is not set");
+    	}
+    	l = w.getLaf();
+    	if (l is null)
+    	{
+    		throw new Exception("Window returned null Laf");
+    	}
+    	return l;
+    }
+
     ulong getX()
     {
     	return 0;
