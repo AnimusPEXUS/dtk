@@ -1,9 +1,13 @@
 module dtk.widgets.ButtonCheck;
 
 import std.stdio;
+import std.typecons;
+
+import dtk.interfaces.WidgetI;
 
 import dtk.types.EventMouse;
 import dtk.types.Property;
+import dtk.types.Position2D;
 
 import dtk.widgets.Button;
 import dtk.widgets.Form;
@@ -58,6 +62,11 @@ class ButtonCheck : Button
     override void redraw()
     {
         mixin(mixin_widget_redraw("ButtonCheck"));
+    }
+    
+    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    {
+    	return tuple(cast(WidgetI)this, point);
     }
     
 }

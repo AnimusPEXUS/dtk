@@ -93,9 +93,12 @@ class Widget : WidgetI
 
     DrawingSurfaceI getDrawingSurface()
     {
-        /* auto p = getPosition();
-        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x, p.y); */
-        return null;
+        auto x = getX();
+        auto y = getY();
+        return new DrawingSurfaceShift(
+        	getParent().getDrawingSurface(), 
+        	cast(int)x, cast(int)y
+        	);
     }
     
     void redraw()

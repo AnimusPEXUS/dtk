@@ -330,4 +330,8 @@ class TextEntry : Widget, ContainerableI
     {
     }
     
+    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    {
+    	return tuple(cast(WidgetI)this, point);
+    }
 }

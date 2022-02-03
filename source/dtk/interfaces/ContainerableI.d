@@ -1,14 +1,12 @@
-/// documentation test 3
 module dtk.interfaces.ContainerableI;
 
-/++
- documentation test 2
-+/
+import std.typecons;
 
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.ContainerI;
 
-/// cool interface
+import dtk.types.Position2D;
+
 interface ContainerableI // : WidgetI
 {
 	 typeof(this) setParent(ContainerI container);
@@ -26,6 +24,7 @@ interface ContainerableI // : WidgetI
 	 	 	 );
 	 }
 	 
+	 Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point);
 	 void redraw();
 	 void propagatePosAndSizeRecalc();
 }

@@ -9,6 +9,7 @@ import dtk.interfaces.WidgetI;
 
 import dtk.types.Property;
 import dtk.types.Size2D;
+import dtk.types.Position2D;
 
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;
@@ -22,11 +23,15 @@ class ScrollBar : Widget, ContainerableI
     override void propagatePosAndSizeRecalc()
     {
     }
- 
-        
+    
+    
     override void redraw()
     {
     }
-
-
+    
+    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    {
+    	return tuple(cast(WidgetI)this, point);
+    }
+    
 }

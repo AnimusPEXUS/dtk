@@ -1,0 +1,19 @@
+module dtk.signal_mixins.Container;
+
+import std.format;
+
+import dtk.miscs.signal_tools;
+
+string mixin_ContainerSignals(bool for_interface)
+{
+	string ret = q{
+		import dtk.miscs.signal_tools;
+		
+	    mixin mixin_installSignal!(
+	    	"Resized", 
+	    	"signal_resized",
+	    	%1$s,
+	    	);
+	}.format(for_interface);
+	return ret;
+}

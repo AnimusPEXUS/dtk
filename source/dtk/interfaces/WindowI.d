@@ -22,17 +22,15 @@ import dtk.interfaces.LafI;
 
 import dtk.widgets.Form;
 
+// import dtk.signal_mixins.Container;
 import dtk.signal_mixins.Window;
 
 interface WindowI
 {
+    mixin(mixin_WindowSignals(true));
+	// mixin(mixin_ContainerSignals(true));
+	
     PlatformI getPlatform();
-
-    // WindowI setWindowEventMgr(WindowEventMgrI mgr);
-    // WindowEventMgrI getWindowEventMgr();
-
-    //void installForm(FormI form);
-    //void uninstallForm();
 
     LafI getLaf();
 
@@ -59,15 +57,8 @@ interface WindowI
     WindowI setWidth(ulong v);
     WindowI setHeight(ulong v);
 
-    /* static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
-    {    	
-    	mixin(mixin_event_handler_reg(v, true));
-    } */
-    
     dstring getTitle();
     WindowI setTitle(dstring value);
-
-    mixin(mixin_WindowSignals(true));
     
     void redraw();
     

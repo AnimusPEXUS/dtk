@@ -180,6 +180,8 @@ class Chicago98Laf : LafI
     {
         auto ds = widget.getDrawingSurface();
         
+        assert(ds !is null);
+        
         auto pos_x = cast(int) widget.getX();
         auto pos_y = cast(int) widget.getY();
         auto size_w = cast(int) widget.getWidth();

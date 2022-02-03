@@ -116,7 +116,7 @@ class SDLDesktopPlatform : PlatformI
     WindowI createWindow(WindowCreationSettings window_settings)
     {
         auto w = new Window(window_settings);
-        // w.setPlatform(this);
+        w.setPlatform(this);
         return w;
     }
     
@@ -155,7 +155,8 @@ class SDLDesktopPlatform : PlatformI
                 break;
         }
         windows ~= sdl_win;
-        sdl_win.setPlatform(this);
+        if (sdl_win.getPlatform() != this)
+        	sdl_win.setPlatform(this);
     }
     
     void removeWindow(WindowI win)

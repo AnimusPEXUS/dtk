@@ -1,6 +1,7 @@
 module dtk.interfaces.ContainerI;
 
 import dtk.interfaces.ContainerableI;
+import dtk.interfaces.DrawingSurfaceI;
 
 /* interface ContainerI
 {
@@ -34,4 +35,6 @@ interface ContainerI
 	bool haveChild(ContainerableI child);
 	
 	ContainerI getParent();
+	
+	DrawingSurfaceI getDrawingSurface();
 }

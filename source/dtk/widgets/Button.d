@@ -17,6 +17,7 @@ import dtk.interfaces.WidgetI;
 import dtk.types.Size2D;
 import dtk.types.EventMouse;
 import dtk.types.Property;
+import dtk.types.Position2D;
 
 import dtk.widgets.Widget;
 import dtk.widgets.Form;
@@ -76,5 +77,9 @@ class Button : Widget, ContainerableI
     {
     }
     
+    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    {
+    	return tuple(cast(WidgetI)this, point);
+    }
     
 }

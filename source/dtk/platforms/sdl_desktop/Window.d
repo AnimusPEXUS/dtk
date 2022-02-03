@@ -167,6 +167,8 @@ class Window : WindowI
         				
         				if (new_value !is null)
         				{
+        					if (!new_value.haveWindow(this))
+        						new_value.addWindow(this);
         					platform_signal_connection=
         					new_value.connectToSignal_Event(
         						&onPlatformEvent
