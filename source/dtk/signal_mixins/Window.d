@@ -22,11 +22,11 @@ string mixin_WindowSignals(bool for_interface)
 	    	%1$s,
 	    	Event*
 	    	);
-	    mixin mixin_installSignal!(
+/* 	    mixin mixin_installSignal!(
 	    	"Resized", 
 	    	"signal_resized",
 	    	%1$s,
 	    	);
-	}.format(for_interface);
+ */	}.format(for_interface);
 	return ret;
 }

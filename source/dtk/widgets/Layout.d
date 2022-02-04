@@ -70,7 +70,7 @@ class LayoutChild
 
 
 const auto LayoutProperties = cast(PropSetting[]) [
-PropSetting("gsun", "LayoutEngineI", "vertical_overflow_behavior", "LayoutEngine", "null"),
+PropSetting("gsun", "LayoutEngineI", "layout_engine", "LayoutEngine", "null"),
 // PropSetting("gs_w_d", "ulong", "vertical_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
 // PropSetting("gs_w_d", "ulong", "horizontal_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
 // PropSetting("gsun", "ContainerI", "parent_container", "Parent", "null")
