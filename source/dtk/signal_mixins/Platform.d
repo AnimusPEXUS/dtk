@@ -4,6 +4,9 @@ import std.format;
 
 string mixin_PlatformSignals(bool for_interface)
 {
+	import dtk.miscs.signal_tools;
+	import std.format;
+	
 	string ret = q{
 	    mixin mixin_installSignal!(
 	    	"Timer500", 

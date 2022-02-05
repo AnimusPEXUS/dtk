@@ -274,9 +274,7 @@ EventTextInput* convertSDLTextInputEventToDtkEventTextInput(
     
     EventTextInput* ret = new EventTextInput;
     
-    ret.text = to!dstring(
-    	cast(string)(std.string.fromStringz(cast(char*)e.text)).idup
-    	);
+    ret.text = to!dstring(cast(string)(std.string.fromStringz(cast(char*)e.text)).idup);
     
     return ret;
 }
