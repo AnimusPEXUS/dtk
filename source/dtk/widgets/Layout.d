@@ -9,7 +9,7 @@ import std.array;
 import std.exception;
 
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.LayoutEngineI;
@@ -59,11 +59,11 @@ PropSetting("gsun", "LayoutChildSettingsI", "settings", "Settings", "null"),
 
 class LayoutChild
 {
-	ContainerableI child;
+	WidgetI child;
 	
     mixin mixin_multiple_properties_define!(LayoutChildProperties);
     mixin mixin_multiple_properties_forward!(LayoutChildProperties, false);
-    this(ContainerableI widget) {
+    this(WidgetI widget) {
     	mixin(mixin_multiple_properties_inst(LayoutChildProperties));
     }
 }
@@ -85,7 +85,7 @@ NOTE: Layout should not do any changes to any positions and sizes of it's
 own children.
 
 +/
-class Layout : Widget, ContainerI //, LayoutI
+class Layout : Widget, ContainerI, WidgetI //, LayoutI
 {
 	
     // children field is public and is a normal array. you can use it to
@@ -140,7 +140,7 @@ class Layout : Widget, ContainerI //, LayoutI
     	}
     }
     
-    LayoutChild getLayoutChildByChild(ContainerableI child)
+    LayoutChild getLayoutChildByChild(WidgetI child)
     {
     	foreach (v; children)
     	{
@@ -207,6 +207,9 @@ class Layout : Widget, ContainerI //, LayoutI
     		}
     	}
     	return tuple(cast(WidgetI)this, Position2D(local_x, local_y));
+    	
+    	// return tuple(cast(WidgetI)this, point);
+    	//return tuple(cast(WidgetI)null, point);
     }
     
     static foreach(v;["X", "Y", "Width", "Height"])
@@ -214,7 +217,7 @@ class Layout : Widget, ContainerI //, LayoutI
     	import std.format;
     	mixin(
     		q{
-    			ulong getChild%1$s(ContainerableI child)
+    			ulong getChild%1$s(WidgetI child)
     			{
     				auto c = getLayoutChildByChild(child);
     				if (c is null)
@@ -224,7 +227,7 @@ class Layout : Widget, ContainerI //, LayoutI
     				return c.get%1$s();
     			}
     			
-    			void setChild%1$s(ContainerableI child, ulong v)
+    			void setChild%1$s(WidgetI child, ulong v)
     			{
     				auto c = getLayoutChildByChild(child);
     				if (c is null)
@@ -238,7 +241,7 @@ class Layout : Widget, ContainerI //, LayoutI
     		);
     }
     
-    void addChild(ContainerableI child)
+    void addChild(WidgetI child)
     {
     	if (!haveChild(child))
     	{
@@ -250,12 +253,12 @@ class Layout : Widget, ContainerI //, LayoutI
     	}
     }
     
-    void removeChild(ContainerableI child)
+    void removeChild(WidgetI child)
     {
     	if (!haveChild(child))
     		return;
     	
-    	ContainerableI[] removed;
+    	WidgetI[] removed;
     	
     	foreach_reverse (i, v; children)
     	{
@@ -272,7 +275,7 @@ class Layout : Widget, ContainerI //, LayoutI
     	}
     }
     
-    bool haveChild(ContainerableI child)
+    bool haveChild(WidgetI child)
     {
     	foreach(v;children)
     	{

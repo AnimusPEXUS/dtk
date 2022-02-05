@@ -2,11 +2,16 @@ module dtk.widgets.ButtonRadio;
 
 import std.stdio;
 import std.exception;
+import std.typecons;
 
 import observable.signal;
 
+import dtk.interfaces.WidgetI;
+
 import dtk.types.EventMouse;
 import dtk.types.Property;
+import dtk.types.Position2D;
+
 
 import dtk.miscs.RadioGroup;
 
@@ -22,7 +27,7 @@ PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
 ];
 
 
-class ButtonRadio : Button
+class ButtonRadio : Button, WidgetI
 {
 	private {
     	SignalConnectionContainer con_cont;
@@ -97,4 +102,9 @@ class ButtonRadio : Button
         mixin(mixin_widget_redraw("ButtonRadio"));
     }
 
+    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    {
+    	// return tuple(cast(WidgetI)this, point);
+    	return tuple(cast(WidgetI)null, point);
+    }
 }

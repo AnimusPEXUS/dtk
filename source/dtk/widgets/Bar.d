@@ -9,7 +9,7 @@ module dtk.widgets.Bar;
 import std.typecons;
 
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.WidgetI;
 import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
 
@@ -23,7 +23,7 @@ import dtk.widgets.mixins;
 /++
 Test documentation
 +/
-class Bar : Widget, ContainerableI
+class Bar : Widget, WidgetI
 {
     
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
@@ -31,7 +31,7 @@ class Bar : Widget, ContainerableI
     
     private
     {
-        ContainerableI[] _children;
+        WidgetI[] _children;
     }
     
     override void propagatePosAndSizeRecalc()
@@ -46,6 +46,7 @@ class Bar : Widget, ContainerableI
     override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI)this, point);
+    	// return tuple(cast(WidgetI)null, point);
     }
     
 }

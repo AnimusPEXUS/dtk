@@ -1,11 +1,12 @@
 module dtk.interfaces.WidgetI;
 
 import std.typecons;
+import std.format;
 
 // import dtk.interfaces.FormI;
 // import dtk.interfaces.LayoutI;
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+//import dtk.interfaces.ContainerableI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.event_receivers;
 
@@ -22,7 +23,7 @@ import dtk.widgets.Layout;
 
 // import dtk.miscs.mixin_event_handler_reg;
 
-interface WidgetI : ContainerableI
+interface WidgetI // : ContainerableI
 {
     Form getForm();
     
@@ -33,23 +34,30 @@ interface WidgetI : ContainerableI
     
     void redraw();
     
-    ulong getX();
-    ulong getY();
-    ulong getWidth();
-    ulong getHeight();
-    
-    WidgetI setX(ulong);
-    WidgetI setY(ulong);
-    WidgetI setWidth(ulong);
-    WidgetI setHeight(ulong);
-    
-    Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point);
+    // Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point);
     
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
     
     // static foreach(v; ["Keyboard", "Mouse", "TextInput"])
     // {
-    	// mixin(mixin_event_handler_reg(v, true));
+    // mixin(mixin_event_handler_reg(v, true));
     // }
+    
+    typeof(this) setParent(ContainerI container);
+    typeof(this) unsetParent();
+    ContainerI getParent();
+    
+    static foreach (v; ["X", "Y", "Width", "Height"])
+    {
+    	mixin(
+    		q{
+    			ulong get%1$s();
+    			typeof(this) set%1$s(ulong v);
+    		}.format(v)
+    		);
+    }
+    
+    void redraw();
+    void propagatePosAndSizeRecalc();
 }

@@ -14,7 +14,7 @@ import dtk.interfaces.LafI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.WidgetI;
 // import dtk.interfaces.LayoutI;
 
 import dtk.types.Position2D;
@@ -35,7 +35,7 @@ import dtk.signal_mixins.Form;
 const auto FormProperties = cast(PropSetting[]) [
 PropSetting("gsun", "WindowI", "window", "Window", ""),
 PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", ""),
-PropSetting("gsun", "ContainerableI", "child", "Child", ""),
+PropSetting("gsun", "WidgetI", "child", "Child", ""),
 
 PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
 PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
@@ -59,8 +59,8 @@ class Form : ContainerI
     	
     	sc_childChange = connectToChild_onAfterChanged(
     		delegate void(
-    			ContainerableI o,
-    			ContainerableI n
+    			WidgetI o,
+    			WidgetI n
     			)
     		{
     			collectException(
@@ -315,44 +315,44 @@ class Form : ContainerI
     	return tuple(cast(WidgetI) null, Position2D(0,0));
     }
     
-    ulong getChildX(ContainerableI child)
+    ulong getChildX(WidgetI child)
     {
     	return 0;
     }
     
-    ulong getChildY(ContainerableI child)
+    ulong getChildY(WidgetI child)
     {
     	return 0;
     }
     
-    ulong getChildWidth(ContainerableI child)
+    ulong getChildWidth(WidgetI child)
     {
     	return getWidth();
     }
     
-    ulong getChildHeight(ContainerableI child)
+    ulong getChildHeight(WidgetI child)
     {
     	return getHeight();
     }
     
-    void setChildX(ContainerableI child, ulong v)
+    void setChildX(WidgetI child, ulong v)
     {}
     
-    void setChildY(ContainerableI child, ulong v)
+    void setChildY(WidgetI child, ulong v)
     {}
     
-    void setChildWidth(ContainerableI child, ulong v)
+    void setChildWidth(WidgetI child, ulong v)
     {}
     
-    void setChildHeight(ContainerableI child, ulong v)
+    void setChildHeight(WidgetI child, ulong v)
     {}
     
-    void addChild(ContainerableI child)
+    void addChild(WidgetI child)
     {
     	setChild(child);
     }
     
-    void removeChild(ContainerableI child)
+    void removeChild(WidgetI child)
     {
     	if (haveChild(child))
     	{
@@ -360,7 +360,7 @@ class Form : ContainerI
     	}
     }
     
-    bool haveChild(ContainerableI child)
+    bool haveChild(WidgetI child)
     {
     	return getChild() == child;
     }

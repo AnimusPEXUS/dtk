@@ -1,6 +1,7 @@
 module dtk.interfaces.ContainerI;
 
-import dtk.interfaces.ContainerableI;
+//import dtk.interfaces.ContainerableI;
+import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 
 /* interface ContainerI
@@ -21,18 +22,20 @@ import dtk.interfaces.DrawingSurfaceI;
 
 interface ContainerI
 {
-	ulong getChildX(ContainerableI child);
-	ulong getChildY(ContainerableI child);
-	ulong getChildWidth(ContainerableI child);
-	ulong getChildHeight(ContainerableI child);
-	void setChildX(ContainerableI child, ulong v);
-	void setChildY(ContainerableI child, ulong v);
-	void setChildWidth(ContainerableI child, ulong v);
-	void setChildHeight(ContainerableI child, ulong v);
+	Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point);
+
+	ulong getChildX(WidgetI child);
+	ulong getChildY(WidgetI child);
+	ulong getChildWidth(WidgetI child);
+	ulong getChildHeight(WidgetI child);
+	void setChildX(WidgetI child, ulong v);
+	void setChildY(WidgetI child, ulong v);
+	void setChildWidth(WidgetI child, ulong v);
+	void setChildHeight(WidgetI child, ulong v);
 	
-	void addChild(ContainerableI child);
-	void removeChild(ContainerableI child);
-	bool haveChild(ContainerableI child);
+	void addChild(WidgetI child);
+	void removeChild(WidgetI child);
+	bool haveChild(WidgetI child);
 	
 	ContainerI getParent();
 	

@@ -10,7 +10,7 @@ module dtk.widgets.Menu;
 import std.typecons;
 
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 //import dtk.interfaces.FormI;
 
@@ -24,7 +24,7 @@ import dtk.widgets.mixins;
 import dtk.miscs.SizeGroup;
 
 
-class Menu : Widget, ContainerableI
+class Menu : Widget, WidgetI
 {
 	
 	mixin mixin_multiple_properties_forward!(WidgetProperties, true);
@@ -48,6 +48,7 @@ class Menu : Widget, ContainerableI
     override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI)this, point);
+    	// return tuple(cast(WidgetI)null, point);
     }
 
 }

@@ -20,7 +20,7 @@ PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
 ];
 
 
-class ButtonCheck : Button
+class ButtonCheck : Button, WidgetI
 {
 
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
@@ -66,7 +66,8 @@ class ButtonCheck : Button
     
     override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
-    	return tuple(cast(WidgetI)this, point);
+    	// return tuple(cast(WidgetI)this, point);
+    	return tuple(cast(WidgetI)null, point);
     }
     
 }

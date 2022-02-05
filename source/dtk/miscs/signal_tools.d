@@ -2,8 +2,6 @@ module dtk.miscs.signal_tools;
 
 import std.typecons;
 
-import observable.signal;
-
 public import observable.signal : SignalConnection, SignalConnectionContainer;
 
 // import dtk.types.FormEvent;
@@ -24,7 +22,7 @@ mixin template mixin_installSignal(
 {
 	import std.format;
 	import observable.signal;
-	
+
 	static if (!for_interface)
 	{
 		private {

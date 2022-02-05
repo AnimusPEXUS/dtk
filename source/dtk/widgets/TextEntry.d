@@ -15,7 +15,7 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.FontMgrI;
@@ -51,7 +51,7 @@ PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
 PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
 ];
 
-class TextEntry : Widget, ContainerableI
+class TextEntry : Widget, WidgetI
 {
 	
     mixin mixin_multiple_properties_define!(TextEntryProperties);
@@ -333,5 +333,6 @@ class TextEntry : Widget, ContainerableI
     override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI)this, point);
+    	// return tuple(cast(WidgetI)null, point);
     }
 }

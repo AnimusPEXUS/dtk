@@ -1,0 +1,13 @@
+module dtk.interfaces.ContainerableI;
+
+import std.typecons;
+import std.format;
+
+import dtk.interfaces.WidgetI;
+import dtk.interfaces.ContainerI;
+
+import dtk.types.Position2D;
+
+interface ContainerableI // : WidgetI
+{
+}

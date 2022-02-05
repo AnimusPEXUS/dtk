@@ -10,7 +10,7 @@ import std.stdio;
 import std.typecons;
 
 import dtk.interfaces.ContainerI;
-import dtk.interfaces.ContainerableI;
+// import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
 
@@ -26,7 +26,7 @@ import dtk.widgets.mixins;
 import dtk.miscs.RadioGroup;
 
 /// Button class
-class Button : Widget, ContainerableI
+class Button : Widget, WidgetI
 {
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();    
@@ -79,7 +79,8 @@ class Button : Widget, ContainerableI
     
     override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
     {
-    	return tuple(cast(WidgetI)this, point);
-    }
+    	// return tuple(cast(WidgetI)this, point);
+    	return tuple(cast(WidgetI)null, point);
+   }
     
 }
