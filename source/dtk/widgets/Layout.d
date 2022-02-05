@@ -7,13 +7,14 @@ import std.algorithm;
 import std.typecons;
 import std.array;
 import std.exception;
+import std.format;
 
 import dtk.interfaces.ContainerI;
 import dtk.interfaces.ContainerableI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.LayoutEngineI;
-import dtk.interfaces.LayoutChildSettingsI;
+// import dtk.interfaces.LayoutChildSettingsI;
 
 
 import dtk.types.Position2D;
@@ -53,7 +54,7 @@ PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
 // Each Layout Engine have it's own set of parameters for each child,
 // so LayoutChild somehow have to store settings for any engine child.
 // here's how it does this.
-PropSetting("gsun", "LayoutChildSettingsI", "settings", "Settings", "null"),
+// PropSetting("gsun", "LayoutChildSettingsI", "settings", "Settings", "null"),
 ];
 
 
@@ -71,9 +72,6 @@ class LayoutChild
 
 const auto LayoutProperties = cast(PropSetting[]) [
 PropSetting("gsun", "LayoutEngineI", "layout_engine", "LayoutEngine", "null"),
-// PropSetting("gs_w_d", "ulong", "vertical_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
-// PropSetting("gs_w_d", "ulong", "horizontal_overflow_behavior", "LayoutOverflowBehavior", "LayoutOverflowBehavior.Resize"),
-// PropSetting("gsun", "ContainerI", "parent_container", "Parent", "null")
 ];
 
 /++
@@ -211,7 +209,6 @@ class Layout : Widget, ContainerI //, LayoutI
     
     static foreach(v;["X", "Y", "Width", "Height"])
     {
-    	import std.format;
     	mixin(
     		q{
     			ulong getChild%1$s(ContainerableI child)

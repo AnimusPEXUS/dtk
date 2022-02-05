@@ -18,7 +18,7 @@ import dtk.interfaces.LafI;
 // import dtk.interfaces.WindowEventMgrI;
 // import dtk.interfaces.event_receivers;
 
-// import dtk.miscs.mixin_event_handler_reg;
+import dtk.miscs.signal_tools;
 
 import dtk.widgets.Form;
 

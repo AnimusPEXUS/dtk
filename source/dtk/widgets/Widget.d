@@ -5,6 +5,7 @@ import core.sync.mutex;
 import std.stdio;
 import std.conv;
 import std.typecons;
+import std.format;
 
 // import dtk.interfaces.FormI;
 import dtk.interfaces.WidgetI;
@@ -202,7 +203,6 @@ class Widget : WidgetI
     
     static foreach (v; ["X", "Y", "Width", "Height"])
     {
-    	import std.format;
     	mixin(
     		q{
     			ulong get%1$s()
