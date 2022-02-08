@@ -1,6 +1,9 @@
 module dtk.interfaces.ContainerI;
 
-//import dtk.interfaces.ContainerableI;
+import std.typecons;
+
+import dtk.types.Position2D;
+
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 

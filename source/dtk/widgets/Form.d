@@ -126,7 +126,7 @@ class Form : ContainerI
     			{
     				if (event.eventType == EventType.mouse)
     				{
-    					auto res = this.getWidgetAtPosition(
+    					auto res = this.getChildAtPosition(
     						Position2D(
     							event.em.x,
     							event.em.y
@@ -310,7 +310,7 @@ class Form : ContainerI
         return null;
     }
     
-    Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI) null, Position2D(0,0));
     }

@@ -58,6 +58,17 @@ class TextEntry : Widget, WidgetI
     mixin mixin_multiple_properties_forward!(TextEntryProperties, false);
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
+    mixin mixin_forward_super_functions!(
+    	[
+    	"getForm",
+    	"getNextFocusableWidget",
+    	"getPrevFocusableWidget",
+    	"propagatePosAndSizeRecalc",
+    	"getChildAtPosition",
+    	"getDrawingSurface"
+    	]
+    	);
+    
     
     // Image textImage;
     
@@ -67,7 +78,7 @@ class TextEntry : Widget, WidgetI
         SignalConnectionContainer con_cont;
         SignalConnection textViewConnCon;
     }
-    
+
     this()
     {
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
@@ -330,7 +341,7 @@ class TextEntry : Widget, WidgetI
     {
     }
     
-    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI)this, point);
     	// return tuple(cast(WidgetI)null, point);

@@ -7,17 +7,17 @@ import std.typecons;
 import observable.signal;
 
 import dtk.interfaces.WidgetI;
+import dtk.interfaces.ContainerI;
 
 import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
 
-
 import dtk.miscs.RadioGroup;
 
+import dtk.widgets.Widget;
 import dtk.widgets.Button;
 import dtk.widgets.Form;
-
 import dtk.widgets.mixins;
 
 
@@ -35,6 +35,8 @@ class ButtonRadio : Button, WidgetI
 
 	mixin mixin_multiple_properties_define!(ButtonRadioProperties);
     mixin mixin_multiple_properties_forward!(ButtonRadioProperties, false);
+    mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    mixin mixin_forwardXYWH_from_Widget!();
 
     this()
     {
@@ -47,7 +49,18 @@ class ButtonRadio : Button, WidgetI
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
     }
-
+    
+    mixin mixin_forward_super_functions!(
+    	[
+    	"getForm",
+    	"getNextFocusableWidget",
+    	"getPrevFocusableWidget",
+    	"propagatePosAndSizeRecalc",
+    	"getChildAtPosition",
+    	"getDrawingSurface"
+    	]
+    	);
+    
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
 
@@ -102,9 +115,4 @@ class ButtonRadio : Button, WidgetI
         mixin(mixin_widget_redraw("ButtonRadio"));
     }
 
-    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
-    {
-    	// return tuple(cast(WidgetI)this, point);
-    	return tuple(cast(WidgetI)null, point);
-    }
 }

@@ -97,6 +97,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     mixin mixin_multiple_properties_define!(LayoutProperties);
     mixin mixin_multiple_properties_forward!(LayoutProperties, false);
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    mixin mixin_forwardXYWH_from_Widget!();
     
     private {
     	SignalConnection sc_parentChange;
@@ -121,6 +122,21 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     			collectException(writeln("Layout parent change form ", o, " to ", n));
     		}
     		);
+    }
+    
+    override Form getForm()
+    {
+    	return super.getForm();
+    }
+    
+    override WidgetI getNextFocusableWidget()
+    {
+    	return super.getNextFocusableWidget();
+    }
+    
+    override WidgetI getPrevFocusableWidget()
+    {
+    	return super.getPrevFocusableWidget();
     }
     
     void checkChildren()
@@ -172,7 +188,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
         }
     }
     
-    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	auto x = point.x;
         auto y = point.y;
@@ -203,7 +219,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     		if (x >= c_pos_x && x <= (c_pos_x + c_size_w)
     			&& y >= c_pos_y && y <= (c_pos_y + c_size_h))
     		{
-    			return c.child.getWidgetAtPosition(Position2D(x - c_pos_x, y - c_pos_y));
+    			return c.child.getChildAtPosition(Position2D(x - c_pos_x, y - c_pos_y));
     		}
     	}
     	return tuple(cast(WidgetI)this, Position2D(local_x, local_y));

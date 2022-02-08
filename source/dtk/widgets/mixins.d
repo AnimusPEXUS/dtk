@@ -10,7 +10,7 @@ import std.stdio;
 	import dtk.types.Position2D;
 	
     /// Note: x/y are local to widget the function is running at
-    override Tuple!(WidgetI, ulong, ulong) getWidgetAtPosition(Position2D point)
+    override Tuple!(WidgetI, ulong, ulong) getChildAtPosition(Position2D point)
     {
         auto x = point.x;
         auto y = point.y;
@@ -45,7 +45,7 @@ import std.stdio;
             	x >= c_pos.x && x <= (c_pos.x + c_size.width) && y >= c_pos.y
                     && y <= (c_pos.y + c_size.height))
             {
-                return c.getWidgetAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
+                return c.getChildAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
             }
         }
 
@@ -68,7 +68,7 @@ import std.stdio;
                 if (x >= c_pos.x && x <= (c_pos.x + c_size.width) && y >= c_pos.y
                         && y <= (c_pos.y + c_size.height))
                 {
-                    return c.getWidgetAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
+                    return c.getChildAtPosition(Position2D(x - c_pos.x, y - c_pos.y));
                 }
             }
 
@@ -154,4 +154,23 @@ string mixin_widget_redraw(string widgetType)
 		laf.draw%1$s(this);
 	}.format(widgetType);
 	return ret;
+}
+
+mixin template mixin_forward_super_functions(string[] names)
+{
+	import std.format;	
+	import std.traits;
+	import std.meta;
+	
+	static foreach (v; names)
+	{
+		mixin(
+			q{
+				override ReturnType!(super.%1$s) %1$s(AliasSeq!(Parameters!(super.%1$s)) args)
+				{
+					return super.%1$s(args);
+				}
+			}.format(v)
+			);
+	}
 }

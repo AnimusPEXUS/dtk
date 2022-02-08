@@ -34,7 +34,7 @@ interface WidgetI // : ContainerableI
     
     void redraw();
     
-    // Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point);
+    Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point);
     
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();

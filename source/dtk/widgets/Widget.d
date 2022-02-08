@@ -168,7 +168,7 @@ class Widget : WidgetI
         return false;
     }
     
-    Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
         return tuple(cast(WidgetI)this, Position2D(0, 0));
     }

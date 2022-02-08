@@ -25,28 +25,29 @@ Test documentation
 +/
 class Bar : Widget, WidgetI
 {
-    
+	
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
     
     private
     {
-        WidgetI[] _children;
+        WidgetI child;
     }
     
-    override void propagatePosAndSizeRecalc()
-    {
-    }
+    mixin mixin_forward_super_functions!(
+    	[
+    	"getForm",
+    	"getNextFocusableWidget",
+    	"getPrevFocusableWidget",
+    	"propagatePosAndSizeRecalc",
+    	"getChildAtPosition",
+    	"getDrawingSurface"
+    	]
+    	);
     
-        
+    
     override void redraw()
     {
-    }
-
-    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
-    {
-    	return tuple(cast(WidgetI)this, point);
-    	// return tuple(cast(WidgetI)null, point);
     }
     
 }

@@ -4,6 +4,7 @@ import std.stdio;
 import std.typecons;
 
 import dtk.interfaces.WidgetI;
+import dtk.interfaces.ContainerI;
 
 import dtk.types.EventMouse;
 import dtk.types.Property;
@@ -11,6 +12,7 @@ import dtk.types.Position2D;
 
 import dtk.widgets.Button;
 import dtk.widgets.Form;
+import dtk.widgets.Widget;
 
 import dtk.widgets.mixins;
 
@@ -22,7 +24,9 @@ PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
 
 class ButtonCheck : Button, WidgetI
 {
-
+	
+	mixin mixin_multiple_properties_forward!(WidgetProperties, true);
+    mixin mixin_forwardXYWH_from_Widget!();    
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
     mixin mixin_multiple_properties_forward!(ButtonCheckProperties, false);
     
@@ -34,6 +38,17 @@ class ButtonCheck : Button, WidgetI
         // setMouseHandler("button-down", &on_mouse_down_internal);
         // setMouseHandler("button-up", &on_mouse_up_internal);
     }
+
+    mixin mixin_forward_super_functions!(
+    	[
+    	"getForm",
+    	"getNextFocusableWidget",
+    	"getPrevFocusableWidget",
+    	"propagatePosAndSizeRecalc",
+    	"getChildAtPosition",
+    	"getDrawingSurface"
+    	]
+    	);      
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
@@ -64,7 +79,7 @@ class ButtonCheck : Button, WidgetI
         mixin(mixin_widget_redraw("ButtonCheck"));
     }
     
-    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
+    override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	// return tuple(cast(WidgetI)this, point);
     	return tuple(cast(WidgetI)null, point);

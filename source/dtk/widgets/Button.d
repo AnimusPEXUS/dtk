@@ -29,7 +29,7 @@ import dtk.miscs.RadioGroup;
 class Button : Widget, WidgetI
 {
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
-    mixin mixin_forwardXYWH_from_Widget!();    
+    mixin mixin_forwardXYWH_from_Widget!();
     
     bool button_is_down;
     
@@ -43,6 +43,16 @@ class Button : Widget, WidgetI
     }
     
     // mixin mixin_getWidgetAtPosition;
+    mixin mixin_forward_super_functions!(
+    	[
+    	"getForm",
+    	"getNextFocusableWidget",
+    	"getPrevFocusableWidget",
+    	"propagatePosAndSizeRecalc",
+    	"getChildAtPosition",
+    	"getDrawingSurface"
+    	]
+    	);
     
     void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
@@ -72,15 +82,4 @@ class Button : Widget, WidgetI
     {
         mixin(mixin_widget_redraw("Button"));
     }
-    
-    override void propagatePosAndSizeRecalc()
-    {
-    }
-    
-    override Tuple!(WidgetI, Position2D) getWidgetAtPosition(Position2D point)
-    {
-    	// return tuple(cast(WidgetI)this, point);
-    	return tuple(cast(WidgetI)null, point);
-   }
-    
 }
