@@ -68,9 +68,8 @@ class TextEntry : Widget, WidgetI
     	"getDrawingSurface"
     	]
     	);
-    
-    
-    // Image textImage;
+    mixin mixin_Widget_renderImage!("TextEntry");
+    mixin mixin_widget_redraw!();
     
     TextView text_view;
     
@@ -78,7 +77,7 @@ class TextEntry : Widget, WidgetI
         SignalConnectionContainer con_cont;
         SignalConnection textViewConnCon;
     }
-
+    
     this()
     {
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
@@ -96,7 +95,7 @@ class TextEntry : Widget, WidgetI
         };
         
         text_view.getDrawingSurface = &getDrawingSurfaceForTextView;
-
+        
         text_view.isFocused = delegate bool()
         {
             auto f = getForm();
@@ -160,29 +159,29 @@ class TextEntry : Widget, WidgetI
         }
         
         /* con_cont.add(
-            connectToSize_onAfterChanged(
-                delegate void(Size2D old_value, Size2D new_value)
-                {
-                    collectException(
-                        {
-                            auto err = collectException(
-                                applySettingsToTextProcessor()
-                                );
-                            if (err !is null)
-                            {
-                                writeln(err);
-                            }
-                        }()
-                        );
-                }
-                )
-            ); */
+        connectToSize_onAfterChanged(
+        delegate void(Size2D old_value, Size2D new_value)
+        {
+        collectException(
+        {
+        auto err = collectException(
+        applySettingsToTextProcessor()
+        );
+        if (err !is null)
+        {
+        writeln(err);
+        }
+        }()
+        );
+        }
+        )
+        ); */
         
-       /*  con_cont.add(connectToText_onAfterChanged(&afterTextChanged)); */
+        /*  con_cont.add(connectToText_onAfterChanged(&afterTextChanged)); */
         
-       /*  setMouseEvent("button-click", &on_mouse_click_internal);
+        /*  setMouseEvent("button-click", &on_mouse_click_internal);
         setTextInputEvent("text-input", &on_text_input_internal);
-
+        
         setKeyboardEvent("key-down", &on_keyboard_down_internal);
         setKeyboardEvent("key-up", &on_keyboard_up_internal); */
         
@@ -196,11 +195,11 @@ class TextEntry : Widget, WidgetI
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
     {
- /*        auto p = getPosition();
+    	/*        auto p = getPosition();
         if (getDrawBewelAndBackground())
         {
-            p.x+=2;
-            p.y+=2;
+        p.x+=2;
+        p.y+=2;
         }
         return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y); */
         return null;
@@ -297,7 +296,7 @@ class TextEntry : Widget, WidgetI
     void applySettingsToTextProcessor()
     {
         /* text_view.setText(getText()); */ // NOTE: too expansive probably
-/*         
+        /*         
         auto tvt = text_view.getText();
         
         tvt.setFaceFamily(getFontFamily());
@@ -316,13 +315,13 @@ class TextEntry : Widget, WidgetI
         
         if (getDrawBewelAndBackground())
         {
-            // TODO: optimize this: must be as less view redrawings as possible
-            text_view.setWidth(text_view.getWidth()-4);
-            text_view.setHeight(text_view.getHeight()-4);
-            tvt.setDefaultBGColor(getBewelBackgroundColor());
+        // TODO: optimize this: must be as less view redrawings as possible
+        text_view.setWidth(text_view.getWidth()-4);
+        text_view.setHeight(text_view.getHeight()-4);
+        tvt.setDefaultBGColor(getBewelBackgroundColor());
         } else {
-            // TODO: get default form color from Theme
-            tvt.setDefaultBGColor(Color(0xc0c0c0));
+        // TODO: get default form color from Theme
+        tvt.setDefaultBGColor(Color(0xc0c0c0));
         }
         
         text_view.setTextSelectionEnabled(getTextSelectable());
@@ -332,12 +331,11 @@ class TextEntry : Widget, WidgetI
     
     //mixin mixin_getWidgetAtPosition;
     
-    override void redraw()
+    override void propagatePosAndSizeRecalc()
     {
-         mixin(mixin_widget_redraw("TextEntry"));
     }
     
-    override void propagatePosAndSizeRecalc()
+    override void propagateRedraw()
     {
     }
     

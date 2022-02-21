@@ -30,6 +30,8 @@ class Button : Widget, WidgetI
 {
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
+    mixin mixin_Widget_renderImage!("Button");
+    mixin mixin_widget_redraw!();
     
     bool button_is_down;
     
@@ -78,8 +80,9 @@ class Button : Widget, WidgetI
         return ;
     }
     
-    override void redraw()
+    override void propagateRedraw()
     {
-        mixin(mixin_widget_redraw("Button"));
+    	redraw();
     }
+    
 }

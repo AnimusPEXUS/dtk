@@ -19,6 +19,7 @@ class ScrollBar : Widget, WidgetI
 	
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
+    mixin mixin_Widget_renderImage!("ScrollBar");
     
     mixin mixin_forward_super_functions!(
     	[
@@ -30,9 +31,9 @@ class ScrollBar : Widget, WidgetI
     	"getDrawingSurface"
     	]
     	);
+    mixin mixin_widget_redraw!();
     
-    override void redraw()
+    override void propagateRedraw()
     {
-    }
-    
+    }   
 }

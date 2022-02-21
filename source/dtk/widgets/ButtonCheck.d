@@ -29,6 +29,8 @@ class ButtonCheck : Button, WidgetI
     mixin mixin_forwardXYWH_from_Widget!();
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
     mixin mixin_multiple_properties_forward!(ButtonCheckProperties, false);
+    mixin mixin_Widget_renderImage!("ButtonCheck");
+    mixin mixin_widget_redraw!();
     
     this()
     {
@@ -73,10 +75,10 @@ class ButtonCheck : Button, WidgetI
     {
         return ;
     }
-    
-    override void redraw()
+        
+    override void propagateRedraw()
     {
-        mixin(mixin_widget_redraw("ButtonCheck"));
+    	redraw();
     }
     
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)

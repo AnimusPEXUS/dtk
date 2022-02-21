@@ -90,7 +90,7 @@ class Form : ContainerI
     					
     					if (o == n)
     						return;
-
+    					
     					sc_windowOtherEvents.disconnect();
     					
     					if (o !is null)
@@ -104,7 +104,7 @@ class Form : ContainerI
     							&onWindowOtherEvent
     							);
     					}
-    							
+    					
     				}()
     				);
     		}
@@ -153,13 +153,13 @@ class Form : ContainerI
     		}()
     		);
     }
-
+    
     ContainerI getParent()
     {
     	return null;
     }
     
-
+    
     LafI getLaf()
     {
     	auto l = getForcedLaf();
@@ -177,7 +177,7 @@ class Form : ContainerI
     	}
     	return l;
     }
-
+    
     ulong getX()
     {
     	return 0;
@@ -248,15 +248,7 @@ class Form : ContainerI
     
     void redraw()
     {
-        mixin(mixin_widget_redraw("Form"));
-        
-        if (isSetChild())
-        {
-        	getChild().redraw();
-        }
-        
-        auto ds = getDrawingSurface();
-        ds.present();
+        // TODO: todo
     }
     
     // mixin mixin_getWidgetAtPosition;
@@ -365,4 +357,26 @@ class Form : ContainerI
     	return getChild() == child;
     }
     
+    void propagateRedraw()
+    {
+    	redraw();
+    	auto c = getChild();
+    	if (c !is null)
+    		c.propagateRedraw();
+    	
+    	auto ds = getDrawingSurface();
+        ds.present();
+    }
+    
+        
+    void redrawChild(WidgetI child)
+    {
+    	if (getChild() != child)
+    		return;
+    	
+    	auto img = child.renderImage();
+    	auto ds = getDrawingSurface();
+    	ds.drawImage(Position2D(0,0),img);
+    }
+
 }

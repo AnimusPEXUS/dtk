@@ -31,15 +31,15 @@ class MenuItem : Widget, WidgetI
     	"getDrawingSurface"
     	]
     	);
-    
+    mixin mixin_Widget_renderImage!("MenuItem");
+    mixin mixin_widget_redraw!();
     
     private
     {
         WidgetI child;
     }
     
-    override void redraw()
+    override void propagateRedraw()
     {
     }
-    
 }

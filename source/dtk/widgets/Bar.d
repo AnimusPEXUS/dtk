@@ -28,6 +28,8 @@ class Bar : Widget, WidgetI
 	
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
+    mixin mixin_Widget_renderImage!("Bar");
+    mixin mixin_widget_redraw!();
     
     private
     {
@@ -45,9 +47,7 @@ class Bar : Widget, WidgetI
     	]
     	);
     
-    
-    override void redraw()
+    override void propagateRedraw()
     {
     }
-    
 }

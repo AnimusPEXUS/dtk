@@ -36,6 +36,9 @@ class Menu : Widget, WidgetI, ContainerI
     mixin mixin_multiple_properties_forward!(MenuProperties, false);
 	mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
+    mixin mixin_Widget_renderImage!("Menu");
+    mixin mixin_widget_redraw!();
+
     
     private
     {
@@ -57,10 +60,6 @@ class Menu : Widget, WidgetI, ContainerI
     this()
     {
     	mixin(mixin_multiple_properties_inst(MenuProperties));
-    }
-    
-    override void redraw()
-    {
     }
     
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
@@ -116,5 +115,19 @@ class Menu : Widget, WidgetI, ContainerI
     bool haveChild(WidgetI child)
     {
     	return getChild() == child;
+    }
+    
+    override void propagateRedraw()
+    {
+    }
+    
+    void redrawChild(WidgetI child)
+    {
+    	if (getChild() != child)
+    		return;
+    	
+    	auto img = child.renderImage();
+    	auto ds = getDrawingSurface();
+    	ds.drawImage(Position2D(0, 0), img);
     }
 }

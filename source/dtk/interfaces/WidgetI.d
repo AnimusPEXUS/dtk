@@ -17,6 +17,7 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 import dtk.widgets.Form;
 import dtk.widgets.Layout;
@@ -29,20 +30,10 @@ interface WidgetI // : ContainerableI
     
     DrawingSurfaceI getDrawingSurface();
     
-    //void positionAndSizeRequest(Position2D, Size2D);
-    void propagatePosAndSizeRecalc();
-    
-    void redraw();
-    
     Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point);
     
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();
-    
-    // static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    // {
-    // mixin(mixin_event_handler_reg(v, true));
-    // }
     
     typeof(this) setParent(ContainerI container);
     typeof(this) unsetParent();
@@ -58,6 +49,9 @@ interface WidgetI // : ContainerableI
     		);
     }
     
+	Image renderImage(ulong x, ulong y, ulong w, ulong h);    
+	Image renderImage();    
     void redraw();
     void propagatePosAndSizeRecalc();
+    void propagateRedraw();
 }

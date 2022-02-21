@@ -28,8 +28,10 @@ class Picture : Widget, WidgetI
     	"getDrawingSurface"
     	]
     	);
+    mixin mixin_Widget_renderImage!("Picture");
+    mixin mixin_widget_redraw!();
     
-    override void redraw()
+    override void propagateRedraw()
     {
     }
 }

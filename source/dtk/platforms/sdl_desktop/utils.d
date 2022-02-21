@@ -27,6 +27,7 @@ Event* convertSDLEventToEvent(SDL_Event* event)
 		return null;
 	case SDL_WINDOWEVENT:
 		ret.ew = convertSDLWindowEventToDtkEventWindow(&event.window);
+		ret.eventType = EventType.window;
 		break;
 	case SDL_KEYDOWN:
 	case SDL_KEYUP:
@@ -40,19 +41,24 @@ Event* convertSDLEventToEvent(SDL_Event* event)
 			return null;
 		}
 		ret.ek = res[0];
+		ret.eventType = EventType.keyboard;
 		break;
 	case SDL_MOUSEMOTION:
 		ret.em=convertSDLMouseMotionEventToDtkEventMouse(&event.motion);
+		ret.eventType = EventType.mouse;
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:
 		ret.em=convertSDLMouseButtonEventToDtkEventMouse(&event.button);
+		ret.eventType = EventType.mouse;
 		break;
 	case SDL_MOUSEWHEEL:
 		ret.em=convertSDLMouseWheelEventToDtkEventMouse(&event.wheel);
+		ret.eventType = EventType.mouse;
 		break;
 	case SDL_TEXTINPUT:
 		ret.eti=convertSDLTextInputEventToDtkEventTextInput(&event.text);
+		ret.eventType = EventType.textInput;
 		break;
 	}
 	

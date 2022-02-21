@@ -18,6 +18,7 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Property;
 import dtk.types.MoveT;
+import dtk.types.Image;
 
 import dtk.types.Size2D;
 import dtk.types.Position2D;
@@ -106,42 +107,6 @@ class Widget : WidgetI
         throw new Exception("this function must be overriden");
     }
     
-    // void redraw_x(T)(T new_this)
-    // {
-    	// 
-        // /* alias A1 = typeof(new_this); */
-        // 
-        // const id = __traits(identifier, new_this);
-        // const id_t = __traits(identifier, T);
-        // 
-        // static if (!is(T == Widget))
-        // {
-            // const drawid = "draw" ~ id_t;
-            // 
-            // FormI form = new_this.getForm();
-            // if (form is null)
-            // {
-                // throw new Exception("error: redraw() function couldn't get Form");
-            // }
-            // 
-            // auto theme = form.getLaf();
-            // 
-            // if (theme is null)
-            // {
-                // throw new Exception("theme not set");
-            // }
-            // 
-            // static if (!__traits(hasMember, theme, drawid))
-            // {
-                // return;
-            // }
-            // else
-            // {
-                // __traits(getMember, theme, drawid)(new_this);
-            // }
-        // }
-    // }
-    
     void positionAndSizeRequest(Position2D position, Size2D size)
     {
         /* setPosition(position);
@@ -225,4 +190,19 @@ class Widget : WidgetI
     void propagatePosAndSizeRecalc()
     {
     }
+    
+    void propagateRedraw()
+    {
+    }
+    
+    Image renderImage(ulong x, ulong y, ulong w, ulong h)
+    {
+    	throw new Exception("must be reimplemented");
+    }
+    
+    Image renderImage()
+    {
+    	throw new Exception("must be reimplemented");
+    }
+    
 }

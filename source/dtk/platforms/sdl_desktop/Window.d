@@ -247,6 +247,9 @@ class Window : WindowI
     {
     	collectException(
     		{
+    			if (event.window != this)
+    				return;
+    			
     			debug if (event.eventType == EventType.none)
     			{
     				writeln("event.type == EventType.none");
