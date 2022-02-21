@@ -91,20 +91,15 @@ class Widget : WidgetI
     		);
         return ret;
     }
-
+    
     DrawingSurfaceI getDrawingSurface()
     {
         auto x = getX();
         auto y = getY();
         return new DrawingSurfaceShift(
-        	getParent().getDrawingSurface(), 
+        	getParent().getDrawingSurface(),
         	cast(int)x, cast(int)y
         	);
-    }
-    
-    void redraw()
-    {
-        throw new Exception("this function must be overriden");
     }
     
     void positionAndSizeRequest(Position2D position, Size2D size)
@@ -150,7 +145,7 @@ class Widget : WidgetI
     
     // static foreach(v; ["Keyboard", "Mouse", "TextInput"])
     // {
-    	// mixin(mixin_event_handler_reg(v));
+    // mixin(mixin_event_handler_reg(v));
     // }
     
     void exceptionIfParentNotSet()
@@ -193,6 +188,11 @@ class Widget : WidgetI
     
     void propagateRedraw()
     {
+    }
+    
+    void redraw(bool present = false)
+    {
+        throw new Exception("must be reimplemented");
     }
     
     Image renderImage(ulong x, ulong y, ulong w, ulong h)

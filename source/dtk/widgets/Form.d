@@ -246,13 +246,6 @@ class Form : ContainerI
     	return this;
     }
     
-    void redraw()
-    {
-        // TODO: todo
-    }
-    
-    // mixin mixin_getWidgetAtPosition;
-    
     void focusTo(WidgetI widget)
     {
         auto x = getFocusedWidget();
@@ -357,6 +350,19 @@ class Form : ContainerI
     	return getChild() == child;
     }
     
+    void redraw(bool present=false)
+    {
+        mixin(mixin_widget_redraw("Form"));
+        if (present)
+        {
+        	auto ds = getDrawingSurface();
+        	if (ds !is null)
+        	{
+        		ds.present();
+        	}
+        }
+    }
+    
     void propagateRedraw()
     {
     	redraw();
@@ -368,7 +374,7 @@ class Form : ContainerI
         ds.present();
     }
     
-        
+    
     void redrawChild(WidgetI child)
     {
     	if (getChild() != child)
@@ -378,5 +384,5 @@ class Form : ContainerI
     	auto ds = getDrawingSurface();
     	ds.drawImage(Position2D(0,0),img);
     }
-
+    
 }

@@ -134,41 +134,50 @@ string mixin_simple_parent_change_action()
 	return ret;
 }
 
-/* string mixin_widget_redraw(string widgetType)
+string mixin_widget_redraw(string widgetType)
 {
-import std.format;
-
-string ret = q{
-Form form = this.getForm();
-if (form is null)
-{
-throw new Exception(this.toString() ~ ".redraw() requires Form to be set");
+	import std.format;
+	
+	string ret = q{
+		{
+			Form form = this.getForm();
+			if (form is null)
+			{
+				throw new Exception(this.toString() ~ ".redraw() requires Form to be set");
+			}
+			
+			auto laf = form.getLaf();
+			if (laf is null)
+			{
+				throw new Exception("Laf not set");
+			}
+			
+			auto ds = getDrawingSurface();
+			if (ds !is null)
+			{
+				laf.draw%1$s(this, ds);
+			}
+		}
+	}.format(widgetType);
+	return ret;
 }
 
-auto laf = form.getLaf();
-if (laf is null)
-{
-throw new Exception("Laf not set");
-}
 
-laf.draw%1$s(this);
-}.format(widgetType);
-return ret;
-}
-*/
-
-mixin template mixin_widget_redraw()
+mixin template mixin_widget_redraw_using_parent()
 {
-	override void redraw()
+	override void redraw(bool present=false)
 	{
 		auto p = getParent();
 		if (p !is null)
 		{
 			p.redrawChild(this);
-			auto ds = getDrawingSurface();
-			if (ds !is null)
+			if (present) 
 			{
-				ds.present();
+				auto ds = getDrawingSurface();
+				if (ds !is null)
+				{
+					ds.present();
+				}
 			}
 		}
 	}

@@ -38,7 +38,7 @@ class ButtonRadio : Button, WidgetI
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
     mixin mixin_Widget_renderImage!("ButtonRadio");
-    mixin mixin_widget_redraw!();
+    mixin mixin_widget_redraw_using_parent!();
     
     this()
     {

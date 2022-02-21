@@ -30,7 +30,7 @@ class ButtonCheck : Button, WidgetI
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
     mixin mixin_multiple_properties_forward!(ButtonCheckProperties, false);
     mixin mixin_Widget_renderImage!("ButtonCheck");
-    mixin mixin_widget_redraw!();
+    mixin mixin_widget_redraw_using_parent!();
     
     this()
     {

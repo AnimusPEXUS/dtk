@@ -39,8 +39,10 @@ class RadioGroup
     bool isIn(ButtonRadio b)
     {
         foreach (v; buttons)
-        if (v == b)
-        	return true;
+        {
+        	if (v == b)
+        		return true;
+        }
         return false;
     }
     
@@ -58,8 +60,10 @@ class RadioGroup
     ButtonRadio getSelectedButton()
     {
         foreach (v; buttons)
-        if (v.getChecked())
-        	return v;
+        {
+        	if (v.getChecked())
+        		return v;
+        }
         return cast(ButtonRadio) null;
     }
     

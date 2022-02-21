@@ -32,7 +32,7 @@ class MenuItem : Widget, WidgetI
     	]
     	);
     mixin mixin_Widget_renderImage!("MenuItem");
-    mixin mixin_widget_redraw!();
+    mixin mixin_widget_redraw_using_parent!();
     
     private
     {

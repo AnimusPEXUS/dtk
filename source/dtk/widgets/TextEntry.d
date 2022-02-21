@@ -69,7 +69,7 @@ class TextEntry : Widget, WidgetI
     	]
     	);
     mixin mixin_Widget_renderImage!("TextEntry");
-    mixin mixin_widget_redraw!();
+    mixin mixin_widget_redraw_using_parent!();
     
     TextView text_view;
     
