@@ -51,7 +51,7 @@ interface WidgetI // : ContainerableI
     
 	Image renderImage(ulong x, ulong y, ulong w, ulong h);    
 	Image renderImage();    
-    void redraw(bool present=false);
+    void redraw();
     void propagatePosAndSizeRecalc();
     void propagateRedraw();
 }

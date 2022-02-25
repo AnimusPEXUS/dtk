@@ -23,7 +23,9 @@ import dtk.types.LineStyle;
 import dtk.types.FillStyle;
 import dtk.types.Property;
 import dtk.types.Event;
+import dtk.types.EventWindow;
 import dtk.types.FormEvent;
+import dtk.types.Image;
 
 import dtk.widgets.mixins;
 import dtk.widgets.Widget;
@@ -46,11 +48,15 @@ class Form : ContainerI
     mixin(mixin_FormSignals(false));
     mixin mixin_multiple_properties_define!(FormProperties);
     mixin mixin_multiple_properties_forward!(FormProperties, false);
+    mixin mixin_Widget_renderImage!("Form", "");
+    mixin mixin_propagateRedraw_children_one!("");
     
     private {
     	SignalConnection sc_childChange;
     	SignalConnection sc_windowChange;
+
     	SignalConnection sc_windowOtherEvents;
+    	SignalConnection sc_windowEvents;
     }
     
     this()
@@ -92,6 +98,7 @@ class Form : ContainerI
     						return;
     					
     					sc_windowOtherEvents.disconnect();
+    					sc_windowEvents.disconnect();
     					
     					if (o !is null)
     					{
@@ -102,6 +109,9 @@ class Form : ContainerI
     					{
     						sc_windowOtherEvents = n.connectToSignal_OtherEvents(
     							&onWindowOtherEvent
+    							);
+    						sc_windowEvents = n.connectToSignal_WindowEvents(
+    							&onWindowEvent
     							);
     					}
     					
@@ -153,6 +163,32 @@ class Form : ContainerI
     		}()
     		);
     }
+    
+    void onWindowEvent(EventWindow* event) nothrow
+    {
+    	collectException(
+    		{
+    			bool propogate_resize_and_repaint = false;
+    			
+    			switch (event.eventId)
+    			{
+    			default:
+    				break;
+    			case EnumWindowEvent.resize:
+    				propogate_resize_and_repaint = true;
+    			}
+    			
+    			if (propogate_resize_and_repaint)
+    			{
+    				propagatePosAndSizeRecalc();
+    				debug writeln("Form calling propagateRedraw()");
+    				propagateRedraw();
+    				debug writeln("Form calling getDrawingSurface().present()");
+    				getDrawingSurface().present();
+    			}
+    		}()
+    		);
+    }    
     
     ContainerI getParent()
     {
@@ -229,13 +265,30 @@ class Form : ContainerI
     DrawingSurfaceI getDrawingSurface()
     {
         DrawingSurfaceI ret = null;
+        debug if (!isSetWindow())
+        {
+        	writeln("window is not set on Form.getDrawingSurface()");
+        }
         if (isSetWindow())
+        {
             ret = getWindow().getDrawingSurface();
+        }
+        assert(ret !is null);
         return ret;
     }
     
     void propagatePosAndSizeRecalc()
     {
+    	auto w = getWindow();
+    	if (w !is null)
+    	{
+    		setWidth(w.getFormWidth());
+    		setHeight(w.getFormHeight());
+    		debug writefln(
+    			"form size propogated: %sx%s", getWidth(), getHeight()
+    			);
+    	}
+    	
     	auto c = getChild();
     	if (c !is null)
     		c.propagatePosAndSizeRecalc();
@@ -350,39 +403,15 @@ class Form : ContainerI
     	return getChild() == child;
     }
     
-    void redraw(bool present=false)
+    void redraw()
     {
-        mixin(mixin_widget_redraw("Form"));
-        if (present)
-        {
-        	auto ds = getDrawingSurface();
-        	if (ds !is null)
-        	{
-        		ds.present();
-        	}
-        }
+		propagateRedraw();        
+		getDrawingSurface().present();
     }
     
-    void propagateRedraw()
+    void drawChild(WidgetI child, Image img)
     {
-    	redraw();
-    	auto c = getChild();
-    	if (c !is null)
-    		c.propagateRedraw();
-    	
     	auto ds = getDrawingSurface();
-        ds.present();
+    	ds.drawImage(Position2D(0,0), img);
     }
-    
-    
-    void redrawChild(WidgetI child)
-    {
-    	if (getChild() != child)
-    		return;
-    	
-    	auto img = child.renderImage();
-    	auto ds = getDrawingSurface();
-    	ds.drawImage(Position2D(0,0),img);
-    }
-    
 }

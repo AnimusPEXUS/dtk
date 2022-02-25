@@ -3,6 +3,7 @@ module dtk.interfaces.ContainerI;
 import std.typecons;
 
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -24,7 +25,7 @@ interface ContainerI
 	void removeChild(WidgetI child);
 	bool haveChild(WidgetI child);
 	
-	void redrawChild(WidgetI child);
+	void drawChild(WidgetI child, Image img);
 	
 	ContainerI getParent();
 	

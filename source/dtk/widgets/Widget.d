@@ -188,20 +188,25 @@ class Widget : WidgetI
     
     void propagateRedraw()
     {
+    	// static assert(false, "must be reimplemented");
+    	throw new Exception("must be reimplemented");
     }
     
-    void redraw(bool present = false)
+    void redraw()
     {
+    	// static assert(false, "must be reimplemented");
         throw new Exception("must be reimplemented");
     }
     
     Image renderImage(ulong x, ulong y, ulong w, ulong h)
     {
+    	// static assert(false, "must be reimplemented");
     	throw new Exception("must be reimplemented");
     }
     
     Image renderImage()
     {
+    	// static assert(false, "must be reimplemented");
     	throw new Exception("must be reimplemented");
     }
     

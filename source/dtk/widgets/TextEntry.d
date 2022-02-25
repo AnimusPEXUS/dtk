@@ -69,7 +69,8 @@ class TextEntry : Widget, WidgetI
     	]
     	);
     mixin mixin_Widget_renderImage!("TextEntry");
-    mixin mixin_widget_redraw_using_parent!();
+    mixin mixin_widget_redraw_using_propagateRedraw!();
+    mixin mixin_propagateRedraw_children_none!();
     
     TextView text_view;
     
@@ -332,10 +333,6 @@ class TextEntry : Widget, WidgetI
     //mixin mixin_getWidgetAtPosition;
     
     override void propagatePosAndSizeRecalc()
-    {
-    }
-    
-    override void propagateRedraw()
     {
     }
     

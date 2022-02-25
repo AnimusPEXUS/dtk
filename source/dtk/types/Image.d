@@ -187,7 +187,38 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
-    	writeln(new Exception("todo"));
+    	
+    	auto dots = calculateDotsInLine(pos, pos2);
+    	
+    	if (style.style == null)
+        {
+        	foreach (v; dots)
+        	{
+        		auto id = ImageDot();
+        		id.color = style.color;
+        		id.enabled=true;
+        		id.intensivity=1;
+        		drawDot(v, id);
+        	}
+        }
+        else
+        {
+        	auto style_dup = style.style.dup();
+        	foreach (v; dots)
+            {
+                if (style_dup[0])
+                {
+                    {
+                        auto id = ImageDot();
+                        id.color = style.color;
+                        id.enabled=true;
+                        id.intensivity=1;
+                        drawDot(v, id);
+                    }
+                }
+                style_dup = style_dup[1 .. $] ~ style_dup[0];
+            }
+        }
     }
 
     void drawRectangle(
@@ -200,7 +231,37 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         Nullable!(FillStyle) fill_style
         )
     {
-        writeln(new Exception("todo"));
+    	debug writefln("drawing %s rectangle: %s %s", fill_style, pos, size);
+        
+    	// top+left
+    	auto p1_x = pos.x;
+    	auto p1_y = pos.y;
+    	// top+right
+    	auto p2_x = p1_x + size.width;
+    	auto p2_y = p1_y;
+    	// bottom+right
+    	auto p3_x = p2_x;
+    	auto p3_y = p2_y + size.height;
+    	// bottom+left
+    	auto p4_x = p1_x;
+    	auto p4_y = p3_y;
+    	
+    	drawLine(Position2D(p1_x, p1_y), Position2D(p2_x, p2_y), top_style);
+    	drawLine(Position2D(p1_x, p1_y), Position2D(p4_x, p4_y), left_style);
+    	drawLine(Position2D(p4_x, p4_y), Position2D(p3_x, p3_y), bottom_style);
+    	drawLine(Position2D(p2_x, p2_y), Position2D(p3_x, p3_y), right_style);
+    	
+    	if (!fill_style.isNull())
+        {
+            for (auto y = p1_y+1; y < p4_y; y++)
+            {
+            	drawLine(
+            		Position2D(p1_x, y), 
+            		Position2D(p2_x, y), 
+            		LineStyle(fill_style.get().color)
+            		);
+            }
+        }
     }
 
     void drawArc(
@@ -211,12 +272,43 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         real turn_step,
         Color color)
     {
-        writeln(new Exception("todo"));
+                import std.math;
+
+        if (turn_step < 0)
+        {
+            turn_step = -turn_step;
+        }
+
+        if (stop_angle < start_angle)
+        {
+            turn_step = -turn_step;
+        }
+
+        Position2D pcalc(real current_step)
+        {
+            real x = cos(current_step) * radius;
+            real y = sin(current_step) * radius;
+            return Position2D(cast(int)(lround(x)) + pos.x, cast(int)(lround(y)) + pos.y);
+        }
+
+        Position2D prev_point = pcalc(start_angle);
+
+        for (real current_step = start_angle; (current_step >= start_angle)
+                && (current_step <= stop_angle); current_step += turn_step)
+        {
+            auto point = pcalc(current_step);
+            drawLine(prev_point, point, LineStyle(color));
+            prev_point = point;
+        }
     }
 
     void drawCircle(Position2D pos, uint radius, real turn_step, Color color)
     {
-        writeln(new Exception("todo"));
+        if (turn_step < 0)
+        {
+            turn_step = -turn_step;
+        }
+        drawArc(pos, radius, 0, 2 * PI, turn_step, color);
     }
 
     void drawImage(Position2D pos, Image image)

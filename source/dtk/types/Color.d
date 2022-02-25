@@ -60,9 +60,9 @@ struct Color
         }
     }
 
-    string String()
+    string toString()
     {
-        return format("r: %x g: %x b: %x a: %x\n", r, g, b, a,);
+        return format("r: 0x%x g: 0x%x b: 0x%x a: 0x%x", r, g, b, a);
     }
 
     ubyte[3] rgb_ubyte_3()

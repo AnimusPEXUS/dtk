@@ -30,8 +30,8 @@ import dtk.widgets.Button;
 import dtk.widgets.ButtonCheck;
 import dtk.widgets.ButtonRadio;
 import dtk.widgets.Layout;
-import dtk.widgets.Menu;
-import dtk.widgets.MenuItem;
+// import dtk.widgets.Menu;
+// import dtk.widgets.MenuItem;
 import dtk.widgets.Bar;
 import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
@@ -297,14 +297,14 @@ class Chicago98Laf : LafI
         	);
     }
     
-    void drawMenu(Menu widget, DrawingSurfaceI ds)
-    {
-    }
-    
-    void drawMenuItem(MenuItem widget, DrawingSurfaceI ds)
-    {
-    }
-    
+    // void drawMenu(Menu widget, DrawingSurfaceI ds)
+    // {
+    // }
+    // 
+    // void drawMenuItem(MenuItem widget, DrawingSurfaceI ds)
+    // {
+    // }
+    // 
     void drawBar(Bar widget, DrawingSurfaceI ds)
     {
     }

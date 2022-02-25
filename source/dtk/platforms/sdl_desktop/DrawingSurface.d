@@ -200,9 +200,11 @@ class DrawingSurface : DrawingSurfaceI
         {
             for (uint x = 0; x != image.width; x++)
             {
+            	auto xx = image.getDot(x, y);
+            	// xx.color.a = 255;
                 drawDot(
                     Position2D(pos.x + x, pos.y + y),
-                    image.getDot(x, y)
+                    xx
                     );
             }
         }

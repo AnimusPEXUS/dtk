@@ -31,9 +31,7 @@ class ScrollBar : Widget, WidgetI
     	"getDrawingSurface"
     	]
     	);
-    mixin mixin_widget_redraw_using_parent!();
-    
-    override void propagateRedraw()
-    {
-    }   
+    mixin mixin_widget_redraw_using_propagateRedraw!();
+    mixin mixin_propagateRedraw_children_none!();    
+
 }

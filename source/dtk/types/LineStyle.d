@@ -1,5 +1,7 @@
 module dtk.types.LineStyle;
 
+import std.format;
+
 import dtk.types.Color;
 
 struct LineStyle
@@ -11,5 +13,10 @@ struct LineStyle
     {
         this.color = color;
         this.style = style;
+    }
+    
+    string toString()
+    {
+    	return "(color: %s, style: %s)".format(color, style);
     }
 }

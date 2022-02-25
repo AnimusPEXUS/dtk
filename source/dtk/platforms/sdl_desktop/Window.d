@@ -250,13 +250,19 @@ class Window : WindowI
     			if (event.window != this)
     				return;
     			
-    			debug if (event.eventType == EventType.none)
+    			if (event.eventType == EventType.none)
     			{
-    				writeln("event.type == EventType.none");
+    				debug writeln("event.type == EventType.none");
+    				return;
     			}
     			
     			if (event.eventType == EventType.window)
     			{
+    				if (event.ew.eventId == EnumWindowEvent.resize)
+    				{
+    					setFormWidth(event.ew.size.width);
+    					setFormHeight(event.ew.size.height);
+    				}
     				emitSignal_WindowEvents(event.ew);
     			}
     			else

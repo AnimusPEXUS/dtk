@@ -18,6 +18,7 @@ import dtk.interfaces.LayoutChildSettingsI;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
+import dtk.types.Image;
 
 import dtk.widgets.Form;
 import dtk.widgets.Widget;
@@ -102,7 +103,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     mixin mixin_multiple_properties_forward!(WidgetProperties, true);
     mixin mixin_forwardXYWH_from_Widget!();
     mixin mixin_Widget_renderImage!("Layout");
-    mixin mixin_widget_redraw_using_parent!();
+    mixin mixin_widget_redraw_using_propagateRedraw!();
     
     private {
     	SignalConnection sc_parentChange;
@@ -176,22 +177,14 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     override void propagatePosAndSizeRecalc()
     {
     	auto la = getLayoutEngine();
-    	// TODO: fix?
-    	la.performLayout();
+    	
+    	if (la !is null)
+    		la.performLayout();
+    	
     	foreach (v; children)
         {
         	v.child.propagatePosAndSizeRecalc();
         }
-    }
-    
-    override void propagateRedraw()
-    {
-    	redraw();
-    	// TODO: propagate only to those who really should
-        foreach (v; children)
-        {
-            v.child.propagateRedraw();
-        }    	
     }
     
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
@@ -316,7 +309,56 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	return super.getDrawingSurface();
     }
     
-    void redrawChild(WidgetI child)
+    override void propagateRedraw()
+    {
+    	auto img = this.renderImage();
+    	auto ds = getDrawingSurface();
+    	ds.drawImage(Position2D(0,0),img);
+    	
+    	auto vis_chi = calcVisibleChildren();
+    	
+    	foreach (v; vis_chi)
+    	{
+    		v.propagateRedraw();
+    	}
+    }
+    
+    WidgetI[] calcVisibleChildren()
+    {
+    	WidgetI[] ret;
+    	
+    	auto vp_x = getViewPortX();
+    	auto vp_y = getViewPortY();
+    	auto vp_w = getViewPortWidth();
+    	auto vp_h = getViewPortHeight();
+    	
+    	foreach (v; children)
+    	{
+    		
+    		auto cx = getChildX(v.child);
+    		auto cy = getChildY(v.child);
+    		auto cw = getChildWidth(v.child);
+    		auto ch = getChildHeight(v.child);
+    		
+    		auto res = calculateVisiblePart(
+    			vp_x,
+    			vp_y,
+    			vp_w,
+    			vp_h,
+    			cx,
+    			cy,
+    			cw,
+    			ch
+    			);
+    		if (res[0])
+    		{
+    			ret ~= v.child;
+    		}
+    	}
+    	return ret;
+    }
+    
+    void drawChild(WidgetI child, Image img)
     {
     	auto vp_x = getViewPortX();
     	auto vp_y = getViewPortY();
@@ -341,8 +383,13 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	if (!res[0])
     		return;
 
-    	auto img = child.renderImage(cast(int)res[1], res[2], res[3], res[4]);
+    	// auto img = child.renderImage(cast(int)res[1], res[2], res[3], res[4]);
     	auto ds = getDrawingSurface();
-    	ds.drawImage(Position2D(cast(int)res[5], cast(int)res[6]), img);
-    }
+    	ds.drawImage(
+    		Position2D(
+    			cast(int)res[5], cast(int)res[6]
+    			), 
+    		img.getImage(res[1], res[2], res[3], res[4])
+    		);
+    } 
 }
