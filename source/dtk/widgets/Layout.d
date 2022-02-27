@@ -26,6 +26,7 @@ import dtk.widgets.mixins;
 
 import dtk.miscs.signal_tools;
 import dtk.miscs.calculateVisiblePart;
+import dtk.miscs.DrawingSurfaceShift;
 
 enum LayoutOverflowBehavior
 {
@@ -174,19 +175,6 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	return null;
     }
     
-    override void propagatePosAndSizeRecalc()
-    {
-    	auto la = getLayoutEngine();
-    	
-    	if (la !is null)
-    		la.performLayout();
-    	
-    	foreach (v; children)
-        {
-        	v.child.propagatePosAndSizeRecalc();
-        }
-    }
-    
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	auto x = point.x;
@@ -309,18 +297,77 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	return super.getDrawingSurface();
     }
     
-    override void propagateRedraw()
+    override DrawingSurfaceI shiftDrawingSurfaceForChild(
+		DrawingSurfaceI ds, 
+		WidgetI child
+		)
+    {
+    	if (!haveChild(child))
+    		throw new Exception("not a child");
+    	
+        auto vp_x = getViewPortX();
+    	auto vp_y = getViewPortY();
+    	auto vp_w = getViewPortWidth();
+    	auto vp_h = getViewPortHeight();
+    	
+    	auto cx = getChildX(child);
+    	auto cy = getChildY(child);
+    	auto cw = getChildWidth(child);
+    	auto ch = getChildHeight(child);
+    	
+    	auto res = calculateVisiblePart(
+    		vp_x,
+    		vp_y,
+    		vp_w,
+    		vp_h,
+    		cx,
+    		cy,
+    		cw,
+    		ch
+    		);
+        
+        auto ret = new DrawingSurfaceShift(
+        	ds,
+        	cast(int)res[5],
+        	cast(int)res[6]
+        	);
+        
+        return ret;
+    }
+    
+    override void propagatePosAndSizeRecalc()
+    {
+    	auto w = getWidth();
+    	auto h = getHeight();
+    	
+    	setViewPortWidth(w);
+    	setViewPortHeight(h);
+    	
+    	auto la = getLayoutEngine();
+    	
+    	if (la !is null)
+    		la.performLayout();
+    	
+    	foreach (v; children)
+        {
+        	v.child.propagatePosAndSizeRecalc();
+        }
+    }
+    
+    override Image propagateRedraw()
     {
     	auto img = this.renderImage();
-    	auto ds = getDrawingSurface();
-    	ds.drawImage(Position2D(0,0),img);
+    	// auto ds = getDrawingSurface();
+    	// ds.drawImage(Position2D(0,0),img);
     	
     	auto vis_chi = calcVisibleChildren();
     	
-    	foreach (v; vis_chi)
+    	foreach (c; vis_chi)
     	{
-    		v.propagateRedraw();
+    		auto c_img = c.propagateRedraw();
+    		this.drawChild(img, c, c_img);
     	}
+    	return img;
     }
     
     WidgetI[] calcVisibleChildren()
@@ -332,6 +379,10 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	auto vp_w = getViewPortWidth();
     	auto vp_h = getViewPortHeight();
     	
+    	debug writefln("vp_x: %s, vp_y: %s, vp_w: %s, vp_h: %s".format(
+    		vp_x, vp_y, vp_w, vp_h
+    		));
+    	
     	foreach (v; children)
     	{
     		
@@ -339,6 +390,8 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     		auto cy = getChildY(v.child);
     		auto cw = getChildWidth(v.child);
     		auto ch = getChildHeight(v.child);
+    		
+    		debug writefln("cx: %s, cy: %s, cw: %s, ch: %s".format(cx, cy, cw, ch));
     		
     		auto res = calculateVisiblePart(
     			vp_x,
@@ -352,14 +405,29 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     			);
     		if (res[0])
     		{
+    			debug writeln("visible  : ", v.child);
     			ret ~= v.child;
+    		} 
+    		else
+    		{
+    			debug writeln("invisible: ", v.child);
     		}
+
     	}
     	return ret;
     }
     
-    void drawChild(WidgetI child, Image img)
+    override void drawChild(WidgetI child, Image img)
     {
+    	auto ds = getDrawingSurface();
+    	drawChild(ds, child, img);
+    	return;
+    }
+    
+    override void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
+    {
+    	ds = shiftDrawingSurfaceForChild(ds, child);
+    	
     	auto vp_x = getViewPortX();
     	auto vp_y = getViewPortY();
     	auto vp_w = getViewPortWidth();
@@ -382,14 +450,15 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     		);
     	if (!res[0])
     		return;
-
+    	
     	// auto img = child.renderImage(cast(int)res[1], res[2], res[3], res[4]);
-    	auto ds = getDrawingSurface();
     	ds.drawImage(
     		Position2D(
-    			cast(int)res[5], cast(int)res[6]
-    			), 
+    			0, 0
+    			// NOTE: ds should be already shifted to correct position
+    			// cast(int)res[5], cast(int)res[6]
+    			),
     		img.getImage(res[1], res[2], res[3], res[4])
     		);
-    } 
+    }
 }

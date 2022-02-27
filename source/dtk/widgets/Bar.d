@@ -16,6 +16,7 @@ import dtk.interfaces.WidgetI;
 import dtk.types.Size2D;
 import dtk.types.Property;
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 import dtk.widgets.Widget;
 import dtk.widgets.mixins;

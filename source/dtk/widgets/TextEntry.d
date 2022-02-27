@@ -30,7 +30,6 @@ import dtk.miscs.DrawingSurfaceShift;
 import dtk.miscs.signal_tools;
 
 const auto TextEntryProperties = cast(PropSetting[]) [
-PropSetting("gs", "dstring", "text", "Text"),
 // TODO: use fontconfig instead of this
 PropSetting("gs_w_d", "string", "font_family", "FontFamily", "\"Go\""),
 PropSetting("gs_w_d", "string", "font_style", "FontStyle", "\"Regular\""),
@@ -194,16 +193,34 @@ class TextEntry : Widget, WidgetI
         
     }
     
+    dstring getText()
+    {
+    	return text_view.getText().getText();
+    }
+    
+    void setText(dstring txt)
+    {
+    	text_view.setText(txt);
+    	return;
+    }
+    
     DrawingSurfaceI getDrawingSurfaceForTextView()
     {
-    	/*        auto p = getPosition();
+    	auto x = getX();
+    	auto y = getY();
         if (getDrawBewelAndBackground())
         {
-        p.x+=2;
-        p.y+=2;
+        	x+=2;
+        	y+=2;
         }
-        return new DrawingSurfaceShift(getParent().getDrawingSurface(), p.x,p.y); */
-        return null;
+        
+        auto ds = new DrawingSurfaceShift(
+        	getDrawingSurface(),
+        	cast(int)x,
+        	cast(int)y
+        	);
+        
+        return ds;
     }
     
     void on_mouse_click_internal(
@@ -296,8 +313,6 @@ class TextEntry : Widget, WidgetI
     
     void applySettingsToTextProcessor()
     {
-        /* text_view.setText(getText()); */ // NOTE: too expansive probably
-        /*         
         auto tvt = text_view.getText();
         
         tvt.setFaceFamily(getFontFamily());
@@ -310,30 +325,31 @@ class TextEntry : Widget, WidgetI
         tvt.setLinesLayout(getLayoutLines());
         tvt.setLineCharsLayout(getLayoutChars());
         
-        auto size = getSize();
-        text_view.setWidth(size.width);
-        text_view.setHeight(size.height);
-        
         if (getDrawBewelAndBackground())
         {
-        // TODO: optimize this: must be as less view redrawings as possible
-        text_view.setWidth(text_view.getWidth()-4);
-        text_view.setHeight(text_view.getHeight()-4);
-        tvt.setDefaultBGColor(getBewelBackgroundColor());
+        	tvt.setDefaultBGColor(getBewelBackgroundColor());
         } else {
-        // TODO: get default form color from Theme
-        tvt.setDefaultBGColor(Color(0xc0c0c0));
+        	tvt.setDefaultBGColor(Color(0xc0c0c0));
         }
         
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
-        text_view.setCursorEnabled(getCursorEnabled()); */
+        text_view.setCursorEnabled(getCursorEnabled()); 
     }
     
     //mixin mixin_getWidgetAtPosition;
     
     override void propagatePosAndSizeRecalc()
     {
+		auto w = getWidth();
+    	auto h = getHeight();
+    	if (getDrawBewelAndBackground())
+        {
+        	w -=4;
+        	h -=4;
+        }
+        text_view.setWidth(w);
+        text_view.setHeight(h);
     }
     
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)

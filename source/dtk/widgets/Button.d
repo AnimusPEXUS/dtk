@@ -18,6 +18,7 @@ import dtk.types.Size2D;
 import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 import dtk.widgets.Widget;
 import dtk.widgets.Form;
@@ -51,18 +52,25 @@ class Button : Widget, WidgetI
     	"getForm",
     	"getNextFocusableWidget",
     	"getPrevFocusableWidget",
-    	"propagatePosAndSizeRecalc",
     	"getChildAtPosition",
     	"getDrawingSurface"
     	]
     	);
     
-    void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    void on_mouse_click_internal(
+    	EventMouse* event, 
+    	ulong mouseWidget_x, 
+    	ulong mouseWidget_y
+    	)
     {
         return ;
     }
     
-    void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    void on_mouse_down_internal(
+    	EventMouse* event, 
+    	ulong mouseWidget_x, 
+    	ulong mouseWidget_y
+    	)
     {
         button_is_down = true;
         auto f = getForm();
@@ -74,13 +82,18 @@ class Button : Widget, WidgetI
         return ;
     }
     
-    void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    void on_mouse_up_internal(
+    	EventMouse* event, 
+    	ulong mouseWidget_x, 
+    	ulong mouseWidget_y
+    	)
     {
         button_is_down = false;
         redraw();
         return ;
     }
     
- 
+    override void propagatePosAndSizeRecalc()
+	{}    
     
 }

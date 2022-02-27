@@ -70,8 +70,6 @@ class Window : WindowI
     	// SignalConnection cs_LafChange;
     	SignalConnection cs_FormChange;
     	
-    	SignalConnection cs_WindowEvents;
-    	
     	SignalConnection platform_signal_connection;
     }
     
@@ -199,30 +197,6 @@ class Window : WindowI
         			);
         	}
         	);
-        
-        // TODO: either everywhere rename 'Manager' to 'Mgr', either viseversia
-        
-        /*  connectToWindowEventMgr_onAfterChanged(
-        delegate void(
-        WindowEventMgrI old_value,
-        WindowEventMgrI new_value
-        )
-        {
-        collectException(
-        { ensurePlatformEventManangerAndLafConnection(); }()
-        );
-        }
-        ); */
-        
-        cs_WindowEvents = connectToSignal_WindowEvents(
-        	delegate void (EventWindow *e) nothrow {
-        		collectException(
-        			{
-        				writeln("window event");
-					}()
-					);
-			}
-        	);
     }
     
     LafI getLaf()
@@ -258,10 +232,21 @@ class Window : WindowI
     			
     			if (event.eventType == EventType.window)
     			{
-    				if (event.ew.eventId == EnumWindowEvent.resize)
+    				switch (event.ew.eventId)
     				{
-    					setFormWidth(event.ew.size.width);
-    					setFormHeight(event.ew.size.height);
+    				default:
+    					break;
+    				case EnumWindowEvent.resize:
+    				case EnumWindowEvent.show:
+    					int w;
+    					int h;
+    					SDL_GetWindowSize(
+    						this.sdl_window,
+    						&w,
+    						&h,
+    						);
+    					setFormWidth(w);
+    					setFormHeight(h);
     				}
     				emitSignal_WindowEvents(event.ew);
     			}

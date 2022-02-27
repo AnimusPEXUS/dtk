@@ -74,8 +74,6 @@ EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
         break;
     case SDL_WINDOWEVENT_NONE:
         break;
-    case SDL_WINDOWEVENT_SIZE_CHANGED:
-        throw new Exception("should be ignored, not processed");
     case SDL_WINDOWEVENT_SHOWN:
         ret.eventId = EnumWindowEvent.show;
         break;
@@ -89,6 +87,11 @@ EventWindow* convertSDLWindowEventToDtkEventWindow(SDL_WindowEvent* e)
         ret.eventId = EnumWindowEvent.move;
         ret.position.x = e.data1;
         ret.position.y = e.data2;
+        break;
+    case SDL_WINDOWEVENT_SIZE_CHANGED:
+        ret.eventId = EnumWindowEvent.sizeChanged;
+        ret.size.width = e.data1;
+        ret.size.height = e.data2;
         break;
     case SDL_WINDOWEVENT_RESIZED:
         ret.eventId = EnumWindowEvent.resize;

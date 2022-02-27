@@ -2044,8 +2044,10 @@ class TextView
         return _rendered_image;
     }
     
-    void completeRedrawToDS()
+    void completeRedrawToDS(DrawingSurfaceI ds=null)
     {
+    	if (ds is null)
+    		ds = getDrawingSurface();
         ulong x;
         ulong y;
         ulong width;
@@ -2056,7 +2058,7 @@ class TextView
         width = getWidth();
         height = getHeight();
         
-        drawImageToDrawingSurface(x,y,width,height);
+        drawImageToDrawingSurface(x,y,width,height,ds);
     }
     
     // TODO: move this to some more appropriate place
@@ -2069,16 +2071,20 @@ class TextView
         ulong target_x,
         ulong target_y,
         ulong width,
-        ulong height
+        ulong height,
+        DrawingSurfaceI ds
         )
     {
-        auto ds = getDrawingSurface();
+    	if (ds is null)
+    		ds = getDrawingSurface();
         auto image = getRenderedImage();
         
         auto p = Position2D(cast(int)target_x,cast(int)target_y);
         auto i = image.getImage(p, Size2D(cast(int)width, cast(int)height));
         ds.drawImage(p, i);
-        ds.present();
+        
+        if (ds.canPresent())
+        	ds.present();
     }
     
     void ensureTimer500Connection()
@@ -2258,7 +2264,8 @@ class TextView
             e.target_x,
             e.target_y,
             e.width,
-            e.height
+            e.height,
+            null
             );
     }
     
@@ -2432,7 +2439,7 @@ class TextView
     }
     
     void clearCursor(ulong x,ulong y,ulong width,ulong height) {
-        drawImageToDrawingSurface(x, y, width, height);
+        drawImageToDrawingSurface(x, y, width, height, null);
     }
     
     Tuple!(bool, ulong, ulong, ulong, ulong) calculateVisibleCursor(

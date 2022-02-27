@@ -94,12 +94,16 @@ class Widget : WidgetI
     
     DrawingSurfaceI getDrawingSurface()
     {
-        auto x = getX();
-        auto y = getY();
-        return new DrawingSurfaceShift(
-        	getParent().getDrawingSurface(),
-        	cast(int)x, cast(int)y
-        	);
+    	auto p = getParent();
+    	if (p is null)
+    		throw new Exception("parent is null");
+    	auto ds = p.getDrawingSurface();
+    	if (ds is null)
+    		throw new Exception("parent drawing surface is null");
+    	auto dsc = p.shiftDrawingSurfaceForChild(ds, this);
+    	if (dsc is null)
+    		throw new Exception("parent drawing surface for child is null");
+    	return dsc;
     }
     
     void positionAndSizeRequest(Position2D position, Size2D size)
@@ -184,9 +188,11 @@ class Widget : WidgetI
     
     void propagatePosAndSizeRecalc()
     {
+    	// static assert(false, "must be reimplemented");
+        throw new Exception("must be reimplemented");
     }
     
-    void propagateRedraw()
+    Image propagateRedraw()
     {
     	// static assert(false, "must be reimplemented");
     	throw new Exception("must be reimplemented");
@@ -205,6 +211,18 @@ class Widget : WidgetI
     }
     
     Image renderImage()
+    {
+    	// static assert(false, "must be reimplemented");
+    	throw new Exception("must be reimplemented");
+    }
+    
+    void drawChild(WidgetI child, Image img)
+    {
+    	// static assert(false, "must be reimplemented");
+    	throw new Exception("must be reimplemented");
+    }
+    
+    void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
     {
     	// static assert(false, "must be reimplemented");
     	throw new Exception("must be reimplemented");

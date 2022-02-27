@@ -286,15 +286,15 @@ class Chicago98Laf : LafI
     
     void drawLayout(Layout widget, DrawingSurfaceI ds)
     {
-        auto size_w = cast(int) widget.getWidth();
-        auto size_h = cast(int) widget.getHeight();
-        
-        ds.drawRectangle(
-        	Position2D(0, 0),
-        	Size2D(size_w, size_h),
-        	LineStyle(Color(0)),
-        	Nullable!FillStyle()
-        	);
+        // auto size_w = cast(int) widget.getWidth();
+        // auto size_h = cast(int) widget.getHeight();
+        // 
+        // ds.drawRectangle(
+        	// Position2D(0, 0),
+        	// Size2D(size_w, size_h),
+        	// LineStyle(Color(cast(ubyte[3])[55,55,55])),
+        	// nullable(FillStyle(Color(cast(ubyte[3])[100,100,100])))
+        	// );
     }
     
     // void drawMenu(Menu widget, DrawingSurfaceI ds)
@@ -344,7 +344,7 @@ class Chicago98Laf : LafI
         
         if (widget.text_view !is null)
         {
-        	widget.text_view.completeRedrawToDS();
+        	widget.text_view.completeRedrawToDS(ds);
         }
     }
 }

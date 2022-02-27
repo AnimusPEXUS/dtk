@@ -53,5 +53,7 @@ interface WidgetI // : ContainerableI
 	Image renderImage();    
     void redraw();
     void propagatePosAndSizeRecalc();
-    void propagateRedraw();
+    Image propagateRedraw();
+    // void drawChild(WidgetI child, Image img);
+    // void drawChild(DrawingSurfaceI ds, WidgetI child, Image img);
 }

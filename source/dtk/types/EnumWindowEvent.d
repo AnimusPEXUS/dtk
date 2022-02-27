@@ -6,6 +6,7 @@ enum EnumWindowEvent
     invalid, // reserved value for possible indication of error
     close,
     move,
+    sizeChanged,
     resize,
     maximize,
     unmaximize,

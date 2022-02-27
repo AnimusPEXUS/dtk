@@ -31,6 +31,7 @@ import dtk.widgets.mixins;
 import dtk.widgets.Widget;
 
 import dtk.miscs.signal_tools;
+import dtk.miscs.DrawingSurfaceShift;
 
 import dtk.signal_mixins.Form;
 
@@ -49,12 +50,12 @@ class Form : ContainerI
     mixin mixin_multiple_properties_define!(FormProperties);
     mixin mixin_multiple_properties_forward!(FormProperties, false);
     mixin mixin_Widget_renderImage!("Form", "");
-    mixin mixin_propagateRedraw_children_one!("");
+    // mixin mixin_propagateRedraw_children_one!("");
     
     private {
     	SignalConnection sc_childChange;
     	SignalConnection sc_windowChange;
-
+    	
     	SignalConnection sc_windowOtherEvents;
     	SignalConnection sc_windowEvents;
     }
@@ -168,27 +169,40 @@ class Form : ContainerI
     {
     	collectException(
     		{
-    			bool propogate_resize_and_repaint = false;
-    			
-    			switch (event.eventId)
-    			{
-    			default:
-    				break;
-    			case EnumWindowEvent.resize:
-    				propogate_resize_and_repaint = true;
-    			}
-    			
-    			if (propogate_resize_and_repaint)
-    			{
-    				propagatePosAndSizeRecalc();
-    				debug writeln("Form calling propagateRedraw()");
-    				propagateRedraw();
-    				debug writeln("Form calling getDrawingSurface().present()");
-    				getDrawingSurface().present();
-    			}
+    			auto e = collectException(
+    				{
+    					bool propogate_resize_and_repaint = false;
+    					
+    					debug writeln("form received window event: ", event.eventId);
+    					
+    					switch (event.eventId)
+    					{
+    					default:
+    						break;
+    					case EnumWindowEvent.resize:
+    					case EnumWindowEvent.show:
+    						propogate_resize_and_repaint = true;
+    					}
+    					
+    					if (propogate_resize_and_repaint)
+    					{
+    						auto ds = getDrawingSurface();
+    						if (ds is null)
+    						{
+    							debug writeln(new Exception("drawing surface unavailable"));
+    							return;
+    						}
+    						debug writeln("calling propagatePosAndSizeRecalc");
+    						propagatePosAndSizeRecalc();
+    						debug writeln("calling redraw");
+    						redraw();
+    					}
+    				}()
+    				);
+    			debug if (e !is null) writeln("exception: ", e);
     		}()
     		);
-    }    
+    }
     
     ContainerI getParent()
     {
@@ -277,21 +291,24 @@ class Form : ContainerI
         return ret;
     }
     
-    void propagatePosAndSizeRecalc()
+    DrawingSurfaceI shiftDrawingSurfaceForChild(
+		DrawingSurfaceI ds,
+		WidgetI child
+		)
     {
-    	auto w = getWindow();
-    	if (w !is null)
-    	{
-    		setWidth(w.getFormWidth());
-    		setHeight(w.getFormHeight());
-    		debug writefln(
-    			"form size propogated: %sx%s", getWidth(), getHeight()
-    			);
-    	}
+    	if (getChild() != child)
+    		throw new Exception("not a child");
     	
-    	auto c = getChild();
-    	if (c !is null)
-    		c.propagatePosAndSizeRecalc();
+    	auto x = getChildX(child);
+        auto y = getChildY(child);
+        
+        auto ret = new DrawingSurfaceShift(
+        	ds,
+        	cast(int)x,
+        	cast(int)y
+        	);
+        
+        return ret;
     }
     
     Form getForm()
@@ -350,27 +367,36 @@ class Form : ContainerI
     
     Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
+    	// TODO: fix this
     	return tuple(cast(WidgetI) null, Position2D(0,0));
     }
     
     ulong getChildX(WidgetI child)
     {
-    	return 0;
+    	return 5;
     }
     
     ulong getChildY(WidgetI child)
     {
-    	return 0;
+    	return 5;
     }
     
     ulong getChildWidth(WidgetI child)
     {
-    	return getWidth();
+    	auto x = getWidth();
+    	if (x>5)
+    		return x-10;
+    	else
+    		return 0;
     }
     
     ulong getChildHeight(WidgetI child)
     {
-    	return getHeight();
+    	auto x = getHeight();
+    	if (x>5)
+    		return x-10;
+    	else
+    		return 0;
     }
     
     void setChildX(WidgetI child, ulong v)
@@ -403,15 +429,51 @@ class Form : ContainerI
     	return getChild() == child;
     }
     
+    void propagatePosAndSizeRecalc()
+    {
+    	auto w = getWindow();
+    	if (w !is null)
+    	{
+    		setWidth(w.getFormWidth());
+    		setHeight(w.getFormHeight());
+    	}
+    	
+    	auto c = getChild();
+    	if (c !is null)
+    		c.propagatePosAndSizeRecalc();
+    }
+    
     void redraw()
     {
-		propagateRedraw();        
-		getDrawingSurface().present();
+    	auto img = propagateRedraw();
+    	auto ds = getDrawingSurface();
+    	ds.drawImage(Position2D(0,0), img);
+    	ds.present();
+    }
+    
+    Image propagateRedraw()
+    {
+    	auto img = this.renderImage();
+    	
+    	auto c = getChild();
+    	if (c !is null)
+    	{
+    		auto c_img = c.propagateRedraw();
+    		this.drawChild(img, c, c_img);
+    	}
+    	return img;
     }
     
     void drawChild(WidgetI child, Image img)
     {
     	auto ds = getDrawingSurface();
-    	ds.drawImage(Position2D(0,0), img);
+    	drawChild(ds, child, img);
+    	return;
+    }
+    
+    void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
+    {
+    	ds = shiftDrawingSurfaceForChild(ds, child);
+    	ds.drawImage(Position2D(0, 0), img);
     }
 }

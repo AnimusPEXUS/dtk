@@ -12,6 +12,7 @@ import dtk.interfaces.ContainerI;
 import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 import dtk.miscs.RadioGroup;
 
@@ -112,9 +113,5 @@ class ButtonRadio : Button, WidgetI
     {
         return;
     }
-    
-    override void propagateRedraw()
-    {
-    	
-    }
+
 }

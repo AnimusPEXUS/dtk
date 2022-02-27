@@ -91,6 +91,7 @@ mixin template mixin_Widget_renderImage(
 	string override_str="override"
 	)
 {
+	import std.stdio;
 	import std.format;
 	
 	import dtk.types.Image;
@@ -100,6 +101,7 @@ mixin template mixin_Widget_renderImage(
 		q{
 			%2$s Image renderImage()
 			{
+				debug writeln(this, ".renderImage() called");
 				Form form = this.getForm();
 				if (form is null)
 				{
@@ -168,11 +170,10 @@ mixin template mixin_propagateRedraw_children_none(string override_str="override
 	import std.format;
 	mixin(
 		q{
-			%1$s void propagateRedraw()
+			%1$s Image propagateRedraw()
 			{
 				auto img = this.renderImage();
-				auto ds = getDrawingSurface();
-				ds.drawImage(Position2D(0,0),img);
+				return img;
 			}
     	}.format(override_str)
     	);
@@ -186,12 +187,13 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 			%1$s void propagateRedraw()
 			{
 				auto img = this.renderImage();
-				auto ds = getDrawingSurface();
-				ds.drawImage(Position2D(0,0), img);
 				
-				/* auto c = getChild();
+				auto c = getChild();
 				if (c !is null)
-					c.propagateRedraw(); */
+				{
+					auto c_img = c.propagateRedraw();
+					this.drawChild(img, c, c_img);
+				}
 			}
 		}.format(override_str)
 		);

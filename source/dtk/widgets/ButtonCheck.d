@@ -9,6 +9,7 @@ import dtk.interfaces.ContainerI;
 import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
+import dtk.types.Image;
 
 import dtk.widgets.Button;
 import dtk.widgets.Form;
@@ -76,12 +77,7 @@ class ButtonCheck : Button, WidgetI
     {
         return ;
     }
-        
-    override void propagateRedraw()
-    {
-    	redraw();
-    }
-    
+
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	// return tuple(cast(WidgetI)this, point);

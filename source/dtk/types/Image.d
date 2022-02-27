@@ -121,7 +121,8 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
             for (ulong x2 = 0; x2 != horizontal_copy_count; x2++)
             {
                 auto dot = new_image.getDot(x2, y2);
-                setDot(x + x2, y + y2, dot);
+                if (dot.enabled)
+                	setDot(x + x2, y + y2, dot);
             }
         }
     }
@@ -251,16 +252,19 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     	drawLine(Position2D(p4_x, p4_y), Position2D(p3_x, p3_y), bottom_style);
     	drawLine(Position2D(p2_x, p2_y), Position2D(p3_x, p3_y), right_style);
     	
-    	if (!fill_style.isNull())
-        {
-            for (auto y = p1_y+1; y < p4_y; y++)
-            {
-            	drawLine(
-            		Position2D(p1_x, y), 
-            		Position2D(p2_x, y), 
-            		LineStyle(fill_style.get().color)
-            		);
-            }
+    	if (size.width > 2 && size.height > 2)
+    	{
+    		if (!fill_style.isNull())
+    		{
+    			for (auto y = p1_y+1; y < p4_y; y++)
+    			{
+    				drawLine(
+    					Position2D(p1_x+1, y), 
+    					Position2D(p2_x-1, y), 
+    					LineStyle(fill_style.get().color)
+    					);
+    			}
+    		}
         }
     }
 

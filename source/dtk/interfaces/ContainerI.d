@@ -26,8 +26,13 @@ interface ContainerI
 	bool haveChild(WidgetI child);
 	
 	void drawChild(WidgetI child, Image img);
+	void drawChild(DrawingSurfaceI ds, WidgetI child, Image img);
 	
 	ContainerI getParent();
 	
 	DrawingSurfaceI getDrawingSurface();
+	DrawingSurfaceI shiftDrawingSurfaceForChild(
+		DrawingSurfaceI ds, 
+		WidgetI child
+		);
 }
