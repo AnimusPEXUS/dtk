@@ -34,7 +34,7 @@ Now
 4. create this '/home/user/dpath_work' directory and cd into it
 5. now create symlink (with name 'dtk') to /home/user/projects/dtk
 
-after succeeding steps abowe, the example project inside of examples/hello 
+after succeeding steps above, the example project inside of examples/hello 
 shuold become buildable with 'dub build'. 
 
 NOTE: usually, I comment with 'compilable' commits which succeed in 'dub build'.
