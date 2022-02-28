@@ -68,4 +68,4 @@ use Platform for some basic interactions with the system and for windows creatio
 Window is Platform's specific decision to create and handle windows, dialogs
 and pop-ups.
 
-The portable part, is src/dtk and all the supplementary code for it's work.
+The portable part, is src/dtk/widgets and all the supplementary code for it's work.
