@@ -48,3 +48,21 @@ Currently DTK depends at least on following things and their development files:
 * SDL
 * font-config
 * freetype
+
+The Project Structure
+---------------------
+
+DTK consists of three parts: 
+- backends
+- portable part: dtk widgets and utilities
+- lafs ([Look and Feel]s) - the visual themes
+
+Backends - are all supposed to be places into src/platforms dir.
+
+backends provide dtk with Platform and Window realizations. User supposed to
+use Platform for some basic interactions with the system and for windows creation.
+
+Window is Platform's specific decision to create and handle windows, dialogs 
+and pop-ups.
+
+The portable part, is src/dtk and all the supplementary code for it's work.
