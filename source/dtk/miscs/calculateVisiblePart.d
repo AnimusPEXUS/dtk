@@ -7,14 +7,14 @@ import std.typecons;
 //  1, 2, 3, 4 - visible image part
 //  5, 6 - vertical and horizontal offset where to put visible part
 Tuple!(
-	bool, 
-	ulong, ulong, ulong, ulong, 
+	bool,
+	ulong, ulong, ulong, ulong,
 	ulong, ulong
 	) calculateVisiblePart(
-ulong vp_x,
-ulong vp_y,
-ulong vp_w,
-ulong vp_h,
+ulong vpx,
+ulong vpy,
+ulong vpw,
+ulong vph,
 ulong cx,
 ulong cy,
 ulong cw,
@@ -22,8 +22,8 @@ ulong ch
 )
     {
     	auto ret_invisible = tuple(
-    		false, 
-    		0UL, 0UL, 0UL, 0UL, 
+    		false,
+    		0UL, 0UL, 0UL, 0UL,
     		0UL, 0UL
     		);
     	ulong x;
@@ -40,74 +40,76 @@ ulong ch
     	
     	auto cx_p_cw = cx+cw;
     	auto cy_p_ch = cy+ch;
-    	auto vp_x_p_vp_w = vp_x+vp_w; 
-    	auto vp_y_p_vp_h = vp_y+vp_h; 
+    	auto vpx_p_vpw = vpx+vpw;
+    	auto vpy_p_vph = vpy+vph;
     	
     	if (
-    		vp_x > cx_p_cw 
-    	|| vp_y > cy_p_ch
-    	|| vp_x_p_vp_w < cx
-    	|| vp_y_p_vp_h < cy
+    		vpx > cx_p_cw
+    	|| vpy > cy_p_ch
+    	|| vpx_p_vpw < cx
+    	|| vpy_p_vph < cy
     	)
     	{
     		return ret_invisible;
     	}
     	
-    	if (vp_x > cx)
     	{
-    		vx = 0;
-    	}
-    	else
-    	{
-    		vx = cx - vp_x;
+    		if (vpx >= cx)
+    		{
+    			vx = 0;
+    		}
+    		else
+    		{
+    			vx = cx - vpx;
+    		}
+    		
+    		if (vpy >= cy)
+    		{
+    			vy = 0;
+    		}
+    		else
+    		{
+    			vy = cy - vpy;
+    		}
     	}
     	
-    	if (vp_y > cy)
     	{
-    		vy = 0;
-    	}
-    	else
-    	{
-    		vy = cy - vp_y;
-    	}
-    	
-    	{
-    		if (vp_x < cx) 
+    		if (vpx < cx)
     		{
     			x = 0;
     		}
     		else
     		{
-    			x = cx - vp_x;
+    			x = vpx - cx;
     		}
     		
-    		if (vp_y < cy) 
+    		if (vpy < cy)
     		{
     			y = 0;
     		}
     		else
     		{
-    			y = cy - vp_y;
+    			y = vpy - cy;
     		}
     	}
     	
     	{
-    		if (vp_x_p_vp_w > cx_p_cw) 
+    		if (vpx_p_vpw > cx_p_cw)
     		{
     			w = cw;
     		}
     		else
     		{
-    			w = cx_p_cw - vp_x_p_vp_w;
+    			w = cw - (cx_p_cw - vpx_p_vpw);
     		}
     		
-    		if (vp_y_p_vp_h > cy_p_ch) 
+    		if (vpy_p_vph > cy_p_ch)
     		{
     			h = ch;
     		}
     		else
     		{
-    			h = cy_p_ch - vp_y_p_vp_h;
+    			h = ch - (cy_p_ch - vpy_p_vph);
     		}
     		
     		if (x>w) {

@@ -257,7 +257,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     	{
     		if (!fill_style.isNull())
     		{
-    			for (auto y = p1_y+1; y < p4_y; y++)
+    			for (auto y = p1_y+1; y != p4_y; y++)
     			{
     				drawLine(
     					Position2D(p1_x+1, y), 
