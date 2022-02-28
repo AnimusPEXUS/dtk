@@ -173,7 +173,8 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
 
     void drawDot(Position2D pos, ImageDot dot)
     {
-        setDot(pos.x, pos.y, dot);
+    	if (dot.enabled)
+    		setDot(pos.x, pos.y, dot);
     }
 
     bool canGetDot()
