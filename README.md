@@ -6,9 +6,9 @@ About
 
 This is DTK (D graphical ToolKit).
 
-Currntly under heavy and deep develpment. It's far even to alpha.
+Currently under heavy and deep development. It's far even to alpha.
 
-DTK is thought to be higly portable, but currently it actually supports only SDL
+DTK is thought to be highly portable, but currently it actually supports only SDL
 backend.
 
 
@@ -38,7 +38,7 @@ Now
 5. now create symlink (with name 'dtk') to /home/user/projects/dtk
 
 after succeeding steps above, the example project inside of examples/hello
-shuold become buildable with 'dub build'.
+should become buildable with 'dub build'.
 
 NOTE: usually, I comment with 'compilable' commits which succeed in 'dub build'.
    currently not all commits to 'master' branch are compilable.
@@ -60,7 +60,7 @@ DTK consists of three parts:
 - portable part: dtk widgets and utilities
 - lafs ([Look and Feel]s) - the visual themes
 
-Backends - are all supposed to be places into src/platforms dir.
+Backends - are all supposed to be places into src/dtk/platforms dir.
 
 backends provide dtk with Platform and Window realizations. User supposed to
 use Platform for some basic interactions with the system and for windows creation.
