@@ -6,7 +6,7 @@ About
 
 This is DTK (D graphical ToolKit).
 
-Currntly under heavy and deep develpment. It's far event to alpha.
+Currntly under heavy and deep develpment. It's far even to alpha.
 
 DTK is thought to be higly portable, but currently it actually supports only SDL
 backend.
