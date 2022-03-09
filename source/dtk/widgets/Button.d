@@ -21,7 +21,7 @@ import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
 import dtk.types.Event;
-import dtk.types.FormEvent;
+import dtk.types.EventForm;
 
 import dtk.widgets.Widget;
 import dtk.widgets.Form;
@@ -94,36 +94,7 @@ class Button : Widget, WidgetI
     						
     						debug writeln("button window other event: connecting");
     						sc_formEvent = f.connectToSignal_Event(
-    							delegate void(FormEvent* event) nothrow
-    							{
-    								collectException(
-    									{
-    										auto f = getForm();
-    										if (f is null)
-    											return;
-    										formEventFilter(
-    											event,
-    											f,
-    											false,
-    											false,
-    											true,
-    											true,
-    											this,
-    											this,
-    											false,
-    											null,
-    											delegate bool(
-    												Form form,
-    												FormEvent* fe,
-    												)
-												{
-													debug writeln("1111111111111111");
-													return true;
-												}
-    											);
-    									}()
-    									);
-    							}
+    							&buttonTypeSpecificEventHandler
     							);
     					}
     					
@@ -133,7 +104,38 @@ class Button : Widget, WidgetI
     		);
     }
     
-
+    void buttonTypeSpecificEventHandler(EventForm* event) nothrow
+    {
+    	collectException(
+    		{
+    			auto f = getForm();
+    			if (f is null)
+    				return;
+    			debug writeln("filtering events for button");
+    			formEventFilter(
+    				event,
+    				f,
+    				false,
+    				false,
+    				true,
+    				true,
+    				this,
+    				this,
+    				false,
+    				null,
+    				delegate bool(
+    					Form form,
+    					EventForm* fe,
+    					)
+    				{
+    					debug writeln("1111111111111111: ", fe.event.eventType);
+    					return true;
+    				}
+    				);
+    		}()
+    		);
+    }
+    
     void on_mouse_click_internal(
     	EventMouse* event, 
     	ulong mouseWidget_x, 

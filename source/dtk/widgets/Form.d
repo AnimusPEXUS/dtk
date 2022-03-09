@@ -25,7 +25,7 @@ import dtk.types.FillStyle;
 import dtk.types.Property;
 import dtk.types.Event;
 import dtk.types.EventWindow;
-import dtk.types.FormEvent;
+import dtk.types.EventForm;
 import dtk.types.Image;
 
 import dtk.widgets.mixins;
@@ -133,7 +133,8 @@ class Form : ContainerI, WidgetI
     {
     	collectException(
     		{
-    			FormEvent* fe = new FormEvent();
+    			EventForm* fe = new EventForm();
+    			debug writeln("Form.onWindowOtherEvent: ", event.eventType);
     			
     			WidgetI focusedWidget = this.getFocusedWidget();
     			WidgetI mouseFocusedWidget;
@@ -141,24 +142,43 @@ class Form : ContainerI, WidgetI
     			ulong mouseFocusedWidget_x = 0;
     			ulong mouseFocusedWidget_y = 0;
     			
-    			{
-    				if (event.eventType == EventType.mouse)
+    			{    			
+    				
+    				ulong form_mouse_x;
+    				ulong form_mouse_y;
+    				
+    				/* if (event.eventType == EventType.mouse)
     				{
-    					auto res = this.getChildAtPosition(
-    						Position2D(
-    							event.em.x,
-    							event.em.y
-    							)
-    						);
-    					mouseFocusedWidget = res[0];
-    					auto pos = res[1];
-    					mouseFocusedWidget_x = pos.x;
-    					mouseFocusedWidget_y = pos.y;
+    					form_mouse_x = cast(ulong)event.em.x;
+    					form_mouse_y = cast(ulong)event.em.y;
     				}
-    				else
+    				else */
     				{
-    					// TODO: todo
+    					auto w = getWindow();
+    					if (w is null)
+    					{
+    						debug writeln("onWindowOtherEvent w is null");
+    						return;
+    					}
+    					auto res = w.getMousePosition();
+    					if (!res[0])
+    					{
+    						debug writeln("onWindowOtherEvent getMousePosition false");
+    						return;
+    					}
+    					form_mouse_x = res[1].x;
+    					form_mouse_y = res[1].y;
     				}
+    				auto res = this.getChildAtPosition(
+    					Position2D(
+    						cast(int)form_mouse_x,
+    						cast(int)form_mouse_y
+    						)
+    					);
+    				mouseFocusedWidget = res[0];
+    				auto pos = res[1];
+    				mouseFocusedWidget_x = pos.x;
+    				mouseFocusedWidget_y = pos.y;
     			}
     			
     			fe.event = event;
@@ -375,7 +395,7 @@ class Form : ContainerI, WidgetI
     Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	
-    	auto ret_this = tuple(cast(WidgetI) null, Position2D(0,0));
+    	auto ret_this = tuple(cast(WidgetI)this, Position2D(0,0));
     	
     	auto c = getChild();
     	

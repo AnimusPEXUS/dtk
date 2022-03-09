@@ -259,6 +259,20 @@ class Window : WindowI
         return;
     }
     
+    Tuple!(bool, Position2D) getMousePosition()
+    {
+    	auto ret_fail = tuple(false, Position2D(0,0));
+    	int x;
+    	int y;
+    	SDL_GetMouseState(&x, &y);
+    	if (x < 0 || y < 0)
+    	{
+    		debug writeln("getMousePosition: x or y is negative");
+    		return ret_fail;
+    	}
+    	return tuple(true, Position2D(x,y));
+    }
+    
     void redraw()
     {
     	auto form = getForm();

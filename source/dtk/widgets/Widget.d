@@ -57,7 +57,6 @@ class Widget : WidgetI
     
     Form getForm()
     {
-    	debug writeln("getForm() called at ", this);
     	auto ret = recursionGuard(
     		form_recursion_protection_bool,
     		form_recursion_protection_mutex,
@@ -72,7 +71,6 @@ class Widget : WidgetI
     			
     			while (true)
     			{
-    				debug writeln("p == ", p);
     				if (p is null)
     				{
     					return null;
@@ -85,7 +83,6 @@ class Widget : WidgetI
     				}
     				
     				p = p.getParent();
-    				debug writeln("(2) p == ", p);
     			}
     		}
     		);

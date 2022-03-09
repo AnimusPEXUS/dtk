@@ -358,6 +358,5 @@ class TextEntry : Widget, WidgetI
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI)this, point);
-    	// return tuple(cast(WidgetI)null, point);
     }
 }

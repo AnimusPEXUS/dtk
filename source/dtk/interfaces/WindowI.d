@@ -60,6 +60,8 @@ interface WindowI
     dstring getTitle();
     WindowI setTitle(dstring value);
     
+    Tuple!(bool, Position2D) getMousePosition();
+    
     void redraw();
     
     // void handleEvent(Event* event);

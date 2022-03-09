@@ -11,7 +11,7 @@ string mixin_FormSignals(bool for_interface)
 	    	"Event", 
 	    	"signal_event",
 	    	%1$s,
-	    	FormEvent*
+	    	EventForm*
 	    	);
 	}.format(for_interface);
 	return ret;

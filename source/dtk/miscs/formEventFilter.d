@@ -1,16 +1,17 @@
 module dtk.miscs.formEventFilter;
 
+import std.stdio;
 import std.typecons;
 
-import dtk.types.FormEvent;
+import dtk.types.EventForm;
 
 import dtk.interfaces.WidgetI;
 
 import dtk.widgets.Form;
 
 // returns matched Event and checkMatch and action result
-Tuple!(FormEvent*, bool, bool) formEventFilter(
-	FormEvent* fe,
+Tuple!(EventForm*, bool, bool) formEventFilter(
+	EventForm* fe,
 	Form form,
 	
 	// ------- short filter start -------
@@ -39,19 +40,22 @@ Tuple!(FormEvent*, bool, bool) formEventFilter(
 	/// matched
 	bool delegate(
 		Form form,
-		FormEvent* fe,
+		EventForm* fe,
 		) checkMatch,
 	
 	/// this is actual action which should be started
 	/// this is called then all filters successfully passed.
 	bool delegate(
 		Form form,
-		FormEvent* fe,
+		EventForm* fe,
 		) action
 	)
 {
 	assert(form !is null);
 	assert(fe !is null);
+	
+	debug writeln("formEventFilter fe.focusedWidget      ",fe.focusedWidget);
+	debug writeln("formEventFilter fe.mouseFocusedWidget ",fe.mouseFocusedWidget);
 	
 	bool focusedWidget_ok;
 	bool mouseFocusedWidget_ok;
@@ -132,7 +136,7 @@ Tuple!(FormEvent*, bool, bool) formEventFilter(
 	// goto short_check_passed;
 	
 	short_checks_failed:
-	return tuple(cast(FormEvent*)null, false, false);
+	return tuple(cast(EventForm*)null, false, false);
 	
 	short_check_passed:
 	
@@ -147,14 +151,14 @@ Tuple!(FormEvent*, bool, bool) formEventFilter(
 			form,
 			fe
 			);
+	}
 		
-		if (checkMatch_res)
-		{
-			action_res = action(
-				form,
-				fe
-				);
-		}
+	if ((checkMatch !is null && checkMatch_res) || (checkMatch is null))
+	{
+		action_res = action(
+			form,
+			fe
+			);
 	}
 	
 	return tuple(fe, checkMatch_res, action_res);

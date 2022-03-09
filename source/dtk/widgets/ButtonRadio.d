@@ -13,6 +13,7 @@ import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
+import dtk.types.EventForm;
 
 import dtk.miscs.RadioGroup;
 
@@ -67,6 +68,10 @@ class ButtonRadio : Button, WidgetI
         
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
+    }
+    
+    override void buttonTypeSpecificEventHandler(EventForm* event) nothrow
+    {
     }
     
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow

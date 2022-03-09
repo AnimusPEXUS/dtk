@@ -7,6 +7,7 @@ import dtk.interfaces.WidgetI;
 import dtk.interfaces.ContainerI;
 
 import dtk.types.EventMouse;
+import dtk.types.EventForm;
 import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
@@ -56,6 +57,10 @@ class ButtonCheck : Button, WidgetI
         // setMouseHandler("button-down", &on_mouse_down_internal);
         // setMouseHandler("button-up", &on_mouse_up_internal);
     }
+    
+    override void buttonTypeSpecificEventHandler(EventForm* event) nothrow
+    {
+    }
 
     override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
@@ -83,8 +88,7 @@ class ButtonCheck : Button, WidgetI
 
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
-    	// return tuple(cast(WidgetI)this, point);
-    	return tuple(cast(WidgetI)null, point);
+    	return tuple(cast(WidgetI)this, point);
     }
     
 }

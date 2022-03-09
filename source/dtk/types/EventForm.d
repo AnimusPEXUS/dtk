@@ -1,10 +1,12 @@
-module dtk.types.FormEvent;
+module dtk.types.EventForm;
+
+// TODO: rename to EventForm?
 
 import dtk.types.Event;
 
 import dtk.interfaces.WidgetI;
 
-struct FormEvent
+struct EventForm
 {
 	Event* event;
 	WidgetI focusedWidget;
