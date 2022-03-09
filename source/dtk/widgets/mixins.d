@@ -198,3 +198,69 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 		}.format(override_str)
 		);
 }
+
+
+/* string mixin_propagateParentChangeEmision_this()
+{
+	return q{
+		import core.sync.mutex;
+		propagateParentChangeEmision_recursion_protection_mtx = new Mutex();
+	};
+} */
+
+mixin template mixin_propagateParentChangeEmision()
+{
+	private
+    {
+		import core.sync.mutex;
+    	bool propagateParentChangeEmision_recursion_protection;
+    	Mutex propagateParentChangeEmision_recursion_protection_mtx;
+    }
+    
+    override void propagateParentChangeEmision()
+    {
+    	import dtk.miscs.recursionGuard;
+    	import core.sync.mutex;
+    	
+    	synchronized 
+    	{
+    		if (propagateParentChangeEmision_recursion_protection_mtx is null)
+    			propagateParentChangeEmision_recursion_protection_mtx = new Mutex();
+    		
+    		recursionGuard(
+    			propagateParentChangeEmision_recursion_protection,
+    			propagateParentChangeEmision_recursion_protection_mtx,
+    			0,
+    			delegate int() {
+    				import dtk.widgets.Form;
+    				
+    				static if (is(typeof(this) == Form))
+    				{
+    					pragma(msg, "propagateParentChangeEmision for Form");
+    					setWindow(getWindow());
+    				}
+    				else
+    				{
+    					pragma(msg, "propagateParentChangeEmision for simple widget");
+    					setParent(getParent());
+    				}
+    				
+    				static if (__traits(hasMember, this, "children"))
+    				{
+    					foreach (c; children)
+    					{
+    						c.child.propagateParentChangeEmision();
+    					}
+    				}
+    				else static if (__traits(hasMember, this, "getChild"))
+    				{
+    					auto c = getChild();
+    					if (c !is null)
+    						c.propagateParentChangeEmision();
+    				}
+    				return 0;
+    			}
+    			);
+    	}
+    }
+}

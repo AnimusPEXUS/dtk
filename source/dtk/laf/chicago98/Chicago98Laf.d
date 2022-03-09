@@ -32,7 +32,7 @@ import dtk.widgets.ButtonRadio;
 import dtk.widgets.Layout;
 // import dtk.widgets.Menu;
 // import dtk.widgets.MenuItem;
-import dtk.widgets.Bar;
+// import dtk.widgets.Bar;
 import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
 import dtk.widgets.Picture;
@@ -305,9 +305,9 @@ class Chicago98Laf : LafI
     // {
     // }
     // 
-    void drawBar(Bar widget, DrawingSurfaceI ds)
-    {
-    }
+    // void drawBar(Bar widget, DrawingSurfaceI ds)
+    // {
+    // }
     
     void drawScrollBar(ScrollBar widget, DrawingSurfaceI ds)
     {

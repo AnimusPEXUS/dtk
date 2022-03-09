@@ -71,6 +71,8 @@ class TextEntry : Widget, WidgetI
     mixin mixin_widget_redraw_using_propagateRedraw!();
     mixin mixin_propagateRedraw_children_none!();
     
+    mixin mixin_propagateParentChangeEmision!();
+    
     TextView text_view;
     
     private {
@@ -81,6 +83,7 @@ class TextEntry : Widget, WidgetI
     this()
     {
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
+    	// mixin(mixin_propagateParentChangeEmision_this());
     	
         text_view = new TextView();
         text_view.getForm = delegate Form()

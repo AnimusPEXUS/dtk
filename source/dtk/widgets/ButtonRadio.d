@@ -42,18 +42,6 @@ class ButtonRadio : Button, WidgetI
     mixin mixin_widget_redraw_using_propagateRedraw!();
     mixin mixin_propagateRedraw_children_none!();
     
-    this()
-    {
-    	mixin(mixin_multiple_properties_inst(ButtonRadioProperties));
-    	
-        // setMouseHandler("button-click", &on_mouse_click_internal);
-        // setMouseHandler("button-down", &on_mouse_down_internal);
-        // setMouseHandler("button-up", &on_mouse_up_internal);
-        
-        con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
-        con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
-    }
-    
     mixin mixin_forward_super_functions!(
     	[
     	"getForm",
@@ -64,6 +52,22 @@ class ButtonRadio : Button, WidgetI
     	"getDrawingSurface"
     	]
     	);
+    
+    mixin mixin_propagateParentChangeEmision!();
+    
+    this()
+    {
+    	mixin(mixin_multiple_properties_inst(ButtonRadioProperties));
+    	
+        // setMouseHandler("button-click", &on_mouse_click_internal);
+        // setMouseHandler("button-down", &on_mouse_down_internal);
+        // setMouseHandler("button-up", &on_mouse_up_internal);
+        
+        // mixin(mixin_propagateParentChangeEmision_this());
+        
+        con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
+        con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
+    }
     
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
@@ -113,5 +117,5 @@ class ButtonRadio : Button, WidgetI
     {
         return;
     }
-
+    
 }

@@ -106,32 +106,6 @@ class Widget : WidgetI
     	return dsc;
     }
     
-    void positionAndSizeRequest(Position2D position, Size2D size)
-    {
-        /* setPosition(position);
-        setSize(size); */
-    }
-    
-    void recalculateChildrenPositionsAndSizes()
-    {
-        return;
-    }
-    
-    bool handle_event_keyboard(EventKeyboard* e)
-    {
-        return false;
-    }
-    
-    bool handle_event_mouse(EventMouse* e)
-    {
-        return false;
-    }
-    
-    bool handle_event_textinput(EventTextInput* e)
-    {
-        return false;
-    }
-    
     Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
         return tuple(cast(WidgetI)this, Position2D(0, 0));
@@ -146,11 +120,6 @@ class Widget : WidgetI
     {
         return null;
     }
-    
-    // static foreach(v; ["Keyboard", "Mouse", "TextInput"])
-    // {
-    // mixin(mixin_event_handler_reg(v));
-    // }
     
     void exceptionIfParentNotSet()
     {
@@ -184,6 +153,11 @@ class Widget : WidgetI
     			
     		}.format(v)
     		);
+    }
+    
+    void propagateParentChangeEmision()
+    {
+    	throw new Exception("must be reimplemented");
     }
     
     void propagatePosAndSizeRecalc()

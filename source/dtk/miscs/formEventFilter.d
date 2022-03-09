@@ -33,9 +33,10 @@ Tuple!(FormEvent*, bool, bool) formEventFilter(
 	bool and_evaluation,
 	// ------- short filter end -------
 	
-	/// this is long filter
+	/// this is for custom long filter
 	/// if true is not returned - action will not be called.  checkMatch is not
-	/// called (and it's return assumed to be false) if prefilter isn't matched
+	/// called (and it's return assumed to be false) if short filter didn't 
+	/// matched
 	bool delegate(
 		Form form,
 		FormEvent* fe,

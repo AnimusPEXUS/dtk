@@ -8,6 +8,7 @@ module dtk.widgets.Button;
 
 import std.stdio;
 import std.typecons;
+import std.exception;
 
 import dtk.interfaces.ContainerI;
 // import dtk.interfaces.ContainerableI;
@@ -19,12 +20,14 @@ import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
+import dtk.types.Event;
 
 import dtk.widgets.Widget;
 import dtk.widgets.Form;
 import dtk.widgets.mixins;
 
 import dtk.miscs.RadioGroup;
+import dtk.miscs.signal_tools;
 
 /// Button class
 class Button : Widget, WidgetI
@@ -37,13 +40,10 @@ class Button : Widget, WidgetI
     
     bool button_is_down;
     
-    this()
+    private 
     {
-        // setFocusable(true);
-        
-        // setMouseHandler("button-click", &on_mouse_click_internal);
-        // setMouseHandler("button-down", &on_mouse_down_internal);
-        // setMouseHandler("button-up", &on_mouse_up_internal);
+    	SignalConnection sc_parentChange;
+    	SignalConnection sc_windowOtherEvents;
     }
     
     // mixin mixin_getWidgetAtPosition;
@@ -57,6 +57,66 @@ class Button : Widget, WidgetI
     	]
     	);
     
+    mixin mixin_propagateParentChangeEmision!();
+    
+    this()
+    {
+    	sc_parentChange = connectToParent_onAfterChanged(
+    		delegate void(
+    			ContainerI o,
+    			ContainerI n
+    			)
+    		{
+    			collectException(
+    				{
+    					debug writeln("Button parent changed from ",o," to ",n);
+    					
+    					scope(exit) 
+    					{
+    						propagateParentChangeEmision();
+    					}
+    					
+    					if (o == n)
+    						return;
+    					
+    					sc_windowOtherEvents.disconnect();
+    					
+    					if (n !is null)
+    					{
+    						auto f = getForm();
+    						if (f is null)
+    						{
+    							debug writeln("button window other event: no form");
+    							return;
+    						}
+
+    						auto w = f.getWindow();
+    						if (w is null)
+    						{
+    							debug writeln("button window other event: no window");
+    							return;
+    						}
+    						
+    						debug writeln("button window other event: connecting");
+    						sc_windowOtherEvents = w.connectToSignal_OtherEvents(
+    							delegate void(Event* event) nothrow
+    							{
+    								collectException(
+    									{
+    										debug writeln("button window other event");
+    									}()
+    									);
+    							}
+    							);
+    					}
+    					
+    				}()
+    				);
+    		}
+    		);
+    }
+    
+
     void on_mouse_click_internal(
     	EventMouse* event, 
     	ulong mouseWidget_x, 
@@ -94,6 +154,9 @@ class Button : Widget, WidgetI
     }
     
     override void propagatePosAndSizeRecalc()
-	{}    
+	{
+	}    
+	
+
     
 }

@@ -14,6 +14,11 @@ T2 recursionGuard(T2, T1...)
 	)
 {
 
+	// assert(already_called !is null);
+	assert(call_mutex !is null);
+	assert(already_started_call !is null);
+	assert(target !is null);
+	
     synchronized (call_mutex)
     {
         if (already_called)

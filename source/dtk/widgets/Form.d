@@ -2,6 +2,7 @@
 
 module dtk.widgets.Form;
 
+import core.sync.mutex;
 import std.stdio;
 import std.typecons;
 import std.exception;
@@ -44,13 +45,15 @@ PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
 PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
 ];
 
-class Form : ContainerI
+class Form : ContainerI, WidgetI
 {
     mixin(mixin_FormSignals(false));
     mixin mixin_multiple_properties_define!(FormProperties);
     mixin mixin_multiple_properties_forward!(FormProperties, false);
     mixin mixin_Widget_renderImage!("Form", "");
     // mixin mixin_propagateRedraw_children_one!("");
+    
+    mixin mixin_propagateParentChangeEmision!();
     
     private {
     	SignalConnection sc_childChange;
@@ -63,7 +66,9 @@ class Form : ContainerI
     this()
     {
     	mixin(mixin_multiple_properties_inst(FormProperties));
-    	
+
+    	// mixin(mixin_propagateParentChangeEmision_this());
+
     	sc_childChange = connectToChild_onAfterChanged(
     		delegate void(
     			WidgetI o,
@@ -115,6 +120,8 @@ class Form : ContainerI
     							&onWindowEvent
     							);
     					}
+    					
+    					propagateParentChangeEmision();
     					
     				}()
     				);
@@ -367,8 +374,37 @@ class Form : ContainerI
     
     Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
-    	// TODO: fix this
-    	return tuple(cast(WidgetI) null, Position2D(0,0));
+    	
+    	auto ret_this = tuple(cast(WidgetI) null, Position2D(0,0));
+    	
+    	auto c = getChild();
+    	
+    	if (c is null)
+    	{
+    		return ret_this;
+    	}
+    	
+    	auto w = getWidth();
+    	auto h = getHeight();
+    	
+    	if (w <= 10 || h <= 10)
+    	{
+    		return ret_this;
+    	}
+    	
+    	auto p_x = point.x;
+    	auto p_y = point.y;
+    	
+    	if (p_x < 5
+    		|| p_y < 5
+    	|| (p_x < w && p_x > w-5)
+    	|| (p_y < h && p_y > h-5)
+    	)
+    	{
+    		return ret_this;
+    	}
+    	
+    	return c.getChildAtPosition(Position2D(p_x - 5, p_y - 5));
     }
     
     ulong getChildX(WidgetI child)
@@ -476,4 +512,15 @@ class Form : ContainerI
     	ds = shiftDrawingSurfaceForChild(ds, child);
     	ds.drawImage(Position2D(0, 0), img);
     }
+    
+    WidgetI setParent(ContainerI container)
+    {
+    	return this;
+    }
+    
+    WidgetI unsetParent()
+    {
+    	return this;
+    }
+    
 }

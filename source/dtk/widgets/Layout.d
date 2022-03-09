@@ -1,5 +1,6 @@
 module dtk.widgets.Layout;
 
+import core.sync.mutex;
 import std.conv;
 import std.stdio;
 import std.container;
@@ -19,6 +20,7 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
 import dtk.types.Image;
+import dtk.types.VisibilityMap;
 
 import dtk.widgets.Form;
 import dtk.widgets.Widget;
@@ -98,6 +100,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     // needed to be called after you've done what you wanted with children
     // array.
     LayoutChild[] children;
+    VisibilityMap!(WidgetI) vm;
     
     mixin mixin_multiple_properties_define!(LayoutProperties);
     mixin mixin_multiple_properties_forward!(LayoutProperties, false);
@@ -105,6 +108,8 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     mixin mixin_forwardXYWH_from_Widget!();
     mixin mixin_Widget_renderImage!("Layout");
     mixin mixin_widget_redraw_using_propagateRedraw!();
+    
+    mixin mixin_propagateParentChangeEmision!();
     
     private {
     	SignalConnection sc_parentChange;
@@ -116,9 +121,15 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	this([]);
     }
     
-    this(LayoutChild[] children) {
+    this(LayoutChild[] children) 
+    {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
+    	
+    	// mixin(mixin_propagateParentChangeEmision_this());
+
     	this.children = children;
+    	
+    	vm = new VisibilityMap!(WidgetI)();
     	
     	sc_parentChange = connectToParent_onAfterChanged(
     		delegate void(
@@ -177,42 +188,19 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
-    	auto x = point.x;
-        auto y = point.y;
-        
-        int local_x;
-        int local_y;
-        {
-        	// auto pos = this.getPosition();
-        	local_x=x;
-        	local_y=y;
-        }
-        
-    	if (children.length == 0)
+    	WidgetI c;
+    	Position2D cp;
     	{
-    		return tuple(cast(WidgetI)this, Position2D(local_x, local_y));
+    		auto res = vm.getByPoint(point, false);
+    		if (res.length == 0)
+    			return tuple(cast(WidgetI)this, point);
+    		auto x = res[$-1];
+    		c = x[0].o;
+    		cp = x[1];
+    		assert(c !is null);
     	}
     	
-    	// TODO: optimize for visible part
-    	foreach (c; children)
-    	{
-    		// auto c_pos = c.getPosition();
-    		// auto c_size = c.getSize();
-    		int c_pos_x = cast(int) c.getX();
-    		int c_pos_y = cast(int) c.getY();
-    		auto c_size_w = c.getWidth();
-    		auto c_size_h = c.getHeight();
-    		
-    		if (x >= c_pos_x && x <= (c_pos_x + c_size_w)
-    			&& y >= c_pos_y && y <= (c_pos_y + c_size_h))
-    		{
-    			return c.child.getChildAtPosition(Position2D(x - c_pos_x, y - c_pos_y));
-    		}
-    	}
-    	return tuple(cast(WidgetI)this, Position2D(local_x, local_y));
-    	
-    	// return tuple(cast(WidgetI)this, point);
-    	//return tuple(cast(WidgetI)null, point);
+    	return c.getChildAtPosition(cp);
     }
     
     static foreach(v;["X", "Y", "Width", "Height"])
@@ -298,7 +286,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     }
     
     override DrawingSurfaceI shiftDrawingSurfaceForChild(
-		DrawingSurfaceI ds, 
+		DrawingSurfaceI ds,
 		WidgetI child
 		)
     {
@@ -325,7 +313,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     		cw,
     		ch
     		);
-        
+    	
         auto ret = new DrawingSurfaceShift(
         	ds,
         	cast(int)res[5],
@@ -352,6 +340,8 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
         {
         	v.child.propagatePosAndSizeRecalc();
         }
+        
+        recalcVisibilityMap();
     }
     
     override Image propagateRedraw()
@@ -360,61 +350,41 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	// auto ds = getDrawingSurface();
     	// ds.drawImage(Position2D(0,0),img);
     	
-    	auto vis_chi = calcVisibleChildren();
-    	
-    	foreach (c; vis_chi)
+    	foreach (c; vm.map)
     	{
-    		auto c_img = c.propagateRedraw();
-    		this.drawChild(img, c, c_img);
+    		assert(c.o !is null);
+    		auto c_img = c.o.propagateRedraw();
+    		this.drawChild(img, c.o, c_img);
     	}
     	return img;
     }
     
-    WidgetI[] calcVisibleChildren()
+    void recalcVisibilityMap()
     {
-    	WidgetI[] ret;
+    	vm.init(
+    		getViewPortX(),
+    		getViewPortY(),
+    		getViewPortWidth(),
+    		getViewPortHeight()
+    		);
     	
-    	auto vp_x = getViewPortX();
-    	auto vp_y = getViewPortY();
-    	auto vp_w = getViewPortWidth();
-    	auto vp_h = getViewPortHeight();
-    	
-    	debug writefln("vp_x: %s, vp_y: %s, vp_w: %s, vp_h: %s".format(
-    		vp_x, vp_y, vp_w, vp_h
-    		));
-    	
+    	bool started;
     	foreach (v; children)
     	{
-    		
-    		auto cx = getChildX(v.child);
-    		auto cy = getChildY(v.child);
-    		auto cw = getChildWidth(v.child);
-    		auto ch = getChildHeight(v.child);
-    		
-    		debug writefln("cx: %s, cy: %s, cw: %s, ch: %s".format(cx, cy, cw, ch));
-    		
-    		auto res = calculateVisiblePart(
-    			vp_x,
-    			vp_y,
-    			vp_w,
-    			vp_h,
-    			cx,
-    			cy,
-    			cw,
-    			ch
+    		auto res = vm.put(
+    			v.getX(),
+    			v.getY(),
+    			v.getWidth(),
+    			v.getHeight(),
+    			v.child
     			);
-    		if (res[0])
-    		{
-    			debug writeln("visible  : ", v.child);
-    			ret ~= v.child;
-    		} 
-    		else
-    		{
-    			debug writeln("invisible: ", v.child);
-    		}
-
+    		if (!started && res)
+    			started=true;
+    		if (started && !res)
+    			break;
     	}
-    	return ret;
+    	
+    	return;
     }
     
     override void drawChild(WidgetI child, Image img)

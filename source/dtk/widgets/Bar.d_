@@ -33,11 +33,6 @@ class Bar : Widget, WidgetI
     mixin mixin_widget_redraw_using_propagateRedraw!();
     mixin mixin_propagateRedraw_children_none!();
     
-    private
-    {
-        WidgetI child;
-    }
-    
     mixin mixin_forward_super_functions!(
     	[
     	"getForm",
@@ -48,5 +43,18 @@ class Bar : Widget, WidgetI
     	"getDrawingSurface"
     	]
     	);
+    
+    mixin mixin_propagateParentChangeEmision_children_none!();
+    
+    private
+    {
+        WidgetI child;
+    }
+    
+	this()
+    {
+    	mixin(mixin_propagateParentChangeEmision_this());
+    }
+
     
 }

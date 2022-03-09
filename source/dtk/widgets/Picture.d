@@ -32,5 +32,11 @@ class Picture : Widget, WidgetI
     mixin mixin_Widget_renderImage!("Picture");
     mixin mixin_widget_redraw_using_propagateRedraw!();
     mixin mixin_propagateRedraw_children_none!();
+    mixin mixin_propagateParentChangeEmision!();
 
+    this()
+    {
+    	// mixin(mixin_propagateParentChangeEmision_this());
+    }
+    
 }
