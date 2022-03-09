@@ -21,6 +21,7 @@ import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
 import dtk.types.Event;
+import dtk.types.FormEvent;
 
 import dtk.widgets.Widget;
 import dtk.widgets.Form;
@@ -28,6 +29,7 @@ import dtk.widgets.mixins;
 
 import dtk.miscs.RadioGroup;
 import dtk.miscs.signal_tools;
+import dtk.miscs.formEventFilter;
 
 /// Button class
 class Button : Widget, WidgetI
@@ -43,7 +45,7 @@ class Button : Widget, WidgetI
     private 
     {
     	SignalConnection sc_parentChange;
-    	SignalConnection sc_windowOtherEvents;
+    	SignalConnection sc_formEvent;
     }
     
     // mixin mixin_getWidgetAtPosition;
@@ -79,7 +81,7 @@ class Button : Widget, WidgetI
     					if (o == n)
     						return;
     					
-    					sc_windowOtherEvents.disconnect();
+    					sc_formEvent.disconnect();
     					
     					if (n !is null)
     					{
@@ -89,21 +91,36 @@ class Button : Widget, WidgetI
     							debug writeln("button window other event: no form");
     							return;
     						}
-
-    						auto w = f.getWindow();
-    						if (w is null)
-    						{
-    							debug writeln("button window other event: no window");
-    							return;
-    						}
     						
     						debug writeln("button window other event: connecting");
-    						sc_windowOtherEvents = w.connectToSignal_OtherEvents(
-    							delegate void(Event* event) nothrow
+    						sc_formEvent = f.connectToSignal_Event(
+    							delegate void(FormEvent* event) nothrow
     							{
     								collectException(
     									{
-    										debug writeln("button window other event");
+    										auto f = getForm();
+    										if (f is null)
+    											return;
+    										formEventFilter(
+    											event,
+    											f,
+    											false,
+    											false,
+    											true,
+    											true,
+    											this,
+    											this,
+    											false,
+    											null,
+    											delegate bool(
+    												Form form,
+    												FormEvent* fe,
+    												)
+												{
+													debug writeln("1111111111111111");
+													return true;
+												}
+    											);
     									}()
     									);
     							}

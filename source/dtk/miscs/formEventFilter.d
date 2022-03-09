@@ -141,17 +141,20 @@ Tuple!(FormEvent*, bool, bool) formEventFilter(
 	bool checkMatch_res;
 	bool action_res;
 	
-	checkMatch_res = checkMatch(
-		form,
-		fe
-		);
-	
-	if (checkMatch_res)
+	if (checkMatch !is null)
 	{
-		action_res = action(
+		checkMatch_res = checkMatch(
 			form,
 			fe
 			);
+		
+		if (checkMatch_res)
+		{
+			action_res = action(
+				form,
+				fe
+				);
+		}
 	}
 	
 	return tuple(fe, checkMatch_res, action_res);
