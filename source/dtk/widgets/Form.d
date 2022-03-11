@@ -134,7 +134,6 @@ class Form : ContainerI, WidgetI
     	collectException(
     		{
     			EventForm* fe = new EventForm();
-    			debug writeln("Form.onWindowOtherEvent: ", event.eventType);
     			
     			WidgetI focusedWidget = this.getFocusedWidget();
     			WidgetI mouseFocusedWidget;
@@ -143,32 +142,12 @@ class Form : ContainerI, WidgetI
     			ulong mouseFocusedWidget_y = 0;
     			
     			{    			
-    				
     				ulong form_mouse_x;
     				ulong form_mouse_y;
+
+    				form_mouse_x = cast(ulong)event.em.x;
+    				form_mouse_y = cast(ulong)event.em.y;
     				
-    				/* if (event.eventType == EventType.mouse)
-    				{
-    					form_mouse_x = cast(ulong)event.em.x;
-    					form_mouse_y = cast(ulong)event.em.y;
-    				}
-    				else */
-    				{
-    					auto w = getWindow();
-    					if (w is null)
-    					{
-    						debug writeln("onWindowOtherEvent w is null");
-    						return;
-    					}
-    					auto res = w.getMousePosition();
-    					if (!res[0])
-    					{
-    						debug writeln("onWindowOtherEvent getMousePosition false");
-    						return;
-    					}
-    					form_mouse_x = res[1].x;
-    					form_mouse_y = res[1].y;
-    				}
     				auto res = this.getChildAtPosition(
     					Position2D(
     						cast(int)form_mouse_x,

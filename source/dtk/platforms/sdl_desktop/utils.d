@@ -181,37 +181,37 @@ EventMouse* convertSDLMouseMotionEventToDtkEventMouse(SDL_MouseMotionEvent* e)
     ret.type = EventMouseType.movement;
     
     ret.mouseId = e.which;
-    ret.movement.button = EnumMouseButton.none;
+    ret.button = EnumMouseButton.none;
     if ((e.state && SDL_BUTTON_LEFT) != 0)
     {
-        ret.movement.button |= EnumMouseButton.bl;
+        ret.button |= EnumMouseButton.bl;
     }
     
     if ((e.state && SDL_BUTTON_RIGHT) != 0)
     {
-        ret.movement.button |= EnumMouseButton.br;
+        ret.button |= EnumMouseButton.br;
     }
     
     if ((e.state && SDL_BUTTON_MIDDLE) != 0)
     {
-        ret.movement.button |= EnumMouseButton.bm;
+        ret.button |= EnumMouseButton.bm;
     }
     
     if ((e.state && SDL_BUTTON_X1) != 0)
     {
-        ret.movement.button |= EnumMouseButton.b4;
+        ret.button |= EnumMouseButton.b4;
     }
     
     if ((e.state && SDL_BUTTON_X2) != 0)
     {
-        ret.movement.button |= EnumMouseButton.b5;
+        ret.button |= EnumMouseButton.b5;
     }
     
     ret.x = e.x;
     ret.y = e.y;
-    ret.movement.xr = e.xrel;
-    ret.movement.yr = e.yrel;
-    
+    /* ret.xr = e.xr;
+    ret.yr = e.yr;
+     */
     return ret;
 }
 
@@ -221,40 +221,40 @@ EventMouse* convertSDLMouseButtonEventToDtkEventMouse(SDL_MouseButtonEvent* e)
     
     ret.type = EventMouseType.button;
     
-    ret.button.button = EnumMouseButton.none;
+    ret.button = EnumMouseButton.none;
     switch (e.button)
     {
     default:
         break;
     case SDL_BUTTON_LEFT:
-        ret.button.button = EnumMouseButton.bl;
+        ret.button = EnumMouseButton.bl;
         break;
     case SDL_BUTTON_RIGHT:
-        ret.button.button = EnumMouseButton.br;
+        ret.button = EnumMouseButton.br;
         break;
     case SDL_BUTTON_MIDDLE:
-        ret.button.button = EnumMouseButton.bm;
+        ret.button = EnumMouseButton.bm;
         break;
     case SDL_BUTTON_X1:
-        ret.button.button = EnumMouseButton.b4;
+        ret.button = EnumMouseButton.b4;
         break;
     case SDL_BUTTON_X2:
-        ret.button.button = EnumMouseButton.b5;
+        ret.button = EnumMouseButton.b5;
         break;
     }
     
     if (e.state == SDL_PRESSED)
     {
-        ret.button.buttonState = EnumMouseButtonState.pressed;
+        ret.buttonState = EnumMouseButtonState.pressed;
     }
     else
     {
-        ret.button.buttonState = EnumMouseButtonState.released;
+        ret.buttonState = EnumMouseButtonState.released;
     }
     
     // TODO: todo
     // Error: no property `clicks` for type `bindbc.sdl.bind.sdlevents.SDL_MouseButtonEvent*`
-    ret.button.clicks = e.clicks;
+    ret.clicks = e.clicks;
     
     ret.x = e.x;
     ret.y = e.y;
@@ -267,9 +267,10 @@ EventMouse* convertSDLMouseWheelEventToDtkEventMouse(SDL_MouseWheelEvent* e)
     EventMouse* ret = new EventMouse;
     
     ret.type = EventMouseType.wheel;
-    
-    ret.x = e.x;
-    ret.y = e.y;
+
+    // TODO: fix this
+    // ret.x = e.x;
+    // ret.y = e.y;
     
     return ret;
 }

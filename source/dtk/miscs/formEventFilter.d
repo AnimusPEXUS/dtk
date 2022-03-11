@@ -9,6 +9,8 @@ import dtk.interfaces.WidgetI;
 
 import dtk.widgets.Form;
 
+// TODO: I think this function is overhead
+
 // returns matched Event and checkMatch and action result
 Tuple!(EventForm*, bool, bool) formEventFilter(
 	EventForm* fe,

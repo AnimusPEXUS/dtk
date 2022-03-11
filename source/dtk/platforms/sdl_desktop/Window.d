@@ -73,6 +73,13 @@ class Window : WindowI
     	SignalConnection platform_signal_connection;
     }
     
+    private
+    {
+    	bool mouse_in;
+    	ulong mouse_x;
+    	ulong mouse_y;
+    }
+    
 	mixin mixin_multiple_properties_define!(WindowProperties);
     mixin mixin_multiple_properties_forward!(WindowProperties, false);
     
@@ -230,6 +237,19 @@ class Window : WindowI
     				return;
     			}
     			
+    			if (event.eventType == EventType.mouse 
+    				&& event.em.type == EventMouseType.movement)
+    			{
+    					// TODO: save relative values too?
+    					mouse_x = event.em.x; 
+    					mouse_y = event.em.y; 
+    			} 
+    			else
+    			{
+    				event.em.x = cast(int)mouse_x;
+    				event.em.y = cast(int)mouse_y;
+    			}
+    			
     			if (event.eventType == EventType.window)
     			{
     				switch (event.ew.eventId)
@@ -261,7 +281,7 @@ class Window : WindowI
     
     Tuple!(bool, Position2D) getMousePosition()
     {
-    	auto ret_fail = tuple(false, Position2D(0,0));
+/*     	auto ret_fail = tuple(false, Position2D(0,0));
     	int x;
     	int y;
     	SDL_GetMouseState(&x, &y);
@@ -270,7 +290,8 @@ class Window : WindowI
     		debug writeln("getMousePosition: x or y is negative");
     		return ret_fail;
     	}
-    	return tuple(true, Position2D(x,y));
+    	return tuple(true, Position2D(x,y)); */
+    	return tuple(mouse_in, Position2D(cast(int)mouse_x,cast(int)mouse_y));
     }
     
     void redraw()

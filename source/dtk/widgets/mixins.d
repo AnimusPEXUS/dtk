@@ -60,8 +60,10 @@ mixin template mixin_widget_redraw_using_propagateRedraw()
 {
 	override void redraw()
     {
-		propagateRedraw();
-		getDrawingSurface().present();
+		auto img = propagateRedraw();
+		auto ds = getDrawingSurface();
+		ds.drawImage(Position2D(0,0), img);
+		ds.present();
     }
 }
 

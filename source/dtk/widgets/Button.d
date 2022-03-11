@@ -108,68 +108,30 @@ class Button : Widget, WidgetI
     {
     	collectException(
     		{
-    			auto f = getForm();
-    			if (f is null)
+    			auto form = getForm();
+    			if (form is null)
     				return;
-    			debug writeln("filtering events for button");
-    			formEventFilter(
-    				event,
-    				f,
-    				false,
-    				false,
-    				true,
-    				true,
-    				this,
-    				this,
-    				false,
-    				null,
-    				delegate bool(
-    					Form form,
-    					EventForm* fe,
-    					)
+    			
+    			if (event.mouseFocusedWidget == this
+    				&& event.event.eventType == EventType.mouse
+    			&& event.event.em.type == EventMouseType.button)
+    			{
+    				if (event.event.em.button == EnumMouseButton.bl) 
     				{
-    					debug writeln("1111111111111111: ", fe.event.eventType);
-    					return true;
+    					if (event.event.em.buttonState == EnumMouseButtonState.pressed) 
+    					{
+    						button_is_down = true;
+    						form.focusTo(this);
+    					}
+    					if (event.event.em.buttonState == EnumMouseButtonState.released) 
+    					{
+    						button_is_down = false;
+    					}
+    					redraw();
     				}
-    				);
+    			}
     		}()
     		);
-    }
-    
-    void on_mouse_click_internal(
-    	EventMouse* event, 
-    	ulong mouseWidget_x, 
-    	ulong mouseWidget_y
-    	)
-    {
-        return ;
-    }
-    
-    void on_mouse_down_internal(
-    	EventMouse* event, 
-    	ulong mouseWidget_x, 
-    	ulong mouseWidget_y
-    	)
-    {
-        button_is_down = true;
-        auto f = getForm();
-        if (f !is null)
-        {
-            f.focusTo(this);
-        }
-        redraw();
-        return ;
-    }
-    
-    void on_mouse_up_internal(
-    	EventMouse* event, 
-    	ulong mouseWidget_x, 
-    	ulong mouseWidget_y
-    	)
-    {
-        button_is_down = false;
-        redraw();
-        return ;
     }
     
     override void propagatePosAndSizeRecalc()

@@ -30,25 +30,6 @@ enum EnumMouseButton : ushort
     b12 = 0b00000100000000000
 }
 
-struct EventMouseMovement
-{
-    /// binary mask of pressed buttons
-    EnumMouseButton button;
-
-    int xr;
-    int yr;
-}
-
-struct EventMouseButton
-{
-    /// changed button
-    EnumMouseButton button;
-    /// new state for changed button
-    EnumMouseButtonState buttonState;
-
-    ubyte clicks;
-}
-
 enum EventMouseWheelDirection : ubyte
 {
     Up = 0b01,
@@ -57,21 +38,18 @@ enum EventMouseWheelDirection : ubyte
     Right = 0b1000
 }
 
-struct EventMouseWheel
-{
-    EventMouseWheelDirection direction;
-}
-
 struct EventMouse
 {
-    EventMouseType type;
     uint mouseId;
+    EventMouseType type;
     int x;
     int y;
-    union
-    {
-        EventMouseMovement movement;
-        EventMouseButton button;
-        EventMouseWheel wheel;
-    }
+    int xr;
+    int yr;
+    int wheelX;
+    int wheelY;
+    EnumMouseButton button;
+    /// new state for changed button
+    EnumMouseButtonState buttonState;
+    ubyte clicks;
 }

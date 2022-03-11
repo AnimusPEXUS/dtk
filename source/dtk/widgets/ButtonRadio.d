@@ -95,7 +95,7 @@ class ButtonRadio : Button, WidgetI
         }());
     }
     
-    override void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         auto rg = getRadioGroup();
         if (rg !is null)
@@ -106,7 +106,7 @@ class ButtonRadio : Button, WidgetI
         return ;
     }
     
-    override void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         auto f = getForm();
         if (f !is null)
@@ -118,7 +118,7 @@ class ButtonRadio : Button, WidgetI
         return ;
     }
     
-    override void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
+    void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         return;
     }
