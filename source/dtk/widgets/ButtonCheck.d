@@ -58,10 +58,6 @@ class ButtonCheck : Button, WidgetI
         // setMouseHandler("button-up", &on_mouse_up_internal);
     }
     
-    override void buttonTypeSpecificEventHandler(EventForm* event) nothrow
-    {
-    }
-
     void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
     {
         setChecked(!getChecked());
@@ -91,4 +87,16 @@ class ButtonCheck : Button, WidgetI
     	return tuple(cast(WidgetI)this, point);
     }
     
+    override void focusEnter(WidgetI widget) {};
+    override void focusExit(WidgetI widget) {};
+    
+    override void visualActivationStart(WidgetI widget, EventForm* event) {};
+    override void visualReset(WidgetI widget, EventForm* event) {};
+    
+    override void intMousePress(WidgetI widget, EventForm* event) {};
+    override void intMouseRelease(WidgetI widget, EventForm* event) {};
+    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseMove(WidgetI widget, EventForm* event) {};
+
 }

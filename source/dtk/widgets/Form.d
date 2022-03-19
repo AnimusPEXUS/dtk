@@ -6,6 +6,7 @@ import core.sync.mutex;
 import std.stdio;
 import std.typecons;
 import std.exception;
+import std.datetime;
 
 import observable.signal;
 
@@ -55,7 +56,8 @@ class Form : ContainerI, WidgetI
     
     mixin mixin_propagateParentChangeEmision!();
     
-    private {
+    private
+    {
     	SignalConnection sc_childChange;
     	SignalConnection sc_windowChange;
     	
@@ -63,12 +65,20 @@ class Form : ContainerI, WidgetI
     	SignalConnection sc_windowEvents;
     }
     
+    
+    // public
+    // {
+    	// SysTime button_down_time;
+    // }
+    
     this()
     {
     	mixin(mixin_multiple_properties_inst(FormProperties));
-
+    	
     	// mixin(mixin_propagateParentChangeEmision_this());
-
+    	
+    	click_sequence_timeout = (cast(DateTime)Clock.currTime()) - seconds(2);
+    	
     	sc_childChange = connectToChild_onAfterChanged(
     		delegate void(
     			WidgetI o,
@@ -141,10 +151,10 @@ class Form : ContainerI, WidgetI
     			ulong mouseFocusedWidget_x = 0;
     			ulong mouseFocusedWidget_y = 0;
     			
-    			{    			
+    			{
     				ulong form_mouse_x;
     				ulong form_mouse_y;
-
+    				
     				form_mouse_x = cast(ulong)event.em.x;
     				form_mouse_y = cast(ulong)event.em.y;
     				
@@ -208,6 +218,59 @@ class Form : ContainerI, WidgetI
     			debug if (e !is null) writeln("exception: ", e);
     		}()
     		);
+    }
+
+    private
+    {
+    	// click registry
+    	SysTime click_sequence_timeout;
+    	WidgetI click_sequence_widget;
+    	ubyte click_sequence_count;
+    	ubyte click_sequence_count_max;
+    	EnumMouseButton click_sequence_btn;
+
+    	WidgetI mouse_focused_widget;
+    }
+
+    void onFormSignal(EventForm* event)
+    {
+    	if (event.mouseFocusedWidget != mouse_focused_widget)
+    	{
+    		WidgetI old = mouse_focused_widget;
+    		mouse_focused_widget = event.mouseFocusedWidget;
+    		old.intMouseLeave(old, mouse_focused_widget, event);
+    		mouse_focused_widget.intMouseEnter(old, mouse_focused_widget, event);
+    	}
+    	
+    	switch (event.event.type)
+    	{
+    	default:
+    		break;
+    	case EventType.mouse:
+    		switch (event.event.em.type)
+    		{
+    		default:
+    			break;
+    		case EventMouseType.movement:
+    			event.mouseFocusedWidget.intMouseMove(event.mouseFocusedWidget, event);
+    			break;
+    		case EventMouseType.button:
+    			switch (event.event.em.buttonState)
+    			{
+    			default:
+    				break;
+    			case EnumMouseButtonState.pressed:
+    				event.mouseFocusedWidget.intMousePress(event.mouseFocusedWidget, event);
+    				break;
+    			case EnumMouseButtonState.released:
+    				event.mouseFocusedWidget.intMouseRelease(event.mouseFocusedWidget, event);
+    				break;
+    			}
+    			break;
+    		}
+    		break;
+    		
+    	}
     }
     
     ContainerI getParent()
@@ -522,4 +585,72 @@ class Form : ContainerI, WidgetI
     	return this;
     }
     
+    Tuple!(bool, EnumMouseButton) clickSequencePress(
+    	WidgetI w, 
+    	EnumMouseButton btn, 
+    	ubyte max
+    	)
+    {
+    	const auto ret_fail = tuple(false, EnumMouseButton.bl);
+    	bool force_restart= false;
+    	restart:
+    	if (force_restart || (Clock.currTime(UTC()) >= click_sequence_timeout))
+    	{
+    		click_sequence_count = 0;
+    		click_sequence_count_max = max;
+    		click_sequence_widget = w;
+    		click_sequence_btn = btn;
+    	}
+    	else
+    	{
+    		if (click_sequence_widget != w || click_sequence_btn != btn)
+    		{
+    			force_restart=true;
+    			goto restart;
+    		}
+    	}
+    	
+    	return tuple(true, btn);
+    	
+    }
+    
+    Tuple!(bool, EnumMouseButton, ubyte) clickSequenceRelease(
+    	WidgetI w,
+    	EnumMouseButton btn, 
+    	)
+    {
+    	// if ((cast(DateTime)Clock.currTime()) >= click_sequence_timeout)
+    	// {
+    		// return 0;
+    	// }
+    	const auto ret_fail = tuple(false, EnumMouseButton.bl, cast(ubyte)0);
+    	
+    	if (click_sequence_widget != w || click_sequence_btn != btn)
+    	{
+    		return ret_fail;
+    	}
+    	
+    	click_sequence_timeout = Clock.currTime(UTC()) + msecs(500);
+    	
+    	if (click_sequence_count >= click_sequence_count_max)
+    	{
+    		return ret_fail;
+    	}
+    	
+    	click_sequence_count++;
+    	return tuple(true, click_sequence_btn, click_sequence_count);
+    }
+    
+    override void focusEnter(WidgetI widget) {};
+    override void focusExit(WidgetI widget) {};
+    
+    override void visualActivationStart(WidgetI widget, EventForm* event) {};
+    override void visualReset(WidgetI widget, EventForm* event) {};
+    
+    override void intMousePress(WidgetI widget, EventForm* event) {};
+    override void intMouseRelease(WidgetI widget, EventForm* event) {};
+    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseMove(WidgetI widget, EventForm* event) {};
+        
 }

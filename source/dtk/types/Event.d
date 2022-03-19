@@ -2,10 +2,11 @@ module dtk.types.Event;
 
 import dtk.interfaces.WindowI;
 
-import dtk.types.EventWindow;
-import dtk.types.EventKeyboard;
-import dtk.types.EventMouse;
-import dtk.types.EventTextInput;
+public import dtk.types.EventWindow;
+public import dtk.types.EventKeyboard;
+public import dtk.types.EventMouse;
+public import dtk.types.EventTextInput;
+public import dtk.types.EventForm;
 
 enum EventType : ubyte
 {
@@ -18,7 +19,7 @@ enum EventType : ubyte
 
 struct Event
 {
-	EventType eventType;
+	EventType type;
 	WindowI window;
 	union
 	{

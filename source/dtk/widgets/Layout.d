@@ -21,6 +21,7 @@ import dtk.types.Size2D;
 import dtk.types.Property;
 import dtk.types.Image;
 import dtk.types.VisibilityMap;
+import dtk.types.Event;
 
 import dtk.widgets.Form;
 import dtk.widgets.Widget;
@@ -431,4 +432,17 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     		img.getImage(res[1], res[2], res[3], res[4])
     		);
     }
+    
+    override void focusEnter(WidgetI widget) {};
+    override void focusExit(WidgetI widget) {};
+    
+    override void visualActivationStart(WidgetI widget, EventForm* event) {};
+    override void visualReset(WidgetI widget, EventForm* event) {};
+    
+    override void intMousePress(WidgetI widget, EventForm* event) {};
+    override void intMouseRelease(WidgetI widget, EventForm* event) {};
+    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseMove(WidgetI widget, EventForm* event) {};
+
 }

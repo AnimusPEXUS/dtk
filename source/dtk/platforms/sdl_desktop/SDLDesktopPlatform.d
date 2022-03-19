@@ -219,13 +219,13 @@ class SDLDesktopPlatform : PlatformI
     	import core.time;
     	
     	//    	auto sleep_f = core.thread.osthread.Thread.getThis.sleep;
-    	auto m500 = msecs(500);
+    	const auto m500 = msecs(500);
     	while(!stop_flag)
     	{
-    		core.thread.osthread.Thread.getThis.sleep(m500);
+    		Thread.sleep(m500);
     		// sleep_f(m500);
     		auto e = new SDL_Event();
-    		e.user = SDL_UserEvent();
+			e.user = SDL_UserEvent();
     		e.user.type = timer500_event_id;
     		SDL_PushEvent(e);
     	}

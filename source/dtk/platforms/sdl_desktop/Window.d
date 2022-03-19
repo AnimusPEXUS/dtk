@@ -231,13 +231,13 @@ class Window : WindowI
     			if (event.window != this)
     				return;
     			
-    			if (event.eventType == EventType.none)
+    			if (event.type == EventType.none)
     			{
     				debug writeln("event.type == EventType.none");
     				return;
     			}
     			
-    			if (event.eventType == EventType.mouse 
+    			if (event.type == EventType.mouse 
     				&& event.em.type == EventMouseType.movement)
     			{
     					// TODO: save relative values too?
@@ -250,7 +250,7 @@ class Window : WindowI
     				event.em.y = cast(int)mouse_y;
     			}
     			
-    			if (event.eventType == EventType.window)
+    			if (event.type == EventType.window)
     			{
     				switch (event.ew.eventId)
     				{

@@ -1,10 +1,8 @@
 module dtk.types.EventForm;
 
-// TODO: rename to EventForm?
-
-import dtk.types.Event;
-
 import dtk.interfaces.WidgetI;
+
+public import dtk.types.Event;
 
 struct EventForm
 {

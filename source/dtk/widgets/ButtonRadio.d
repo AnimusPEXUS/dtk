@@ -70,10 +70,6 @@ class ButtonRadio : Button, WidgetI
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
     }
     
-    override void buttonTypeSpecificEventHandler(EventForm* event) nothrow
-    {
-    }
-    
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
     	
@@ -82,7 +78,6 @@ class ButtonRadio : Button, WidgetI
         			if (old_v.isIn(this))
                     old_v.remove(this);
         }());
-        
     }
     
     private void handleRadioGroup_onAfterChanged(RadioGroup old_v, RadioGroup new_v) nothrow
@@ -122,5 +117,17 @@ class ButtonRadio : Button, WidgetI
     {
         return;
     }
+    
+    override void focusEnter(WidgetI widget) {};
+    override void focusExit(WidgetI widget) {};
+    
+    override void visualActivationStart(WidgetI widget, EventForm* event) {};
+    override void visualReset(WidgetI widget, EventForm* event) {};
+    
+    override void intMousePress(WidgetI widget, EventForm* event) {};
+    override void intMouseRelease(WidgetI widget, EventForm* event) {};
+    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseMove(WidgetI widget, EventForm* event) {};
     
 }

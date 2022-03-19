@@ -10,11 +10,7 @@ import dtk.interfaces.ContainerI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.event_receivers;
 
-// import dtk.types.Event;
-import dtk.types.EventWindow;
-import dtk.types.EventKeyboard;
-import dtk.types.EventMouse;
-import dtk.types.EventTextInput;
+import dtk.types.Event;
 import dtk.types.Size2D;
 import dtk.types.Position2D;
 import dtk.types.Image;
@@ -55,6 +51,22 @@ interface WidgetI // : ContainerableI
     void propagatePosAndSizeRecalc();
     Image propagateRedraw();
     void propagateParentChangeEmision();
+
+    void focusEnter(WidgetI widget);
+    void focusExit(WidgetI widget);
+
+    void visualActivationStart(WidgetI widget, EventForm* event);
+    void visualReset(WidgetI widget, EventForm* event);
+
+    void intMousePress(WidgetI widget, EventForm* event);
+    void intMouseRelease(WidgetI widget, EventForm* event);
+    void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event);
+    void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event);
+    void intMouseMove(WidgetI widget, EventForm* event);
+        
+    
+    // void intMouseDragStart();
+    // void intMouseDragStop();
     // void drawChild(WidgetI child, Image img);
     // void drawChild(DrawingSurfaceI ds, WidgetI child, Image img);
 }

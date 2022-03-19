@@ -7,6 +7,7 @@ should be visually transformed to such using it's properties.
 module dtk.widgets.Button;
 
 import std.stdio;
+import std.datetime;
 import std.typecons;
 import std.exception;
 
@@ -16,12 +17,10 @@ import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
 
 import dtk.types.Size2D;
-import dtk.types.EventMouse;
 import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
 import dtk.types.Event;
-import dtk.types.EventForm;
 
 import dtk.widgets.Widget;
 import dtk.widgets.Form;
@@ -63,81 +62,100 @@ class Button : Widget, WidgetI
     
     this()
     {
-    	sc_parentChange = connectToParent_onAfterChanged(
-    		delegate void(
-    			ContainerI o,
-    			ContainerI n
-    			)
-    		{
-    			collectException(
-    				{
-    					debug writeln("Button parent changed from ",o," to ",n);
-    					
-    					scope(exit) 
-    					{
-    						propagateParentChangeEmision();
-    					}
-    					
-    					if (o == n)
-    						return;
-    					
-    					sc_formEvent.disconnect();
-    					
-    					if (n !is null)
-    					{
-    						auto f = getForm();
-    						if (f is null)
-    						{
-    							debug writeln("button window other event: no form");
-    							return;
-    						}
-    						
-    						debug writeln("button window other event: connecting");
-    						sc_formEvent = f.connectToSignal_Event(
-    							&buttonTypeSpecificEventHandler
-    							);
-    					}
-    					
-    				}()
-    				);
-    		}
-    		);
+    	/*     	sc_parentChange = connectToParent_onAfterChanged(
+    	delegate void(
+    	ContainerI o,
+    	ContainerI n
+    	)
+    	{
+    	collectException(
+    	{
+    	debug writeln("Button parent changed from ",o," to ",n);
+    	
+    	scope(exit) 
+    	{
+    	propagateParentChangeEmision();
+    	}
+    	
+    	if (o == n)
+    	return;
+    	
+    	sc_formEvent.disconnect();
+    	
+    	if (n !is null)
+    	{
+    	auto f = getForm();
+    	if (f is null)
+    	{
+    	debug writeln("button window other event: no form");
+    	return;
+    	}
+    	
+    	debug writeln("button window other event: connecting");
+    	sc_formEvent = f.connectToSignal_Event(
+    	&buttonTypeSpecificEventHandler
+    	);
+    	}
+    	
+    	}()
+    	);
+    	}
+    	); */
     }
     
-    void buttonTypeSpecificEventHandler(EventForm* event) nothrow
+    /*     void buttonTypeSpecificEventHandler(EventForm* event) nothrow
     {
-    	collectException(
-    		{
-    			auto form = getForm();
-    			if (form is null)
-    				return;
-    			
-    			if (event.mouseFocusedWidget == this
-    				&& event.event.eventType == EventType.mouse
-    			&& event.event.em.type == EventMouseType.button)
-    			{
-    				if (event.event.em.button == EnumMouseButton.bl) 
-    				{
-    					if (event.event.em.buttonState == EnumMouseButtonState.pressed) 
-    					{
-    						button_is_down = true;
-    						form.focusTo(this);
-    					}
-    					if (event.event.em.buttonState == EnumMouseButtonState.released) 
-    					{
-    						button_is_down = false;
-    					}
-    					redraw();
-    				}
-    			}
-    		}()
-    		);
+    collectException(
+    {
+    auto form = getForm();
+    if (form is null)
+    return;
+    
+    auto res = thisWidgetMouseBtnClickSuccess(
+    event, 
+    form, 
+    this,
+    2,
+    delegate void (
+    EventForm* event,
+    Form form,
+    WidgetI thisWidget,
+    ) 
+    {
+    debug writeln("onpress");
+    },
+    delegate void (
+    EventForm* event,
+    Form form,
+    WidgetI thisWidget,
+    ) 
+    {
+    debug writeln("onrelease");
     }
+    );    			
+    debug writeln(
+    "thisWidgetMouseBtnClickSuccess ", 
+    res
+    );
+    
+    }()
+    );
+    } */
     
     override void propagatePosAndSizeRecalc()
 	{
 	}    
 	
-
+    override void focusEnter(WidgetI widget) {};
+    override void focusExit(WidgetI widget) {};
+    
+    override void visualActivationStart(WidgetI widget, EventForm* event) {};
+    override void visualReset(WidgetI widget, EventForm* event) {};
+    
+    override void intMousePress(WidgetI widget, EventForm* event) {};
+    override void intMouseRelease(WidgetI widget, EventForm* event) {};
+    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    override void intMouseMove(WidgetI widget, EventForm* event) {};
     
 }

@@ -4,6 +4,7 @@ import std.stdio;
 import std.typecons;
 
 import dtk.types.EventForm;
+import dtk.types.Event;
 
 import dtk.interfaces.WidgetI;
 
@@ -38,7 +39,7 @@ Tuple!(EventForm*, bool, bool) formEventFilter(
 	
 	/// this is for custom long filter
 	/// if true is not returned - action will not be called.  checkMatch is not
-	/// called (and it's return assumed to be false) if short filter didn't 
+	/// called (and it's return assumed to be false) if short filter didn't
 	/// matched
 	bool delegate(
 		Form form,
@@ -113,7 +114,7 @@ Tuple!(EventForm*, bool, bool) formEventFilter(
 		}
 		else
 		{
-			mouseFocusedWidget_ok = 
+			mouseFocusedWidget_ok =
 			shortMouseFocusedWidget == fe.mouseFocusedWidget;
 		}
 	}
@@ -154,7 +155,7 @@ Tuple!(EventForm*, bool, bool) formEventFilter(
 			fe
 			);
 	}
-		
+	
 	if ((checkMatch !is null && checkMatch_res) || (checkMatch is null))
 	{
 		action_res = action(
@@ -164,4 +165,108 @@ Tuple!(EventForm*, bool, bool) formEventFilter(
 	}
 	
 	return tuple(fe, checkMatch_res, action_res);
+}
+
+bool thisWidgetMouseBtnPressed(
+	EventForm* event,
+	Form form,
+	WidgetI thisWidget
+	)
+{
+	bool ret = event.mouseFocusedWidget == thisWidget
+	&& event.event.type == EventType.mouse
+	&& event.event.em.type == EventMouseType.button
+	&& event.event.em.buttonState == EnumMouseButtonState.pressed;
+	return ret;
+}
+
+Tuple!(bool, EnumMouseButton) thisWidgetMouseBtnPressedRegisterClickStart(
+	EventForm* event,
+	Form form,
+	WidgetI thisWidget,
+	ubyte max_clicks
+	)
+{
+	if (thisWidgetMouseBtnPressed(event, form, thisWidget))
+	{
+		return form.clickSequencePress(
+			thisWidget,
+			event.event.em.button,
+			max_clicks
+			);
+	}
+	return tuple(false, EnumMouseButton.bl);
+}
+
+bool thisWidgetMouseBtnReleased(
+	EventForm* event,
+	Form form,
+	WidgetI thisWidget
+	)
+{
+	bool ret = event.mouseFocusedWidget == thisWidget
+	&& event.event.type == EventType.mouse
+	&& event.event.em.type == EventMouseType.button
+	&& event.event.em.buttonState == EnumMouseButtonState.released;
+	return ret;
+}
+
+Tuple!(bool, EnumMouseButton, ubyte) thisWidgetMouseBtnReleasedCheckClickSuccess(
+	EventForm* event,
+	Form form,
+	WidgetI thisWidget
+	)
+{
+	const auto ret_fail = tuple(false, EnumMouseButton.bl, cast(ubyte)0);
+	if (thisWidgetMouseBtnReleased(event, form, thisWidget))
+	{
+		return form.clickSequenceRelease(thisWidget,event.event.em.button);
+	}
+	return ret_fail;
+}
+
+void thisWidgetMouseBtnClickSuccess(
+	EventForm* event,
+	Form form,
+	WidgetI thisWidget,
+	ubyte max_clicks,
+	void delegate(
+		EventForm* event,
+		Form form,
+		WidgetI thisWidget,
+		) onpress,
+	void delegate(
+		EventForm* event,
+		Form form,
+		WidgetI thisWidget,
+		) onrelease,
+	)
+{
+	// const auto ret_fail = tuple(false, EnumMouseButton.bl, cast(ubyte)0);
+	auto res = thisWidgetMouseBtnPressedRegisterClickStart(
+		event,
+		form,
+		thisWidget,
+		max_clicks,
+		);
+	//debug writeln("thisWidgetMouseBtnPressedRegisterClickStart ", res);
+	if (res[0]) 
+	{
+		if (onpress !is null)
+		{
+			onpress(event, form, thisWidget);
+		}
+	}
+
+	auto res2 = thisWidgetMouseBtnReleasedCheckClickSuccess(
+		event, form, thisWidget,
+		);
+	{
+		if (onrelease !is null)
+		{
+			onrelease(event, form, thisWidget);
+		}
+	}
+	
+	return;
 }

@@ -12,10 +12,7 @@ import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.LayoutI;
 import dtk.interfaces.ContainerI;
 
-import dtk.types.EventWindow;
-import dtk.types.EventKeyboard;
-import dtk.types.EventMouse;
-import dtk.types.EventTextInput;
+import dtk.types.Event;
 import dtk.types.Property;
 import dtk.types.MoveT;
 import dtk.types.Image;
@@ -199,4 +196,15 @@ class Widget : WidgetI
     	throw new Exception("must be reimplemented");
     }
     
+    void focusEnter(WidgetI widget) {};
+    void focusExit(WidgetI widget) {};
+    
+    void visualActivationStart(WidgetI widget, EventForm* event) {};
+    void visualReset(WidgetI widget, EventForm* event) {};
+    
+    void intMousePress(WidgetI widget, EventForm* event) {};
+    void intMouseRelease(WidgetI widget, EventForm* event) {};
+    void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
+    void intMouseMove(WidgetI widget, EventForm* event) {};
 }
