@@ -14,6 +14,7 @@ import dtk.types.Image;
 import dtk.types.Event;
 
 import dtk.widgets.Widget;
+import dtk.widgets.Form;
 import dtk.widgets.mixins;
 
 class ScrollBar : Widget, WidgetI
@@ -43,15 +44,28 @@ class ScrollBar : Widget, WidgetI
     	// mixin(mixin_propagateParentChangeEmision_this());
     }
     
-    override void focusEnter(WidgetI widget) {};
-    override void focusExit(WidgetI widget) {};
-    
-    override void visualActivationStart(WidgetI widget, EventForm* event) {};
-    override void visualReset(WidgetI widget, EventForm* event) {};
-    
-    override void intMousePress(WidgetI widget, EventForm* event) {};
-    override void intMouseRelease(WidgetI widget, EventForm* event) {};
-    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
-    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
-    override void intMouseMove(WidgetI widget, EventForm* event) {};
+    override void focusEnter(Form form, WidgetI widget)
+    {}
+    override void focusExit(Form form, WidgetI widget) 
+    {}
+
+    override bool isVisualPressed()
+    {return false;}
+    override void visualPress(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void visualRelease(Form form, WidgetI widget, EventForm* event)
+    {}
+
+    override void intMousePress(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
+    {}
+    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {}
+    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {}
+    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
+    {}
 }

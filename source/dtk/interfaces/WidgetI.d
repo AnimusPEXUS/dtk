@@ -52,17 +52,19 @@ interface WidgetI // : ContainerableI
     Image propagateRedraw();
     void propagateParentChangeEmision();
 
-    void focusEnter(WidgetI widget);
-    void focusExit(WidgetI widget);
+    void focusEnter(Form form, WidgetI widget);
+    void focusExit(Form form, WidgetI widget);
 
-    void visualActivationStart(WidgetI widget, EventForm* event);
-    void visualReset(WidgetI widget, EventForm* event);
+    bool isVisualPressed();
+    void visualPress(Form form, WidgetI widget, EventForm* event);
+    void visualRelease(Form form, WidgetI widget, EventForm* event);
 
-    void intMousePress(WidgetI widget, EventForm* event);
-    void intMouseRelease(WidgetI widget, EventForm* event);
-    void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event);
-    void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event);
-    void intMouseMove(WidgetI widget, EventForm* event);
+    void intMousePress(Form form, WidgetI widget, EventForm* event);
+    void intMouseRelease(Form form, WidgetI widget, EventForm* event);
+    void intMouseClick(Form form, WidgetI widget, EventForm* event);
+    void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event);
+    void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event);
+    void intMouseMove(Form form, WidgetI widget, EventForm* event);
         
     
     // void intMouseDragStart();

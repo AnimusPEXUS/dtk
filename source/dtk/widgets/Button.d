@@ -28,7 +28,7 @@ import dtk.widgets.mixins;
 
 import dtk.miscs.RadioGroup;
 import dtk.miscs.signal_tools;
-import dtk.miscs.formEventFilter;
+// import dtk.miscs.formEventFilter;
 
 /// Button class
 class Button : Widget, WidgetI
@@ -38,7 +38,7 @@ class Button : Widget, WidgetI
     mixin mixin_Widget_renderImage!("Button");
     mixin mixin_widget_redraw_using_propagateRedraw!();
     mixin mixin_propagateRedraw_children_none!();
-    
+
     bool button_is_down;
     
     private 
@@ -62,100 +62,56 @@ class Button : Widget, WidgetI
     
     this()
     {
-    	/*     	sc_parentChange = connectToParent_onAfterChanged(
-    	delegate void(
-    	ContainerI o,
-    	ContainerI n
-    	)
-    	{
-    	collectException(
-    	{
-    	debug writeln("Button parent changed from ",o," to ",n);
     	
-    	scope(exit) 
-    	{
-    	propagateParentChangeEmision();
-    	}
-    	
-    	if (o == n)
-    	return;
-    	
-    	sc_formEvent.disconnect();
-    	
-    	if (n !is null)
-    	{
-    	auto f = getForm();
-    	if (f is null)
-    	{
-    	debug writeln("button window other event: no form");
-    	return;
-    	}
-    	
-    	debug writeln("button window other event: connecting");
-    	sc_formEvent = f.connectToSignal_Event(
-    	&buttonTypeSpecificEventHandler
-    	);
-    	}
-    	
-    	}()
-    	);
-    	}
-    	); */
     }
-    
-    /*     void buttonTypeSpecificEventHandler(EventForm* event) nothrow
-    {
-    collectException(
-    {
-    auto form = getForm();
-    if (form is null)
-    return;
-    
-    auto res = thisWidgetMouseBtnClickSuccess(
-    event, 
-    form, 
-    this,
-    2,
-    delegate void (
-    EventForm* event,
-    Form form,
-    WidgetI thisWidget,
-    ) 
-    {
-    debug writeln("onpress");
-    },
-    delegate void (
-    EventForm* event,
-    Form form,
-    WidgetI thisWidget,
-    ) 
-    {
-    debug writeln("onrelease");
-    }
-    );    			
-    debug writeln(
-    "thisWidgetMouseBtnClickSuccess ", 
-    res
-    );
-    
-    }()
-    );
-    } */
     
     override void propagatePosAndSizeRecalc()
 	{
 	}    
 	
-    override void focusEnter(WidgetI widget) {};
-    override void focusExit(WidgetI widget) {};
+    override void focusEnter(Form form, WidgetI widget)
+    {}
+    override void focusExit(Form form, WidgetI widget) 
+    {}
     
-    override void visualActivationStart(WidgetI widget, EventForm* event) {};
-    override void visualReset(WidgetI widget, EventForm* event) {};
+    override bool isVisualPressed()
+    {
+    	return button_is_down;
+    }
+    override void visualPress(Form form, WidgetI widget, EventForm* event)
+    {
+    	button_is_down=true;
+    	redraw();
+    }
+    override void visualRelease(Form form, WidgetI widget, EventForm* event)
+    {
+    	button_is_down=false;
+    	redraw();
+    }
     
-    override void intMousePress(WidgetI widget, EventForm* event) {};
-    override void intMouseRelease(WidgetI widget, EventForm* event) {};
-    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
-    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
-    override void intMouseMove(WidgetI widget, EventForm* event) {};
+    override void intMousePress(Form form, WidgetI widget, EventForm* event)
+    {
+    	debug writeln("press");
+    	
+    	visualPress(form, widget, event);
+    }
+    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
+    {
+    	debug writeln("release");
+    	visualRelease(form, widget, event);
+    }
+    override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
+    {debug writeln("click");}
+    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {
+    	visualRelease(form, old_w, event);
+    }
+    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {
+    	if (form.click_sequence_started && form.click_sequence_widget == this)
+    		visualPress(form, new_w, event);
+    }
+    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
+    {}
     
 }

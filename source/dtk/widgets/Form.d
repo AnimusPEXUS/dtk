@@ -63,21 +63,19 @@ class Form : ContainerI, WidgetI
     	
     	SignalConnection sc_windowOtherEvents;
     	SignalConnection sc_windowEvents;
+    	
+    	SignalConnection sc_formEventHandler;
     }
     
+    bool click_sequence_started;
+    WidgetI click_sequence_widget;
+    EnumMouseButton click_sequence_btn;
     
-    // public
-    // {
-    	// SysTime button_down_time;
-    // }
+    WidgetI mouse_focused_widget;
     
     this()
     {
     	mixin(mixin_multiple_properties_inst(FormProperties));
-    	
-    	// mixin(mixin_propagateParentChangeEmision_this());
-    	
-    	click_sequence_timeout = (cast(DateTime)Clock.currTime()) - seconds(2);
     	
     	sc_childChange = connectToChild_onAfterChanged(
     		delegate void(
@@ -137,6 +135,8 @@ class Form : ContainerI, WidgetI
     				);
     		}
     		);
+    	
+    	sc_formEventHandler = this.connectToSignal_Event(&onFormSignal);
     }
     
     void onWindowOtherEvent(Event* event) nothrow
@@ -220,57 +220,78 @@ class Form : ContainerI, WidgetI
     		);
     }
 
-    private
+    void onFormSignal(EventForm* event) nothrow
     {
-    	// click registry
-    	SysTime click_sequence_timeout;
-    	WidgetI click_sequence_widget;
-    	ubyte click_sequence_count;
-    	ubyte click_sequence_count_max;
-    	EnumMouseButton click_sequence_btn;
-
-    	WidgetI mouse_focused_widget;
-    }
-
-    void onFormSignal(EventForm* event)
-    {
-    	if (event.mouseFocusedWidget != mouse_focused_widget)
-    	{
-    		WidgetI old = mouse_focused_widget;
-    		mouse_focused_widget = event.mouseFocusedWidget;
-    		old.intMouseLeave(old, mouse_focused_widget, event);
-    		mouse_focused_widget.intMouseEnter(old, mouse_focused_widget, event);
-    	}
-    	
-    	switch (event.event.type)
-    	{
-    	default:
-    		break;
-    	case EventType.mouse:
-    		switch (event.event.em.type)
+    	auto err = collectException(
     		{
-    		default:
-    			break;
-    		case EventMouseType.movement:
-    			event.mouseFocusedWidget.intMouseMove(event.mouseFocusedWidget, event);
-    			break;
-    		case EventMouseType.button:
-    			switch (event.event.em.buttonState)
+    			if (event.mouseFocusedWidget != mouse_focused_widget)
+    			{
+    				WidgetI old = mouse_focused_widget;
+    				mouse_focused_widget = event.mouseFocusedWidget;
+    				if (old !is null)
+    					old.intMouseLeave(this, old, mouse_focused_widget, event);
+    				mouse_focused_widget.intMouseEnter(this, old, mouse_focused_widget, event);
+    			}
+    			
+    			switch (event.event.type)
     			{
     			default:
     				break;
-    			case EnumMouseButtonState.pressed:
-    				event.mouseFocusedWidget.intMousePress(event.mouseFocusedWidget, event);
+    			case EventType.mouse:
+    				switch (event.event.em.type)
+    				{
+    				default:
+    					break;
+    				case EventMouseType.movement:
+    					event.mouseFocusedWidget.intMouseMove(
+    						this, 
+    						event.mouseFocusedWidget, 
+    						event
+    						);
+    					break;
+    				case EventMouseType.button:
+    					switch (event.event.em.buttonState)
+    					{
+    					default:
+    						break;
+    					case EnumMouseButtonState.pressed:
+    						click_sequence_started = true;
+    						click_sequence_widget = event.mouseFocusedWidget;
+    						click_sequence_btn = event.event.em.button;
+    						event.mouseFocusedWidget.intMousePress(
+    							this, 
+    							event.mouseFocusedWidget, 
+    							event
+    							);
+    						break;
+    					case EnumMouseButtonState.released:
+    						event.mouseFocusedWidget.intMouseRelease(
+    							this, 
+    							event.mouseFocusedWidget, 
+    							event
+    							);
+    						if (click_sequence_started
+    							&& click_sequence_widget == event.mouseFocusedWidget 
+    							&& click_sequence_btn == event.event.em.button)
+    						{
+    							event.mouseFocusedWidget.intMouseClick(
+    								this, 
+    								event.mouseFocusedWidget, 
+    								event
+    								);
+    						}
+    						click_sequence_started = false;
+    						break;
+    					}
+    					break;
+    				}
     				break;
-    			case EnumMouseButtonState.released:
-    				event.mouseFocusedWidget.intMouseRelease(event.mouseFocusedWidget, event);
-    				break;
+    				
     			}
-    			break;
-    		}
-    		break;
-    		
-    	}
+    		}()
+    		);
+    	debug if (err !is null)
+    		writeln("form exception caught: ", err);
     }
     
     ContainerI getParent()
@@ -585,72 +606,29 @@ class Form : ContainerI, WidgetI
     	return this;
     }
     
-    Tuple!(bool, EnumMouseButton) clickSequencePress(
-    	WidgetI w, 
-    	EnumMouseButton btn, 
-    	ubyte max
-    	)
-    {
-    	const auto ret_fail = tuple(false, EnumMouseButton.bl);
-    	bool force_restart= false;
-    	restart:
-    	if (force_restart || (Clock.currTime(UTC()) >= click_sequence_timeout))
-    	{
-    		click_sequence_count = 0;
-    		click_sequence_count_max = max;
-    		click_sequence_widget = w;
-    		click_sequence_btn = btn;
-    	}
-    	else
-    	{
-    		if (click_sequence_widget != w || click_sequence_btn != btn)
-    		{
-    			force_restart=true;
-    			goto restart;
-    		}
-    	}
-    	
-    	return tuple(true, btn);
-    	
-    }
-    
-    Tuple!(bool, EnumMouseButton, ubyte) clickSequenceRelease(
-    	WidgetI w,
-    	EnumMouseButton btn, 
-    	)
-    {
-    	// if ((cast(DateTime)Clock.currTime()) >= click_sequence_timeout)
-    	// {
-    		// return 0;
-    	// }
-    	const auto ret_fail = tuple(false, EnumMouseButton.bl, cast(ubyte)0);
-    	
-    	if (click_sequence_widget != w || click_sequence_btn != btn)
-    	{
-    		return ret_fail;
-    	}
-    	
-    	click_sequence_timeout = Clock.currTime(UTC()) + msecs(500);
-    	
-    	if (click_sequence_count >= click_sequence_count_max)
-    	{
-    		return ret_fail;
-    	}
-    	
-    	click_sequence_count++;
-    	return tuple(true, click_sequence_btn, click_sequence_count);
-    }
-    
-    override void focusEnter(WidgetI widget) {};
-    override void focusExit(WidgetI widget) {};
-    
-    override void visualActivationStart(WidgetI widget, EventForm* event) {};
-    override void visualReset(WidgetI widget, EventForm* event) {};
-    
-    override void intMousePress(WidgetI widget, EventForm* event) {};
-    override void intMouseRelease(WidgetI widget, EventForm* event) {};
-    override void intMouseLeave(WidgetI old_w, WidgetI new_w, EventForm* event) {};
-    override void intMouseEnter(WidgetI old_w, WidgetI new_w, EventForm* event) {};
-    override void intMouseMove(WidgetI widget, EventForm* event) {};
+    override void focusEnter(Form form, WidgetI widget)
+    {}
+    override void focusExit(Form form, WidgetI widget) 
+    {}
+
+    override bool isVisualPressed()
+    {return false;}
+    override void visualPress(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void visualRelease(Form form, WidgetI widget, EventForm* event)
+    {}
+
+    override void intMousePress(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
+    {}
+    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {}
+    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {}
+    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
+    {}
         
 }
