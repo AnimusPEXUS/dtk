@@ -79,13 +79,6 @@ class ButtonCheck : Button, WidgetI
 
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
     {
-    	auto f = getForm();
-        if (f !is null)
-        {
-            f.focusTo(this);
-        }
-        
-        redraw();
     }
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
