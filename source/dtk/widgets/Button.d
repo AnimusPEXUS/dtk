@@ -91,25 +91,17 @@ class Button : Widget, WidgetI
     
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
     {
-    	debug writeln("press");
-    	
-    	visualPress(form, widget, event);
     }
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {
-    	debug writeln("release");
-    	visualRelease(form, widget, event);
     }
     override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
     {debug writeln("click");}
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {
-    	visualRelease(form, old_w, event);
     }
     override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {
-    	if (form.click_sequence_started && form.click_sequence_widget == this)
-    		visualPress(form, new_w, event);
     }
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}

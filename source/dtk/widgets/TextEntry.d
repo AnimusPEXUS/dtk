@@ -264,7 +264,7 @@ class TextEntry : Widget, WidgetI
         )
     {
     	debug writeln("EventKeyboard: ");        
-    	debug writeln(" key_state: ", event.key_state);        
+    	debug writeln("  keyState: ", event.keyState);        
     	debug writeln("      type: ", type);        
     	debug writeln("    repeat: ", event.repeat);        
     	debug writeln("    keysym: ", event.keysym);

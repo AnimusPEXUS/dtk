@@ -5,7 +5,7 @@ public import dtk.types.KeySym;
 
 struct EventKeyboard
 {
-    EnumKeyboardKeyState key_state;
+    EnumKeyboardKeyState keyState;
     bool repeat;
     KeySym keysym;
 }

@@ -60,6 +60,7 @@ class Form : ContainerI, WidgetI
     {
     	SignalConnection sc_childChange;
     	SignalConnection sc_windowChange;
+    	SignalConnection sc_focusedWidgetChange;
     	
     	SignalConnection sc_windowOtherEvents;
     	SignalConnection sc_windowEvents;
@@ -131,6 +132,27 @@ class Form : ContainerI, WidgetI
     					
     					propagateParentChangeEmision();
     					
+    				}()
+    				);
+    		}
+    		);
+    	
+    	sc_focusedWidgetChange = connectToFocusedWidget_onAfterChanged(
+    		delegate void(
+    			WidgetI o,
+    			WidgetI n
+    			)
+    		{
+    			collectException(
+    				{
+    					if (o !is null)
+    					{
+    						o.redraw();
+    					}
+    					if (n !is null)
+    					{
+    						n.redraw();
+    					}
     				}()
     				);
     		}
@@ -219,7 +241,7 @@ class Form : ContainerI, WidgetI
     		}()
     		);
     }
-
+    
     void onFormSignal(EventForm* event) nothrow
     {
     	auto err = collectException(
@@ -229,7 +251,18 @@ class Form : ContainerI, WidgetI
     				WidgetI old = mouse_focused_widget;
     				mouse_focused_widget = event.mouseFocusedWidget;
     				if (old !is null)
+    				{
+    					old.visualRelease(this, old, event);
     					old.intMouseLeave(this, old, mouse_focused_widget, event);
+    				}
+    				if (this.click_sequence_started && this.click_sequence_widget == mouse_focused_widget)
+    				{
+    					mouse_focused_widget.visualPress(
+    						this, 
+    						mouse_focused_widget, 
+    						event
+    						);
+    				}
     				mouse_focused_widget.intMouseEnter(this, old, mouse_focused_widget, event);
     			}
     			
@@ -244,8 +277,8 @@ class Form : ContainerI, WidgetI
     					break;
     				case EventMouseType.movement:
     					event.mouseFocusedWidget.intMouseMove(
-    						this, 
-    						event.mouseFocusedWidget, 
+    						this,
+    						event.mouseFocusedWidget,
     						event
     						);
     					break;
@@ -258,25 +291,36 @@ class Form : ContainerI, WidgetI
     						click_sequence_started = true;
     						click_sequence_widget = event.mouseFocusedWidget;
     						click_sequence_btn = event.event.em.button;
+    						this.focusTo(event.mouseFocusedWidget);
     						event.mouseFocusedWidget.intMousePress(
-    							this, 
-    							event.mouseFocusedWidget, 
+    							this,
+    							event.mouseFocusedWidget,
+    							event
+    							);
+    						event.mouseFocusedWidget.visualPress(
+    							this,
+    							event.mouseFocusedWidget,
     							event
     							);
     						break;
     					case EnumMouseButtonState.released:
     						event.mouseFocusedWidget.intMouseRelease(
-    							this, 
-    							event.mouseFocusedWidget, 
+    							this,
+    							event.mouseFocusedWidget,
+    							event
+    							);
+    						event.mouseFocusedWidget.visualRelease(
+    							this,
+    							event.mouseFocusedWidget,
     							event
     							);
     						if (click_sequence_started
-    							&& click_sequence_widget == event.mouseFocusedWidget 
-    							&& click_sequence_btn == event.event.em.button)
+    							&& click_sequence_widget == event.mouseFocusedWidget
+    						&& click_sequence_btn == event.event.em.button)
     						{
     							event.mouseFocusedWidget.intMouseClick(
-    								this, 
-    								event.mouseFocusedWidget, 
+    								this,
+    								event.mouseFocusedWidget,
     								event
     								);
     						}
@@ -286,12 +330,33 @@ class Form : ContainerI, WidgetI
     					break;
     				}
     				break;
-    				
+    			case EventType.keyboard:
+    				switch (event.event.ek.keyState)
+    				{
+    				default:
+    					break;
+    					/* case EnumKeyboardKeyState.pressed:
+    					event.mouseFocusedWidget.intMousePress(
+    					this,
+    					event.mouseFocusedWidget,
+    					event
+    					);
+    					break;
+    					case EnumKeyboardKeyState.released:
+    					event.mouseFocusedWidget.intMousePress(
+    					this,
+    					event.mouseFocusedWidget,
+    					event
+    					);
+    					break; */
+    				}
     			}
     		}()
     		);
     	debug if (err !is null)
+    	{
     		writeln("form exception caught: ", err);
+    	}
     }
     
     ContainerI getParent()
@@ -408,12 +473,7 @@ class Form : ContainerI, WidgetI
     
     void focusTo(WidgetI widget)
     {
-        auto x = getFocusedWidget();
-        setFocusedWidget(widget);
-        if (x !is null)
-        {
-            x.redraw();
-        }
+    	setFocusedWidget(widget);
     }
     
     private WidgetI focusXWidget(WidgetI delegate() getXFocusableWidget)
@@ -608,21 +668,21 @@ class Form : ContainerI, WidgetI
     
     override void focusEnter(Form form, WidgetI widget)
     {}
-    override void focusExit(Form form, WidgetI widget) 
+    override void focusExit(Form form, WidgetI widget)
     {}
-
+    
     override bool isVisualPressed()
     {return false;}
     override void visualPress(Form form, WidgetI widget, EventForm* event)
     {}
     override void visualRelease(Form form, WidgetI widget, EventForm* event)
     {}
-
+    
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
-    override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
+    override void intMouseClick(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
@@ -630,5 +690,5 @@ class Form : ContainerI, WidgetI
     {}
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}
-        
+    
 }

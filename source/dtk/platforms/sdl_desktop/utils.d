@@ -138,10 +138,10 @@ Tuple!(EventKeyboard*, Exception) convertSDLKeyboardEventToDtkEventKeyboard(
     final switch (e.state)
     {
     case SDL_PRESSED:
-        ret.key_state = EnumKeyboardKeyState.pressed;
+        ret.keyState = EnumKeyboardKeyState.pressed;
         break;
     case SDL_RELEASED:
-        ret.key_state = EnumKeyboardKeyState.released;
+        ret.keyState = EnumKeyboardKeyState.released;
         break;
     }
     

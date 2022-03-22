@@ -57,30 +57,6 @@ class ButtonCheck : Button, WidgetI
         // setMouseHandler("button-down", &on_mouse_down_internal);
         // setMouseHandler("button-up", &on_mouse_up_internal);
     }
-    
-    void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
-    {
-        setChecked(!getChecked());
-        redraw();
-        return ;
-    }
-    
-    void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
-    {
-        auto f = getForm();
-        if (f !is null)
-        {
-            f.focusTo(this);
-        }
-        
-        redraw();
-        return ;
-    }
-    
-    void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
-    {
-        return ;
-    }
 
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
@@ -95,16 +71,29 @@ class ButtonCheck : Button, WidgetI
     override bool isVisualPressed()
     {return false;}
     override void visualPress(Form form, WidgetI widget, EventForm* event)
-    {}
+    {
+    	
+    }
     override void visualRelease(Form form, WidgetI widget, EventForm* event)
     {}
 
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    {}
+    {
+    	auto f = getForm();
+        if (f !is null)
+        {
+            f.focusTo(this);
+        }
+        
+        redraw();
+    }
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
-    {}
+    {
+    	setChecked(!getChecked());
+        redraw();
+    }
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
     override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)

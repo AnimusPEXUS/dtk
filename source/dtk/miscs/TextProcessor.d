@@ -2790,7 +2790,7 @@ class TextView
     {
     	// TODO: reproces() and redrawing usage have to be smarter
     	// TODO: this function obviously requires optimizations
-        if (event.key_state == EnumKeyboardKeyState.pressed)
+        if (event.keyState == EnumKeyboardKeyState.pressed)
         {
         	cursorMakeLongerVisible();
         	

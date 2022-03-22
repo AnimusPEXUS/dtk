@@ -90,34 +90,6 @@ class ButtonRadio : Button, WidgetI
         }());
     }
     
-    void on_mouse_click_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
-    {
-        auto rg = getRadioGroup();
-        if (rg !is null)
-        {
-            rg.selectButton(this);
-        }
-        redraw();
-        return ;
-    }
-    
-    void on_mouse_down_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
-    {
-        auto f = getForm();
-        if (f !is null)
-        {
-            f.focusTo(this);
-        }
-        
-        redraw();
-        return ;
-    }
-    
-    void on_mouse_up_internal(EventMouse* event, ulong mouseWidget_x, ulong mouseWidget_y)
-    {
-        return;
-    }
-    
     override void focusEnter(Form form, WidgetI widget)
     {}
     override void focusExit(Form form, WidgetI widget) 
@@ -131,11 +103,22 @@ class ButtonRadio : Button, WidgetI
     {}
 
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    {}
+    {
+        redraw();
+    }
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
-    {}
+    {
+    	
+    }
     override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
-    {}
+    {
+    	auto rg = getRadioGroup();
+        if (rg !is null)
+        {
+            rg.selectButton(this);
+        }
+        redraw();
+    }
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
     override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
