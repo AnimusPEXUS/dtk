@@ -45,27 +45,31 @@ interface WidgetI // : ContainerableI
     		);
     }
     
-	Image renderImage(ulong x, ulong y, ulong w, ulong h);    
-	Image renderImage();    
+	Image renderImage(ulong x, ulong y, ulong w, ulong h);
+	Image renderImage();
     void redraw();
     void propagatePosAndSizeRecalc();
     Image propagateRedraw();
     void propagateParentChangeEmision();
-
+    
     void focusEnter(Form form, WidgetI widget);
     void focusExit(Form form, WidgetI widget);
-
+    
     bool isVisualPressed();
     void visualPress(Form form, WidgetI widget, EventForm* event);
     void visualRelease(Form form, WidgetI widget, EventForm* event);
-
+    
     void intMousePress(Form form, WidgetI widget, EventForm* event);
     void intMouseRelease(Form form, WidgetI widget, EventForm* event);
-    void intMouseClick(Form form, WidgetI widget, EventForm* event);
+    void intMousePressRelease(Form form, WidgetI widget, EventForm* event);
     void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event);
     void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event);
     void intMouseMove(Form form, WidgetI widget, EventForm* event);
-        
+    
+    void intKeyboardPress(Form form, WidgetI widget, EventForm* event);
+    void intKeyboardRelease(Form form, WidgetI widget, EventForm* event);
+    
+    void intTextInput(Form form, WidgetI widget, EventForm* event);
     
     // void intMouseDragStart();
     // void intMouseDragStop();

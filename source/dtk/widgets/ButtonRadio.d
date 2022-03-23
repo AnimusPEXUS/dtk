@@ -110,7 +110,7 @@ class ButtonRadio : Button, WidgetI
     {
     	
     }
-    override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
+    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
     {
     	auto rg = getRadioGroup();
         if (rg !is null)
@@ -125,5 +125,11 @@ class ButtonRadio : Button, WidgetI
     {}
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}
+    
+         
+    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
+    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
+    
+    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
     
 }

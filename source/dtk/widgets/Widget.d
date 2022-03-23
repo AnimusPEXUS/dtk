@@ -205,8 +205,14 @@ class Widget : WidgetI
 
     void intMousePress(Form form, WidgetI widget, EventForm* event) {}
     void intMouseRelease(Form form, WidgetI widget, EventForm* event) {}
-    void intMouseClick(Form form, WidgetI widget, EventForm* event) {}
+    void intMousePressRelease(Form form, WidgetI widget, EventForm* event) {}
     void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event) {}
     void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event) {}
     void intMouseMove(Form form, WidgetI widget, EventForm* event) {}
+    
+    void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
+    void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
+    
+    void intTextInput(Form form, WidgetI widget, EventForm* event) {}
+
 }

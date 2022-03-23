@@ -68,9 +68,13 @@ class Form : ContainerI, WidgetI
     	SignalConnection sc_formEventHandler;
     }
     
-    bool click_sequence_started;
-    WidgetI click_sequence_widget;
-    EnumMouseButton click_sequence_btn;
+    bool pressrelease_sequence_started;
+    WidgetI pressrelease_sequence_widget;
+    EnumMouseButton pressrelease_sequence_btn;
+
+    // bool kb_pressrelease_sequence_started;
+    // WidgetI kb_pressrelease_sequence_widget;
+    // EnumMouseButton kb_pressrelease_sequence_btn;
     
     WidgetI mouse_focused_widget;
     
@@ -255,7 +259,7 @@ class Form : ContainerI, WidgetI
     					old.visualRelease(this, old, event);
     					old.intMouseLeave(this, old, mouse_focused_widget, event);
     				}
-    				if (this.click_sequence_started && this.click_sequence_widget == mouse_focused_widget)
+    				if (this.pressrelease_sequence_started && this.pressrelease_sequence_widget == mouse_focused_widget)
     				{
     					mouse_focused_widget.visualPress(
     						this, 
@@ -269,28 +273,28 @@ class Form : ContainerI, WidgetI
     			switch (event.event.type)
     			{
     			default:
-    				break;
+    				return;
     			case EventType.mouse:
     				switch (event.event.em.type)
     				{
     				default:
-    					break;
+    					return;
     				case EventMouseType.movement:
     					event.mouseFocusedWidget.intMouseMove(
     						this,
     						event.mouseFocusedWidget,
     						event
     						);
-    					break;
+    					return;
     				case EventMouseType.button:
     					switch (event.event.em.buttonState)
     					{
     					default:
-    						break;
+    						return;
     					case EnumMouseButtonState.pressed:
-    						click_sequence_started = true;
-    						click_sequence_widget = event.mouseFocusedWidget;
-    						click_sequence_btn = event.event.em.button;
+    						pressrelease_sequence_started = true;
+    						pressrelease_sequence_widget = event.mouseFocusedWidget;
+    						pressrelease_sequence_btn = event.event.em.button;
     						this.focusTo(event.mouseFocusedWidget);
     						event.mouseFocusedWidget.intMousePress(
     							this,
@@ -302,7 +306,7 @@ class Form : ContainerI, WidgetI
     							event.mouseFocusedWidget,
     							event
     							);
-    						break;
+    						return;
     					case EnumMouseButtonState.released:
     						event.mouseFocusedWidget.intMouseRelease(
     							this,
@@ -314,41 +318,52 @@ class Form : ContainerI, WidgetI
     							event.mouseFocusedWidget,
     							event
     							);
-    						if (click_sequence_started
-    							&& click_sequence_widget == event.mouseFocusedWidget
-    						&& click_sequence_btn == event.event.em.button)
+    						if (pressrelease_sequence_started
+    							&& pressrelease_sequence_widget == event.mouseFocusedWidget
+    						&& pressrelease_sequence_btn == event.event.em.button)
     						{
-    							event.mouseFocusedWidget.intMouseClick(
+    							event.mouseFocusedWidget.intMousePressRelease(
     								this,
     								event.mouseFocusedWidget,
     								event
     								);
     						}
-    						click_sequence_started = false;
-    						break;
+    						pressrelease_sequence_started = false;
+    						return;
     					}
-    					break;
     				}
-    				break;
     			case EventType.keyboard:
     				switch (event.event.ek.keyState)
     				{
     				default:
-    					break;
-    					/* case EnumKeyboardKeyState.pressed:
-    					event.mouseFocusedWidget.intMousePress(
-    					this,
-    					event.mouseFocusedWidget,
-    					event
-    					);
-    					break;
-    					case EnumKeyboardKeyState.released:
-    					event.mouseFocusedWidget.intMousePress(
-    					this,
-    					event.mouseFocusedWidget,
-    					event
-    					);
-    					break; */
+    					return;
+    				case EnumKeyboardKeyState.pressed:
+    					event.focusedWidget.intKeyboardPress(
+    						this,
+    						event.focusedWidget,
+    						event
+    						);
+    					return;
+    				case EnumKeyboardKeyState.released:
+    					event.focusedWidget.intKeyboardRelease(
+    						this,
+    						event.focusedWidget,
+    						event
+    						);
+    					return; 
+    				}
+    			case EventType.textInput:
+    				switch (event.event.ek.keyState)
+    				{
+    				default:
+    					return;
+    				case EnumKeyboardKeyState.pressed:
+    					event.focusedWidget.intTextInput(
+    						this,
+    						event.focusedWidget,
+    						event
+    						);
+    					return;
     				}
     			}
     		}()
@@ -682,7 +697,7 @@ class Form : ContainerI, WidgetI
     {}
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
-    override void intMouseClick(Form form, WidgetI widget, EventForm* event)
+    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
@@ -690,5 +705,11 @@ class Form : ContainerI, WidgetI
     {}
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}
+    
+         
+    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
+    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
+    
+    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
     
 }

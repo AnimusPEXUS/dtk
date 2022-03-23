@@ -60,7 +60,7 @@ class ScrollBar : Widget, WidgetI
     {}
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
-    override void intMouseClick(Form form, WidgetI widget, EventForm* event) 
+    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
     {}
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
@@ -68,4 +68,10 @@ class ScrollBar : Widget, WidgetI
     {}
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}
+    
+         
+    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
+    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
+    
+    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
 }
