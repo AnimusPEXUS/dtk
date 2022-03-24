@@ -237,17 +237,17 @@ class Window : WindowI
     				return;
     			}
     			
-    			if (event.type == EventType.mouse 
+    			if (event.type == EventType.mouse
     				&& event.em.type == EventMouseType.movement)
     			{
-    					// TODO: save relative values too?
-    					mouse_x = event.em.x; 
-    					mouse_y = event.em.y; 
-    			} 
-    			else
+    				// TODO: save relative values too?
+    				mouse_x = event.em.x;
+    				mouse_y = event.em.y;
+    			}
+    			
     			{
-    				event.em.x = cast(int)mouse_x;
-    				event.em.y = cast(int)mouse_y;
+    				event.mouse_x = cast(int)mouse_x;
+    				event.mouse_y = cast(int)mouse_y;
     			}
     			
     			if (event.type == EventType.window)
@@ -281,14 +281,14 @@ class Window : WindowI
     
     Tuple!(bool, Position2D) getMousePosition()
     {
-/*     	auto ret_fail = tuple(false, Position2D(0,0));
+    	/*     	auto ret_fail = tuple(false, Position2D(0,0));
     	int x;
     	int y;
     	SDL_GetMouseState(&x, &y);
     	if (x < 0 || y < 0)
     	{
-    		debug writeln("getMousePosition: x or y is negative");
-    		return ret_fail;
+    	debug writeln("getMousePosition: x or y is negative");
+    	return ret_fail;
     	}
     	return tuple(true, Position2D(x,y)); */
     	return tuple(mouse_in, Position2D(cast(int)mouse_x,cast(int)mouse_y));

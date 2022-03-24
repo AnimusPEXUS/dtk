@@ -321,7 +321,7 @@ class SDLDesktopPlatform : PlatformI
             	}
             	e.window = w;
             	
-            	signal_event.emit(e);
+            	emitSignal_Event(e);
             }
         }
         

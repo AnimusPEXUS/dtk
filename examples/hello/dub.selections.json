@@ -1,7 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"bindbc-freetype": "1.0.2",
+		"bindbc-freetype": "1.0.3",
 		"bindbc-loader": "1.0.1",
 		"bindbc-sdl": "1.0.1",
 		"dtk": "~master",
@@ -9,9 +9,9 @@
 		"fontconfig": "2.0.0+2.13.91",
 		"libasync": "0.8.6",
 		"memutils": "1.0.4",
-		"observable": "1.0.3",
+		"observable": "1.1.1",
 		"stdx-allocator": "2.77.5",
 		"taggedalgebraic": "0.11.22",
-		"vibe-core": "1.22.0"
+		"vibe-core": "1.22.1"
 	}
 }

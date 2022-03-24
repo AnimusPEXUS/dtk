@@ -2765,7 +2765,7 @@ class TextView
         
         TextChar[] new_chars;
         
-        foreach (v; cast(dchar[]) txt)
+        foreach (v; txt)
         {
             auto x = new TextChar(line);
             x.chr = v;

@@ -106,7 +106,7 @@ class TextEntry : Widget, WidgetI
             }
             
             return f.getFocusedWidget() == this;
-        };        
+        };
         
         struct stname {
             string sname;
@@ -207,24 +207,24 @@ class TextEntry : Widget, WidgetI
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
     {
-    	auto x = getX();
-    	auto y = getY();
-        if (getDrawBewelAndBackground())
-        {
-        	x+=2;
-        	y+=2;
-        }
+    	// auto x = getX();
+    	// auto y = getY();
+        // if (getDrawBewelAndBackground())
+        // {
+        	// x+=2;
+        	// y+=2;
+        // }
         
         auto ds = new DrawingSurfaceShift(
         	getDrawingSurface(),
-        	cast(int)x,
-        	cast(int)y
+        	cast(int)0,
+        	cast(int)0
         	);
         
         return ds;
     }
     
-    void on_mouse_click_internal(
+    /* void on_mouse_click_internal(
         EventMouse* event,
         ulong x,
         ulong y
@@ -244,50 +244,32 @@ class TextEntry : Widget, WidgetI
         text_view.click(x, y);
         
         return ;
-    }
+    } */
     
-    void on_text_input_internal(
-        EventTextInput* event,
-        ulong x,
-        ulong y
-        )
-    {
-        text_view.textInput(event.text);
-        redraw(); // TODO: maybe this is too expansive and optimization is required
-    }
-    
+    // void on_text_input_internal(
+        // EventTextInput* event,
+        // ulong x,
+        // ulong y
+        // )
+    // {
+        // text_view.textInput(event.text);
+        // redraw(); // TODO: maybe this is too expansive and optimization is required
+    // }
+    // 
     void on_keyboard_internal(
     	string type, // TODO: better type for parameter
-        EventKeyboard* event,
-        ulong x,
-        ulong y
-        )
+    	EventKeyboard* event,
+    	ulong x,
+    	ulong y
+    	)
     {
-    	debug writeln("EventKeyboard: ");        
-    	debug writeln("  keyState: ", event.keyState);        
-    	debug writeln("      type: ", type);        
-    	debug writeln("    repeat: ", event.repeat);        
+    	debug writeln("EventKeyboard: ");
+    	debug writeln("  keyState: ", event.keyState);
+    	debug writeln("      type: ", type);
+    	debug writeln("    repeat: ", event.repeat);
     	debug writeln("    keysym: ", event.keysym);
     	
-        text_view.keyboardInput(type, event);
-    }
-    
-    void on_keyboard_up_internal(
-        EventKeyboard* event,
-        ulong x,
-        ulong y
-        )
-    {
-    	on_keyboard_internal("up", event, x,y);
-    }
-    
-    void on_keyboard_down_internal(
-        EventKeyboard* event,
-        ulong x,
-        ulong y
-        )
-    {
-    	on_keyboard_internal("down", event, x,y);    	      
+    	text_view.keyboardInput(type, event);
     }
     
     private void afterTextChanged(dstring old_val, dstring new_val) nothrow
@@ -335,7 +317,7 @@ class TextEntry : Widget, WidgetI
         
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
-        text_view.setCursorEnabled(getCursorEnabled()); 
+        text_view.setCursorEnabled(getCursorEnabled());
     }
     
     //mixin mixin_getWidgetAtPosition;
@@ -360,32 +342,65 @@ class TextEntry : Widget, WidgetI
     
     override void focusEnter(Form form, WidgetI widget)
     {}
-    override void focusExit(Form form, WidgetI widget) 
+    override void focusExit(Form form, WidgetI widget)
     {}
-
+    
     override bool isVisualPressed()
     {return false;}
     override void visualPress(Form form, WidgetI widget, EventForm* event)
     {}
     override void visualRelease(Form form, WidgetI widget, EventForm* event)
     {}
-
+    
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
-    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
-    {}
+    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
+    {
+    	text_view.click(
+    		event.mouseFocusedWidget_x,
+    		event.mouseFocusedWidget_y
+    		);
+    }
+    
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
     override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
+    {
+    	on_keyboard_internal(
+    		"up", 
+    		event.event.ek, 
+    		event.mouseFocusedWidget_x,
+    		event.mouseFocusedWidget_y
+    		);
+    }
+    
+    
+    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event)
+    {
+    	on_keyboard_internal(
+    		"down", 
+    		event.event.ek, 
+    		event.mouseFocusedWidget_x,
+    		event.mouseFocusedWidget_y
+    		);
+    }
+    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event)
     {}
     
-         
-    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
-    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
-    
-    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
+    override void intTextInput(Form form, WidgetI widget, EventForm* event)
+    {
+    	assert(event !is null);
+    	assert(event.event !is null);
+    	assert(event.event.eti !is null);
+    	assert(event.event.eti.text !is null);
+    	auto x = event.event.eti.text;
+    	debug writeln("new_str2 ",x);
+    	debug writefln("event.event.eti.text (%d) %s",x.length,x);
+    	text_view.textInput(x);
+    	redraw();
+    }
 }

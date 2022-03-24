@@ -59,6 +59,7 @@ Event* convertSDLEventToEvent(SDL_Event* event)
 	case SDL_TEXTINPUT:
 		ret.eti=convertSDLTextInputEventToDtkEventTextInput(&event.text);
 		ret.type = EventType.textInput;
+		writeln("convertSDLEventToEvent eti.text ", ret.eti.text);
 		break;
 	}
 	
@@ -281,10 +282,22 @@ EventTextInput* convertSDLTextInputEventToDtkEventTextInput(
 {
     import std.conv;
     import std.string;
+    import core.stdc.string;
     
     EventTextInput* ret = new EventTextInput;
     
-    ret.text = to!dstring(cast(string)(std.string.fromStringz(cast(char*)e.text)).idup);
+    string new_str;
+    
+    foreach(v;e.text)
+    {
+    	if (v == 0)
+    	{
+    		break;
+    	}
+    	new_str ~= v;
+    }
+    	
+    ret.text = to!dstring(new_str);
     
     return ret;
 }
