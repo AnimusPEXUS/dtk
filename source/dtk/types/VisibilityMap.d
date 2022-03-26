@@ -8,29 +8,29 @@ import dtk.types.Position2D;
 
 class Visibility(T)
 {
-	ulong x;
-	ulong y;
-	ulong w;
-	ulong h;
-	ulong vx;
-	ulong vy;
+	int x;
+	int y;
+	int w;
+	int h;
+	int vx;
+	int vy;
 	T o;
 }
 
 class VisibilityMap(T)
 {
-	ulong vp_x;
-	ulong vp_y;
-	ulong vp_w;
-	ulong vp_h;
+	int vp_x;
+	int vp_y;
+	int vp_w;
+	int vp_h;
 	
 	Visibility!(T)[] map;
 	
 	void init(
-		ulong vp_x, 
-		ulong vp_y,
-		ulong vp_w, 
-		ulong vp_h
+		int vp_x, 
+		int vp_y,
+		int vp_w, 
+		int vp_h
 		)
 	{
 		this.vp_x = vp_x;
@@ -42,10 +42,10 @@ class VisibilityMap(T)
 	
 	// visible?
 	bool put(
-		ulong x,
-    	ulong y,
-    	ulong w,
-    	ulong h,
+		int x,
+    	int y,
+    	int w,
+    	int h,
     	T o
     	)
     {
@@ -101,8 +101,8 @@ class VisibilityMap(T)
 				ret = tuple(
 					v, 
 					Position2D(
-						cast(int)(p_x - v.vx),
-						cast(int)(p_y - v.vy)
+						(p_x - v.vx),
+						(p_y - v.vy)
 						)
 					) 
 				~ ret;

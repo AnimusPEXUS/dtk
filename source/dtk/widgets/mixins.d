@@ -9,12 +9,12 @@ mixin template mixin_forwardXYWH_from_Widget()
     	import std.format;
     	mixin(
     		q{
-    			override ulong get%1$s()
+    			override int get%1$s()
     			{
     				return super.get%1$s();
     			}
     			
-    			override typeof(this) set%1$s(ulong v)
+    			override typeof(this) set%1$s(int v)
     			{
     				super.set%1$s(v);
     				return this;
@@ -138,7 +138,7 @@ mixin template mixin_Widget_renderImage(
 				return ds;
 			}
 			
-			%2$s Image renderImage(ulong x, ulong y, ulong w, ulong h)
+			%2$s Image renderImage(int x, int y, int w, int h)
 			{
 				return renderImage().getImage(x,y,w,h);
 			}

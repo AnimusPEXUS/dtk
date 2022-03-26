@@ -198,8 +198,8 @@ class TextEntry : Widget, WidgetI
     void on_keyboard_internal(
     	string type, // TODO: better type for parameter
     	EventKeyboard* event,
-    	ulong x,
-    	ulong y
+    	int x,
+    	int y
     	)
     {
     	// debug writeln("EventKeyboard: ");
@@ -270,12 +270,12 @@ class TextEntry : Widget, WidgetI
     
     public
     {
-    	ulong padding_left;
-    	ulong padding_top;
-    	ulong padding_right;
-    	ulong padding_bottom;
-    	ulong tv_width;
-    	ulong tv_height;
+    	int padding_left;
+    	int padding_top;
+    	int padding_right;
+    	int padding_bottom;
+    	int tv_width;
+    	int tv_height;
     }
     
     void recalcPaddings()

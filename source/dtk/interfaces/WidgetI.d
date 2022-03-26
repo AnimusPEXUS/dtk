@@ -39,13 +39,13 @@ interface WidgetI // : ContainerableI
     {
     	mixin(
     		q{
-    			ulong get%1$s();
-    			typeof(this) set%1$s(ulong v);
+    			int get%1$s();
+    			typeof(this) set%1$s(int v);
     		}.format(v)
     		);
     }
     
-	Image renderImage(ulong x, ulong y, ulong w, ulong h);
+	Image renderImage(int x, int y, int w, int h);
 	Image renderImage();
     void redraw();
     void propagatePosAndSizeRecalc();

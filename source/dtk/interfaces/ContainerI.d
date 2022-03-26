@@ -12,14 +12,14 @@ interface ContainerI
 {
 	Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point);
 
-	ulong getChildX(WidgetI child);
-	ulong getChildY(WidgetI child);
-	ulong getChildWidth(WidgetI child);
-	ulong getChildHeight(WidgetI child);
-	void setChildX(WidgetI child, ulong v);
-	void setChildY(WidgetI child, ulong v);
-	void setChildWidth(WidgetI child, ulong v);
-	void setChildHeight(WidgetI child, ulong v);
+	int getChildX(WidgetI child);
+	int getChildY(WidgetI child);
+	int getChildWidth(WidgetI child);
+	int getChildHeight(WidgetI child);
+	void setChildX(WidgetI child, int v);
+	void setChildY(WidgetI child, int v);
+	void setChildWidth(WidgetI child, int v);
+	void setChildHeight(WidgetI child, int v);
 	
 	void addChild(WidgetI child);
 	void removeChild(WidgetI child);

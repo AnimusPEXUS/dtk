@@ -8,30 +8,40 @@ import std.typecons;
 //  5, 6 - vertical and horizontal offset where to put visible part
 Tuple!(
 	bool,
-	ulong, ulong, ulong, ulong,
-	ulong, ulong
+	int, int, int, int,
+	int, int
 	) calculateVisiblePart(
-ulong vpx,
-ulong vpy,
-ulong vpw,
-ulong vph,
-ulong cx,
-ulong cy,
-ulong cw,
-ulong ch
+int vpx,
+int vpy,
+int vpw,
+int vph,
+int cx,
+int cy,
+int cw,
+int ch
 )
     {
+    	
+    	assert(vpx >= 0);
+    	assert(vpy >= 0);
+    	assert(vpw >= 0);
+    	assert(vph >= 0);
+    	assert(cx >= 0);
+    	assert(cy >= 0);
+    	assert(cw >= 0);
+    	assert(ch >= 0);
+    	
     	auto ret_invisible = tuple(
     		false,
-    		0UL, 0UL, 0UL, 0UL,
-    		0UL, 0UL
+    		0, 0, 0, 0,
+    		0, 0
     		);
-    	ulong x;
-    	ulong y;
-    	ulong w;
-    	ulong h;
-    	ulong vx;
-    	ulong vy;
+    	int x;
+    	int y;
+    	int w;
+    	int h;
+    	int vx;
+    	int vy;
     	
     	if (cw==0 || ch==0)
     	{

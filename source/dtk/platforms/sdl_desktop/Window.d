@@ -48,10 +48,10 @@ PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "nul
 PropSetting("gs_w_d", "dstring", "title", "Title", q{""d}),
 PropSetting("gs_w_d", "int", "x", "X", "0"),
 PropSetting("gs_w_d", "int", "y", "Y", "0"),
-PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
-PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
-PropSetting("gs_w_d", "ulong", "form_width", "FormWidth", "0"),
-PropSetting("gs_w_d", "ulong", "form_height", "FormHeight", "0"),
+PropSetting("gs_w_d", "int", "width", "Width", "0"),
+PropSetting("gs_w_d", "int", "height", "Height", "0"),
+PropSetting("gs_w_d", "int", "form_width", "FormWidth", "0"),
+PropSetting("gs_w_d", "int", "form_height", "FormHeight", "0"),
 ];
 
 class Window : WindowI
@@ -76,8 +76,8 @@ class Window : WindowI
     private
     {
     	bool mouse_in;
-    	ulong mouse_x;
-    	ulong mouse_y;
+    	int mouse_x;
+    	int mouse_y;
     }
     
 	mixin mixin_multiple_properties_define!(WindowProperties);

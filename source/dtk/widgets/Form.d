@@ -174,15 +174,15 @@ class Form : ContainerI, WidgetI
     			WidgetI focusedWidget = this.getFocusedWidget();
     			WidgetI mouseFocusedWidget;
     			
-    			ulong mouseFocusedWidget_x = 0;
-    			ulong mouseFocusedWidget_y = 0;
+    			int mouseFocusedWidget_x = 0;
+    			int mouseFocusedWidget_y = 0;
     			
     			{
-    				ulong form_mouse_x;
-    				ulong form_mouse_y;
+    				int form_mouse_x;
+    				int form_mouse_y;
     				
-    				form_mouse_x = cast(ulong)event.em.x;
-    				form_mouse_y = cast(ulong)event.em.y;
+    				form_mouse_x = cast(int)event.em.x;
+    				form_mouse_y = cast(int)event.em.y;
     				
     				auto res = this.getChildAtPosition(
     					Position2D(
@@ -398,17 +398,17 @@ class Form : ContainerI, WidgetI
     	return l;
     }
     
-    ulong getX()
+    int getX()
     {
     	return 0;
     }
     
-    ulong getY()
+    int getY()
     {
     	return 0;
     }
     
-    ulong getWidth()
+    int getWidth()
     {
     	if (isSetWindow())
     	{
@@ -417,7 +417,7 @@ class Form : ContainerI, WidgetI
     	return 0;
     }
     
-    ulong getHeight()
+    int getHeight()
     {
     	if (isSetWindow())
     	{
@@ -426,22 +426,22 @@ class Form : ContainerI, WidgetI
     	return 0;
     }
     
-    Form setX(ulong v)
+    Form setX(int v)
     {
     	return this;
     }
     
-    Form setY(ulong v)
+    Form setY(int v)
     {
     	return this;
     }
     
-    Form setWidth(ulong v)
+    Form setWidth(int v)
     {
     	return this;
     }
     
-    Form setHeight(ulong v)
+    Form setHeight(int v)
     {
     	return this;
     }
@@ -565,17 +565,17 @@ class Form : ContainerI, WidgetI
     	return c.getChildAtPosition(Position2D(p_x - 5, p_y - 5));
     }
     
-    ulong getChildX(WidgetI child)
+    int getChildX(WidgetI child)
     {
     	return 5;
     }
     
-    ulong getChildY(WidgetI child)
+    int getChildY(WidgetI child)
     {
     	return 5;
     }
     
-    ulong getChildWidth(WidgetI child)
+    int getChildWidth(WidgetI child)
     {
     	auto x = getWidth();
     	if (x>5)
@@ -584,7 +584,7 @@ class Form : ContainerI, WidgetI
     		return 0;
     }
     
-    ulong getChildHeight(WidgetI child)
+    int getChildHeight(WidgetI child)
     {
     	auto x = getHeight();
     	if (x>5)
@@ -593,16 +593,16 @@ class Form : ContainerI, WidgetI
     		return 0;
     }
     
-    void setChildX(WidgetI child, ulong v)
+    void setChildX(WidgetI child, int v)
     {}
     
-    void setChildY(WidgetI child, ulong v)
+    void setChildY(WidgetI child, int v)
     {}
     
-    void setChildWidth(WidgetI child, ulong v)
+    void setChildWidth(WidgetI child, int v)
     {}
     
-    void setChildHeight(WidgetI child, ulong v)
+    void setChildHeight(WidgetI child, int v)
     {}
     
     void addChild(WidgetI child)

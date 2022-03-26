@@ -132,13 +132,13 @@ class Widget : WidgetI
     	import std.format;
     	mixin(
     		q{
-    			ulong get%1$s()
+    			int get%1$s()
     			{
     				exceptionIfParentNotSet();
     				return getParent().getChild%1$s(this);
     			}
     			
-    			typeof(this) set%1$s(ulong v)
+    			typeof(this) set%1$s(int v)
     			{
     				exceptionIfParentNotSet();
     				getParent().setChild%1$s(this, v);
@@ -172,7 +172,7 @@ class Widget : WidgetI
         throw new Exception("must be reimplemented");
     }
     
-    Image renderImage(ulong x, ulong y, ulong w, ulong h)
+    Image renderImage(int x, int y, int w, int h)
     {
     	// static assert(false, "must be reimplemented");
     	throw new Exception("must be reimplemented");

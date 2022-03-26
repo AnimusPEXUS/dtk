@@ -50,10 +50,10 @@ const auto LayoutChildProperties = cast(PropSetting[]) [
 // X, Y, Width and Height is for storring real effective values
 // users should not change those unless Layout is set to use
 // free positioning for widgets.
-PropSetting("gs_w_d", "ulong", "x", "X", "0"),
-PropSetting("gs_w_d", "ulong", "y", "Y", "0"),
-PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
-PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
+PropSetting("gs_w_d", "int", "x", "X", "0"),
+PropSetting("gs_w_d", "int", "y", "Y", "0"),
+PropSetting("gs_w_d", "int", "width", "Width", "0"),
+PropSetting("gs_w_d", "int", "height", "Height", "0"),
 
 // Each Layout Engine have it's own set of parameters for each child,
 // so LayoutChild somehow have to store settings for any engine child.
@@ -78,10 +78,10 @@ class LayoutChild
 const auto LayoutProperties = cast(PropSetting[]) [
 PropSetting("gsun", "LayoutEngineI", "layout_engine", "LayoutEngine", "null"),
 
-PropSetting("gs_w_d", "ulong", "viewport_x", "ViewPortX", "0"),
-PropSetting("gs_w_d", "ulong", "viewport_y", "ViewPortY", "0"),
-PropSetting("gs_w_d", "ulong", "viewport_width", "ViewPortWidth", "0"),
-PropSetting("gs_w_d", "ulong", "viewport_height", "ViewPortHeight", "0"),
+PropSetting("gs_w_d", "int", "viewport_x", "ViewPortX", "0"),
+PropSetting("gs_w_d", "int", "viewport_y", "ViewPortY", "0"),
+PropSetting("gs_w_d", "int", "viewport_width", "ViewPortWidth", "0"),
+PropSetting("gs_w_d", "int", "viewport_height", "ViewPortHeight", "0"),
 ];
 
 /++
@@ -209,7 +209,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	import std.format;
     	mixin(
     		q{
-    			ulong getChild%1$s(WidgetI child)
+    			int getChild%1$s(WidgetI child)
     			{
     				auto c = getLayoutChildByChild(child);
     				if (c is null)
@@ -221,7 +221,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     				return c.get%1$s();
     			}
     			
-    			void setChild%1$s(WidgetI child, ulong v)
+    			void setChild%1$s(WidgetI child, int v)
     			{
     				auto c = getLayoutChildByChild(child);
     				if (c is null)

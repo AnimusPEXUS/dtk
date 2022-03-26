@@ -15,8 +15,8 @@ struct WindowCreationSettings
 
     Nullable!int x;
     Nullable!int y;
-    Nullable!ulong width;
-    Nullable!ulong height;
+    Nullable!int width;
+    Nullable!int height;
 
     Nullable!bool fullscreen;
     Nullable!bool fullscreen_desktop;

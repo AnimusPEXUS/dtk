@@ -44,21 +44,21 @@ enum GenVisibilityMapForSubitemsLayout
 // NOTE: this function does not calculate wrapping. wrapping is based on
 //       lines and sublines sizes done by Text.reprocess() and it's subcalls
 void genVisibilityMapForSubitems(
-    ulong max_width, ulong max_height,
+    int max_width, int max_height,
     
-    ulong x, ulong y,
-    ulong width, ulong height,
+    int x, int y,
+    int width, int height,
     
     GenVisibilityMapForSubitemsLayout layout,
     
-    ulong delegate() getSubitemCount,
-    ulong delegate(ulong subitem_index) getSubitemWidth,
-    ulong delegate(ulong subitem_index) getSubitemHeight,
+    int delegate() getSubitemCount,
+    int delegate(int subitem_index) getSubitemWidth,
+    int delegate(int subitem_index) getSubitemHeight,
     void delegate(
-        ulong subitem_index,
-        ulong target_x, ulong target_y,
-        ulong x, ulong y,
-        ulong width, ulong height,
+        int subitem_index,
+        int target_x, int target_y,
+        int x, int y,
+        int width, int height,
         bool its_the_last_visible_item
         ) genVisibilityMapForSubitem,)
 {
@@ -74,24 +74,24 @@ void genVisibilityMapForSubitems(
     auto x2 = x + width;
     auto y2 = y + height;
     
-    ulong first_visible_item;
+    int first_visible_item;
     bool first_visible_item_found;
-    ulong first_visible_item_offset;
+    int first_visible_item_offset;
     
-    ulong last_visible_item;
+    int last_visible_item;
     bool last_visible_item_found;
-    ulong last_visible_item_offset;
+    int last_visible_item_offset;
     
-    ulong subitem_count = getSubitemCount();
+    int subitem_count = getSubitemCount();
     
     {
-        ulong processed_size;
+        int processed_size;
         
         {
-            ulong z;
-            ulong z2;
+            int z;
+            int z2;
             
-            ulong current_size;
+            int current_size;
             
             switch (layout)
             {
@@ -107,7 +107,7 @@ void genVisibilityMapForSubitems(
                 break;
             }
             
-            for (ulong i = 0; i != subitem_count; i++)
+            for (int i = 0; i != subitem_count; i++)
             {
             	
                 switch (layout)
@@ -155,79 +155,79 @@ void genVisibilityMapForSubitems(
     }
     
     {
-        ulong items_count = last_visible_item - first_visible_item+1;
+        int items_count = last_visible_item - first_visible_item+1;
         
-        ulong delegate(ulong i) calc_loop_target_x;
-        ulong delegate(ulong i) calc_loop_target_y;
-        ulong delegate(ulong i) calc_loop_source_x;
-        ulong delegate(ulong i) calc_loop_source_y;
-        ulong delegate(ulong i) calc_loop_source_width;
-        ulong delegate(ulong i) calc_loop_source_height;
+        int delegate(int i) calc_loop_target_x;
+        int delegate(int i) calc_loop_target_y;
+        int delegate(int i) calc_loop_source_x;
+        int delegate(int i) calc_loop_source_y;
+        int delegate(int i) calc_loop_source_width;
+        int delegate(int i) calc_loop_source_height;
         
         switch (layout)
         {
         default:
             throw new Exception("unknown layout");
         case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-            calc_loop_target_x = delegate ulong(ulong i) {
+            calc_loop_target_x = delegate int(int i) {
                 if (i == 0)
                     return 0;
-                ulong width;
-                for (ulong j = 0; j != i; j++)
+                int width;
+                for (int j = 0; j != i; j++)
                 {
                     width += getSubitemWidth(first_visible_item + j);
                 }
                 return width - first_visible_item_offset;
             };
             
-            calc_loop_target_y = delegate ulong(ulong i) { return 0; };
+            calc_loop_target_y = delegate int(int i) { return 0; };
             
-            calc_loop_source_x = delegate ulong(ulong i) {
+            calc_loop_source_x = delegate int(int i) {
                 if (i == 0)
                     return first_visible_item_offset;
                 return 0;
             };
             
-            calc_loop_source_y = delegate ulong(ulong i) { return 0; };
+            calc_loop_source_y = delegate int(int i) { return 0; };
             
-            calc_loop_source_width = delegate ulong(ulong i) {
+            calc_loop_source_width = delegate int(int i) {
                 if (i == 0)
                     return getSubitemWidth(first_visible_item + i)
                 - first_visible_item_offset;
                 return getSubitemWidth(first_visible_item + i);
             };
             
-            calc_loop_source_height = delegate ulong(ulong i) {
+            calc_loop_source_height = delegate int(int i) {
                 return getSubitemHeight(first_visible_item + i);
             };
             break;
         case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-            calc_loop_target_x = delegate ulong(ulong i) { return 0; };
+            calc_loop_target_x = delegate int(int i) { return 0; };
             
-            calc_loop_target_y = delegate ulong(ulong i) {
+            calc_loop_target_y = delegate int(int i) {
                 if (i == 0)
                     return 0;
-                ulong height;
-                for (ulong j = 0; j != i; j++)
+                int height;
+                for (int j = 0; j != i; j++)
                 {
                     height += getSubitemHeight(first_visible_item + j);
                 }
                 return height - first_visible_item_offset;
             };
             
-            calc_loop_source_x = delegate ulong(ulong i) { return 0; };
+            calc_loop_source_x = delegate int(int i) { return 0; };
             
-            calc_loop_source_y = delegate ulong(ulong i) {
+            calc_loop_source_y = delegate int(int i) {
                 if (i == 0)
                     return first_visible_item_offset;
                 return 0;
             };
             
-            calc_loop_source_width = delegate ulong(ulong i) {
+            calc_loop_source_width = delegate int(int i) {
                 return getSubitemWidth(first_visible_item + i);
             };
             
-            calc_loop_source_height = delegate ulong(ulong i) {
+            calc_loop_source_height = delegate int(int i) {
                 if (i == 0)
                     return getSubitemHeight(first_visible_item + i)
                 - first_visible_item_offset;
@@ -236,7 +236,7 @@ void genVisibilityMapForSubitems(
             break;
         }
         
-        for (ulong i = 0; i != items_count; i++)
+        for (int i = 0; i != items_count; i++)
         {
             auto tx = calc_loop_target_x(i);
             auto ty = calc_loop_target_y(i);
@@ -281,12 +281,12 @@ class TextChar
     
     mixin getState!("text_view.text_char_states", TextCharViewState);
     
-    ulong getWidth(TextView text_view)
+    int getWidth(TextView text_view)
     {
         return getState(text_view).resImg.width;
     }
     
-    ulong getHeight(TextView text_view)
+    int getHeight(TextView text_view)
     {
         return getState(text_view).resImg.height;
     }
@@ -393,10 +393,10 @@ class TextChar
         
         auto ret = new Image(width,height);
         
-        for (ulong x= 0 ; x != state.glyph.bitmap.width; x++)
+        for (int x= 0 ; x != state.glyph.bitmap.width; x++)
         {
             auto tx = x+bearing_x;
-            for (ulong y= 0 ; y != state.glyph.bitmap.height; y++)
+            for (int y= 0 ; y != state.glyph.bitmap.height; y++)
             {
                 auto ty = y+ascend-bearing_y;
                 auto dot = state.glyph.bitmap.getDot(x,y);
@@ -413,69 +413,69 @@ class TextChar
         return parent_line;
     }
     
-    ulong calcLineIndex()
+    int calcLineIndex()
     {
         auto lines = parent_line.parent_text.lines;
         foreach (i, v; lines)
         {
             if (v == parent_line)
             {
-                return i;
+                return  cast(int) i;
             }
         }
         throw new Exception("line not found");
     }
     
-    ulong calcLineColumnIndex()
+    int calcLineColumnIndex()
     {
         auto textchars = parent_line.textchars;
-        foreach (ulong i, v ; textchars)
+        foreach (i, v ; textchars)
         {
             if (v == this)
             {
-                return i;
+                return cast(int) i;
             }
         }
         throw new Exception("char not found");
     }
     
-    Tuple!(TextLine, ulong) calcLineAndColumnIndex()
+    Tuple!(TextLine, int) calcLineAndColumnIndex()
     {
         auto textchars = parent_line.textchars;
-        foreach (ulong i, v ; textchars)
+        foreach (i, v ; textchars)
         {
             if (v == this)
             {
-                return tuple(parent_line, i);
+                return tuple(parent_line, cast(int) i);
             }
         }
         throw new Exception("char not found");
     }
     
-    ulong calcSublineIndex(TextView text_view)
+    int calcSublineIndex(TextView text_view)
     {
         auto line_state = parent_line.getState(text_view);
         auto this_subline = calcSubline(text_view);
-        foreach (ulong i, v ; line_state.sublines)
+        foreach (i, v ; line_state.sublines)
         {
             if (v == this_subline)
             {
-                return i;
+                return cast(int) i;
             }
         }
         throw new Exception("subline not found");
     }
     
-    ulong calcSublineColumnIndex(TextView text_view)
+    int calcSublineColumnIndex(TextView text_view)
     {
         auto this_state = getState(text_view);
         auto this_subline = calcSubline(text_view);
         auto textchars = this_subline.getState(text_view).textchars;
-        foreach (ulong i, v ; textchars)
+        foreach (i, v ; textchars)
         {
             if (v == this)
             {
-                return i;
+                return cast(int) i;
             }
         }
         throw new Exception("subline column not found");
@@ -552,8 +552,8 @@ class TextChar
 class TextLineSublineViewState
 {
     TextChar[] textchars;
-    ulong width;
-    ulong height;
+    int width;
+    int height;
     // TextChar prev_char;
 }
 
@@ -573,12 +573,12 @@ class TextLineSubline
         TextLineSublineViewState
         );
     
-    ulong getWidth(TextView text_view)
+    int getWidth(TextView text_view)
     {
         return getState(text_view).width;
     }
     
-    ulong getHeight(TextView text_view)
+    int getHeight(TextView text_view)
     {
         return getState(text_view).height;
     }
@@ -647,17 +647,17 @@ class TextLineSubline
     }
     
     void genVisibilityMap(
-        ulong this_line_index,
-        ulong this_subline_index,
-        ulong this_line_done_chars_count,
+        int this_line_index,
+        int this_subline_index,
+        int this_line_done_chars_count,
         
-        ulong sublines_target_x,
-        ulong sublines_target_y,
+        int sublines_target_x,
+        int sublines_target_y,
         
-        ulong x,
-        ulong y,
-        ulong width,
-        ulong height,
+        int x,
+        int y,
+        int width,
+        int height,
         
         TextView text_view,
         ElementVisibilityMap visibility_map
@@ -674,26 +674,26 @@ class TextLineSubline
             
             parent_line.parent_text.getLineCharsLayout(),
             
-            delegate ulong()
+            delegate int()
             {
-                return state.textchars.length;
+                return cast(int) state.textchars.length;
             },
             
-            delegate ulong(ulong subitem_index)
+            delegate int(int subitem_index)
             {
                 return state.textchars[subitem_index].getWidth(text_view);
             },
             
-            delegate ulong(ulong subitem_index)
+            delegate int(int subitem_index)
             {
                 return state.textchars[subitem_index].getHeight(text_view);
             },
             
             delegate void(
-                ulong subitem_index,
-                ulong target_x, ulong target_y,
-                ulong x, ulong y,
-                ulong width, ulong height,
+                int subitem_index,
+                int target_x, int target_y,
+                int x, int y,
+                int width, int height,
                 bool its_the_last_visible_item
                 )
             {
@@ -726,53 +726,53 @@ class TextLineSubline
         return parent_line;
     }
     
-    ulong calcLineIndex()
+    int calcLineIndex()
     {
         auto lines = parent_line.parent_text.lines;
         foreach (i, v; lines)
         {
             if (v == parent_line)
             {
-                return i;
+                return cast(int) i;
             }
         }
         throw new Exception("line not found");
     }
     
-    ulong calcLineColumnIndex()
+    int calcLineColumnIndex()
     {
         auto textchars = parent_line.textchars;
-        foreach (ulong i, v ; textchars)
+        foreach (i, v ; textchars)
         {
             if (v == this)
             {
-                return i;
+                return cast(int) i;
             }
         }
         throw new Exception("char not found");
     }
     
-    Tuple!(TextLine, ulong) calcLineAndColumnIndex()
+    Tuple!(TextLine, int) calcLineAndColumnIndex()
     {
         auto textchars = parent_line.textchars;
-        foreach (ulong i, v ; textchars)
+        foreach (i, v ; textchars)
         {
             if (v == this)
             {
-                return tuple(parent_line, i);
+                return tuple(parent_line, cast(int) i);
             }
         }
         throw new Exception("char not found");
     }
     
-    ulong calcSublineIndex(TextView text_view)
+    int calcSublineIndex(TextView text_view)
     {
         auto line_state = parent_line.getState(text_view);
-        foreach (ulong i, v ; line_state.sublines)
+        foreach (i, v ; line_state.sublines)
         {
             if (v == this)
             {
-                return i;
+                return cast(int) i;
             }
         }
         throw new Exception("subline not found");
@@ -878,8 +878,8 @@ class TextLineSubline
 class TextLineViewState
 {
     TextLineSubline[] sublines;
-    ulong width;
-    ulong height;
+    int width;
+    int height;
 }
 
 class TextLine
@@ -895,7 +895,7 @@ class TextLine
     
     mixin getState!("text_view.text_line_states", TextLineViewState);
     
-    ulong getLength()
+    int getLength()
     {
         auto ret = textchars.length;
         
@@ -904,7 +904,7 @@ class TextLine
         {
             ret++;
         }
-        return  ret;
+        return cast(int) ret;
     }
     
     void setText(dstring txt)
@@ -957,13 +957,13 @@ class TextLine
         
         // each line always have at least one subline
         state.sublines ~= new TextLineSubline(this);
-        ulong current_line = 0;
+        int current_line = 0;
         
         // TODO: comment this out?
         /* reprocessUnits(text_view); */
         
         // TODO: optimization required
-        ulong required_size;
+        int required_size;
         
         if (text_view.getVirtualWrapBySpace()
             || text_view.getVirtualWrapByChar())
@@ -986,7 +986,7 @@ class TextLine
             }
         }
         
-        ulong current_size = 0;
+        int current_size = 0;
         
         auto sl = state.sublines[current_line];
         auto sl_state = sl.getState(text_view);
@@ -995,7 +995,7 @@ class TextLine
         
         foreach (tc; textchars)
         {
-            ulong s;
+            int s;
             
             // auto tc_state = tc.getState(text_view);
             
@@ -1121,11 +1121,11 @@ class TextLine
         return ret;
     }
     
-    dstring getText(ulong start, ulong stop)
+    dstring getText(int start, int stop)
     {
         dstring ret;
         
-        for (ulong i = start; i != stop; i++)
+        for (int i = start; i != stop; i++)
         {
             ret ~= textchars[i].chr;
         }
@@ -1135,15 +1135,15 @@ class TextLine
     
     void genVisibilityMap(
         // this is passed deeper to TextChar and stored to visibility_map items
-        ulong this_line_index,
+        int this_line_index,
         
-        ulong lines_target_x,
-        ulong lines_target_y,
+        int lines_target_x,
+        int lines_target_y,
         
-        ulong x,
-        ulong y,
-        ulong width,
-        ulong height,
+        int x,
+        int y,
+        int width,
+        int height,
         
         TextView text_view,
         ElementVisibilityMap visibility_map
@@ -1159,30 +1159,30 @@ class TextLine
             
             parent_text.getLinesLayout(),
             
-            delegate ulong()
+            delegate int()
             {
-                return state.sublines.length;
+                return cast(int) state.sublines.length;
             },
             
-            delegate ulong(ulong subitem_index)
+            delegate int(int subitem_index)
             {
                 return state.sublines[subitem_index].getState(text_view).width;
             },
             
-            delegate ulong(ulong subitem_index)
+            delegate int(int subitem_index)
             {
                 return state.sublines[subitem_index].getState(text_view).height;
             },
             delegate  void(
-                ulong subitem_index,
-                ulong target_x, ulong target_y,
-                ulong x, ulong y,
-                ulong width, ulong height,
+                int subitem_index,
+                int target_x, int target_y,
+                int x, int y,
+                int width, int height,
                 bool its_the_last_visible_item
                 )
             {
-                ulong sum=0;
-                /* ulong width_or_height_offset=0; */
+                int sum=0;
+                /* int width_or_height_offset=0; */
                 foreach (v;state.sublines[0 .. subitem_index])
                 {
                     sum += v.getState(text_view).textchars.length;
@@ -1203,19 +1203,19 @@ class TextLine
         
     }
     
-    ulong calcSublinesCount(TextView text_view)
+    int calcSublinesCount(TextView text_view)
     {
         auto state = getState(text_view);
-        return state.sublines.length;
+        return cast(int) state.sublines.length;
     }
     
-    ulong calcLineIndex()
+    int calcLineIndex()
     {
-    	foreach (ulong i, v; parent_text.lines)
+    	foreach (i, v; parent_text.lines)
     	{
     		if (v == this)
     		{
-    			return i;
+    			return cast(int) i;
     		}
     	}
     	throw new Exception("this line is not in text's lines");
@@ -1263,8 +1263,8 @@ enum TextMarkupType
 
 class TextViewState
 {
-    ulong width;
-    ulong height;
+    int width;
+    int height;
 }
 
 const auto TextProperties = cast(PropSetting[]) [
@@ -1293,8 +1293,8 @@ PropSetting(
 
 PropSetting("gs_w_d", "string", "faceFamily", "FaceFamily", q{"Go"}),
 PropSetting("gs_w_d", "string", "faceStyle", "FaceStyle", "\"Regular\""),
-PropSetting("gs_w_d", "uint", "faceSize", "FaceSize", "20*64"),
-PropSetting("gs_w_d", "uint", "faceResolution", "FaceResolution", "72"),
+PropSetting("gs_w_d", "int", "faceSize", "FaceSize", "20*64"),
+PropSetting("gs_w_d", "int", "faceResolution", "FaceResolution", "72"),
 
 PropSetting("gs_w_d", "bool", "bold", "Bold", "false"),
 PropSetting("gs_w_d", "bool", "italic", "Italic", "false"),
@@ -1370,16 +1370,16 @@ class Text
         static foreach(
             v;
             [
-            // stname("X", "ulong"),
-            // stname("Y", "ulong"),
+            // stname("X", "int"),
+            // stname("Y", "int"),
             stname("TextMarkupType", "TextMarkupType"),
             stname("LinesLayout", "GenVisibilityMapForSubitemsLayout"),
             stname("LineCharsLayout", "GenVisibilityMapForSubitemsLayout"),
             
             stname("FaceFamily", "string"),
             stname("FaceStyle", "string"),
-            stname("FaceSize", "uint"),
-            stname("FaceResolution", "uint"),
+            stname("FaceSize", "int"),
+            stname("FaceResolution", "int"),
             
             stname("Bold", "bool"),
             stname("Italic", "bool"),
@@ -1600,20 +1600,23 @@ class Text
         return ret;
     }
     
-    dstring getText(ulong start, ulong stop)
+    dstring getText(int start, int stop)
     {
+    	assert(start >= 0);
+    	assert(stop >= 0);
+    	
         bool first_found = false;
-        ulong first_text_textchar;
-        ulong first_text_textchar_index;
+        int first_text_textchar;
+        int first_text_textchar_index;
         
         bool last_found = false;
-        ulong last_text_textchar;
-        ulong last_text_textchar_index;
+        int last_text_textchar;
+        int last_text_textchar_index;
         
         bool searching_first = true;
         
-        /* ulong prev_length = 0; */
-        ulong calc_length = 0;
+        /* int prev_length = 0; */
+        int calc_length = 0;
         
         {
             if (start > stop)
@@ -1634,14 +1637,14 @@ class Text
             if (start < calc_length + l_l)
             {
                 first_found = true;
-                first_text_textchar = i;
+                first_text_textchar = cast(int) i;
                 first_text_textchar_index = start - calc_length;
             }
             
             if (stop < calc_length + l_l)
             {
                 last_found = true;
-                last_text_textchar = i;
+                last_text_textchar = cast(int) i;
                 last_text_textchar_index = stop - calc_length;
             }
             
@@ -1661,12 +1664,14 @@ class Text
         
         dstring ret;
         
-        ret ~= lines[first_text_textchar].getText(first_text_textchar_index,
-            lines[first_text_textchar].textchars.length);
+        ret ~= lines[first_text_textchar].getText(
+        	first_text_textchar_index,
+            cast(int) lines[first_text_textchar].textchars.length
+            );
         
         if (last_text_textchar - first_text_textchar > 1)
         {
-            for (ulong i = first_text_textchar + 1; i < last_text_textchar; i++)
+            for (int i = first_text_textchar + 1; i < last_text_textchar; i++)
             {
                 ret ~= "\n" ~ lines[i].getText();
             }
@@ -1681,8 +1686,8 @@ class Text
     }
     
     void genVisibilityMap(
-        ulong x, ulong y,
-        ulong width, ulong height,
+        int x, int y,
+        int width, int height,
         TextView text_view,
         ElementVisibilityMap visibility_map
         )
@@ -1697,23 +1702,23 @@ class Text
             
             getLinesLayout(),
             
-            delegate ulong()
+            delegate int()
             {
-                return lines.length;
+                return cast(int) lines.length;
             },
-            delegate ulong(ulong subitem_index)
+            delegate int(int subitem_index)
             {
                 return lines[subitem_index].getState(text_view).width;
             },
-            delegate ulong(ulong subitem_index)
+            delegate int(int subitem_index)
             {
                 return lines[subitem_index].getState(text_view).height;
             },
             delegate void(
-                ulong subitem_index,
-                ulong target_x, ulong target_y,
-                ulong x, ulong y,
-                ulong width, ulong height,
+                int subitem_index,
+                int target_x, int target_y,
+                int x, int y,
+                int width, int height,
                 bool its_the_last_visible_item
                 )
             {
@@ -1730,9 +1735,9 @@ class Text
         
     }
     
-    ulong getLength()
+    int getLength()
     {
-        ulong ret;
+        int ret;
         foreach (i, l; lines)
         {
             ret += l.textchars.length;
@@ -1741,34 +1746,34 @@ class Text
         return ret;
     }
     
-    bool isLineEmpty(ulong line)
+    bool isLineEmpty(int line)
     {
         return getTextLine(line).textchars.length == 0;
     }
     
     bool isEOL(
-        ulong line, ulong column
+        int line, int column
         )
     {
         return getTextLine(line).textchars.length == column;
     }
     
     TextLine getTextLine(
-        ulong line
+        int line
         )
     {
         return lines[line];
     }
     
     TextChar getTextLineChar(
-        ulong line, ulong column
+        int line, int column
         )
     {
         return getTextLine(line).textchars[column];
     }
     
     bool isEOL(
-        ulong line, ulong subline, ulong subline_column,
+        int line, int subline, int subline_column,
         TextView text_view
         )
     {
@@ -1778,7 +1783,7 @@ class Text
     }
     
     bool isEOSL(
-        ulong line, ulong subline, ulong subline_column,
+        int line, int subline, int subline_column,
         TextView text_view
         )
     {
@@ -1787,7 +1792,7 @@ class Text
     }
     
     TextLineSubline getTextLineSubline(
-        ulong line, ulong subline,
+        int line, int subline,
         TextView text_view
         )
     {
@@ -1795,7 +1800,7 @@ class Text
     }
     
     TextChar getTextLineSublineChar(
-        ulong line, ulong subline, ulong column,
+        int line, int subline, int column,
         TextView text_view
         )
     {
@@ -1860,24 +1865,24 @@ enum TextViewMode
 }
 
 const auto TextViewProperties = cast(PropSetting[]) [
-PropSetting("gs_w_d", "ulong", "x", "X", "0"),
-PropSetting("gs_w_d", "ulong", "y", "Y", "0"),
-PropSetting("gs_w_d", "ulong", "width", "Width", "0"),
-PropSetting("gs_w_d", "ulong", "height", "Height", "0"),
+PropSetting("gs_w_d", "int", "x", "X", "0"),
+PropSetting("gs_w_d", "int", "y", "Y", "0"),
+PropSetting("gs_w_d", "int", "width", "Width", "0"),
+PropSetting("gs_w_d", "int", "height", "Height", "0"),
 
 // TODO: text selection mechanism looks dumb
 PropSetting("gs_w_d", "bool", "text_selection_enabled", "TextSelectionEnabled", "true"),
 PropSetting("gs_w_d", "bool", "text_selected", "TextSelected", "false"),
-PropSetting("gs_w_d", "ulong", "selection_start", "TextSelectionStart", "0"),
-PropSetting("gs_w_d", "ulong", "selection_end", "TextSelectionEnd", "0"),
+PropSetting("gs_w_d", "int", "selection_start", "TextSelectionStart", "0"),
+PropSetting("gs_w_d", "int", "selection_end", "TextSelectionEnd", "0"),
 
 PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
 
 // NOTE: I think it's better not to create entire property for this
 // PropSetting("gs_w_d", "bool", "cursor_animation_iteration_visible", "CursorAnimationIterationVisible", "false"),
 
-//PropSetting("gs_w_d", "ulong", "cursor_position_line", "CursorPositionLine", "0"),
-//PropSetting("gs_w_d", "ulong", "cursor_position_column", "CursorPositionColumn", "0"),
+//PropSetting("gs_w_d", "int", "cursor_position_line", "CursorPositionLine", "0"),
+//PropSetting("gs_w_d", "int", "cursor_position_column", "CursorPositionColumn", "0"),
 
 PropSetting("gs_w_d", "bool", "readOnly", "ReadOnly", "false"),
 
@@ -1936,8 +1941,8 @@ class TextView
         static foreach(
             v;
             [
-            stname("Width", "ulong"),
-            stname("Height", "ulong"),
+            stname("Width", "int"),
+            stname("Height", "int"),
             
             stname("TextViewMode", "TextViewMode"),
             stname("VirtualWrapBySpace", "bool"),
@@ -1962,10 +1967,10 @@ class TextView
         static foreach(
             v;
             [
-            stname("X", "ulong"),
-            stname("Y", "ulong"),
-            // stname("Width", "ulong"),
-            // stname("Height", "ulong"),
+            stname("X", "int"),
+            stname("Y", "int"),
+            // stname("Width", "int"),
+            // stname("Height", "int"),
             ]
             )
         {
@@ -2048,10 +2053,10 @@ class TextView
     {
     	if (ds is null)
     		ds = getDrawingSurface();
-        ulong x;
-        ulong y;
-        ulong width;
-        ulong height;
+        int x;
+        int y;
+        int width;
+        int height;
         
         x = getX();
         y = getY();
@@ -2068,10 +2073,10 @@ class TextView
     }
     
     void drawImageToDrawingSurface(
-        ulong target_x,
-        ulong target_y,
-        ulong width,
-        ulong height,
+        int target_x,
+        int target_y,
+        int width,
+        int height,
         DrawingSurfaceI ds
         )
     {
@@ -2209,9 +2214,9 @@ class TextView
             // auto tv_x = getX();
             // auto tv_y = getY();
             
-            for (ulong y = 0; y < chr_image.height; y++)
+            for (int y = 0; y < chr_image.height; y++)
             {
-                for (ulong x = 0; x < chr_image.width; x++)
+                for (int x = 0; x < chr_image.width; x++)
                 {
                     auto bg_dot = _rendered_image.getDot(
                         e.target_x+x,
@@ -2285,9 +2290,9 @@ class TextView
             bg_dot.intensivity=1;
             bg_dot.color = text.getDefaultBGColor();
             
-            for (ulong y = 0; y != h; y++)
+            for (int y = 0; y != h; y++)
             {
-                for (ulong x = 0; x != w; x++)
+                for (int x = 0; x != w; x++)
                 {
                     _rendered_image.drawDot(
                         Position2D(
@@ -2376,10 +2381,10 @@ class TextView
     	
         CursorPosition cusor_pos;
         
-        ulong x;
-        ulong y;
-        ulong width;
-        ulong height;
+        int x;
+        int y;
+        int width;
+        int height;
         
         if (visibility_map is null)
         {
@@ -2408,7 +2413,7 @@ class TextView
             clearCursor(res[1], res[2], res[3], res[4]);
     }
     
-    void drawCursor(ulong x,ulong y,ulong width,ulong height)
+    void drawCursor(int x,int y,int width,int height)
     {
         auto ds = getDrawingSurface();
         
@@ -2419,9 +2424,9 @@ class TextView
         
         // auto color = Color(cast(ubyte[3])[255,0,0]);
         
-        for (ulong i = x; i != x+width; i++)
+        for (int i = x; i != x+width; i++)
         {
-            for (ulong j = y; j != y+height; j++)
+            for (int j = y; j != y+height; j++)
             {
                 ds.drawDot(Position2D(cast(int)i,cast(int)j),dot);
             }
@@ -2438,11 +2443,11 @@ class TextView
         clearCursor(res[1], res[2], res[3], res[4]);
     }
     
-    void clearCursor(ulong x,ulong y,ulong width,ulong height) {
+    void clearCursor(int x,int y,int width,int height) {
         drawImageToDrawingSurface(x, y, width, height, null);
     }
     
-    Tuple!(bool, ulong, ulong, ulong, ulong) calculateVisibleCursor(
+    Tuple!(bool, int, int, int, int) calculateVisibleCursor(
         CursorPosition cursor_pos
         )
     {
@@ -2456,12 +2461,12 @@ class TextView
             writeln("   atEOVL:", cursor_pos.atEOVL(this));
         }
         
-        auto fail_res = tuple(false, 0UL,0UL,0UL,0UL);
+        auto fail_res = tuple(false, 0,0,0,0);
         
-        ulong x;
-        ulong y;
-        ulong width;
-        ulong height;
+        int x;
+        int y;
+        int width;
+        int height;
         
         if (visibility_map is null)
             return fail_res;
@@ -2566,11 +2571,11 @@ class TextView
         return fail_res;
     }
     
-    void changeCursorPositionByCoordinates(ulong x, ulong y)
+    void changeCursorPositionByCoordinates(int x, int y)
     {
     	
-        ulong line;
-        ulong column;
+        int line;
+        int column;
         
         auto el_clicked = determineVisibleElementAt(x,y);
         
@@ -2669,7 +2674,7 @@ class TextView
         // element after the clicked (null if it's not in view)
         ElementVisibilityMapElement, // 6
         )
-    determineVisibleElementAt(ulong x, ulong y)
+    determineVisibleElementAt(int x, int y)
     {
         auto fail_res = tuple(
             cast(ElementVisibilityMapElement) null,
@@ -2727,7 +2732,7 @@ class TextView
     }
     
     
-    void click(ulong x, ulong y)
+    void click(int x, int y)
     {
         if (getCursorEnabled())
         {
@@ -2750,7 +2755,7 @@ class TextView
         
         auto cp_chr = cp.chr;
         TextLine line;
-        ulong index;
+        int index;
         bool atEOVL=cp.atEOVL(this);
         
         if (cp.chr !is null) {
@@ -2880,7 +2885,7 @@ class TextView
             	if (cp.chr !is null)
             	{
             		TextLine line;
-            		ulong line_column_index;
+            		int line_column_index;
             		{
             			auto line_and_column_index = cp.chr.calcLineAndColumnIndex();
             			line = line_and_column_index[0];
@@ -2970,7 +2975,7 @@ class TextView
             	if (cp.chr !is null)
             	{
             		TextLine line;
-            		ulong    line_column_index;
+            		int    line_column_index;
             		{
             			auto line_and_index = cp.chr.calcLineAndColumnIndex();
             			line = line_and_index[0];
@@ -3020,7 +3025,7 @@ class TextView
             	else
             	{
             		TextLine line = cp.subline.calcLine();
-					ulong line_index = line.calcLineIndex();
+					int line_index = line.calcLineIndex();
             		if (line_index == text.lines.length-1) {
             			return;
             		}
@@ -3097,19 +3102,19 @@ class TextView
     	}
     	
         TextLine cursor_line;
-        ulong cursor_line_index;
-        ulong cursor_subline_index;
-        ulong cursor_line_subline_count;
+        int cursor_line_index;
+        int cursor_subline_index;
+        int cursor_line_subline_count;
         
         TextLineSubline cursor_subline;
-        ulong cursor_subline_column_index;
+        int cursor_subline_column_index;
         
         if (cursor.chr !is null)
         {
             cursor_line = cursor.chr.calcLine();
             cursor_line_index = cursor.chr.calcLineIndex();
             cursor_subline_index = cursor.chr.calcSublineIndex(this);
-            cursor_line_subline_count = cursor_line.getState(this).sublines.length;
+            cursor_line_subline_count = cast(int) cursor_line.getState(this).sublines.length;
             
             cursor_subline = cursor.chr.calcSubline(this);
             cursor_subline_column_index = cursor.chr.calcSublineColumnIndex(this);
@@ -3119,12 +3124,12 @@ class TextView
             cursor_line = cursor.subline.calcLine();
             cursor_line_index = cursor.subline.calcLineIndex();
             cursor_subline_index = cursor.subline.calcSublineIndex(this);
-            cursor_line_subline_count = cursor_line.getState(this).sublines.length;
+            cursor_line_subline_count = cast(int) cursor_line.getState(this).sublines.length;
             
             cursor_subline = cursor.subline;
         }
         
-        ulong same_line_chars_width_or_height;
+        int same_line_chars_width_or_height;
         
         auto textchars = cursor_subline.getState(this).textchars;
         
@@ -3188,7 +3193,7 @@ class TextView
         TextChar new_char;
         bool new_atEOL;
         bool new_atEOVL;
-        ulong new_line_chars_width_or_height;
+        int new_line_chars_width_or_height;
         
         bool new_char_found = false;
         foreach (v;new_subline.getState(this).textchars)
@@ -3283,7 +3288,7 @@ class TextView
     	}
     	else
     	{
-    		ulong chr_index = cp.chr.calcSublineColumnIndex(this);
+    		int chr_index = cp.chr.calcSublineColumnIndex(this);
     		auto subline_textchars = subline.getState(this).textchars;
     		if (!prev)
     		{
@@ -3371,12 +3376,12 @@ class ElementVisibilityMapElement
     ElementVisibilityMap map;
     TextChar chr;
     
-    ulong target_x;
-    ulong target_y;
-    ulong x;
-    ulong y;
-    ulong width;
-    ulong height;
+    int target_x;
+    int target_y;
+    int x;
+    int y;
+    int width;
+    int height;
 }
 
 class ElementVisibilityMap

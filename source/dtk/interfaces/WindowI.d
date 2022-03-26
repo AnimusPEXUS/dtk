@@ -46,16 +46,16 @@ interface WindowI
 
     int getX();
     int getY();
-    ulong getWidth();
-    ulong getHeight();
+    int getWidth();
+    int getHeight();
     
-    ulong getFormWidth();
-    ulong getFormHeight();
+    int getFormWidth();
+    int getFormHeight();
     
     WindowI setX(int v);
     WindowI setY(int v);
-    WindowI setWidth(ulong v);
-    WindowI setHeight(ulong v);
+    WindowI setWidth(int v);
+    WindowI setHeight(int v);
 
     dstring getTitle();
     WindowI setTitle(dstring value);
