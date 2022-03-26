@@ -204,10 +204,10 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 
 /* string mixin_propagateParentChangeEmision_this()
 {
-	return q{
-		import core.sync.mutex;
-		propagateParentChangeEmision_recursion_protection_mtx = new Mutex();
-	};
+return q{
+import core.sync.mutex;
+propagateParentChangeEmision_recursion_protection_mtx = new Mutex();
+};
 } */
 
 mixin template mixin_propagateParentChangeEmision()
@@ -224,7 +224,7 @@ mixin template mixin_propagateParentChangeEmision()
     	import dtk.miscs.recursionGuard;
     	import core.sync.mutex;
     	
-    	synchronized 
+    	synchronized
     	{
     		if (propagateParentChangeEmision_recursion_protection_mtx is null)
     			propagateParentChangeEmision_recursion_protection_mtx = new Mutex();

@@ -37,6 +37,8 @@ import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
 import dtk.widgets.Picture;
 
+import dtk.miscs.DrawingSurfaceShift;
+
 // TODO: deprecate Position2D and Size2D and pass values directly
 
 const
@@ -288,23 +290,23 @@ class Chicago98Laf : LafI
     {
         // auto size_w = cast(int) widget.getWidth();
         // auto size_h = cast(int) widget.getHeight();
-        // 
+        //
         // ds.drawRectangle(
-        	// Position2D(0, 0),
-        	// Size2D(size_w, size_h),
-        	// LineStyle(Color(cast(ubyte[3])[55,55,55])),
-        	// nullable(FillStyle(Color(cast(ubyte[3])[100,100,100])))
-        	// );
+        // Position2D(0, 0),
+        // Size2D(size_w, size_h),
+        // LineStyle(Color(cast(ubyte[3])[55,55,55])),
+        // nullable(FillStyle(Color(cast(ubyte[3])[100,100,100])))
+        // );
     }
     
     // void drawMenu(Menu widget, DrawingSurfaceI ds)
     // {
     // }
-    // 
+    //
     // void drawMenuItem(MenuItem widget, DrawingSurfaceI ds)
     // {
     // }
-    // 
+    //
     // void drawBar(Bar widget, DrawingSurfaceI ds)
     // {
     // }
@@ -322,29 +324,37 @@ class Chicago98Laf : LafI
         auto draw_bewel = widget.getDrawBewelAndBackground();
         auto bewel_bg_color = widget.getBewelBackgroundColor();
         
+        auto tv_ds = ds;
+        
         if (draw_bewel)
         {
+        	tv_ds = new DrawingSurfaceShift(
+    			ds,
+    			cast(int)widget.padding_left,
+    			cast(int)widget.padding_top
+    			);
+    		
             drawBewel(
             	ds,
             	Position2D(pos_x, pos_y),
             	Size2D(size_w, size_h),
             	true
             	);
-            pos_x += 2;
-            pos_y += 2;
-            size_w -= 4;
-            size_h -= 4;
+            pos_x = cast(int) widget.padding_left;
+            pos_y = cast(int) widget.padding_top;
+            size_w = cast(int) widget.tv_width;
+            size_h = cast(int) widget.tv_height;
             ds.drawRectangle(
-                Position2D(pos_x, pos_y),
-                Size2D(size_w, size_h),
-                LineStyle(Color(0)),
-                nullable(FillStyle(bewel_bg_color))
-                );
+            	Position2D(pos_x, pos_y),
+            	Size2D(size_w, size_h),
+            	LineStyle(Color(0)),
+            	nullable(FillStyle(bewel_bg_color))
+            	);
         }
         
         if (widget.text_view !is null)
         {
-        	widget.text_view.completeRedrawToDS(ds);
+        	widget.text_view.completeRedrawToDS(tv_ds);
         }
     }
 }

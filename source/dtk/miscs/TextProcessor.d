@@ -1339,17 +1339,17 @@ class Text
     TextLine[] lines;
     
     mixin mixin_installSignal!(
-    	"LinesRecalcRequired", 
+    	"LinesRecalcRequired",
     	"signal_linesRecalcRequired",
     	false,
     	);
     mixin mixin_installSignal!(
-    	"VisibilityMapRecalcRequired", 
+    	"VisibilityMapRecalcRequired",
     	"signal_visibilityMapRecalcRequired",
     	false,
     	);
     mixin mixin_installSignal!(
-    	"ImageRegenRequired", 
+    	"ImageRegenRequired",
     	"signal_imageRegenRequired",
     	false,
     	);

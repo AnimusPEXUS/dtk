@@ -281,16 +281,6 @@ class Window : WindowI
     
     Tuple!(bool, Position2D) getMousePosition()
     {
-    	/*     	auto ret_fail = tuple(false, Position2D(0,0));
-    	int x;
-    	int y;
-    	SDL_GetMouseState(&x, &y);
-    	if (x < 0 || y < 0)
-    	{
-    	debug writeln("getMousePosition: x or y is negative");
-    	return ret_fail;
-    	}
-    	return tuple(true, Position2D(x,y)); */
     	return tuple(mouse_in, Position2D(cast(int)mouse_x,cast(int)mouse_y));
     }
     

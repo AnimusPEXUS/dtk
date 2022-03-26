@@ -37,7 +37,7 @@ PropSetting("gs_w_d", "bool", "font_italic", "FontItalic", "false"),
 PropSetting("gs_w_d", "bool", "font_bold", "FontBold", "false"),
 PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_lines", "LayoutLines", "GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft"),
 PropSetting("gs_w_d", "GenVisibilityMapForSubitemsLayout", "layout_line_chars", "LayoutChars", "GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop"),
-PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "false"),
+PropSetting("gs_w_d", "bool", "draw_bewel_and_background", "DrawBewelAndBackground", "true"),
 PropSetting("gs_w_d", "Color", "bewel_background_color", "BewelBackgroundColor", q{Color(cast(ubyte[3])[255,255,255])}),
 PropSetting("gs_w_d", "bool", "multiline", "Multiline", "false"),
 PropSetting("gs_w_d", "bool", "virtual_wrap_by_char", "VirtualWrapByChar", "false"),
@@ -82,6 +82,8 @@ class TextEntry : Widget, WidgetI
     {
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	// mixin(mixin_propagateParentChangeEmision_this());
+    	
+    	recalcPaddings();
     	
         text_view = new TextView();
         text_view.getForm = delegate Form()
@@ -147,9 +149,14 @@ class TextEntry : Widget, WidgetI
                                         auto err = collectException(
                                             applySettingsToTextProcessor()
                                             );
-                                        if (err !is null)
+                                        debug if (err !is null)
                                         {
                                             writeln(err);
+                                        }
+                                        
+                                        static if(is(%1$s == DrawBewelAndBackground))
+                                        {
+                                        	recalcPaddings();
                                         }
                                     }()
                                     );
@@ -158,39 +165,6 @@ class TextEntry : Widget, WidgetI
                         );
                 }.format(v.sname, v.tname));
         }
-        
-        /* con_cont.add(
-        connectToSize_onAfterChanged(
-        delegate void(Size2D old_value, Size2D new_value)
-        {
-        collectException(
-        {
-        auto err = collectException(
-        applySettingsToTextProcessor()
-        );
-        if (err !is null)
-        {
-        writeln(err);
-        }
-        }()
-        );
-        }
-        )
-        ); */
-        
-        /*  con_cont.add(connectToText_onAfterChanged(&afterTextChanged)); */
-        
-        /*  setMouseEvent("button-click", &on_mouse_click_internal);
-        setTextInputEvent("text-input", &on_text_input_internal);
-        
-        setKeyboardEvent("key-down", &on_keyboard_down_internal);
-        setKeyboardEvent("key-up", &on_keyboard_up_internal); */
-        
-        // textViewConnCon = text_view.connectTo_PerformRedraw(
-        // &on_textview_redraw_request
-        // );
-        
-        // textViewTimerConnection = getForm()
         
     }
     
@@ -207,55 +181,20 @@ class TextEntry : Widget, WidgetI
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
     {
-    	// auto x = getX();
-    	// auto y = getY();
-        // if (getDrawBewelAndBackground())
-        // {
-        	// x+=2;
-        	// y+=2;
-        // }
-        
-        auto ds = new DrawingSurfaceShift(
-        	getDrawingSurface(),
-        	cast(int)0,
-        	cast(int)0
-        	);
+    	auto ds = getDrawingSurface();
+    	
+    	if (getDrawBewelAndBackground())
+    	{
+    		ds = new DrawingSurfaceShift(
+    			ds,
+    			cast(int)padding_left,
+    			cast(int)padding_top
+    			);
+        }
         
         return ds;
     }
     
-    /* void on_mouse_click_internal(
-        EventMouse* event,
-        ulong x,
-        ulong y
-        )
-    {
-        auto f = getForm();
-        f.focusTo(this);
-        
-        if (getDrawBewelAndBackground())
-        {
-            if (x <= 2 || y <= 2)
-                return;
-            x -= 2;
-            y -= 2;
-        }
-        
-        text_view.click(x, y);
-        
-        return ;
-    } */
-    
-    // void on_text_input_internal(
-        // EventTextInput* event,
-        // ulong x,
-        // ulong y
-        // )
-    // {
-        // text_view.textInput(event.text);
-        // redraw(); // TODO: maybe this is too expansive and optimization is required
-    // }
-    // 
     void on_keyboard_internal(
     	string type, // TODO: better type for parameter
     	EventKeyboard* event,
@@ -263,11 +202,11 @@ class TextEntry : Widget, WidgetI
     	ulong y
     	)
     {
-    	debug writeln("EventKeyboard: ");
-    	debug writeln("  keyState: ", event.keyState);
-    	debug writeln("      type: ", type);
-    	debug writeln("    repeat: ", event.repeat);
-    	debug writeln("    keysym: ", event.keysym);
+    	// debug writeln("EventKeyboard: ");
+    	// debug writeln("  keyState: ", event.keyState);
+    	// debug writeln("      type: ", type);
+    	// debug writeln("    repeat: ", event.repeat);
+    	// debug writeln("    keysym: ", event.keysym);
     	
     	text_view.keyboardInput(type, event);
     }
@@ -324,15 +263,47 @@ class TextEntry : Widget, WidgetI
     
     override void propagatePosAndSizeRecalc()
     {
-		auto w = getWidth();
-    	auto h = getHeight();
+    	recalcTVSize();
+        text_view.setWidth(tv_width);
+        text_view.setHeight(tv_height);
+    }
+    
+    public
+    {
+    	ulong padding_left;
+    	ulong padding_top;
+    	ulong padding_right;
+    	ulong padding_bottom;
+    	ulong tv_width;
+    	ulong tv_height;
+    }
+    
+    void recalcPaddings()
+    {
     	if (getDrawBewelAndBackground())
-        {
-        	w -=4;
-        	h -=4;
-        }
-        text_view.setWidth(w);
-        text_view.setHeight(h);
+    	{
+    		padding_left = 2;
+    		padding_top = 2;
+    		padding_right = 2;
+    		padding_bottom = 2;
+    	}
+    	else
+    	{
+    		padding_left = 0;
+    		padding_top = 0;
+    		padding_right = 0;
+    		padding_bottom = 0;
+    	}
+    }
+    
+    void recalcTVSize()
+    {
+    	auto w = getWidth();
+    	auto h = getHeight();
+    	auto p_lr = padding_left + padding_right;
+    	auto p_tb = padding_top + padding_bottom;
+    	tv_width = w > p_lr ? w - p_lr : 0;
+    	tv_height = h > p_tb ? h - p_tb : 0;
     }
     
     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
@@ -359,8 +330,8 @@ class TextEntry : Widget, WidgetI
     override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
     {
     	text_view.click(
-    		event.mouseFocusedWidget_x,
-    		event.mouseFocusedWidget_y
+    		event.mouseFocusedWidget_x+padding_left,
+    		event.mouseFocusedWidget_y+padding_top
     		);
     }
     
@@ -371,10 +342,10 @@ class TextEntry : Widget, WidgetI
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {
     	on_keyboard_internal(
-    		"up", 
-    		event.event.ek, 
-    		event.mouseFocusedWidget_x,
-    		event.mouseFocusedWidget_y
+    		"up",
+    		event.event.ek,
+    		event.mouseFocusedWidget_x+padding_left,
+    		event.mouseFocusedWidget_y+padding_top
     		);
     }
     
@@ -382,10 +353,10 @@ class TextEntry : Widget, WidgetI
     override void intKeyboardPress(Form form, WidgetI widget, EventForm* event)
     {
     	on_keyboard_internal(
-    		"down", 
-    		event.event.ek, 
-    		event.mouseFocusedWidget_x,
-    		event.mouseFocusedWidget_y
+    		"down",
+    		event.event.ek,
+    		event.mouseFocusedWidget_x+padding_left,
+    		event.mouseFocusedWidget_y+padding_top
     		);
     }
     override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event)
@@ -398,8 +369,6 @@ class TextEntry : Widget, WidgetI
     	assert(event.event.eti !is null);
     	assert(event.event.eti.text !is null);
     	auto x = event.event.eti.text;
-    	debug writeln("new_str2 ",x);
-    	debug writefln("event.event.eti.text (%d) %s",x.length,x);
     	text_view.textInput(x);
     	redraw();
     }
