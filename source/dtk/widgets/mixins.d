@@ -108,7 +108,7 @@ mixin template mixin_Widget_renderImage(
 				if (form is null)
 				{
 					throw new Exception(
-						this.toString() ~ ".redraw() requires Form to be set"
+						this.toString() ~ ".renderImage() requires Form to be set"
 						);
 				}
 				
@@ -186,7 +186,7 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 	import std.format;
 	mixin(
 		q{
-			%1$s void propagateRedraw()
+			%1$s Image propagateRedraw()
 			{
 				auto img = this.renderImage();
 				
@@ -196,6 +196,7 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 					auto c_img = c.propagateRedraw();
 					this.drawChild(img, c, c_img);
 				}
+				return img;
 			}
 		}.format(override_str)
 		);
@@ -265,4 +266,32 @@ mixin template mixin_propagateParentChangeEmision()
     			);
     	}
     }
+}
+
+string mixin_widgetSingleChildSet01(string varname)
+{
+	import std.format;
+	string ret;
+	ret = q{
+		%s = connectToChild_onAfterChanged(
+    		delegate void(
+    			WidgetI o,
+    			WidgetI n
+    			)
+    		{
+    			collectException(
+    				{
+    					if (o !is null)
+    						o.unsetParent();
+    					if (n !is null && n.getParent() != this)
+    					{
+    						n.setParent(this);
+    						debug writeln(n, " setParent ", this);
+    					}
+    				}()
+    				);
+    		}
+    		);
+	}.format(varname);
+	return ret;
 }

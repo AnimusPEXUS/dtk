@@ -1908,6 +1908,7 @@ class TextView
     Form delegate() getForm;
     DrawingSurfaceI delegate() getDrawingSurface;
     bool delegate() isFocused;
+    void delegate(Size2D size) viewResized;
     
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;

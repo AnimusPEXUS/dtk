@@ -46,7 +46,19 @@ PropSetting("gs_w_d", "bool", "force_monowidth", "ForceMonowidth", "false"),
 PropSetting("gs_w_d", "bool", "text_selectable", "TextSelectable", "false"),
 PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
 PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
+PropSetting("gs_w_d", "bool", "view_resize_by_content", "ViewResizeByContent", "false"),
+PropSetting("gs_w_d", "bool", "entry_resize_by_content", "EntryResizeByContent", "false"),
 ];
+
+TextEntry NewLineEditor(dstring text)
+{
+	return new TextEntry().setModePreset("line-editor").setText(text);
+}
+
+TextEntry NewLabel(dstring text)
+{
+	return new TextEntry().setModePreset("label").setText(text);
+}
 
 class TextEntry : Widget, WidgetI
 {
@@ -76,6 +88,53 @@ class TextEntry : Widget, WidgetI
     private {
         SignalConnectionContainer con_cont;
         SignalConnection textViewConnCon;
+    }
+    
+    TextEntry setModePreset(string value)
+    {
+    	switch (value)
+    	{
+    	default:
+    		throw new Exception("unsupported");
+    	case "line-editor":
+    		setDrawBewelAndBackground(true);
+    		setMultiline(false);
+    		setTextEditable(true);
+    		setTextSelectable(true);
+    		setCursorEnabled(true);
+    		setBewelBackgroundColor(Color(cast(ubyte[3])[255,255,255]));
+    		setViewResizeByContent(false);
+    		break;
+    	case "multiline-editor":
+    		setDrawBewelAndBackground(true);
+    		setMultiline(true);
+    		setTextEditable(true);
+    		setTextSelectable(true);
+    		setCursorEnabled(true);
+    		setBewelBackgroundColor(Color(cast(ubyte[3])[255,255,255]));
+    		setViewResizeByContent(false);
+    		break;
+    	case "label":
+    	case "label-noninteractive":
+    		setDrawBewelAndBackground(false);
+    		setMultiline(true);
+    		setTextEditable(false);
+    		setTextSelectable(false);
+    		setCursorEnabled(false);
+    		setBewelBackgroundColor(Color(0xc0c0c0));
+    		setViewResizeByContent(true);
+    		break;
+    	case "label-interactive":
+    		setDrawBewelAndBackground(false);
+    		setMultiline(true);
+    		setTextEditable(true);
+    		setTextSelectable(true);
+    		setCursorEnabled(true);
+    		setBewelBackgroundColor(Color(0xc0c0c0));
+    		setViewResizeByContent(true);
+    		break;
+    	}
+    	return this;
     }
     
     this()
@@ -173,10 +232,10 @@ class TextEntry : Widget, WidgetI
     	return text_view.getText().getText();
     }
     
-    void setText(dstring txt)
+    TextEntry setText(dstring txt)
     {
     	text_view.setText(txt);
-    	return;
+    	return this;
     }
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
@@ -257,6 +316,7 @@ class TextEntry : Widget, WidgetI
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
         text_view.setCursorEnabled(getCursorEnabled());
+        text_view.setViewResizeByContent();
     }
     
     //mixin mixin_getWidgetAtPosition;

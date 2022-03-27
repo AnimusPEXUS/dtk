@@ -64,15 +64,16 @@ void main()
     
     lo.setX(10).setY(10).setWidth(290).setHeight(290);
 
-    auto btn = new Button();
-    auto btn2 = new Button();
+    auto btn = new Button().setTextLabel("Button 1");
+    auto btn2 = new Button().setTextLabel("Button 2");
     auto btn3 = new ButtonRadio();
     auto btn4 = new ButtonCheck();
     auto btn5 = new ButtonRadio();
     auto lbl1 = new TextEntry();
+    auto lbl2 = NewLabel("text2");
 
     foreach(v; [btn, btn2, btn3,
-    	btn4, btn5, lbl1
+    	btn4, btn5, lbl1, lbl2
     	])
     {
     	lo.addChild(v);
@@ -104,6 +105,7 @@ void main()
     btn4.setX(10).setY(100).setWidth(12).setHeight(12);
     btn5.setX(10).setY(120).setWidth(12).setHeight(12);
     lbl1.setX(10).setY(140).setWidth(500).setHeight(100);
+    lbl2.setX(10).setY(260).setWidth(500).setHeight(20);
     
     pl.mainLoop();
 

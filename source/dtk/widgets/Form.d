@@ -81,26 +81,7 @@ class Form : ContainerI, WidgetI
     this()
     {
     	mixin(mixin_multiple_properties_inst(FormProperties));
-    	
-    	sc_childChange = connectToChild_onAfterChanged(
-    		delegate void(
-    			WidgetI o,
-    			WidgetI n
-    			)
-    		{
-    			collectException(
-    				{
-    					if (o !is null)
-    						o.unsetParent();
-    					if (n !is null && n.getParent() != this)
-    					{
-    						n.setParent(this);
-    						debug writeln(n, " setParent ", this);
-    					}
-    				}()
-    				);
-    		}
-    		);
+    	mixin(mixin_widgetSingleChildSet01("sc_childChange"));
     	
     	sc_windowChange = connectToWindow_onAfterChanged(
     		delegate void(
