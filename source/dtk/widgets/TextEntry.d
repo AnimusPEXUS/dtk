@@ -144,30 +144,42 @@ class TextEntry : Widget, WidgetI
     	
     	recalcPaddings();
     	
-        text_view = new TextView();
-        text_view.getForm = delegate Form()
-        {
-            auto f = getForm();
-            if (f is null)
-            {
-                throw new Exception("can't get form");
-            }
-            
-            return f;
-        };
+    	{
+    		text_view = new TextView();
+    		text_view.getForm = delegate Form()
+    		{
+    			auto f = getForm();
+    			if (f is null)
+    			{
+    				throw new Exception("can't get form");
+    			}
+    			
+    			return f;
+    		};
+    		
+    		text_view.getDrawingSurface = &getDrawingSurfaceForTextView;
+    		
+    		text_view.isFocused = delegate bool()
+    		{
+    			auto f = getForm();
+    			if (f is null)
+    			{
+    				throw new Exception("can't get form");
+    			}
+    			
+    			return f.getFocusedWidget() == this;
+    		};
+    		
+    		text_view.viewResized = delegate void()
+    		{
+    			if (getEntryResizeByContent())
+    			{
+    				setWidth(text_view.getWidth());
+    				setHeight(text_view.getHeight());
+    			}
+    		};
+        }
         
-        text_view.getDrawingSurface = &getDrawingSurfaceForTextView;
-        
-        text_view.isFocused = delegate bool()
-        {
-            auto f = getForm();
-            if (f is null)
-            {
-                throw new Exception("can't get form");
-            }
-            
-            return f.getFocusedWidget() == this;
-        };
         
         struct stname {
             string sname;
@@ -316,7 +328,7 @@ class TextEntry : Widget, WidgetI
         text_view.setTextSelectionEnabled(getTextSelectable());
         text_view.setReadOnly(!getTextEditable());
         text_view.setCursorEnabled(getCursorEnabled());
-        text_view.setViewResizeByContent();
+        text_view.setViewResizeByContent(getViewResizeByContent());
     }
     
     //mixin mixin_getWidgetAtPosition;

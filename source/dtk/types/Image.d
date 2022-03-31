@@ -45,6 +45,24 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         this.data = new ImageDot[](width * height);
     }
     
+    private int calcIndex(int x, int y)
+    {
+    	assert(x >= 0);
+    	assert(y >= 0);
+    	return y * width + x;
+    }
+    
+    bool isOutOfIndex(int x, int y)
+    {
+    	auto z = calcIndex(x, y);
+    	auto dl = data.length;
+    	if (dl == 0)
+    	{
+    		return true;
+    	}
+    	return !((z >= 0) && (z < dl));
+    }
+    
     typeof(this) setEach(ImageDot new_value)
     {
         for (uint i = 0; i != data.length; i++)
@@ -64,7 +82,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         if (y > height)
             /* throw new Exception("invalid y"); */
         return this;
-        auto z = y * width + x;
+        auto z = calcIndex(x, y);
         if (z < 0 || z >= this.data.length)
             return this;
         this.data[z] = new_value;
@@ -75,12 +93,19 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     {
     	assert(x >= 0);
     	assert(y >= 0);
-        return this.data[y * width + x];
+    	ImageDot ret;
+    	auto i = calcIndex(x, y);
+    	if (i >= this.data.length)
+    	{
+    		debug writefln("getDot: i == %s, x == %s, y == %s", i, x, y);
+    		debug writefln("width: %s, height: %s", width, height);
+    	}
+        return this.data[i];
     }
     
     ref ImageDot getDotRef(int x, int y)
     {
-        return this.data[y * width + x];
+        return this.data[calcIndex(x, y)];
     }
     
     void resize(int width, int height)
@@ -99,7 +124,7 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         {
             for (int x = 0; x != copy_width; x++)
             {
-                new_data[y * width + x] = this.data[y * this_width + x];
+                new_data[calcIndex(x, y)] = this.data[y * this_width + x];
             }
         }
         

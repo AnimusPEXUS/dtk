@@ -1424,6 +1424,20 @@ class Text
         state.width = 0;
         state.height = 0;
         
+        scope (exit)
+        {
+        	if (this == text_view.text)
+        	{
+        		// TODO: make this smarter
+        		text_view.setWidth(state.width);
+        		text_view.setHeight(state.height);
+        		if (text_view.viewResized !is null)
+        		{
+        			text_view.viewResized();
+        		}
+        	}
+        }
+        
         if (lines.length != 0)
         {
         	
@@ -1890,6 +1904,7 @@ PropSetting("gs_w_d", "TextViewMode", "textViewMode", "TextViewMode", "TextViewM
 
 PropSetting("gs_w_d", "bool", "virtualWrapBySpace", "VirtualWrapBySpace", "true"),
 PropSetting("gs_w_d", "bool", "virtualWrapByChar", "VirtualWrapByChar", "true"),
+PropSetting("gs_w_d", "bool", "view_resize_by_content", "ViewResizeByContent", "false"),
 ];
 
 class TextView
@@ -1908,7 +1923,7 @@ class TextView
     Form delegate() getForm;
     DrawingSurfaceI delegate() getDrawingSurface;
     bool delegate() isFocused;
-    void delegate(Size2D size) viewResized;
+    void delegate() viewResized;
     
     TextCharViewState[TextChar] text_char_states;
     TextLineSublineViewState[TextLineSubline] text_line_subline_states;
@@ -2215,15 +2230,41 @@ class TextView
             // auto tv_x = getX();
             // auto tv_y = getY();
             
-            for (int y = 0; y < chr_image.height; y++)
+            main_loop:
+            for (int y = 0; y != chr_image.height; y++)
             {
-                for (int x = 0; x < chr_image.width; x++)
+                for (int x = 0; x != chr_image.width; x++)
                 {
-                    auto bg_dot = _rendered_image.getDot(
-                        e.target_x+x,
-                        e.target_y+y
-                        );
-                    auto fg_dot = chr_image.getDot(x, y);
+                	ImageDot bg_dot;
+                	ImageDot fg_dot;
+                	{
+                		auto t_x_x = e.target_x+x;
+                		auto t_y_y = e.target_y+y;
+                		if (_rendered_image.isOutOfIndex(t_x_x, t_y_y))
+                		{
+                			// TODO: redo
+                			// debug writeln(new Exception("redo this"));
+                			continue;
+                		}
+                		bg_dot = _rendered_image.getDot(
+                			t_x_x,
+                			t_y_y
+                			);
+                    }
+                	{
+                		auto t_x_x = x;
+                		auto t_y_y = y;
+                		if (chr_image.isOutOfIndex(t_x_x, t_y_y))
+                		{
+                			// TODO: redo
+                			// debug writeln(new Exception("redo this"));
+                			continue;
+                		}
+                		fg_dot = chr_image.getDot(
+                			t_x_x,
+                			t_y_y
+                			);
+                    }
                     if (fg_dot.enabled)
                     {
                     	

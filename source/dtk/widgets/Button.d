@@ -15,6 +15,7 @@ import dtk.interfaces.ContainerI;
 // import dtk.interfaces.ContainerableI;
 import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
+import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.types.Size2D;
 import dtk.types.Property;
@@ -29,6 +30,8 @@ import dtk.widgets.mixins;
 
 import dtk.miscs.RadioGroup;
 import dtk.miscs.signal_tools;
+import dtk.miscs.layoutCollection;
+import dtk.miscs.DrawingSurfaceShift;
 
 
 const auto ButtonProperties = cast(PropSetting[]) [
@@ -81,16 +84,7 @@ class Button : Widget, WidgetI, ContainerI
     
     override void propagatePosAndSizeRecalc()
     {
-    	auto w = getWindow();
-    	if (w !is null)
-    	{
-    		setWidth(w.getFormWidth());
-    		setHeight(w.getFormHeight());
-    	}
-    	
-    	auto c = getChild();
-    	if (c !is null)
-    		c.propagatePosAndSizeRecalc();
+    	mixin(mixin_Button_centerChild01_code());
     }
     
         int getChildX(WidgetI child)
@@ -152,19 +146,24 @@ class Button : Widget, WidgetI, ContainerI
     }
     
 	
-    void drawChild(WidgetI child, Image img)
+    override void drawChild(WidgetI child, Image img)
     {
     	auto ds = getDrawingSurface();
     	drawChild(ds, child, img);
     	return;
     }
     
-    void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
+    override void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
     {
     	ds = shiftDrawingSurfaceForChild(ds, child);
     	ds.drawImage(Position2D(0, 0), img);
     }
     
+    DrawingSurfaceI shiftDrawingSurfaceForChild(DrawingSurfaceI ds, WidgetI child)
+    {
+    	auto c = getChild();
+    	return new DrawingSurfaceShift(ds, c.getX(), c.getY());
+    }
 	
 	
     override void focusEnter(Form form, WidgetI widget)
