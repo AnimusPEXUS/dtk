@@ -190,6 +190,8 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 			{
 				auto img = this.renderImage();
 				
+				// pragma(msg, "typeof this ", typeof(getChild));
+				
 				auto c = getChild();
 				if (c !is null)
 				{

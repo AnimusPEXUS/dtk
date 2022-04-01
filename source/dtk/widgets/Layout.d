@@ -122,12 +122,12 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	this([]);
     }
     
-    this(LayoutChild[] children) 
+    this(LayoutChild[] children)
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
     	
     	// mixin(mixin_propagateParentChangeEmision_this());
-
+    	
     	this.children = children;
     	
     	vm = new VisibilityMap!(WidgetI)();
@@ -237,6 +237,32 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     		);
     }
     
+    int getChildCount()
+    {
+    	return children.length;
+    }
+    
+    WidgetI getChild()
+    {
+    	if (children.length == 0)
+    	{
+    		return null;
+    	}
+    	else
+    	{
+    		return children[0];
+    	}
+    }
+    
+    WidgetI getChild(int i)
+    {
+    	if (children.length == 0)
+    		return null;
+    	if (!(i >= 0 && i < children.length))
+    		return null;
+    	return children[i];
+    }
+    
     void addChild(WidgetI child)
     {
     	if (!haveChild(child))
@@ -286,7 +312,7 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     	return super.getDrawingSurface();
     }
     
-    override DrawingSurfaceI shiftDrawingSurfaceForChild(
+    DrawingSurfaceI shiftDrawingSurfaceForChild(
 		DrawingSurfaceI ds,
 		WidgetI child
 		)
@@ -435,21 +461,21 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     
     override void focusEnter(Form form, WidgetI widget)
     {}
-    override void focusExit(Form form, WidgetI widget) 
+    override void focusExit(Form form, WidgetI widget)
     {}
-
+    
     override bool isVisualPressed()
     {return false;}
     override void visualPress(Form form, WidgetI widget, EventForm* event)
     {}
     override void visualRelease(Form form, WidgetI widget, EventForm* event)
     {}
-
+    
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
-    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
+    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
     {}
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
@@ -458,10 +484,10 @@ class Layout : Widget, ContainerI, WidgetI //, LayoutI
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}
     
-         
+    
     override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
     override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
     
     override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
-
+    
 }

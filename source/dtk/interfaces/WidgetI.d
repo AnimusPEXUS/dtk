@@ -9,6 +9,7 @@ import dtk.interfaces.ContainerI;
 //import dtk.interfaces.ContainerableI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.event_receivers;
+import dtk.interfaces.ContainerFunctionSetI;
 
 import dtk.types.Event;
 import dtk.types.Size2D;
@@ -20,13 +21,11 @@ import dtk.widgets.Layout;
 
 // import dtk.miscs.mixin_event_handler_reg;
 
-interface WidgetI // : ContainerableI
+interface WidgetI : ContainerFunctionSetI
 {
     Form getForm();
     
     DrawingSurfaceI getDrawingSurface();
-    
-    Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point);
     
     WidgetI getNextFocusableWidget();
     WidgetI getPrevFocusableWidget();

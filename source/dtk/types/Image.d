@@ -404,6 +404,7 @@ Position2D[] calculateDotsInLine(Position2D pos, Position2D pos2)
     
     Position2D[] ret;
     bool is_x = ((pos2.x - pos.x) > (pos2.y - pos.y));
+    // TODO: some unwize code - rework needed
     if (is_x)
     {
         for (int x = pos.x; x != pos2.x + 1; x++)

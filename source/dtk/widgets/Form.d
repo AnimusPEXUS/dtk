@@ -586,6 +586,23 @@ class Form : ContainerI, WidgetI
     void setChildHeight(WidgetI child, int v)
     {}
     
+    int getChildCount()
+    {
+    	return getChild() is null ? 0 : 1;
+    }
+    
+    WidgetI getChild(int i)
+    {
+    	if (i == 0)
+    	{
+    		return getChild();
+    	}
+    	else
+    	{
+    		return null;
+    	}
+    }
+    
     void addChild(WidgetI child)
     {
     	setChild(child);

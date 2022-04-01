@@ -1428,12 +1428,15 @@ class Text
         {
         	if (this == text_view.text)
         	{
-        		// TODO: make this smarter
-        		text_view.setWidth(state.width);
-        		text_view.setHeight(state.height);
-        		if (text_view.viewResized !is null)
+        		if (text_view.getViewResizeByContent())
         		{
-        			text_view.viewResized();
+        			// TODO: make this smarter
+        			text_view.setWidth(state.width);
+        			text_view.setHeight(state.height);
+        			if (text_view.viewResized !is null)
+        			{
+        				text_view.viewResized();
+        			}
         		}
         	}
         }

@@ -142,6 +142,7 @@ class TextEntry : Widget, WidgetI
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	// mixin(mixin_propagateParentChangeEmision_this());
     	
+    	setModePreset("multiline-editor");
     	recalcPaddings();
     	
     	{

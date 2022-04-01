@@ -57,6 +57,14 @@ class Button : Widget, WidgetI, ContainerI
     	SignalConnection sc_formEvent;
     }
     
+    private
+    {
+    	int c_x;
+    	int c_y;
+    	int c_w;
+    	int c_h;
+    }
+    
     // mixin mixin_getWidgetAtPosition;
     mixin mixin_forward_super_functions!(
     	[
@@ -84,48 +92,72 @@ class Button : Widget, WidgetI, ContainerI
     
     override void propagatePosAndSizeRecalc()
     {
-    	mixin(mixin_Button_centerChild01_code());
+    	if (getChild() !is null)
+    	{
+    		alignParentChild(
+    			0.5, 0.5,
+    			this,
+    			getChild()
+    			);
+    	}
     }
     
-        int getChildX(WidgetI child)
+    int getChildX(WidgetI child)
     {
-    	return 5;
+    	return c_x;
     }
     
     int getChildY(WidgetI child)
     {
-    	return 5;
+    	return c_y;
     }
     
     int getChildWidth(WidgetI child)
     {
-    	auto x = getWidth();
-    	if (x>5)
-    		return x-10;
-    	else
-    		return 0;
+    	return c_w;
     }
     
     int getChildHeight(WidgetI child)
     {
-    	auto x = getHeight();
-    	if (x>5)
-    		return x-10;
-    	else
-    		return 0;
+    	return c_h;
     }
     
     void setChildX(WidgetI child, int v)
-    {}
+    {
+    	c_x = v;
+    }
     
     void setChildY(WidgetI child, int v)
-    {}
+    {
+    	c_y = v;
+    }
     
     void setChildWidth(WidgetI child, int v)
-    {}
+    {
+    	c_w = v;
+    }
     
     void setChildHeight(WidgetI child, int v)
-    {}
+    {
+    	c_h = v;
+    }
+    
+    int getChildCount()
+    {
+    	return getChild() is null ? 0 : 1;
+    }
+    
+    WidgetI getChild(int i)
+    {
+    	if (i == 0)
+    	{
+    		return getChild();
+    	}
+    	else
+    	{
+    		return null;
+    	}
+    }
     
     void addChild(WidgetI child)
     {
