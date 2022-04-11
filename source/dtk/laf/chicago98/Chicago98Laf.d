@@ -17,25 +17,14 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Image;
+import dtk.types.Widget;
 
 import dtk.interfaces.LafI;
 import dtk.interfaces.WindowI;
 // import dtk.interfaces.FormI;
-import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.WindowEventMgrI;
 
-import dtk.widgets.Form;
-import dtk.widgets.Button;
-import dtk.widgets.ButtonCheck;
-import dtk.widgets.ButtonRadio;
-import dtk.widgets.Layout;
-// import dtk.widgets.Menu;
-// import dtk.widgets.MenuItem;
-// import dtk.widgets.Bar;
-import dtk.widgets.ScrollBar;
-import dtk.widgets.TextEntry;
-import dtk.widgets.Picture;
 
 import dtk.miscs.DrawingSurfaceShift;
 
@@ -92,12 +81,12 @@ class Chicago98Laf : LafI
         	);
     }
     
-    void drawForm(Form widget, DrawingSurfaceI ds)
+    void drawForm(Widget e, DrawingSurfaceI ds)
     {
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
-        auto size_w = cast(int) widget.getWidth();
-        auto size_h = cast(int) widget.getHeight();
+        auto size_w = cast(int) e.getWidth();
+        auto size_h = cast(int) e.getHeight();
         ds.drawRectangle(
         	Position2D(pos_x, pos_y),
         	Size2D(size_w, size_h),
@@ -109,28 +98,28 @@ class Chicago98Laf : LafI
         	);
     }
     
-    void drawButton(Button widget, DrawingSurfaceI ds)
+    void drawButton(Widget e, DrawingSurfaceI ds)
     {
         bool is_default = delegate bool() {
-            auto f = widget.getForm();
+            auto f = e.getRoot();
             if (f is null)
                 return false;
-            auto def = f.getDefaultWidget();
-            return widget == def;
+            auto def = f.getRootDefaultWidget();
+            return e == def;
         }();
         bool is_focused = delegate bool() {
-            auto f = widget.getForm();
+            auto f = e.getRoot();
             if (f is null)
                 return false;
-            auto curvid = f.getFocusedWidget();
-            return widget == curvid;
+            auto curvid = f.getRootFocusedWidget();
+            return e == curvid;
         }();
-        bool is_down = widget.button_is_down;
+        bool is_down = e.visuallyPressed;
         
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
-        auto size_w = cast(int) widget.getWidth();
-        auto size_h = cast(int) widget.getHeight();
+        auto size_w = cast(int) e.getWidth();
+        auto size_h = cast(int) e.getHeight();
         
         if (is_default)
         {
@@ -170,14 +159,14 @@ class Chicago98Laf : LafI
     }
     
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
-    void drawButtonRadio(ButtonRadio widget, DrawingSurfaceI ds)
+    void drawButtonRadio(Widget e, DrawingSurfaceI ds)
     {
         assert(ds !is null);
         
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
-        auto size_w = cast(int) widget.getWidth();
-        auto size_h = cast(int) widget.getHeight();
+        auto size_w = cast(int) e.getWidth();
+        auto size_h = cast(int) e.getHeight();
         
         // TODO: this have to be more flexible
         auto step = 2 * PI / 32;
@@ -200,7 +189,7 @@ class Chicago98Laf : LafI
         ds.drawCircle(p, 4, step, Color(0xffffff));
         
         auto fillColor = Color(0xffffff);
-        if (widget.getChecked())
+        if (e.toggledOn)
         {
             fillColor = Color(0);
         }
@@ -218,7 +207,7 @@ class Chicago98Laf : LafI
             ds.drawDot(Position2D(6, 6), id);
         }
         
-        if (widget.getForm().getFocusedWidget() == widget)
+        if (e.getRootFocusedWidget() == e)
         {
             ds.drawRectangle(
             	Position2D(pos_x, pos_y),
@@ -233,12 +222,12 @@ class Chicago98Laf : LafI
     }
     
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
-    void drawButtonCheck(ButtonCheck widget, DrawingSurfaceI ds)
+    void drawButtonCheck(Widget e, DrawingSurfaceI ds)
     {
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
-        auto size_w = cast(int) widget.getWidth();
-        auto size_h = cast(int) widget.getHeight();
+        auto size_w = cast(int) e.getWidth();
+        auto size_h = cast(int) e.getHeight();
         
         drawBewel(ds, Position2D(pos_x, pos_y), Size2D(size_w, size_h), true);
         
@@ -249,7 +238,7 @@ class Chicago98Laf : LafI
         	nullable(FillStyle(Color(0xffffff)))
         	);
         
-        if (widget.getForm().getFocusedWidget() == widget)
+        if (e.getRootFocusedWidget() == e)
         {
             ds.drawRectangle(
             	Position2D(pos_x, pos_y),
@@ -261,7 +250,7 @@ class Chicago98Laf : LafI
         
         auto fillColor = Color(0xffffff);
         
-        if (widget.getChecked())
+        if (e.toggledOn)
         {
             fillColor = Color(0);
         }
@@ -274,7 +263,7 @@ class Chicago98Laf : LafI
         	);
     }
     
-    void drawPicture(Picture widget, DrawingSurfaceI ds)
+    void drawPicture(Widget e, DrawingSurfaceI ds)
     {
     	
     }
@@ -286,7 +275,7 @@ class Chicago98Laf : LafI
     // return cast(ubyte)(lower + ((higher - lower) * part));
     // }
     
-    void drawLayout(Layout widget, DrawingSurfaceI ds)
+    void drawLayout(Widget e, DrawingSurfaceI ds)
     {
         // auto size_w = cast(int) widget.getWidth();
         // auto size_h = cast(int) widget.getHeight();
@@ -299,39 +288,43 @@ class Chicago98Laf : LafI
         // );
     }
     
-    // void drawMenu(Menu widget, DrawingSurfaceI ds)
+    // void drawMenu(Widget e, DrawingSurfaceI ds)
     // {
     // }
     //
-    // void drawMenuItem(MenuItem widget, DrawingSurfaceI ds)
+    // void drawMenuItem(Widget e, DrawingSurfaceI ds)
     // {
     // }
     //
-    // void drawBar(Bar widget, DrawingSurfaceI ds)
+    // void drawBar(Widget e, DrawingSurfaceI ds)
     // {
     // }
     
-    void drawScrollBar(ScrollBar widget, DrawingSurfaceI ds)
+    void drawScrollBar(Widget e, DrawingSurfaceI ds)
     {
     }
     
-    void drawTextEntry(TextEntry widget, DrawingSurfaceI ds)
+    void drawTextEntry(Widget e, DrawingSurfaceI ds)
     {
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
-        auto size_w = cast(int) widget.getWidth();
-        auto size_h = cast(int) widget.getHeight();
-        auto draw_bewel = widget.getDrawBewelAndBackground();
-        auto bewel_bg_color = widget.getBewelBackgroundColor();
-        
+        auto size_w = cast(int) e.getWidth();
+        auto size_h = cast(int) e.getHeight();
+        auto draw_bewel = false;
+        auto bewel_bg_color = Color(cast(ubyte[])[255,255,255]);
+        // auto draw_bewel = widget.getDrawBewelAndBackground();
+        // auto bewel_bg_color = widget.getBewelBackgroundColor();
+
         auto tv_ds = ds;
         
         if (draw_bewel)
         {
         	tv_ds = new DrawingSurfaceShift(
     			ds,
-    			cast(int)widget.padding_left,
-    			cast(int)widget.padding_top
+    			0,
+    			0
+    			// cast(int)widget.padding_left,
+    			// cast(int)widget.padding_top
     			);
     		
             drawBewel(
@@ -340,10 +333,14 @@ class Chicago98Laf : LafI
             	Size2D(size_w, size_h),
             	true
             	);
-            pos_x = cast(int) widget.padding_left;
-            pos_y = cast(int) widget.padding_top;
-            size_w = cast(int) widget.tv_width;
-            size_h = cast(int) widget.tv_height;
+            pos_x = cast(int) 0;
+            pos_y = cast(int) 0;
+            size_w = cast(int) size_w;
+            size_h = cast(int) size_h;
+            // pos_x = cast(int) widget.padding_left;
+            // pos_y = cast(int) widget.padding_top;
+            // size_w = cast(int) widget.tv_width;
+            // size_h = cast(int) widget.tv_height;
             ds.drawRectangle(
             	Position2D(pos_x, pos_y),
             	Size2D(size_w, size_h),
@@ -352,9 +349,9 @@ class Chicago98Laf : LafI
             	);
         }
         
-        if (widget.text_view !is null)
-        {
-        	widget.text_view.completeRedrawToDS(tv_ds);
-        }
+        // if (e.text_view !is null)
+        // {
+        	// e.text_view.completeRedrawToDS(tv_ds);
+        // }
     }
 }

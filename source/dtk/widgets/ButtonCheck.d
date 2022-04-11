@@ -3,18 +3,18 @@ module dtk.widgets.ButtonCheck;
 import std.stdio;
 import std.typecons;
 
-import dtk.interfaces.WidgetI;
-import dtk.interfaces.ContainerI;
+// import dtk.interfaces.WidgetI;
+// import dtk.interfaces.ContainerI;
 
 import dtk.types.EventMouse;
 import dtk.types.EventForm;
 import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
+import dtk.types.Widget;
 
 import dtk.widgets.Button;
 import dtk.widgets.Form;
-import dtk.widgets.Widget;
 
 import dtk.widgets.mixins;
 
@@ -24,7 +24,7 @@ PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
 ];
 
 
-class ButtonCheck : Button, WidgetI
+class ButtonCheck : Widget
 {
 	
 	mixin mixin_multiple_properties_forward!(WidgetProperties, true);
@@ -68,7 +68,7 @@ class ButtonCheck : Button, WidgetI
     override void focusExit(Form form, WidgetI widget) 
     {}
 
-    override bool isVisualPressed()
+    override bool isVisuallyPressed()
     {return false;}
     override void visualPress(Form form, WidgetI widget, EventForm* event)
     {

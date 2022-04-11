@@ -13,7 +13,7 @@ import observable.signal;
 import dtk.interfaces.WindowI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.LafI;
-// import dtk.interfaces.WidgetI;
+import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 //import dtk.interfaces.WidgetI;
 // import dtk.interfaces.WidgetI;
@@ -28,10 +28,9 @@ import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.EventForm;
 import dtk.types.Image;
-import dtk.types.Widget;
 
 import dtk.widgets.mixins;
-// import dtk.widgets.Widget;
+import dtk.widgets.Widget;
 
 import dtk.miscs.signal_tools;
 import dtk.miscs.DrawingSurfaceShift;
@@ -47,7 +46,7 @@ PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
 PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
 ];
 
-class Form : Widget
+class Form : WidgetI
 {
     mixin(mixin_FormSignals(false));
     mixin mixin_multiple_properties_define!(FormProperties);

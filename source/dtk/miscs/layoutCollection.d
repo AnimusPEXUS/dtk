@@ -2,16 +2,16 @@ module dtk.miscs.layoutCollection;
 
 import std.format;
 
-import dtk.interfaces.WidgetI;
-import dtk.interfaces.ContainerI;
+import dtk.types.Widget;
+// import dtk.interfaces.WidgetI;
 
 // Button
 
 void alignParentChild(
 	float valign,
 	float halign,
-	ContainerI parent,
-	WidgetI child
+	Widget parent,
+	Widget child
 	)
 in
 {
@@ -22,13 +22,13 @@ in
 }
 do
 {
-	if (parent.getChild() != child)
+	if (parent.haveChild(child))
 	{
 		throw new Exception("child not the Parent's child");
 	}
 	
-	auto w = (cast(WidgetI)parent).getWidth();
-	auto h = (cast(WidgetI)parent).getHeight();
+	auto w = parent.getWidth();
+	auto h = parent.getHeight();
 	
 	auto cw = child.getWidth();		 
 	auto ch = child.getHeight();

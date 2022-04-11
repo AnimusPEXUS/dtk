@@ -11,7 +11,6 @@ import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
-import dtk.interfaces.WidgetI;
 // import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.LafI;
 
@@ -28,14 +27,16 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Property;
+import dtk.types.Widget;
 
 // import dtk.miscs.WindowEventMgr;
 // import dtk.miscs.mixin_event_handler_reg;
 import dtk.miscs.signal_tools;
 
+import dtk.widgets.Form;
+
 import dtk.signal_mixins.Window;
 
-import dtk.widgets.Form;
 
 
 const auto WindowProperties = cast(PropSetting[]) [
@@ -186,8 +187,8 @@ class Window : WindowI
         
         cs_FormChange = connectToForm_onAfterChanged(
         	delegate void(
-        		Form old_value,
-        		Form new_value
+        		Widget old_value,
+        		Widget new_value
         		)
         	{
         		collectException(

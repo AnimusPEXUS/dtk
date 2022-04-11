@@ -24,8 +24,7 @@ import dtk.types.Size2D;
 import dtk.types.fontinfo;
 import dtk.types.Property;
 import dtk.types.EventKeyboard;
-
-import dtk.widgets.Form;
+import dtk.types.Widget;
 
 import dtk.miscs.signal_tools;
 
@@ -660,7 +659,7 @@ class TextLineSubline
         int height,
         
         TextView text_view,
-        ElementVisibilityMap visibility_map
+        WidgetVisibilityMap visibility_map
         )
     {
     	
@@ -697,7 +696,7 @@ class TextLineSubline
                 bool its_the_last_visible_item
                 )
             {
-                auto evme = new ElementVisibilityMapElement();
+                auto evme = new WidgetVisibilityMapWidget();
                 
                 evme.map = visibility_map;
                 evme.chr = state.textchars[subitem_index];
@@ -1146,7 +1145,7 @@ class TextLine
         int height,
         
         TextView text_view,
-        ElementVisibilityMap visibility_map
+        WidgetVisibilityMap visibility_map
         )
     {
         auto state = getState(text_view);
@@ -1706,7 +1705,7 @@ class Text
         int x, int y,
         int width, int height,
         TextView text_view,
-        ElementVisibilityMap visibility_map
+        WidgetVisibilityMap visibility_map
         )
     {
         auto state = getState(text_view);
@@ -1923,7 +1922,7 @@ class TextView
     
     Text text;
     
-    Form delegate() getForm;
+    Widget delegate() getForm;
     DrawingSurfaceI delegate() getDrawingSurface;
     bool delegate() isFocused;
     void delegate() viewResized;
@@ -1933,7 +1932,7 @@ class TextView
     TextLineViewState[TextLine] text_line_states;
     TextViewState[Text] text_states;
     
-    ElementVisibilityMap visibility_map;
+    WidgetVisibilityMap visibility_map;
     Image _rendered_image;
     
     bool linesRecalcRequired = true;
@@ -2185,7 +2184,7 @@ class TextView
         
         this.visibility_map = null;
         
-        auto visibility_map = new ElementVisibilityMap(this);
+        auto visibility_map = new WidgetVisibilityMap(this);
         
         auto x = getX();
         auto y = getY();
@@ -2207,8 +2206,8 @@ class TextView
         imageRegenRequired=true;
     }
     
-    void drawElementVisibilityMapElement(
-        ElementVisibilityMapElement e,
+    void drawWidgetVisibilityMapWidget(
+        WidgetVisibilityMapWidget e,
         bool redrawOnImage,
         bool copyToDS
         )
@@ -2354,7 +2353,7 @@ class TextView
         {
             foreach (v; visibility_map.elements)
             {
-                drawElementVisibilityMapElement(v, true, false);
+                drawWidgetVisibilityMapWidget(v, true, false);
             }
         }
         
@@ -2520,7 +2519,7 @@ class TextView
         
         if (cursor_pos.atEOVL(this))
         {
-        	ElementVisibilityMapElement last;
+        	WidgetVisibilityMapWidget last;
         	bool subline_started;
         	// bool subline_ended;
         	foreach (ve; visibility_map.elements)
@@ -2622,7 +2621,7 @@ class TextView
         int line;
         int column;
         
-        auto el_clicked = determineVisibleElementAt(x,y);
+        auto el_clicked = determineVisibleWidgetAt(x,y);
         
         // TODO: develop solution for clicks in other places
         if (el_clicked[0] is null)
@@ -2636,16 +2635,16 @@ class TextView
         final switch(text.getLineCharsLayout())
         {
         case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-            if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.right)
+            if (el_clicked[1] == WidgetVisibilityMapWidgetClickLeanH.right)
                 after_clicked = true;
             break;
         case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-            if (el_clicked[1] == ElementVisibilityMapElementClickLeanH.left)
+            if (el_clicked[1] == WidgetVisibilityMapWidgetClickLeanH.left)
                 after_clicked = true;
             break;
         case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
         case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-            if (el_clicked[2] == ElementVisibilityMapElementClickLeanV.bottom)
+            if (el_clicked[2] == WidgetVisibilityMapWidgetClickLeanV.bottom)
                 after_clicked = true;
             break;
         }
@@ -2707,40 +2706,40 @@ class TextView
     }
     
     Tuple!(
-        ElementVisibilityMapElement, // 0
-        ElementVisibilityMapElementClickLeanH, // 1
-        ElementVisibilityMapElementClickLeanV, // 2
+        WidgetVisibilityMapWidget, // 0
+        WidgetVisibilityMapWidgetClickLeanH, // 1
+        WidgetVisibilityMapWidgetClickLeanV, // 2
         // char before the clicked
         TextChar, // 3
         // element before the clicked (null if it's not in view)
-        ElementVisibilityMapElement, // 4
+        WidgetVisibilityMapWidget, // 4
         // char after the clicked
         TextChar, // 5
         // element after the clicked (null if it's not in view)
-        ElementVisibilityMapElement, // 6
+        WidgetVisibilityMapWidget, // 6
         )
-    determineVisibleElementAt(int x, int y)
+    determineVisibleWidgetAt(int x, int y)
     {
         auto fail_res = tuple(
-            cast(ElementVisibilityMapElement) null,
-            cast(ElementVisibilityMapElementClickLeanH)0,
-            cast(ElementVisibilityMapElementClickLeanV)0,
+            cast(WidgetVisibilityMapWidget) null,
+            cast(WidgetVisibilityMapWidgetClickLeanH)0,
+            cast(WidgetVisibilityMapWidgetClickLeanV)0,
             cast(TextChar) null,
-            cast(ElementVisibilityMapElement) null,
+            cast(WidgetVisibilityMapWidget) null,
             cast(TextChar) null,
-            cast(ElementVisibilityMapElement) null,
+            cast(WidgetVisibilityMapWidget) null,
             );
         
         if (visibility_map is null)
             return fail_res;
         
-        ElementVisibilityMapElement res_element;
-        auto lh = ElementVisibilityMapElementClickLeanH.left;
-        auto lv = ElementVisibilityMapElementClickLeanV.top;
+        WidgetVisibilityMapWidget res_element;
+        auto lh = WidgetVisibilityMapWidgetClickLeanH.left;
+        auto lv = WidgetVisibilityMapWidgetClickLeanV.top;
         TextChar prev_char;
-        ElementVisibilityMapElement prev_element;
+        WidgetVisibilityMapWidget prev_element;
         TextChar next_char;
-        ElementVisibilityMapElement next_element;
+        WidgetVisibilityMapWidget next_element;
         
         foreach (v; visibility_map.elements)
         {
@@ -2751,9 +2750,9 @@ class TextView
             {
             	
                 if (x >= v.target_x+(v.width/2))
-                    lh = ElementVisibilityMapElementClickLeanH.right;
+                    lh = WidgetVisibilityMapWidgetClickLeanH.right;
                 if (y >= v.target_y+(v.height/2))
-                    lv = ElementVisibilityMapElementClickLeanV.bottom;
+                    lv = WidgetVisibilityMapWidgetClickLeanV.bottom;
                 
                 res_element = v;
                 
@@ -2761,8 +2760,8 @@ class TextView
                 next_char = v.chr.calcNextCharInSubline(this);
                 debug writeln("next_char == ", next_char);
                 
-                prev_element = visibility_map.getElementByTextChar(prev_char);
-                next_element = visibility_map.getElementByTextChar(next_char);
+                prev_element = visibility_map.getWidgetByTextChar(prev_char);
+                next_element = visibility_map.getWidgetByTextChar(next_char);
                 
                 break;
             }
@@ -3381,13 +3380,13 @@ class TextView
     }
 }
 
-enum ElementVisibilityMapElementClickLeanH : ubyte
+enum WidgetVisibilityMapWidgetClickLeanH : ubyte
 {
     left,
     right,
 }
 
-enum ElementVisibilityMapElementClickLeanV : ubyte
+enum WidgetVisibilityMapWidgetClickLeanV : ubyte
 {
     top,
     bottom,
@@ -3416,9 +3415,9 @@ mixin template getState(string state_container, alias state_type)
         );
 }
 
-class ElementVisibilityMapElement
+class WidgetVisibilityMapWidget
 {
-    ElementVisibilityMap map;
+    WidgetVisibilityMap map;
     TextChar chr;
     
     int target_x;
@@ -3429,20 +3428,20 @@ class ElementVisibilityMapElement
     int height;
 }
 
-class ElementVisibilityMap
+class WidgetVisibilityMap
 {
     TextView textview;
     
-    ElementVisibilityMapElement[] elements;
+    WidgetVisibilityMapWidget[] elements;
     
     this(TextView textview)
     {
         this.textview = textview;
     }
     
-    ElementVisibilityMapElement getElementByTextChar(TextChar chr)
+    WidgetVisibilityMapWidget getWidgetByTextChar(TextChar chr)
     {
-        auto fail_res = cast(ElementVisibilityMapElement) null;
+        auto fail_res = cast(WidgetVisibilityMapWidget) null;
         if (chr is null)
         {
             return fail_res;
@@ -3459,6 +3458,6 @@ class ElementVisibilityMap
     
     bool isTextCharInView(TextChar chr)
     {
-        return getElementByTextChar(chr) !is null;
+        return getWidgetByTextChar(chr) !is null;
     }
 }

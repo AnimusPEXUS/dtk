@@ -13,7 +13,7 @@ import std.exception;
 
 // import dtk.interfaces.ContainerI;
 // import dtk.interfaces.ContainerableI;
-//import dtk.interfaces.WidgetI;
+import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.DrawingSurfaceI;
 
@@ -22,24 +22,23 @@ import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
 import dtk.types.Event;
-import dtk.types.Widget;
 
-// import dtk.widgets.Widget;
+import dtk.widgets.Widget;
+import dtk.widgets.Form;
+import dtk.widgets.TextEntry;
+import dtk.widgets.mixins;
+
 import dtk.miscs.RadioGroup;
 import dtk.miscs.signal_tools;
 import dtk.miscs.layoutCollection;
 import dtk.miscs.DrawingSurfaceShift;
-
-import dtk.widgets.Form;
-import dtk.widgets.TextEntry;
-import dtk.widgets.mixins;
 
 
 const auto ButtonProperties = cast(PropSetting[]) [
 PropSetting("gsun", "WidgetI", "child", "Child", ""),
 ];
 
-class Button : Widget
+class Button : Widget, WidgetI
 {
 	mixin mixin_multiple_properties_define!(ButtonProperties);
     mixin mixin_multiple_properties_forward!(ButtonProperties, false);

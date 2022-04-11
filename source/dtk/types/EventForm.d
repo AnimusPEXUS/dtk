@@ -1,14 +1,16 @@
 module dtk.types.EventForm;
 
-import dtk.interfaces.WidgetI;
+// import dtk.interfaces.WidgetI;
 
 public import dtk.types.Event;
 
-struct EventForm
+import dtk.types.Widget;
+
+struct EventRootWidget
 {
 	Event* event;
-	WidgetI focusedWidget;
-	WidgetI mouseFocusedWidget;
+	Widget focusedWidget;
+	Widget mouseFocusedWidget;
 	int mouseFocusedWidget_x;
 	int mouseFocusedWidget_y;
 }

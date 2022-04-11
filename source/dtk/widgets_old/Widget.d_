@@ -10,7 +10,7 @@ import std.typecons;
 import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.LayoutI;
-import dtk.interfaces.ContainerI;
+// import dtk.interfaces.WidgetI;
 
 import dtk.types.Event;
 import dtk.types.Property;
@@ -32,7 +32,7 @@ import dtk.widgets.Form;
 import dtk.widgets.Layout;
 
 const auto WidgetProperties = cast(PropSetting[]) [
-PropSetting("gsun", "ContainerI", "parent_container", "Parent", "null"),
+PropSetting("gsun", "WidgetI", "parent_container", "Parent", "null"),
 ];
 
 class Widget : WidgetI
@@ -63,7 +63,7 @@ class Widget : WidgetI
     		},
     		delegate Form()
     		{
-    			ContainerI p = this.getParent();
+    			WidgetI p = this.getParent();
     			Form res;
     			
     			while (true)
@@ -149,57 +149,51 @@ class Widget : WidgetI
     		);
     }
     
-    void propagateParentChangeEmision()
+    static foreach (
+    	code; 
+    	[
+    	q{void propagateParentChangeEmision()},
+    	q{void propagatePosAndSizeRecalc()},
+    	q{Image propagateRedraw()},
+    	q{void redraw()},
+    	q{Image renderImage(int x, int y, int w, int h)},
+    	q{Image renderImage()},
+    	q{void drawChild(WidgetI child, Image img)},
+    	q{void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)},
+    	q{int getChildX(WidgetI child)},
+    	q{int getChildY(WidgetI child)},
+    	q{int getChildWidth(WidgetI child)},
+    	q{int getChildHeight(WidgetI child)},
+    	q{void setChildX(WidgetI child, int v)},
+    	q{void setChildY(WidgetI child, int v)},
+    	q{void setChildWidth(WidgetI child, int v)},
+    	q{void setChildHeight(WidgetI child, int v)},
+    	q{int getChildMinCount()},
+    	q{int getChildMaxCount()},
+    	q{int getChildCount()},
+    	q{WidgetI getChild()},
+    	q{WidgetI getChild(int i)},
+    	q{void addChild(WidgetI child)},
+    	q{void removeChild(WidgetI child)},
+    	q{bool haveChild(WidgetI child)},
+    	]
+    	)
     {
-    	throw new Exception("must be reimplemented");
-    }
-    
-    void propagatePosAndSizeRecalc()
-    {
-    	// static assert(false, "must be reimplemented");
-        throw new Exception("must be reimplemented");
-    }
-    
-    Image propagateRedraw()
-    {
-    	// static assert(false, "must be reimplemented");
-    	throw new Exception("must be reimplemented");
-    }
-    
-    void redraw()
-    {
-    	// static assert(false, "must be reimplemented");
-        throw new Exception("must be reimplemented");
-    }
-    
-    Image renderImage(int x, int y, int w, int h)
-    {
-    	// static assert(false, "must be reimplemented");
-    	throw new Exception("must be reimplemented");
-    }
-    
-    Image renderImage()
-    {
-    	// static assert(false, "must be reimplemented");
-    	throw new Exception("must be reimplemented");
-    }
-    
-    void drawChild(WidgetI child, Image img)
-    {
-    	// static assert(false, "must be reimplemented");
-    	throw new Exception("must be reimplemented");
-    }
-    
-    void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
-    {
-    	// static assert(false, "must be reimplemented");
-    	throw new Exception("must be reimplemented");
+    	mixin(
+    		q{
+    			%s
+    			{
+    				static assert(false, "must be reimplemented");
+    				throw new Exception("must be reimplemented");
+    			}    			
+    		}.format(code)
+    		);
     }
     
     void focusEnter(Form form, WidgetI widget) {}
     void focusExit(Form form, WidgetI widget) {}
 
-    bool isVisualPressed() {return false;}
+    bool isVisuallyPressed() {return false;}
     void visualPress(Form form, WidgetI widget, EventForm* event) {}
     void visualRelease(Form form, WidgetI widget, EventForm* event) {}
 

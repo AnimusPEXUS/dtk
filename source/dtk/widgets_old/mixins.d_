@@ -366,7 +366,7 @@ mixin template mixin_WidgetChildrenFunctionsSingle()
 	
 }
 
-/* mixin template mixin_WidgetChildrenFunctionsNone()
+mixin template mixin_WidgetChildrenFunctionsNone()
 {
 	void propagateParentChangeEmision()
 	void propagatePosAndSizeRecalc()
@@ -412,4 +412,4 @@ mixin template mixin_WidgetChildrenFunctionsSingle()
     void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
     
     void intTextInput(Form form, WidgetI widget, EventForm* event) {}
-} */
+}

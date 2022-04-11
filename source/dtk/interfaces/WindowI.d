@@ -10,20 +10,15 @@ import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
+import dtk.types.Widget;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LafI;
-// import dtk.interfaces.FormI;
-// import dtk.interfaces.WindowEventMgrI;
-// import dtk.interfaces.event_receivers;
 
-// import dtk.miscs.mixin_event_handler_reg;
+import dtk.signal_mixins.Window;
 
 import dtk.widgets.Form;
-
-// import dtk.signal_mixins.Container;
-import dtk.signal_mixins.Window;
 
 interface WindowI
 {

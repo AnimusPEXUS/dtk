@@ -583,8 +583,16 @@ mixin template mixin_multiple_properties_define(PropSetting[] settings)
     	v.var_name,
     	)
     	); */
+    	
+    	
     	mixin(
     		q{
+    			// TODO: fixme
+    			// static assert(
+    				// !__traits(hasMember, typeof(this), "%2$s"), 
+    				// "'%2$s' already present in "~__traits(identifier, typeof(this))
+    				// );
+    			
     			private {
     				Property!%1$s %2$s;
     			}

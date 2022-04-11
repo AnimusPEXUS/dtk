@@ -6,7 +6,7 @@ import std.typecons;
 
 import observable.signal;
 
-// import dtk.interfaces.WidgetI;
+import dtk.interfaces.WidgetI;
 // import dtk.interfaces.ContainerI;
 
 import dtk.types.EventMouse;
@@ -14,11 +14,10 @@ import dtk.types.Property;
 import dtk.types.Position2D;
 import dtk.types.Image;
 import dtk.types.EventForm;
-import dtk.types.Widget;
 
 import dtk.miscs.RadioGroup;
 
-// import dtk.widgets.Widget;
+import dtk.widgets.Widget;
 import dtk.widgets.Button;
 import dtk.widgets.Form;
 import dtk.widgets.mixins;
@@ -30,7 +29,7 @@ PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
 ];
 
 
-class ButtonRadio : Widget
+class ButtonRadio : Button, WidgetI
 {
 	private {
     	SignalConnectionContainer con_cont;

@@ -18,12 +18,7 @@ import dtk.miscs.TextProcessor;
 
 import dtk.laf.chicago98.Chicago98Laf;
 
-import dtk.widgets.Form;
-import dtk.widgets.Button;
-import dtk.widgets.ButtonRadio;
-import dtk.widgets.ButtonCheck;
-import dtk.widgets.TextEntry;
-import dtk.widgets.Layout;
+import dtk.elements.StdFactory;
 
 void main()
 {
@@ -53,10 +48,12 @@ void main()
 
     auto w = pl.createWindow(wcs);
 
-    Form form = new Form();
+    auto factory = new StdFactory();
+    
+    auto form = factory.Form();
     w.setForm(form);
 
-    Layout lo = new Layout();
+    auto lo = factory.Layout();
     
     writeln("before form.setChild");
     form.setChild(lo);
@@ -64,13 +61,13 @@ void main()
     
     lo.setX(10).setY(10).setWidth(290).setHeight(290);
 
-    auto btn = new Button().setTextLabel("Button 1");
-    auto btn2 = new Button().setTextLabel("Button 2");
-    auto btn3 = new ButtonRadio();
-    auto btn4 = new ButtonCheck();
-    auto btn5 = new ButtonRadio();
-    auto lbl1 = new TextEntry();
-    auto lbl2 = NewLabel("text2");
+    auto btn = factory.Button().setTextLabel("Button 1");
+    auto btn2 = factory.Button().setTextLabel("Button 2");
+    auto btn3 = factory.ButtonRadio();
+    auto btn4 = factory.ButtonCheck();
+    auto btn5 = factory.ButtonRadio();
+    auto lbl1 = factory.TextEntry();
+    auto lbl2 = factory.Label("text2");
 
     foreach(v; [btn, btn2, btn3,
     	btn4, btn5, lbl1, lbl2

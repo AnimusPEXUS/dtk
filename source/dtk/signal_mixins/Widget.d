@@ -1,0 +1,18 @@
+module dtk.signal_mixins.Widget;
+
+import std.format;
+
+import dtk.miscs.signal_tools;
+
+string mixin_WidgetSignals(bool for_interface)
+{
+	string ret = q{
+	    mixin mixin_installSignal!(
+	    	"Event", 
+	    	"signal_event",
+	    	%1$s,
+	    	EventRootWidget*
+	    	);
+	}.format(for_interface);
+	return ret;
+}

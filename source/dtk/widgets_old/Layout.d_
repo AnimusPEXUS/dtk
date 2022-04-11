@@ -10,8 +10,9 @@ import std.array;
 import std.exception;
 
 //import dtk.interfaces.ContainerI;
-// import dtk.interfaces.Widget;
+// import dtk.interfaces.WidgetI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.WidgetI;
 import dtk.interfaces.LayoutEngineI;
 import dtk.interfaces.LayoutChildSettingsI;
 
@@ -21,9 +22,9 @@ import dtk.types.Property;
 import dtk.types.Image;
 import dtk.types.VisibilityMap;
 import dtk.types.Event;
-import dtk.types.Widget;
 
 import dtk.widgets.Form;
+import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
 import dtk.miscs.signal_tools;
@@ -63,11 +64,11 @@ PropSetting("gsun", "LayoutChildSettingsI", "settings", "Settings", "null"),
 
 class LayoutChild
 {
-	Widget child;
+	WidgetI child;
 	
     mixin mixin_multiple_properties_define!(LayoutChildProperties);
     mixin mixin_multiple_properties_forward!(LayoutChildProperties, false);
-    this(Widget widget) {
+    this(WidgetI widget) {
     	mixin(mixin_multiple_properties_inst(LayoutChildProperties));
     	this.child = widget;
     }
@@ -86,7 +87,7 @@ NOTE: Layout should not do any changes to any positions and sizes of it's
 own children.
 
 +/
-class Layout : Element //, LayoutI
+class Layout : Widget, WidgetI //, LayoutI
 {
 	
     // children field is public and is a normal array. you can use it to
@@ -94,7 +95,7 @@ class Layout : Element //, LayoutI
     // needed to be called after you've done what you wanted with children
     // array.
     LayoutChild[] children;
-    VisibilityMap!(Widget) vm;
+    VisibilityMap!(WidgetI) vm;
     
     mixin mixin_multiple_properties_define!(LayoutProperties);
     mixin mixin_multiple_properties_forward!(LayoutProperties, false);
@@ -123,7 +124,7 @@ class Layout : Element //, LayoutI
     	
     	this.children = children;
     	
-    	vm = new VisibilityMap!(Widget)();
+    	vm = new VisibilityMap!(WidgetI)();
     	
     	sc_parentChange = connectToParent_onAfterChanged(
     		delegate void(
@@ -141,12 +142,12 @@ class Layout : Element //, LayoutI
     	return super.getForm();
     }
     
-    override Widget getNextFocusableWidget()
+    override WidgetI getNextFocusableWidget()
     {
     	return super.getNextFocusableWidget();
     }
     
-    override Widget getPrevFocusableWidget()
+    override WidgetI getPrevFocusableWidget()
     {
     	return super.getPrevFocusableWidget();
     }
@@ -168,7 +169,7 @@ class Layout : Element //, LayoutI
     	}
     }
     
-    LayoutChild getLayoutChildByChild(Widget child)
+    LayoutChild getLayoutChildByChild(WidgetI child)
     {
     	foreach (v; children)
     	{
@@ -180,14 +181,14 @@ class Layout : Element //, LayoutI
     	return null;
     }
     
-    override Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+    override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
-    	Widget c;
+    	WidgetI c;
     	Position2D cp;
     	{
     		auto res = vm.getByPoint(point, false);
     		if (res.length == 0)
-    			return tuple(cast(Widget)this, point);
+    			return tuple(cast(WidgetI)this, point);
     		auto x = res[$-1];
     		c = x[0].o;
     		cp = x[1];
@@ -202,7 +203,7 @@ class Layout : Element //, LayoutI
     	import std.format;
     	mixin(
     		q{
-    			override int getChild%1$s(Widget child)
+    			override int getChild%1$s(WidgetI child)
     			{
     				auto c = getLayoutChildByChild(child);
     				if (c is null)
@@ -214,7 +215,7 @@ class Layout : Element //, LayoutI
     				return c.get%1$s();
     			}
     			
-    			override void setChild%1$s(Widget child, int v)
+    			override void setChild%1$s(WidgetI child, int v)
     			{
     				auto c = getLayoutChildByChild(child);
     				if (c is null)
@@ -245,7 +246,7 @@ class Layout : Element //, LayoutI
     	return children.length;
     }
     
-    Widget getChild()
+    WidgetI getChild()
     {
     	if (children.length == 0)
     	{
@@ -257,7 +258,7 @@ class Layout : Element //, LayoutI
     	}
     }
     
-    Widget getChild(int i)
+    WidgetI getChild(int i)
     {
     	if (children.length == 0)
     		return null;
@@ -266,7 +267,7 @@ class Layout : Element //, LayoutI
     	return children[i];
     }
     
-    void addChild(Widget child)
+    void addChild(WidgetI child)
     {
     	if (!haveChild(child))
     	{
@@ -278,12 +279,12 @@ class Layout : Element //, LayoutI
     	}
     }
     
-    void removeChild(Widget child)
+    void removeChild(WidgetI child)
     {
     	if (!haveChild(child))
     		return;
     	
-    	Widget[] removed;
+    	WidgetI[] removed;
     	
     	foreach_reverse (i, v; children)
     	{
@@ -300,7 +301,7 @@ class Layout : Element //, LayoutI
     	}
     }
     
-    bool haveChild(Widget child)
+    bool haveChild(WidgetI child)
     {
     	foreach(v;children)
     	{
@@ -317,7 +318,7 @@ class Layout : Element //, LayoutI
     
     DrawingSurfaceI shiftDrawingSurfaceForChild(
 		DrawingSurfaceI ds,
-		Widget child
+		WidgetI child
 		)
     {
     	if (!haveChild(child))
@@ -417,14 +418,14 @@ class Layout : Element //, LayoutI
     	return;
     }
     
-    override void drawChild(Widget child, Image img)
+    override void drawChild(WidgetI child, Image img)
     {
     	auto ds = getDrawingSurface();
     	drawChild(ds, child, img);
     	return;
     }
     
-    override void drawChild(DrawingSurfaceI ds, Widget child, Image img)
+    override void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
     {
     	ds = shiftDrawingSurfaceForChild(ds, child);
     	
@@ -462,35 +463,35 @@ class Layout : Element //, LayoutI
     		);
     }
     
-    override void focusEnter(Form form, Widget widget)
+    override void focusEnter(Form form, WidgetI widget)
     {}
-    override void focusExit(Form form, Widget widget)
+    override void focusExit(Form form, WidgetI widget)
     {}
     
     override bool isVisuallyPressed()
     {return false;}
-    override void visualPress(Form form, Widget widget, EventForm* event)
+    override void visualPress(Form form, WidgetI widget, EventForm* event)
     {}
-    override void visualRelease(Form form, Widget widget, EventForm* event)
-    {}
-    
-    override void intMousePress(Form form, Widget widget, EventForm* event)
-    {}
-    override void intMouseRelease(Form form, Widget widget, EventForm* event)
-    {}
-    override void intMousePressRelease(Form form, Widget widget, EventForm* event)
-    {}
-    override void intMouseLeave(Form form, Widget old_w, Widget new_w, EventForm* event)
-    {}
-    override void intMouseEnter(Form form, Widget old_w, Widget new_w, EventForm* event)
-    {}
-    override void intMouseMove(Form form, Widget widget, EventForm* event)
+    override void visualRelease(Form form, WidgetI widget, EventForm* event)
     {}
     
+    override void intMousePress(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
+    {}
+    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {}
+    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    {}
+    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
+    {}
     
-    override void intKeyboardPress(Form form, Widget widget, EventForm* event) {}
-    override void intKeyboardRelease(Form form, Widget widget, EventForm* event) {}
     
-    override void intTextInput(Form form, Widget widget, EventForm* event) {}
+    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
+    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
+    
+    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
     
 }

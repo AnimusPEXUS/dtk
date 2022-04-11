@@ -1,0 +1,15 @@
+module dtk.interfaces.ContainerFunctionSetI;
+
+import std.typecons;
+
+import dtk.types.Position2D;
+import dtk.types.Image;
+
+import dtk.interfaces.WidgetI;
+import dtk.interfaces.DrawingSurfaceI;
+
+
+interface ContainerFunctionSetI
+{
+	
+}

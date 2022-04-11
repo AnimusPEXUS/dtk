@@ -11,17 +11,16 @@ import dtk.types.Property;
 import dtk.types.Image;
 import dtk.types.Color;
 import dtk.types.Event;
-import dtk.types.Widget;
 
 // import dtk.interfaces.ContainerI;
 // import dtk.interfaces.ContainerableI;
-// import dtk.interfaces.WidgetI;
+import dtk.interfaces.WidgetI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.widgets.Form;
-// import dtk.widgets.Widget;
+import dtk.widgets.Widget;
 import dtk.widgets.mixins;
 
 import dtk.miscs.TextProcessor;
