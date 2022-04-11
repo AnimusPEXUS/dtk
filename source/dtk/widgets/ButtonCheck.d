@@ -20,7 +20,7 @@ import dtk.widgets.mixins;
 
 
 const auto ButtonCheckProperties = cast(PropSetting[]) [
-PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
+PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "false"),
 ];
 
 
@@ -46,13 +46,13 @@ class ButtonCheck : Widget
     	]
     	);
 
-    mixin mixin_propagateParentChangeEmision!();
+    mixin mixin_propagateParentChangeEmission!();
 
     this()
     {
     	mixin(mixin_multiple_properties_inst(ButtonCheckProperties));
     	
-    	// mixin(mixin_propagateParentChangeEmision_this());
+    	// mixin(mixin_propagateParentChangeEmission_this());
         // setMouseHandler("button-click", &on_mouse_click_internal);
         // setMouseHandler("button-down", &on_mouse_down_internal);
         // setMouseHandler("button-up", &on_mouse_up_internal);
@@ -74,23 +74,29 @@ class ButtonCheck : Widget
     {
     	
     }
+    
     override void visualRelease(Form form, WidgetI widget, EventForm* event)
     {}
 
     override void intMousePress(Form form, WidgetI widget, EventForm* event)
     {
     }
+    
     override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
     {}
+    
     override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
     {
     	setChecked(!getChecked());
         redraw();
     }
+    
     override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
+    
     override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
     {}
+    
     override void intMouseMove(Form form, WidgetI widget, EventForm* event)
     {}
 

@@ -11,7 +11,7 @@ string mixin_WidgetSignals(bool for_interface)
 	    	"Event", 
 	    	"signal_event",
 	    	%1$s,
-	    	EventRootWidget*
+	    	EventForm*
 	    	);
 	}.format(for_interface);
 	return ret;

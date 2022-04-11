@@ -26,7 +26,7 @@ import dtk.widgets.mixins;
 
 const auto ButtonRadioProperties = cast(PropSetting[]) [
 PropSetting("gsun", "RadioGroup", "radio_group", "RadioGroup", "null"),
-PropSetting("gs_w_d", "bool", "checked", "Checked", "false"),
+PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "false"),
 ];
 
 
@@ -55,7 +55,7 @@ class ButtonRadio : Widget
     	]
     	);
     
-    mixin mixin_propagateParentChangeEmision!();
+    mixin mixin_propagateParentChangeEmission!();
     
     this()
     {
@@ -65,7 +65,7 @@ class ButtonRadio : Widget
         // setMouseHandler("button-down", &on_mouse_down_internal);
         // setMouseHandler("button-up", &on_mouse_up_internal);
         
-        // mixin(mixin_propagateParentChangeEmision_this());
+        // mixin(mixin_propagateParentChangeEmission_this());
         
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));

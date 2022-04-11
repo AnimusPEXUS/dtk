@@ -1,5 +1,7 @@
 module dtk.types.Widget;
 
+import core.sync.mutex;
+
 import std.stdio;
 import std.exception;
 import std.typecons;
@@ -22,8 +24,11 @@ import dtk.types.VisibilityMap;
 import dtk.miscs.signal_tools;
 import dtk.miscs.calculateVisiblePart;
 import dtk.miscs.DrawingSurfaceShift;
+import dtk.miscs.recursionGuard;
 
-import dtk.signal_mixins.Widget;
+import dtk.widgets.Form;
+
+// import dtk.signal_mixins.Widget;
 
 const auto WidgetChildProperties = cast(PropSetting[]) [
 PropSetting("gs_w_d", "int", "x", "X", "0"),
@@ -62,15 +67,15 @@ PropSetting("gs_w_d", "int", "viewportY", "ViewPortY", "0"),
 PropSetting("gs_w_d", "int", "viewportWidth", "ViewPortWidth", "0"),
 PropSetting("gs_w_d", "int", "viewportHeight", "ViewPortHeight", "0"),
 
-PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "0"),
-PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "0"),
+PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
+// PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "0"),
 ];
 
 alias renderFunctionLinkType = void delegate(Widget e, DrawingSurfaceI ds);
 
 class Widget
 {
-	mixin(mixin_WidgetSignals(false));
+	// mixin(mixin_WidgetSignals(false));
 	mixin mixin_multiple_properties_define!(WidgetProperties);
     mixin mixin_multiple_properties_forward!(WidgetProperties, false);
     
@@ -78,24 +83,24 @@ class Widget
     {
 		WidgetChild[] children;
 		
-		int childrenMin;
-		int childrenMax;
-
 		VisibilityMap!(Widget) vm;
     }
     
-        
-    invariant
+    int getChildMinCount()
     {
-        assert(childrenMin >= 0);
-        assert(childrenMax >= childrenMin && childrenMin >= -1);
+    	return 0;
     }
     
-	public
+    int getChildMaxCount()
+    {
+    	return 0;
+    }
+    
+	/* public
 	{
 		bool visuallyPressed;
 		bool toggledOn;
-	}
+	} */
 	
 	private
     {
@@ -113,8 +118,8 @@ class Widget
 		mixin(mixin_multiple_properties_inst(WidgetProperties));
 	}
 	
-
-    
+	
+	
 	static foreach(v; ["Width", "Height", "X", "Y"])
 	{
 		mixin(
@@ -208,65 +213,119 @@ class Widget
     		);
     }
     
-	Widget getRoot()
+    private
+    {
+    	bool getForm_recursion_protection_bool;
+    	Mutex getForm_recursion_protection_mutex;
+    }
+    
+    final Form getForm() 
+    {
+    	auto ret = recursionGuard(
+    		getForm_recursion_protection_bool,
+    		getForm_recursion_protection_mutex,
+    		delegate Form()
+    		{
+    			throw new Exception("parent-children circul detected: this is wrong");
+    		},
+    		delegate Form()
+    		{
+    			WidgetI p = this.getParent();
+    			Form res;
+    			
+    			while (true)
+    			{
+    				if (p is null)
+    				{
+    					return null;
+    				}
+    				
+    				res = cast(Form) p;
+    				if (res !is null)
+    				{
+    					return res;
+    				}
+    				
+    				p = p.getParent();
+    			}
+    		}
+    		);
+        return ret;
+    }
+    
+    private
+    {
+    	bool propagateParentChangeEmission_recursion_protection;
+    	Mutex propagateParentChangeEmission_recursion_protection_mtx;
+    }
+    
+    final void propagateParentChangeEmission()
+    {
+    	
+    	synchronized
+    	{
+    		if (propagateParentChangeEmission_recursion_protection_mtx is null)
+    			propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
+    		
+    		recursionGuard(
+    			propagateParentChangeEmission_recursion_protection,
+    			propagateParentChangeEmission_recursion_protection_mtx,
+    			0,
+    			delegate int() {
+    				import dtk.widgets.Form;
+    				
+    				if ((cast(Form) this ) != null)
+    				{
+    					setWindow(getWindow());
+    				}
+    				else
+    				{
+    					setParent(getParent());
+    				}
+    				
+    				foreach (c; children)
+    				{
+    					c.child.propagateParentChangeEmission();
+    				}
+    				
+    				return 0;
+    			}
+    			);
+    	}
+    }    
+    
+    // TODO: delete this function
+	final Widget getFormDefaultWidget()
 	{
-		// TODO: add recursion protection
-		Widget cur;
-		
-		cur = this;
-		
-		while (true)
-		{
-			
-			auto p = cur.getParent();
-			
-			if (p is null)
-			{
-				return cur;
-			}
-			
-			cur = p;
-		}
+		return getForm().getLocalDefaultWidget();
 	}
 	
-	Widget getRootDefaultWidget()
+    // TODO: delete this function
+	final Widget getFormFocusedWidget()
 	{
-		return getRoot().getLocalDefaultWidget();
+		return getForm().getLocalFocusedWidget();
 	}
 	
-	Widget getRootFocusedWidget()
+    // TODO: delete this function
+	final void setFormDefaultWidget(Widget e)
 	{
-		return getRoot().getLocalFocusedWidget();
-	}
-	
-	void setRootDefaultWidget(Widget e)
-	{
-		getRoot().setLocalDefaultWidget(e);
+		getForm().setLocalDefaultWidget(e);
 		return;
 	}
 	
-	void setRootFocusedWidget(Widget e)
+    // TODO: delete this function
+	final void setFormFocusedWidget(Widget e)
 	{
-		getRoot().setLocalFocusedWidget(e);
+		getForm().setLocalFocusedWidget(e);
 		return;
 	}
 	
-    int getChildMinCount()
-    {
-    	return 0;
-    }
-    
-    int getChildMaxCount()
-    {
-    	return -1;
-    }
-    
-    int getChildCount()
+    final int getChildCount()
     {
     	return cast(int) children.length;
     }
     
-    Widget getChild()
+    final Widget getChild()
     {
     	if (children.length == 0)
     	{
@@ -278,7 +337,7 @@ class Widget
     	}
     }
     
-    Widget getChild(int i)
+    final Widget getChild(int i)
     {
     	if (children.length == 0)
     		return null;
@@ -287,7 +346,7 @@ class Widget
     	return children[i].child;
     }
     
-    void addChild(Widget child)
+    final void addChild(Widget child)
     {
     	if (!haveChild(child))
     	{
@@ -299,7 +358,7 @@ class Widget
     	}
     }
     
-    void removeChild(Widget child)
+    final void removeChild(Widget child)
     {
     	if (!haveChild(child))
     		return;
@@ -321,7 +380,7 @@ class Widget
     	}
     }
     
-	bool haveChild(Widget e)
+	final bool haveChild(Widget e)
 	{
 		foreach (v;children)
 		{
@@ -333,7 +392,7 @@ class Widget
 		return false;
 	}
 	
-	Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+	final Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
     {
     	Widget c;
     	Position2D cp;
@@ -350,7 +409,7 @@ class Widget
     	return c.getChildAtPosition(cp);
     }
     
-    DrawingSurfaceI shiftDrawingSurfaceForChild(
+    final DrawingSurfaceI shiftDrawingSurfaceForChild(
 		DrawingSurfaceI ds,
 		Widget child
 		)
@@ -388,7 +447,7 @@ class Widget
         return ret;
     }
     
-    void propagatePosAndSizeRecalc()
+    final void propagatePosAndSizeRecalc()
     {
     	auto w = getWidth();
     	auto h = getHeight();
@@ -409,7 +468,7 @@ class Widget
         recalcVisibilityMap();
     }
     
-    Image propagateRedraw()
+    final Image propagateRedraw()
     {
     	auto img = this.renderImage();
     	// auto ds = getDrawingSurface();
@@ -424,7 +483,7 @@ class Widget
     	return img;
     }
     
-    void recalcVisibilityMap()
+    final void recalcChildVisibilityMap()
     {
     	vm.init(
     		getViewPortX(),
@@ -452,7 +511,7 @@ class Widget
     	return;
     }
     
-    WidgetChild getWidgetChildByChild(Widget child)
+    final WidgetChild getWidgetChildByChild(Widget child)
     {
     	foreach (v; children)
     	{
@@ -464,14 +523,14 @@ class Widget
     	return null;
     }
     
-    void drawChild(Widget child, Image img)
+    final void drawChild(Widget child, Image img)
     {
     	auto ds = getDrawingSurface();
     	drawChild(ds, child, img);
     	return;
     }
     
-    void drawChild(DrawingSurfaceI ds, Widget child, Image img)
+    final void drawChild(DrawingSurfaceI ds, Widget child, Image img)
     {
     	ds = shiftDrawingSurfaceForChild(ds, child);
     	
@@ -509,7 +568,7 @@ class Widget
     		);
     }
     
-    void redraw()
+    final void redraw()
     {
 		auto img = propagateRedraw();
 		auto ds = getDrawingSurface();
@@ -517,8 +576,9 @@ class Widget
 		ds.present();
     }
     
-    LafI getLaf()
+   final LafI getLaf()
     {
+    	// TODO: add recursion protection?
     	LafI ret;
     	
     	try_get_local_laf:
@@ -557,7 +617,7 @@ class Widget
     		{
     			ret = func_ret;
     			goto ok_exit;
-    		}    		
+    		}
     	}
     	
     	fail_exit:
@@ -566,105 +626,134 @@ class Widget
     	return ret;
     }
     
-	Image renderImage()
+    /* 	Image renderImage()
     {
-    	// debug writeln(this, ".renderImage() called");
-    	// Form form = this.getForm();
-    	// if (form is null)
-    	// {
-    	// throw new Exception(
-    	// this.toString() ~ ".renderImage() requires Form to be set"
-    	// );
-    	// }
-    	
-    	// auto laf = form.getLaf();
-    	// if (laf is null)
-    	// {
-    	// throw new Exception("Laf not set");
-    	// }
-    	
-    	renderFunctionLinkType renderingFunction;
-    	
-    	if (getRenderingFunctionCB is null)
-    	{
-    		throw new Exception("getRenderingFunctionCB must be defined");
-    	}
-    	
-    	LafI llaf = getLaf();
-    	
-    	if (llaf is null)
-    	{
-    		throw new Exception(
-    			"getLaf returned null: "
-    			~"Widget can't determine it's drawing function"
-    			);
-    	}
-    	
-    	renderingFunction = getRenderingFunctionCB(llaf);
-    	
-    	if (renderingFunction is null)
-    	{
-    		throw new Exception("getRenderingFunctionCB returned null");
-    	}
-    	
-    	auto w = getWidth();
-    	auto h = getHeight();
-    	
-    	auto ds = new Image(w, h);
-    	
-    	// static if (__traits(hasMember, this, "renderImageBeforeDraw"))
-    	// {
-    	// this.renderImageBeforeDraw(ds);
-    	// }
-    	
-    	renderingFunction(this, ds);
-    	
-    	// static if (__traits(hasMember, this, "renderImageAfterDraw"))
-    	// {
-    	// this.renderImageAfterDraw(ds);
-    	// }
-    	
-    	return ds;
+    // debug writeln(this, ".renderImage() called");
+    // Form form = this.getForm();
+    // if (form is null)
+    // {
+    // throw new Exception(
+    // this.toString() ~ ".renderImage() requires Form to be set"
+    // );
+    // }
+    
+    // auto laf = form.getLaf();
+    // if (laf is null)
+    // {
+    // throw new Exception("Laf not set");
+    // }
+    
+    renderFunctionLinkType renderingFunction;
+    
+    if (getRenderingFunctionCB is null)
+    {
+    throw new Exception("getRenderingFunctionCB must be defined");
+    }
+    
+    LafI llaf = getLaf();
+    
+    if (llaf is null)
+    {
+    throw new Exception(
+    "getLaf returned null: "
+    ~"Widget can't determine it's drawing function"
+    );
+    }
+    
+    renderingFunction = getRenderingFunctionCB(llaf);
+    
+    if (renderingFunction is null)
+    {
+    throw new Exception("getRenderingFunctionCB returned null");
+    }
+    
+    auto w = getWidth();
+    auto h = getHeight();
+    
+    auto ds = new Image(w, h);
+    
+    // static if (__traits(hasMember, this, "renderImageBeforeDraw"))
+    // {
+    // this.renderImageBeforeDraw(ds);
+    // }
+    
+    renderingFunction(this, ds);
+    
+    // static if (__traits(hasMember, this, "renderImageAfterDraw"))
+    // {
+    // this.renderImageAfterDraw(ds);
+    // }
+    
+    return ds;
     }
     
     Image renderImage(int x, int y, int w, int h)
     {
-    	return renderImage().getImage(x,y,w,h);
-    }
+    return renderImage().getImage(x,y,w,h);
     
-    DrawingSurfaceI getDrawingSurface()
+    } */
+    
+    final DrawingSurfaceI getDrawingSurface()
     {
-    	if (isSetWindow())
+    	auto w = getWindow();
+    	if (w !is null)
     	{
-    		return getWindow().getDrawingSurface();
-        }
-        else
-        {
-        	auto p = getParent();
-        	if (p is null)
-        		throw new Exception("parent is null");
-        	auto ds = p.getDrawingSurface();
-        	if (ds is null)
-        		throw new Exception("parent drawing surface is null");
-        	auto dsc = p.shiftDrawingSurfaceForChild(ds, this);
-        	if (dsc is null)
-        		throw new Exception("parent drawing surface for child is null");
-        	return dsc;
-        }
+    		return w.getDrawingSurface();
+    	}
+    	else
+    	{
+    		auto p = getParent();
+    		if (p is null)
+    			throw new Exception("parent is null");
+    		auto ds = p.getDrawingSurface();
+    		if (ds is null)
+    			throw new Exception("parent drawing surface is null");
+    		auto dsc = p.shiftDrawingSurfaceForChild(ds, this);
+    		if (dsc is null)
+    			throw new Exception("parent drawing surface for child is null");
+    		return dsc;
+    	}
     }
     
-    void delegate (Widget form, Widget widget) focusEnter;
-    void delegate(Widget form, Widget widget)focusExit;
-    bool delegate()isVisuallyPressed;
-    void delegate(Widget form, Widget widget, EventRootWidget* event)visuallyPress;
-    void delegate(Widget form, Widget widget, EventRootWidget* event)visuallyRelease;
-    void delegate(Widget form, Widget widget, EventRootWidget* event)intMousePress;
-    void delegate(Widget form, Widget widget, EventRootWidget* event)intMouseRelease;
-    void delegate(Widget form, Widget widget, EventRootWidget* event)intMousePressRelease;
-    void delegate(Widget form, Widget old_w, Widget new_w, EventRootWidget* event)intMouseLeave;
-    void delegate(Widget form, Widget old_w, Widget new_w, EventRootWidget* event)intMouseEnter;
-    void delegate(Widget form, Widget widget, EventRootWidget* event)intMouseMove;
-    void delegate(Widget form, Widget widget, EventRootWidget* event) intKeyboardPress;
-    void delegate(Widget form, Widget widget, EventRootWidget* event) intKeyboardRelease;
-    void delegate(Widget form, Widget widget, EventRootWidget* event) intTextInput;
+    void delegate (Widget form, Widget widget)
+    focusEnter;
+    
+    void delegate(Widget form, Widget widget)
+    focusExit;
+    
+    bool delegate()
+    isVisuallyPressed;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    visuallyPress;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    visuallyRelease;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intMousePress;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intMouseRelease;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intMousePressRelease;
+    
+    void delegate(Widget form, Widget old_w, Widget new_w, EventForm* event)
+    intMouseLeave;
+    
+    void delegate(Widget form, Widget old_w, Widget new_w, EventForm* event)
+    intMouseEnter;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intMouseMove;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intKeyboardPress;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intKeyboardRelease;
+    
+    void delegate(Widget form, Widget widget, EventForm* event)
+    intTextInput;
 }

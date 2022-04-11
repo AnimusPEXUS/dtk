@@ -13,10 +13,10 @@ import observable.signal;
 import dtk.interfaces.WindowI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.LafI;
-// import dtk.interfaces.WidgetI;
+// import dtk.interfaces.Widget;
 import dtk.interfaces.DrawingSurfaceI;
-//import dtk.interfaces.WidgetI;
-// import dtk.interfaces.WidgetI;
+//import dtk.interfaces.Widget;
+// import dtk.interfaces.Widget;
 // import dtk.interfaces.LayoutI;
 
 import dtk.types.Position2D;
@@ -40,11 +40,11 @@ import dtk.signal_mixins.Form;
 
 const auto FormProperties = cast(PropSetting[]) [
 PropSetting("gsun", "WindowI", "window", "Window", ""),
-PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", ""),
-PropSetting("gsun", "WidgetI", "child", "Child", ""),
+// PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", ""),
+// PropSetting("gsun", "Widget", "child", "Child", ""),
 
-PropSetting("gsun", "WidgetI", "focused_widget", "FocusedWidget", ""),
-PropSetting("gsun", "WidgetI", "default_widget", "DefaultWidget", ""),
+PropSetting("gsun", "Widget", "focusedWidget", "FocusedWidget", ""),
+PropSetting("gsun", "Widget", "defaultWidget", "DefaultWidget", ""),
 ];
 
 class Form : Widget
@@ -55,7 +55,7 @@ class Form : Widget
     mixin mixin_Widget_renderImage!("Form", "");
     // mixin mixin_propagateRedraw_children_one!("");
     
-    mixin mixin_propagateParentChangeEmision!();
+    // mixin mixin_propagateParentChangeEmission!();
     
     private
     {
@@ -70,19 +70,18 @@ class Form : Widget
     }
     
     bool pressrelease_sequence_started;
-    WidgetI pressrelease_sequence_widget;
+    Widget pressrelease_sequence_widget;
     EnumMouseButton pressrelease_sequence_btn;
 
     // bool kb_pressrelease_sequence_started;
-    // WidgetI kb_pressrelease_sequence_widget;
+    // Widget kb_pressrelease_sequence_widget;
     // EnumMouseButton kb_pressrelease_sequence_btn;
     
-    WidgetI mouse_focused_widget;
+    Widget mouse_focused_widget;
     
     this()
     {
     	mixin(mixin_multiple_properties_inst(FormProperties));
-    	mixin(mixin_widgetSingleChildSet01("sc_childChange"));
     	
     	sc_windowChange = connectToWindow_onAfterChanged(
     		delegate void(
@@ -116,7 +115,7 @@ class Form : Widget
     							);
     					}
     					
-    					propagateParentChangeEmision();
+    					propagateParentChangeEmission();
     					
     				}()
     				);
@@ -125,8 +124,8 @@ class Form : Widget
     	
     	sc_focusedWidgetChange = connectToFocusedWidget_onAfterChanged(
     		delegate void(
-    			WidgetI o,
-    			WidgetI n
+    			Widget o,
+    			Widget n
     			)
     		{
     			collectException(
@@ -153,8 +152,8 @@ class Form : Widget
     		{
     			EventForm* fe = new EventForm();
     			
-    			WidgetI focusedWidget = this.getFocusedWidget();
-    			WidgetI mouseFocusedWidget;
+    			Widget focusedWidget = this.getFocusedWidget();
+    			Widget mouseFocusedWidget;
     			
     			int mouseFocusedWidget_x = 0;
     			int mouseFocusedWidget_y = 0;
@@ -234,7 +233,7 @@ class Form : Widget
     		{
     			if (event.mouseFocusedWidget != mouse_focused_widget)
     			{
-    				WidgetI old = mouse_focused_widget;
+    				Widget old = mouse_focused_widget;
     				mouse_focused_widget = event.mouseFocusedWidget;
     				if (old !is null)
     				{
@@ -356,126 +355,23 @@ class Form : Widget
     	}
     }
     
-    WidgetI getParent()
+    // don't allow get Parent at From
+    final override Widget getParent()
     {
     	return null;
     }
     
-    
-    LafI getLaf()
+    // don't allow set Parent at From
+    final override Form setParent(Widget v)
     {
-    	auto l = getForcedLaf();
-    	if (l !is null)
-    		return l;
-    	auto w = getWindow();
-    	if (w is null)
-    	{
-    		throw new Exception("getLaf(): both ForcedLaf and Window is not set");
-    	}
-    	l = w.getLaf();
-    	if (l is null)
-    	{
-    		throw new Exception("Window returned null Laf");
-    	}
-    	return l;
+    	throw new Exception("trying to set Paernt at Form");
+    	// unsetParent();
+    	// return this;
     }
     
-    int getX()
+    private Widget focusXWidget(Widget delegate() getXFocusableWidget)
     {
-    	return 0;
-    }
-    
-    int getY()
-    {
-    	return 0;
-    }
-    
-    int getWidth()
-    {
-    	if (isSetWindow())
-    	{
-    		return getWindow.getFormWidth();
-    	}
-    	return 0;
-    }
-    
-    int getHeight()
-    {
-    	if (isSetWindow())
-    	{
-    		return getWindow.getFormHeight();
-    	}
-    	return 0;
-    }
-    
-    Form setX(int v)
-    {
-    	return this;
-    }
-    
-    Form setY(int v)
-    {
-    	return this;
-    }
-    
-    Form setWidth(int v)
-    {
-    	return this;
-    }
-    
-    Form setHeight(int v)
-    {
-    	return this;
-    }
-    
-    DrawingSurfaceI getDrawingSurface()
-    {
-        DrawingSurfaceI ret = null;
-        debug if (!isSetWindow())
-        {
-        	writeln("window is not set on Form.getDrawingSurface()");
-        }
-        if (isSetWindow())
-        {
-            ret = getWindow().getDrawingSurface();
-        }
-        assert(ret !is null);
-        return ret;
-    }
-    
-    DrawingSurfaceI shiftDrawingSurfaceForChild(
-		DrawingSurfaceI ds,
-		WidgetI child
-		)
-    {
-    	if (getChild() != child)
-    		throw new Exception("not a child");
-    	
-    	auto x = getChildX(child);
-        auto y = getChildY(child);
-        
-        auto ret = new DrawingSurfaceShift(
-        	ds,
-        	cast(int)x,
-        	cast(int)y
-        	);
-        
-        return ret;
-    }
-    
-    Form getForm()
-    {
-    	return this;
-    }
-    
-    void focusTo(WidgetI widget)
-    {
-    	setFocusedWidget(widget);
-    }
-    
-    private WidgetI focusXWidget(WidgetI delegate() getXFocusableWidget)
-    {
-        WidgetI cfw;
+        Widget cfw;
         
         if (isSetFocusedWidget())
         {
@@ -492,223 +388,24 @@ class Form : Widget
         return (isSetFocusedWidget() ? getFocusedWidget() : null);
     }
     
-    WidgetI focusNextWidget()
+    Widget focusNextWidget()
     {
         return focusXWidget(&getNextFocusableWidget);
     }
     
-    WidgetI focusPrevWidget()
+    Widget focusPrevWidget()
     {
         return focusXWidget(&getPrevFocusableWidget);
     }
     
-    WidgetI getNextFocusableWidget()
+    Widget getNextFocusableWidget()
     {
         return null;
     }
     
-    WidgetI getPrevFocusableWidget()
+    Widget getPrevFocusableWidget()
     {
         return null;
     }
-    
-    Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
-    {
-    	
-    	auto ret_this = tuple(cast(WidgetI)this, Position2D(0,0));
-    	
-    	auto c = getChild();
-    	
-    	if (c is null)
-    	{
-    		return ret_this;
-    	}
-    	
-    	auto w = getWidth();
-    	auto h = getHeight();
-    	
-    	if (w <= 10 || h <= 10)
-    	{
-    		return ret_this;
-    	}
-    	
-    	auto p_x = point.x;
-    	auto p_y = point.y;
-    	
-    	if (p_x < 5
-    		|| p_y < 5
-    	|| (p_x < w && p_x > w-5)
-    	|| (p_y < h && p_y > h-5)
-    	)
-    	{
-    		return ret_this;
-    	}
-    	
-    	return c.getChildAtPosition(Position2D(p_x - 5, p_y - 5));
-    }
-    
-    int getChildX(WidgetI child)
-    {
-    	return 5;
-    }
-    
-    int getChildY(WidgetI child)
-    {
-    	return 5;
-    }
-    
-    int getChildWidth(WidgetI child)
-    {
-    	auto x = getWidth();
-    	if (x>5)
-    		return x-10;
-    	else
-    		return 0;
-    }
-    
-    int getChildHeight(WidgetI child)
-    {
-    	auto x = getHeight();
-    	if (x>5)
-    		return x-10;
-    	else
-    		return 0;
-    }
-    
-    void setChildX(WidgetI child, int v)
-    {}
-    
-    void setChildY(WidgetI child, int v)
-    {}
-    
-    void setChildWidth(WidgetI child, int v)
-    {}
-    
-    void setChildHeight(WidgetI child, int v)
-    {}
-    
-    int getChildCount()
-    {
-    	return getChild() is null ? 0 : 1;
-    }
-    
-    WidgetI getChild(int i)
-    {
-    	if (i == 0)
-    	{
-    		return getChild();
-    	}
-    	else
-    	{
-    		return null;
-    	}
-    }
-    
-    void addChild(WidgetI child)
-    {
-    	setChild(child);
-    }
-    
-    void removeChild(WidgetI child)
-    {
-    	if (haveChild(child))
-    	{
-    		unsetChild();
-    	}
-    }
-    
-    bool haveChild(WidgetI child)
-    {
-    	return getChild() == child;
-    }
-    
-    void propagatePosAndSizeRecalc()
-    {
-    	auto w = getWindow();
-    	if (w !is null)
-    	{
-    		setWidth(w.getFormWidth());
-    		setHeight(w.getFormHeight());
-    	}
-    	
-    	auto c = getChild();
-    	if (c !is null)
-    		c.propagatePosAndSizeRecalc();
-    }
-    
-    void redraw()
-    {
-    	auto img = propagateRedraw();
-    	auto ds = getDrawingSurface();
-    	ds.drawImage(Position2D(0,0), img);
-    	ds.present();
-    }
-    
-    Image propagateRedraw()
-    {
-    	auto img = this.renderImage();
-    	
-    	auto c = getChild();
-    	if (c !is null)
-    	{
-    		auto c_img = c.propagateRedraw();
-    		this.drawChild(img, c, c_img);
-    	}
-    	return img;
-    }
-    
-    void drawChild(WidgetI child, Image img)
-    {
-    	auto ds = getDrawingSurface();
-    	drawChild(ds, child, img);
-    	return;
-    }
-    
-    void drawChild(DrawingSurfaceI ds, WidgetI child, Image img)
-    {
-    	ds = shiftDrawingSurfaceForChild(ds, child);
-    	ds.drawImage(Position2D(0, 0), img);
-    }
-    
-    WidgetI setParent(WidgetI container)
-    {
-    	return this;
-    }
-    
-    WidgetI unsetParent()
-    {
-    	return this;
-    }
-    
-    override void focusEnter(Form form, WidgetI widget)
-    {}
-    override void focusExit(Form form, WidgetI widget)
-    {}
-    
-    override bool isVisuallyPressed()
-    {return false;}
-    override void visualPress(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void visualRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    
-    override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
-    {}
-    
-         
-    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
-    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
-    
-    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
     
 }

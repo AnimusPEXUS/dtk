@@ -6,7 +6,7 @@ public import dtk.types.Event;
 
 import dtk.types.Widget;
 
-struct EventRootWidget
+struct EventForm
 {
 	Event* event;
 	Widget focusedWidget;

@@ -82,7 +82,7 @@ class TextEntry : Widget, WidgetI
     mixin mixin_widget_redraw_using_propagateRedraw!();
     mixin mixin_propagateRedraw_children_none!();
     
-    mixin mixin_propagateParentChangeEmision!();
+    mixin mixin_propagateParentChangeEmission!();
     
     TextView text_view;
     
@@ -141,7 +141,7 @@ class TextEntry : Widget, WidgetI
     this()
     {
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
-    	// mixin(mixin_propagateParentChangeEmision_this());
+    	// mixin(mixin_propagateParentChangeEmission_this());
     	
     	setModePreset("multiline-editor");
     	recalcPaddings();

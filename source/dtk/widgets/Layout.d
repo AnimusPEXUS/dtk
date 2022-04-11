@@ -103,7 +103,7 @@ class Layout : Element //, LayoutI
     mixin mixin_Widget_renderImage!("Layout");
     mixin mixin_widget_redraw_using_propagateRedraw!();
     
-    mixin mixin_propagateParentChangeEmision!();
+    mixin mixin_propagateParentChangeEmission!();
     
     private {
     	SignalConnection sc_parentChange;
@@ -119,7 +119,7 @@ class Layout : Element //, LayoutI
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
     	
-    	// mixin(mixin_propagateParentChangeEmision_this());
+    	// mixin(mixin_propagateParentChangeEmission_this());
     	
     	this.children = children;
     	

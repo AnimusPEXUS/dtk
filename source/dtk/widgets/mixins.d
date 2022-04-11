@@ -205,48 +205,48 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 }
 
 
-/* string mixin_propagateParentChangeEmision_this()
+/* string mixin_propagateParentChangeEmission_this()
 {
 return q{
 import core.sync.mutex;
-propagateParentChangeEmision_recursion_protection_mtx = new Mutex();
+propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
 };
 } */
 
-mixin template mixin_propagateParentChangeEmision()
+/* mixin template mixin_propagateParentChangeEmission()
 {
 	private
     {
 		import core.sync.mutex;
-    	bool propagateParentChangeEmision_recursion_protection;
-    	Mutex propagateParentChangeEmision_recursion_protection_mtx;
+    	bool propagateParentChangeEmission_recursion_protection;
+    	Mutex propagateParentChangeEmission_recursion_protection_mtx;
     }
     
-    override void propagateParentChangeEmision()
+    override void propagateParentChangeEmission()
     {
     	import dtk.miscs.recursionGuard;
     	import core.sync.mutex;
     	
     	synchronized
     	{
-    		if (propagateParentChangeEmision_recursion_protection_mtx is null)
-    			propagateParentChangeEmision_recursion_protection_mtx = new Mutex();
+    		if (propagateParentChangeEmission_recursion_protection_mtx is null)
+    			propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
     		
     		recursionGuard(
-    			propagateParentChangeEmision_recursion_protection,
-    			propagateParentChangeEmision_recursion_protection_mtx,
+    			propagateParentChangeEmission_recursion_protection,
+    			propagateParentChangeEmission_recursion_protection_mtx,
     			0,
     			delegate int() {
     				import dtk.widgets.Form;
     				
     				static if (is(typeof(this) == Form))
     				{
-    					pragma(msg, "propagateParentChangeEmision for Form");
+    					pragma(msg, "propagateParentChangeEmission for Form");
     					setWindow(getWindow());
     				}
     				else
     				{
-    					pragma(msg, "propagateParentChangeEmision for simple widget");
+    					pragma(msg, "propagateParentChangeEmission for simple widget");
     					setParent(getParent());
     				}
     				
@@ -254,21 +254,21 @@ mixin template mixin_propagateParentChangeEmision()
     				{
     					foreach (c; children)
     					{
-    						c.child.propagateParentChangeEmision();
+    						c.child.propagateParentChangeEmission();
     					}
     				}
     				else static if (__traits(hasMember, this, "getChild"))
     				{
     					auto c = getChild();
     					if (c !is null)
-    						c.propagateParentChangeEmision();
+    						c.propagateParentChangeEmission();
     				}
     				return 0;
     			}
     			);
     	}
     }
-}
+} */
 
 string mixin_widgetSingleChildSet01(string varname)
 {
@@ -303,7 +303,7 @@ mixin template mixin_WidgetFunctions()
 	static foreach (
     	code; 
     	[
-    	q{void propagateParentChangeEmision()},
+    	q{void propagateParentChangeEmission()},
     	q{void propagatePosAndSizeRecalc()},
     	q{Image propagateRedraw()},
     	q{void redraw()},
@@ -368,7 +368,7 @@ mixin template mixin_WidgetChildrenFunctionsSingle()
 
 /* mixin template mixin_WidgetChildrenFunctionsNone()
 {
-	void propagateParentChangeEmision()
+	void propagateParentChangeEmission()
 	void propagatePosAndSizeRecalc()
 	Image propagateRedraw()
 	void redraw()
