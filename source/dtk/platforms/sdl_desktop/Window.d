@@ -12,7 +12,7 @@ import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 // import dtk.interfaces.WindowEventMgrI;
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 
 import dtk.platforms.sdl_desktop.DrawingSurface;
 import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
@@ -42,7 +42,7 @@ import dtk.signal_mixins.Window;
 const auto WindowProperties = cast(PropSetting[]) [
 PropSetting("gsun", "SDLDesktopPlatform", "platform", "Platform", "null"),
 PropSetting("gsun", "Form", "form", "Form", "null"),
-PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", "null"),
+PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", "null"),
 // PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
 PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
@@ -207,7 +207,7 @@ class Window : WindowI
         	);
     }
     
-    LafI getLaf()
+    LaFI getLaf()
     {
     	auto l = getForcedLaf();
     	if (l !is null)

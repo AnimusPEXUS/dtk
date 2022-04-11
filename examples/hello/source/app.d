@@ -4,7 +4,7 @@ import std.math;
 
 import dtk.main;
 
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 
 import dtk.types.Color;
 import dtk.types.Position2D;
@@ -31,7 +31,7 @@ void main()
     auto laf = new Chicago98Laf;
     
     pl.setOnGetLaf(
-    	delegate LafI()
+    	delegate LaFI()
     	{
     		return laf;
     	}

@@ -14,7 +14,7 @@ import dtk.types.Widget;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 
 import dtk.signal_mixins.Window;
 
@@ -27,10 +27,10 @@ interface WindowI
 	
     PlatformI getPlatform();
 
-    LafI getLaf();
+    LaFI getLaf();
 
-    LafI getForcedLaf();
-    typeof(this) setForcedLaf(LafI);
+    LaFI getForcedLaf();
+    typeof(this) setForcedLaf(LaFI);
     typeof(this) unsetForcedLaf();    
     
     WindowI setForm(Form form);

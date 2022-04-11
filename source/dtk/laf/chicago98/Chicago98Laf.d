@@ -19,7 +19,7 @@ import dtk.types.EventTextInput;
 import dtk.types.Image;
 import dtk.types.Widget;
 
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 import dtk.interfaces.WindowI;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -38,7 +38,7 @@ const
     auto P_135M2 = PI * 2 - P_45;
 }
 
-class Chicago98Laf : LafI
+class Chicago98Laf : LaFI
 {
 	
     Color formBackground = Color(0xc0c0c0);

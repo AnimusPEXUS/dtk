@@ -12,7 +12,7 @@ import observable.signal;
 
 import dtk.interfaces.WindowI;
 // import dtk.interfaces.FormI;
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 // import dtk.interfaces.Widget;
 import dtk.interfaces.DrawingSurfaceI;
 //import dtk.interfaces.Widget;
@@ -40,7 +40,7 @@ import dtk.signal_mixins.Form;
 
 const auto FormProperties = cast(PropSetting[]) [
 PropSetting("gsun", "WindowI", "window", "Window", ""),
-// PropSetting("gsun", "LafI", "forced_laf", "ForcedLaf", ""),
+// PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", ""),
 // PropSetting("gsun", "Widget", "child", "Child", ""),
 
 PropSetting("gsun", "Widget", "focusedWidget", "FocusedWidget", ""),

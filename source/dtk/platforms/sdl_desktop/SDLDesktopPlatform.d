@@ -9,7 +9,7 @@ import std.parallelism;
 import fontconfig.fontconfig;
 import bindbc.sdl;
 
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
@@ -35,7 +35,7 @@ cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
 
 const auto SDLDesktopPlatformProperties = cast(PropSetting[]) [
 PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
-// PropSetting("gsun", "LafI", "laf", "Laf", "null"),
+// PropSetting("gsun", "LaFI", "laf", "Laf", "null"),
 ];
 
 class SDLDesktopPlatform : PlatformI
@@ -120,14 +120,14 @@ class SDLDesktopPlatform : PlatformI
         return w;
     }
     
-    LafI delegate() onGetLaf;
+    LaFI delegate() onGetLaf;
     
-    void setOnGetLaf(LafI delegate() cb)
+    void setOnGetLaf(LaFI delegate() cb)
     {
     	onGetLaf=cb;
     }
     
-    LafI getLaf()
+    LaFI getLaf()
     {
     	if (onGetLaf is null)
     		throw new Exception("onGetLaf is not set");

@@ -2,7 +2,7 @@ module dtk.interfaces.PlatformI;
 
 
 import dtk.interfaces.WindowI;
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 import dtk.interfaces.FontMgrI;
 
 import dtk.types.WindowCreationSettings;
@@ -19,8 +19,8 @@ interface PlatformI
     string getDescription();
     string getSystemTriplet();
     
-    void setOnGetLaf(LafI delegate());
-    LafI getLaf();
+    void setOnGetLaf(LaFI delegate());
+    LaFI getLaf();
     
     FontMgrI getFontManager();
     

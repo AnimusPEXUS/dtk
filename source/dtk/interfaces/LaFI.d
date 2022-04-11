@@ -1,4 +1,4 @@
-module dtk.interfaces.LafI;
+module dtk.interfaces.LaFI;
 
 import dtk.interfaces.DrawingSurfaceI;
 
@@ -14,7 +14,7 @@ import dtk.widgets.Layout;
 // import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
 
-interface LafI
+interface LaFI
 {
     void drawForm(Form e, DrawingSurfaceI ds);
     void drawButton(Button e, DrawingSurfaceI ds);

@@ -10,7 +10,7 @@ import std.format;
 
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
-import dtk.interfaces.LafI;
+import dtk.interfaces.LaFI;
 import dtk.interfaces.LayoutEngineI;
 import dtk.interfaces.LayoutChildSettingsI;
 
@@ -58,7 +58,7 @@ class WidgetChild
 
 const auto WidgetProperties = cast(PropSetting[]) [
 PropSetting("gsun", "Widget", "parent", "Parent", q{null}),
-PropSetting("gsun", "LafI", "localLaf", "LocalLaf", q{null}),
+PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
 
 PropSetting("gsun", "LayoutEngineI", "layout_engine", "LayoutEngine", "null"),
 
@@ -576,10 +576,10 @@ class Widget
 		ds.present();
     }
     
-   final LafI getLaf()
+   final LaFI getLaf()
     {
     	// TODO: add recursion protection?
-    	LafI ret;
+    	LaFI ret;
     	
     	try_get_local_laf:
     	{
@@ -650,7 +650,7 @@ class Widget
     throw new Exception("getRenderingFunctionCB must be defined");
     }
     
-    LafI llaf = getLaf();
+    LaFI llaf = getLaf();
     
     if (llaf is null)
     {
