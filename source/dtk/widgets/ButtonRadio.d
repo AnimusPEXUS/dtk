@@ -38,35 +38,13 @@ class ButtonRadio : Widget
     
 	mixin mixin_multiple_properties_define!(ButtonRadioProperties);
     mixin mixin_multiple_properties_forward!(ButtonRadioProperties, false);
-    mixin mixin_multiple_properties_forward!(WidgetProperties, true);
-    mixin mixin_forwardXYWH_from_Widget!();
     mixin mixin_Widget_renderImage!("ButtonRadio");
-    mixin mixin_widget_redraw_using_propagateRedraw!();
-    mixin mixin_propagateRedraw_children_none!();
-    
-    mixin mixin_forward_super_functions!(
-    	[
-    	"getForm",
-    	"getNextFocusableWidget",
-    	"getPrevFocusableWidget",
-    	"propagatePosAndSizeRecalc",
-    	"getChildAtPosition",
-    	"getDrawingSurface"
-    	]
-    	);
-    
-    mixin mixin_propagateParentChangeEmission!();
     
     this()
     {
+    	super(0, 1);
     	mixin(mixin_multiple_properties_inst(ButtonRadioProperties));
     	
-        // setMouseHandler("button-click", &on_mouse_click_internal);
-        // setMouseHandler("button-down", &on_mouse_down_internal);
-        // setMouseHandler("button-up", &on_mouse_up_internal);
-        
-        // mixin(mixin_propagateParentChangeEmission_this());
-        
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
     }
@@ -74,63 +52,67 @@ class ButtonRadio : Widget
     private void handleRadioGroup_onBeforeChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
     	
-        collectException({
+        collectException(
+        	{
         		if (old_v !is null)
         			if (old_v.isIn(this))
                     old_v.remove(this);
-        }());
+            }()
+            );
     }
     
     private void handleRadioGroup_onAfterChanged(RadioGroup old_v, RadioGroup new_v) nothrow
     {
     	
-        collectException({
+        collectException(
+        	{
         		if (new_v !is null)
         			if (!new_v.isIn(this))
                     new_v.add(this);
-        }());
+            }()
+            );
     }
     
-    override void focusEnter(Form form, WidgetI widget)
-    {}
-    override void focusExit(Form form, WidgetI widget) 
-    {}
-
-    override bool isVisuallyPressed()
-    {return false;}
-    override void visualPress(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void visualRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-
-    override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    {
-        redraw();
-    }
-    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
-    {
-    	
-    }
-    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
-    {
-    	auto rg = getRadioGroup();
-        if (rg !is null)
-        {
-            rg.selectButton(this);
-        }
-        redraw();
-    }
-    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
-    {}
-    
-         
-    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
-    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
-    
-    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
+    // override void focusEnter(Form form, WidgetI widget)
+    // {}
+    // override void focusExit(Form form, WidgetI widget) 
+    // {}
+// 
+    // override bool isVisuallyPressed()
+    // {return false;}
+    // override void visualPress(Form form, WidgetI widget, EventForm* event)
+    // {}
+    // override void visualRelease(Form form, WidgetI widget, EventForm* event)
+    // {}
+// 
+    // override void intMousePress(Form form, WidgetI widget, EventForm* event)
+    // {
+        // redraw();
+    // }
+    // override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
+    // {
+    	// 
+    // }
+    // override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
+    // {
+    	// auto rg = getRadioGroup();
+        // if (rg !is null)
+        // {
+            // rg.selectButton(this);
+        // }
+        // redraw();
+    // }
+    // override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    // {}
+    // override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
+    // {}
+    // override void intMouseMove(Form form, WidgetI widget, EventForm* event)
+    // {}
+    // 
+         // 
+    // override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
+    // override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
+    // 
+    // override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
     
 }

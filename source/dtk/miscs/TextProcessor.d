@@ -28,6 +28,7 @@ import dtk.types.Widget;
 
 import dtk.miscs.signal_tools;
 
+import dtk.widgets.Form;
 
 
 enum GenVisibilityMapForSubitemsLayout
@@ -1922,7 +1923,7 @@ class TextView
     
     Text text;
     
-    Widget delegate() getForm;
+    Form delegate() getForm;
     DrawingSurfaceI delegate() getDrawingSurface;
     bool delegate() isFocused;
     void delegate() viewResized;

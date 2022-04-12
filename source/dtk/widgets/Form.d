@@ -3,6 +3,8 @@
 module dtk.widgets.Form;
 
 import core.sync.mutex;
+
+import std.format;
 import std.stdio;
 import std.typecons;
 import std.exception;
@@ -52,10 +54,7 @@ class Form : Widget
     mixin(mixin_FormSignals(false));
     mixin mixin_multiple_properties_define!(FormProperties);
     mixin mixin_multiple_properties_forward!(FormProperties, false);
-    mixin mixin_Widget_renderImage!("Form", "");
-    // mixin mixin_propagateRedraw_children_one!("");
-    
-    // mixin mixin_propagateParentChangeEmission!();
+    mixin mixin_Widget_renderImage!("Form");
     
     private
     {
@@ -81,6 +80,7 @@ class Form : Widget
     
     this()
     {
+    	super(0, 1);
     	mixin(mixin_multiple_properties_inst(FormProperties));
     	
     	sc_windowChange = connectToWindow_onAfterChanged(
@@ -237,12 +237,12 @@ class Form : Widget
     				mouse_focused_widget = event.mouseFocusedWidget;
     				if (old !is null)
     				{
-    					old.visualRelease(this, old, event);
+    					old.visuallyRelease(this, old, event);
     					old.intMouseLeave(this, old, mouse_focused_widget, event);
     				}
     				if (this.pressrelease_sequence_started && this.pressrelease_sequence_widget == mouse_focused_widget)
     				{
-    					mouse_focused_widget.visualPress(
+    					mouse_focused_widget.visuallyPress(
     						this, 
     						mouse_focused_widget, 
     						event
@@ -276,13 +276,13 @@ class Form : Widget
     						pressrelease_sequence_started = true;
     						pressrelease_sequence_widget = event.mouseFocusedWidget;
     						pressrelease_sequence_btn = event.event.em.button;
-    						this.focusTo(event.mouseFocusedWidget);
+    						setFocusedWidget(event.mouseFocusedWidget);
     						event.mouseFocusedWidget.intMousePress(
     							this,
     							event.mouseFocusedWidget,
     							event
     							);
-    						event.mouseFocusedWidget.visualPress(
+    						event.mouseFocusedWidget.visuallyPress(
     							this,
     							event.mouseFocusedWidget,
     							event
@@ -294,7 +294,7 @@ class Form : Widget
     							event.mouseFocusedWidget,
     							event
     							);
-    						event.mouseFocusedWidget.visualRelease(
+    						event.mouseFocusedWidget.visuallyRelease(
     							this,
     							event.mouseFocusedWidget,
     							event
@@ -356,15 +356,15 @@ class Form : Widget
     }
     
     // don't allow get Parent at From
-    final override Widget getParent()
+    override Widget getParent()
     {
     	return null;
     }
     
     // don't allow set Parent at From
-    final override Form setParent(Widget v)
+    override Form setParent(Widget v)
     {
-    	throw new Exception("trying to set Paernt at Form");
+    	throw new Exception("trying to set Parent at Form");
     	// unsetParent();
     	// return this;
     }

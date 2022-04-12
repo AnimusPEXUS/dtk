@@ -52,7 +52,7 @@ class RadioGroup
         {
             auto x = v == b;
             
-            v.setChecked(x);
+            v.setToggledOn(x);
             v.redraw();
         }
     }
@@ -61,7 +61,7 @@ class RadioGroup
     {
         foreach (v; buttons)
         {
-        	if (v.getChecked())
+        	if (v.getToggledOn())
         		return v;
         }
         return cast(ButtonRadio) null;

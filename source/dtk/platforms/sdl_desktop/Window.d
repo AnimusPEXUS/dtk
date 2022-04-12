@@ -187,8 +187,8 @@ class Window : WindowI
         
         cs_FormChange = connectToForm_onAfterChanged(
         	delegate void(
-        		Widget old_value,
-        		Widget new_value
+        		Form old_value,
+        		Form new_value
         		)
         	{
         		collectException(

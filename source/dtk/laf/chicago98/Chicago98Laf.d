@@ -25,8 +25,16 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 // import dtk.interfaces.WindowEventMgrI;
 
-
 import dtk.miscs.DrawingSurfaceShift;
+
+import dtk.widgets.Form;
+import dtk.widgets.Button;
+import dtk.widgets.ButtonRadio;
+import dtk.widgets.ButtonCheck;
+// import dtk.widgets.Picture;
+import dtk.widgets.Layout;
+// import dtk.widgets.ScrollBar;
+import dtk.widgets.TextEntry;
 
 // TODO: deprecate Position2D and Size2D and pass values directly
 
@@ -51,7 +59,12 @@ class Chicago98Laf : LaFI
     Color elementDarkedColor = Color(0x000000);
     Color elementDarkedColor2 = Color(0x808080);
     
-    void drawBewel(DrawingSurfaceI ds, Position2D pos, Size2D size, bool inverted)
+    void drawBewel(
+    	DrawingSurfaceI ds, 
+    	Position2D pos, 
+    	Size2D size, 
+    	bool inverted
+    	)
     {
         auto c1 = elementLightedColor, c2 = elementDarkedColor,
         c3 = elementLightedColor2, c4 = elementDarkedColor2;
@@ -81,7 +94,7 @@ class Chicago98Laf : LaFI
         	);
     }
     
-    void drawForm(Widget e, DrawingSurfaceI ds)
+    void drawForm(Form e, DrawingSurfaceI ds)
     {
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
@@ -98,23 +111,23 @@ class Chicago98Laf : LaFI
         	);
     }
     
-    void drawButton(Widget e, DrawingSurfaceI ds)
+    void drawButton(Button e, DrawingSurfaceI ds)
     {
         bool is_default = delegate bool() {
-            auto f = e.getRoot();
+            auto f = e.getForm();
             if (f is null)
                 return false;
-            auto def = f.getRootDefaultWidget();
+            auto def = f.getDefaultWidget();
             return e == def;
         }();
         bool is_focused = delegate bool() {
-            auto f = e.getRoot();
+            auto f = e.getForm();
             if (f is null)
                 return false;
-            auto curvid = f.getRootFocusedWidget();
+            auto curvid = f.getFocusedWidget();
             return e == curvid;
         }();
-        bool is_down = e.visuallyPressed;
+        bool is_down = e.getVisuallyPressed();
         
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
@@ -159,7 +172,7 @@ class Chicago98Laf : LaFI
     }
     
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
-    void drawButtonRadio(Widget e, DrawingSurfaceI ds)
+    void drawButtonRadio(ButtonRadio e, DrawingSurfaceI ds)
     {
         assert(ds !is null);
         
@@ -189,7 +202,7 @@ class Chicago98Laf : LaFI
         ds.drawCircle(p, 4, step, Color(0xffffff));
         
         auto fillColor = Color(0xffffff);
-        if (e.toggledOn)
+        if (e.getToggledOn())
         {
             fillColor = Color(0);
         }
@@ -207,7 +220,7 @@ class Chicago98Laf : LaFI
             ds.drawDot(Position2D(6, 6), id);
         }
         
-        if (e.getRootFocusedWidget() == e)
+        if (e.getForm().getFocusedWidget() == e)
         {
             ds.drawRectangle(
             	Position2D(pos_x, pos_y),
@@ -222,7 +235,7 @@ class Chicago98Laf : LaFI
     }
     
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
-    void drawButtonCheck(Widget e, DrawingSurfaceI ds)
+    void drawButtonCheck(ButtonCheck e, DrawingSurfaceI ds)
     {
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
@@ -238,7 +251,7 @@ class Chicago98Laf : LaFI
         	nullable(FillStyle(Color(0xffffff)))
         	);
         
-        if (e.getRootFocusedWidget() == e)
+        if (e.getForm().getFocusedWidget() == e)
         {
             ds.drawRectangle(
             	Position2D(pos_x, pos_y),
@@ -250,7 +263,7 @@ class Chicago98Laf : LaFI
         
         auto fillColor = Color(0xffffff);
         
-        if (e.toggledOn)
+        if (e.getToggledOn())
         {
             fillColor = Color(0);
         }
@@ -263,10 +276,10 @@ class Chicago98Laf : LaFI
         	);
     }
     
-    void drawPicture(Widget e, DrawingSurfaceI ds)
-    {
-    	
-    }
+    // void drawPicture(Widget e, DrawingSurfaceI ds)
+    // {
+    // 
+    // }
     
     // TODO: move this to some more appropriate place or delete
     // NOTE: have copy of this function in TextProcessor
@@ -275,7 +288,7 @@ class Chicago98Laf : LaFI
     // return cast(ubyte)(lower + ((higher - lower) * part));
     // }
     
-    void drawLayout(Widget e, DrawingSurfaceI ds)
+    void drawLayout(Layout e, DrawingSurfaceI ds)
     {
         // auto size_w = cast(int) widget.getWidth();
         // auto size_h = cast(int) widget.getHeight();
@@ -300,11 +313,11 @@ class Chicago98Laf : LaFI
     // {
     // }
     
-    void drawScrollBar(Widget e, DrawingSurfaceI ds)
-    {
-    }
+    // void drawScrollBar(Widget e, DrawingSurfaceI ds)
+    // {
+    // }
     
-    void drawTextEntry(Widget e, DrawingSurfaceI ds)
+    void drawTextEntry(TextEntry e, DrawingSurfaceI ds)
     {
         auto pos_x = cast(int) 0;
         auto pos_y = cast(int) 0;
@@ -314,7 +327,7 @@ class Chicago98Laf : LaFI
         auto bewel_bg_color = Color(cast(ubyte[])[255,255,255]);
         // auto draw_bewel = widget.getDrawBewelAndBackground();
         // auto bewel_bg_color = widget.getBewelBackgroundColor();
-
+        
         auto tv_ds = ds;
         
         if (draw_bewel)
@@ -351,7 +364,7 @@ class Chicago98Laf : LaFI
         
         // if (e.text_view !is null)
         // {
-        	// e.text_view.completeRedrawToDS(tv_ds);
+        // e.text_view.completeRedrawToDS(tv_ds);
         // }
     }
 }

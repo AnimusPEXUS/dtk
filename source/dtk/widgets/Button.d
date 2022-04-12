@@ -43,10 +43,11 @@ class Button : Widget
 	mixin mixin_multiple_properties_define!(ButtonProperties);
     mixin mixin_multiple_properties_forward!(ButtonProperties, false);
     mixin mixin_Widget_renderImage!("Button");
-    mixin mixin_widget_redraw_using_propagateRedraw!();
+    // mixin mixin_widget_redraw_using_propagateRedraw!();
     
     this()
     {
+    	super(0, 1);
     	mixin(mixin_multiple_properties_inst(ButtonProperties));
     }
     
@@ -56,15 +57,15 @@ class Button : Widget
     	return this;
     }
     
-    override void propagatePosAndSizeRecalc()
+    /*     override void propagatePosAndSizeRecalc()
     {
-    	if (getChild() !is null)
-    	{
-    		alignParentChild(
-    			0.5, 0.5,
-    			this,
-    			getChild()
-    			);
-    	}
+    if (getChild() !is null)
+    {
+    alignParentChild(
+    0.5, 0.5,
+    this,
+    getChild()
+    );
     }
+    } */
 }

@@ -30,6 +30,22 @@ import dtk.widgets.Form;
 
 // import dtk.signal_mixins.Widget;
 
+enum LayoutOverflowBehavior
+{
+    Ignore, // do nothing
+    Scroll, // show scrollbar
+    Clip, // don't draw overflow areas
+    Resize, // resize self to fit everything
+}
+
+enum LayoutType : ubyte
+{
+    undefined,
+    linearScrolled,
+    linearWrapped,
+}
+
+
 const auto WidgetChildProperties = cast(PropSetting[]) [
 PropSetting("gs_w_d", "int", "x", "X", "0"),
 PropSetting("gs_w_d", "int", "y", "Y", "0"),
@@ -71,7 +87,7 @@ PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
 // PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "0"),
 ];
 
-alias renderFunctionLinkType = void delegate(Widget e, DrawingSurfaceI ds);
+// alias renderFunctionLinkType = void delegate(Widget e, DrawingSurfaceI ds);
 
 class Widget
 {
@@ -81,26 +97,23 @@ class Widget
     
     private
     {
+		// TODO: make children available by implementing special functions at
+		//       Widget class
 		WidgetChild[] children;
-		
 		VisibilityMap!(Widget) vm;
     }
     
-    int getChildMinCount()
+    public
     {
-    	return 0;
+		const int childMinCount;
+		const int childMaxCount;
     }
     
-    int getChildMaxCount()
+    invariant
     {
-    	return 0;
+    	assert(childMinCount >= 0);
+    	assert(childMaxCount == -1 || (childMaxCount >= childMinCount));
     }
-    
-	/* public
-	{
-		bool visuallyPressed;
-		bool toggledOn;
-	} */
 	
 	private
     {
@@ -113,12 +126,19 @@ class Widget
     	SignalConnection sc_formEventHandler;
     }
     
-	this()
+	// this()
+	// {
+	// mixin(mixin_multiple_properties_inst(WidgetProperties));
+	// childMinCount=-1;
+	// childMaxCount=-1;
+	// }
+	
+	this(int childMinCount, int childMaxCount)
 	{
+		this.childMinCount = childMinCount;
+		this.childMaxCount = childMaxCount;
 		mixin(mixin_multiple_properties_inst(WidgetProperties));
 	}
-	
-	
 	
 	static foreach(v; ["Width", "Height", "X", "Y"])
 	{
@@ -127,8 +147,17 @@ class Widget
 				int get%1$s()
 				{
 					int ret;
-					auto parent = getParent();
-					auto window = getWindow();
+					Widget parent;
+					WindowI window;
+					Form f;
+					
+					parent = getParent();
+					f = cast(Form) this;
+					if (f !is null)
+					{
+						window = f.getWindow();
+					}
+					
 					if (parent !is null)
 					{
 						ret = parent.getChild%1$s(this);
@@ -154,9 +183,17 @@ class Widget
 				
 				Widget set%1$s(int value)
 				{
-					int ret;
-					auto parent = getParent();
-					auto window = getWindow();
+					Widget parent;
+					WindowI window;
+					Form f;
+					
+					parent = getParent();
+					f = cast(Form) this;
+					if (f !is null)
+					{
+						window = f.getWindow();
+					}
+					
 					if (parent !is null)
 					{
 						parent.setChild%1$s(this, value);
@@ -213,13 +250,23 @@ class Widget
     		);
     }
     
+    Image renderImage()
+    {
+    	throw new Exception("override this");
+    }
+    
+    Image renderImage(int x, int y, int w, int h)
+    {
+    	throw new Exception("override this");
+    }
+    
     private
     {
     	bool getForm_recursion_protection_bool;
     	Mutex getForm_recursion_protection_mutex;
     }
     
-    final Form getForm() 
+    final Form getForm()
     {
     	auto ret = recursionGuard(
     		getForm_recursion_protection_bool,
@@ -230,7 +277,7 @@ class Widget
     		},
     		delegate Form()
     		{
-    			WidgetI p = this.getParent();
+    			Widget p = this.getParent();
     			Form res;
     			
     			while (true)
@@ -272,11 +319,12 @@ class Widget
     			propagateParentChangeEmission_recursion_protection_mtx,
     			0,
     			delegate int() {
-    				import dtk.widgets.Form;
     				
-    				if ((cast(Form) this ) != null)
+    				Form f = cast(Form) this;
+    				
+    				if (f !is null)
     				{
-    					setWindow(getWindow());
+    					f.setWindow(f.getWindow());
     				}
     				else
     				{
@@ -292,31 +340,31 @@ class Widget
     			}
     			);
     	}
-    }    
+    }
     
-    // TODO: delete this function
+    // TODO: delete this function?
 	final Widget getFormDefaultWidget()
 	{
-		return getForm().getLocalDefaultWidget();
+		return getForm().getDefaultWidget();
 	}
 	
-    // TODO: delete this function
+    // TODO: delete this function?
 	final Widget getFormFocusedWidget()
 	{
-		return getForm().getLocalFocusedWidget();
+		return getForm().getFocusedWidget();
 	}
 	
-    // TODO: delete this function
+    // TODO: delete this function?
 	final void setFormDefaultWidget(Widget e)
 	{
-		getForm().setLocalDefaultWidget(e);
+		getForm().setDefaultWidget(e);
 		return;
 	}
 	
-    // TODO: delete this function
+    // TODO: delete this function?
 	final void setFormFocusedWidget(Widget e)
 	{
-		getForm().setLocalFocusedWidget(e);
+		getForm().setFocusedWidget(e);
 		return;
 	}
 	
@@ -337,6 +385,14 @@ class Widget
     	}
     }
     
+    // removes all children and adds passed child as only one 
+    final Widget setChild(Widget child)
+    {
+    	removeAllChildren();
+    	addChild(child);
+    	return this;
+    }
+    
     final Widget getChild(int i)
     {
     	if (children.length == 0)
@@ -346,7 +402,7 @@ class Widget
     	return children[i].child;
     }
     
-    final void addChild(Widget child)
+    final Widget addChild(Widget child)
     {
     	if (!haveChild(child))
     	{
@@ -356,12 +412,13 @@ class Widget
     			child.setParent(this);
     		}
     	}
+    	return this;
     }
     
-    final void removeChild(Widget child)
+    final Widget removeChild(Widget child)
     {
     	if (!haveChild(child))
-    		return;
+    		return this;
     	
     	Widget[] removed;
     	
@@ -378,6 +435,20 @@ class Widget
     	{
     		v.unsetParent();
     	}
+    	return this;
+    }
+    
+    final Widget removeAllChildren()
+    {
+    	auto children_copy = children; 
+    	foreach(v; children_copy)
+    	{
+    		if (v.child !is null)
+    		{
+    			removeChild(v.child);
+    		}
+    	}
+    	return this;
     }
     
 	final bool haveChild(Widget e)
@@ -392,6 +463,24 @@ class Widget
 		return false;
 	}
 	
+	// TODO: do something with this
+	private void checkChildren()
+    {
+    	foreach_reverse (i, v; children)
+    	{
+    		if (v.child is null)
+    		{
+    			children = children[0 .. i] ~ children[i+1 .. $];
+    			continue;
+    		}
+    		
+    		if (v.child.getParent() != this)
+    		{
+    			v.child.setParent(this);
+    		}
+    	}
+    }
+    
 	final Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
     {
     	Widget c;
@@ -465,7 +554,7 @@ class Widget
         	v.child.propagatePosAndSizeRecalc();
         }
         
-        recalcVisibilityMap();
+        recalcChildVisibilityMap();
     }
     
     final Image propagateRedraw()
@@ -576,7 +665,7 @@ class Widget
 		ds.present();
     }
     
-   final LaFI getLaf()
+    final LaFI getLaf()
     {
     	// TODO: add recursion protection?
     	LaFI ret;
@@ -607,7 +696,12 @@ class Widget
     	
     	try_get_window_laf:
     	{
-    		auto w = getWindow();
+    		Form f = cast(Form) this;
+    		if (f is null)
+    		{
+    			goto fail_exit;
+    		}
+    		auto w = f.getWindow();
     		if (w is null)
     		{
     			goto fail_exit;
@@ -626,76 +720,14 @@ class Widget
     	return ret;
     }
     
-    /* 	Image renderImage()
-    {
-    // debug writeln(this, ".renderImage() called");
-    // Form form = this.getForm();
-    // if (form is null)
-    // {
-    // throw new Exception(
-    // this.toString() ~ ".renderImage() requires Form to be set"
-    // );
-    // }
-    
-    // auto laf = form.getLaf();
-    // if (laf is null)
-    // {
-    // throw new Exception("Laf not set");
-    // }
-    
-    renderFunctionLinkType renderingFunction;
-    
-    if (getRenderingFunctionCB is null)
-    {
-    throw new Exception("getRenderingFunctionCB must be defined");
-    }
-    
-    LaFI llaf = getLaf();
-    
-    if (llaf is null)
-    {
-    throw new Exception(
-    "getLaf returned null: "
-    ~"Widget can't determine it's drawing function"
-    );
-    }
-    
-    renderingFunction = getRenderingFunctionCB(llaf);
-    
-    if (renderingFunction is null)
-    {
-    throw new Exception("getRenderingFunctionCB returned null");
-    }
-    
-    auto w = getWidth();
-    auto h = getHeight();
-    
-    auto ds = new Image(w, h);
-    
-    // static if (__traits(hasMember, this, "renderImageBeforeDraw"))
-    // {
-    // this.renderImageBeforeDraw(ds);
-    // }
-    
-    renderingFunction(this, ds);
-    
-    // static if (__traits(hasMember, this, "renderImageAfterDraw"))
-    // {
-    // this.renderImageAfterDraw(ds);
-    // }
-    
-    return ds;
-    }
-    
-    Image renderImage(int x, int y, int w, int h)
-    {
-    return renderImage().getImage(x,y,w,h);
-    
-    } */
-    
     final DrawingSurfaceI getDrawingSurface()
     {
-    	auto w = getWindow();
+    	Form f = cast(Form) this;
+    	WindowI w;
+    	if (f !is null)
+    	{
+    		w = f.getWindow();
+    	}
     	if (w !is null)
     	{
     		return w.getDrawingSurface();

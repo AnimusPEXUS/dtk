@@ -108,7 +108,7 @@ mixin template mixin_Widget_renderImage(
 				if (form is null)
 				{
 					throw new Exception(
-						this.toString() ~ ".renderImage() requires Form to be set"
+						this.toString() ~ ".renderImage() can't get Form"
 						);
 				}
 				
@@ -123,17 +123,17 @@ mixin template mixin_Widget_renderImage(
 				
 				auto ds = new Image(w, h);
 				
-				static if (__traits(hasMember, this, "renderImageBeforeDraw"))
-				{
-					this.renderImageBeforeDraw(ds);
-				}
+				// static if (__traits(hasMember, this, "renderImageBeforeDraw"))
+				// {
+					// this.renderImageBeforeDraw(ds);
+				// }
 				
 				laf.draw%1$s(this, ds);
 				
-				static if (__traits(hasMember, this, "renderImageAfterDraw"))
-				{
-					this.renderImageAfterDraw(ds);
-				}
+				// static if (__traits(hasMember, this, "renderImageAfterDraw"))
+				// {
+					// this.renderImageAfterDraw(ds);
+				// }
 				
 				return ds;
 			}
@@ -166,7 +166,7 @@ mixin template mixin_forward_super_functions(string[] names)
 	}
 }
 
-
+/* 
 mixin template mixin_propagateRedraw_children_none(string override_str="override")
 {
 	import std.format;
@@ -179,9 +179,9 @@ mixin template mixin_propagateRedraw_children_none(string override_str="override
 			}
     	}.format(override_str)
     	);
-}
+} */
 
-mixin template mixin_propagateRedraw_children_one(string override_str="override")
+/* mixin template mixin_propagateRedraw_children_one(string override_str="override")
 {
 	import std.format;
 	mixin(
@@ -203,7 +203,7 @@ mixin template mixin_propagateRedraw_children_one(string override_str="override"
 		}.format(override_str)
 		);
 }
-
+ */
 
 /* string mixin_propagateParentChangeEmission_this()
 {
@@ -270,7 +270,7 @@ propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
     }
 } */
 
-string mixin_widgetSingleChildSet01(string varname)
+/* string mixin_widgetSingleChildSet01(string varname)
 {
 	import std.format;
 	string ret;
@@ -296,9 +296,9 @@ string mixin_widgetSingleChildSet01(string varname)
     		);
 	}.format(varname);
 	return ret;
-}
+} */
 
-mixin template mixin_WidgetFunctions()
+/* mixin template mixin_WidgetFunctions()
 {
 	static foreach (
     	code; 
@@ -358,13 +358,13 @@ mixin template mixin_WidgetFunctions()
     void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
     void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
     
-    void intTextInput(Form form, WidgetI widget, EventForm* event) {}
-}
+    void  intTextInput(Form form, WidgetI widget, EventForm* event) {}
+}*/
 
-mixin template mixin_WidgetChildrenFunctionsSingle()
+/* mixin template mixin_WidgetChildrenFunctionsSingle()
 {
 	
-}
+} */
 
 /* mixin template mixin_WidgetChildrenFunctionsNone()
 {

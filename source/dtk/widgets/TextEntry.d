@@ -15,7 +15,7 @@ import dtk.types.Widget;
 
 // import dtk.interfaces.ContainerI;
 // import dtk.interfaces.ContainerableI;
-// import dtk.interfaces.WidgetI;
+// import dtk.interfaces.Widget;
 // import dtk.interfaces.FormI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -61,29 +61,13 @@ TextEntry NewLabel(dstring text)
 	return new TextEntry().setModePreset("label").setText(text);
 }
 
-class TextEntry : Widget, WidgetI
+class TextEntry : Widget
 {
 	
     mixin mixin_multiple_properties_define!(TextEntryProperties);
     mixin mixin_multiple_properties_forward!(TextEntryProperties, false);
-    mixin mixin_multiple_properties_forward!(WidgetProperties, true);
-    mixin mixin_forwardXYWH_from_Widget!();
-    mixin mixin_forward_super_functions!(
-    	[
-    	"getForm",
-    	"getNextFocusableWidget",
-    	"getPrevFocusableWidget",
-    	"propagatePosAndSizeRecalc",
-    	"getChildAtPosition",
-    	"getDrawingSurface"
-    	]
-    	);
     mixin mixin_Widget_renderImage!("TextEntry");
-    mixin mixin_widget_redraw_using_propagateRedraw!();
-    mixin mixin_propagateRedraw_children_none!();
-    
-    mixin mixin_propagateParentChangeEmission!();
-    
+        
     TextView text_view;
     
     private {
@@ -140,6 +124,7 @@ class TextEntry : Widget, WidgetI
     
     this()
     {
+    	super(0, 0);
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	// mixin(mixin_propagateParentChangeEmission_this());
     	
@@ -335,12 +320,12 @@ class TextEntry : Widget, WidgetI
     
     //mixin mixin_getWidgetAtPosition;
     
-    override void propagatePosAndSizeRecalc()
-    {
-    	recalcTVSize();
-        text_view.setWidth(tv_width);
-        text_view.setHeight(tv_height);
-    }
+    // override void propagatePosAndSizeRecalc()
+    // {
+    	// recalcTVSize();
+        // text_view.setWidth(tv_width);
+        // text_view.setHeight(tv_height);
+    // }
     
     public
     {
@@ -380,70 +365,66 @@ class TextEntry : Widget, WidgetI
     	tv_height = h > p_tb ? h - p_tb : 0;
     }
     
-    override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
-    {
-    	return tuple(cast(WidgetI)this, point);
-    }
-    
-    override void focusEnter(Form form, WidgetI widget)
-    {}
-    override void focusExit(Form form, WidgetI widget)
-    {}
-    
-    override bool isVisuallyPressed()
-    {return false;}
-    override void visualPress(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void visualRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    
-    override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event)
-    {
-    	text_view.click(
-    		event.mouseFocusedWidget_x+padding_left,
-    		event.mouseFocusedWidget_y+padding_top
-    		);
-    }
-    
-    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
-    {
-    	on_keyboard_internal(
-    		"up",
-    		event.event.ek,
-    		event.mouseFocusedWidget_x+padding_left,
-    		event.mouseFocusedWidget_y+padding_top
-    		);
-    }
-    
-    
-    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event)
-    {
-    	on_keyboard_internal(
-    		"down",
-    		event.event.ek,
-    		event.mouseFocusedWidget_x+padding_left,
-    		event.mouseFocusedWidget_y+padding_top
-    		);
-    }
-    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    
-    override void intTextInput(Form form, WidgetI widget, EventForm* event)
-    {
-    	assert(event !is null);
-    	assert(event.event !is null);
-    	assert(event.event.eti !is null);
-    	assert(event.event.eti.text !is null);
-    	auto x = event.event.eti.text;
-    	text_view.textInput(x);
-    	redraw();
-    }
+    // 
+    // override void focusEnter(Form form, Widget widget)
+    // {}
+    // override void focusExit(Form form, Widget widget)
+    // {}
+    // 
+    // override bool isVisuallyPressed()
+    // {return false;}
+    // override void visualPress(Form form, Widget widget, EventForm* event)
+    // {}
+    // override void visualRelease(Form form, Widget widget, EventForm* event)
+    // {}
+    // 
+    // override void intMousePress(Form form, Widget widget, EventForm* event)
+    // {}
+    // override void intMouseRelease(Form form, Widget widget, EventForm* event)
+    // {}
+    // override void intMousePressRelease(Form form, Widget widget, EventForm* event)
+    // {
+    	// text_view.click(
+    		// event.mouseFocusedWidget_x+padding_left,
+    		// event.mouseFocusedWidget_y+padding_top
+    		// );
+    // }
+    // 
+    // override void intMouseLeave(Form form, Widget old_w, Widget new_w, EventForm* event)
+    // {}
+    // override void intMouseEnter(Form form, Widget old_w, Widget new_w, EventForm* event)
+    // {}
+    // override void intMouseMove(Form form, Widget widget, EventForm* event)
+    // {
+    	// on_keyboard_internal(
+    		// "up",
+    		// event.event.ek,
+    		// event.mouseFocusedWidget_x+padding_left,
+    		// event.mouseFocusedWidget_y+padding_top
+    		// );
+    // }
+    // 
+    // 
+    // override void intKeyboardPress(Form form, Widget widget, EventForm* event)
+    // {
+    	// on_keyboard_internal(
+    		// "down",
+    		// event.event.ek,
+    		// event.mouseFocusedWidget_x+padding_left,
+    		// event.mouseFocusedWidget_y+padding_top
+    		// );
+    // }
+    // override void intKeyboardRelease(Form form, Widget widget, EventForm* event)
+    // {}
+    // 
+    // override void intTextInput(Form form, Widget widget, EventForm* event)
+    // {
+    	// assert(event !is null);
+    	// assert(event.event !is null);
+    	// assert(event.event.eti !is null);
+    	// assert(event.event.eti.text !is null);
+    	// auto x = event.event.eti.text;
+    	// text_view.textInput(x);
+    	// redraw();
+    // }
 }

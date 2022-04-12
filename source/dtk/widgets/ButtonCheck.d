@@ -3,6 +3,7 @@ module dtk.widgets.ButtonCheck;
 import std.stdio;
 import std.typecons;
 
+// import dtk.interfaces.LaFI;
 // import dtk.interfaces.WidgetI;
 // import dtk.interfaces.ContainerI;
 
@@ -27,38 +28,19 @@ PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "false"),
 class ButtonCheck : Widget
 {
 	
-	mixin mixin_multiple_properties_forward!(WidgetProperties, true);
-    mixin mixin_forwardXYWH_from_Widget!();
+	// mixin mixin_multiple_properties_forward!(WidgetProperties, true);
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
     mixin mixin_multiple_properties_forward!(ButtonCheckProperties, false);
     mixin mixin_Widget_renderImage!("ButtonCheck");
-    mixin mixin_widget_redraw_using_propagateRedraw!();
-    mixin mixin_propagateRedraw_children_none!();
     
-    mixin mixin_forward_super_functions!(
-    	[
-    	"getForm",
-    	"getNextFocusableWidget",
-    	"getPrevFocusableWidget",
-    	"propagatePosAndSizeRecalc",
-    	"getChildAtPosition",
-    	"getDrawingSurface"
-    	]
-    	);
-
-    mixin mixin_propagateParentChangeEmission!();
 
     this()
     {
+    	super(0, 1);
     	mixin(mixin_multiple_properties_inst(ButtonCheckProperties));
-    	
-    	// mixin(mixin_propagateParentChangeEmission_this());
-        // setMouseHandler("button-click", &on_mouse_click_internal);
-        // setMouseHandler("button-down", &on_mouse_down_internal);
-        // setMouseHandler("button-up", &on_mouse_up_internal);
     }
 
-    override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
+/*     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
     {
     	return tuple(cast(WidgetI)this, point);
     }
@@ -104,5 +86,5 @@ class ButtonCheck : Widget
     override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
     override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
     
-    override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
+    override void intTextInput(Form form, WidgetI widget, EventForm* event) {} */
 }
