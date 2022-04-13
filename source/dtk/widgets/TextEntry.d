@@ -125,6 +125,14 @@ class TextEntry : Widget
     this()
     {
     	super(0, 0);
+    	
+    	propagatePosAndSizeRecalcOverride = delegate void()
+    	{
+    		recalcTVSize();
+    		text_view.setWidth(tv_width);
+    		text_view.setHeight(tv_height);
+    	};
+    	
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	// mixin(mixin_propagateParentChangeEmission_this());
     	
@@ -138,7 +146,7 @@ class TextEntry : Widget
     			auto f = getForm();
     			if (f is null)
     			{
-    				throw new Exception("can't get form");
+    				throw new Exception("can't get Form");
     			}
     			
     			return f;
@@ -151,7 +159,7 @@ class TextEntry : Widget
     			auto f = getForm();
     			if (f is null)
     			{
-    				throw new Exception("can't get form");
+    				throw new Exception("can't get Form");
     			}
     			
     			return f.getFocusedWidget() == this;
@@ -317,15 +325,6 @@ class TextEntry : Widget
         text_view.setCursorEnabled(getCursorEnabled());
         text_view.setViewResizeByContent(getViewResizeByContent());
     }
-    
-    //mixin mixin_getWidgetAtPosition;
-    
-    // override void propagatePosAndSizeRecalc()
-    // {
-    	// recalcTVSize();
-        // text_view.setWidth(tv_width);
-        // text_view.setHeight(tv_height);
-    // }
     
     public
     {

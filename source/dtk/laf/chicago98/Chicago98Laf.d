@@ -60,9 +60,9 @@ class Chicago98Laf : LaFI
     Color elementDarkedColor2 = Color(0x808080);
     
     void drawBewel(
-    	DrawingSurfaceI ds, 
-    	Position2D pos, 
-    	Size2D size, 
+    	DrawingSurfaceI ds,
+    	Position2D pos,
+    	Size2D size,
     	bool inverted
     	)
     {
@@ -278,7 +278,7 @@ class Chicago98Laf : LaFI
     
     // void drawPicture(Widget e, DrawingSurfaceI ds)
     // {
-    // 
+    //
     // }
     
     // TODO: move this to some more appropriate place or delete
@@ -323,48 +323,46 @@ class Chicago98Laf : LaFI
         auto pos_y = cast(int) 0;
         auto size_w = cast(int) e.getWidth();
         auto size_h = cast(int) e.getHeight();
-        auto draw_bewel = false;
-        auto bewel_bg_color = Color(cast(ubyte[])[255,255,255]);
-        // auto draw_bewel = widget.getDrawBewelAndBackground();
-        // auto bewel_bg_color = widget.getBewelBackgroundColor();
+        // auto draw_bewel = false;
+        // auto bewel_bg_color = Color(cast(ubyte[])[255,255,255]);
+        auto draw_bewel = e.getDrawBewelAndBackground();
+        auto bewel_bg_color = e.getBewelBackgroundColor();
         
         auto tv_ds = ds;
         
         if (draw_bewel)
         {
-        	tv_ds = new DrawingSurfaceShift(
-    			ds,
-    			0,
-    			0
-    			// cast(int)widget.padding_left,
-    			// cast(int)widget.padding_top
-    			);
-    		
             drawBewel(
             	ds,
             	Position2D(pos_x, pos_y),
             	Size2D(size_w, size_h),
             	true
             	);
-            pos_x = cast(int) 0;
-            pos_y = cast(int) 0;
-            size_w = cast(int) size_w;
-            size_h = cast(int) size_h;
-            // pos_x = cast(int) widget.padding_left;
-            // pos_y = cast(int) widget.padding_top;
-            // size_w = cast(int) widget.tv_width;
-            // size_h = cast(int) widget.tv_height;
+            // pos_x = cast(int) 0;
+            // pos_y = cast(int) 0;
+            // size_w = cast(int) size_w;
+            // size_h = cast(int) size_h;
+            pos_x =  e.padding_left;
+            pos_y =  e.padding_top;
+            size_w =  e.tv_width;
+            size_h =  e.tv_height;
             ds.drawRectangle(
             	Position2D(pos_x, pos_y),
             	Size2D(size_w, size_h),
             	LineStyle(Color(0)),
             	nullable(FillStyle(bewel_bg_color))
             	);
+            
+        	tv_ds = new DrawingSurfaceShift(
+    			ds,
+    			e.padding_left,
+    			e.padding_top
+    			);
         }
         
-        // if (e.text_view !is null)
-        // {
-        // e.text_view.completeRedrawToDS(tv_ds);
-        // }
+        if (e.text_view !is null)
+        {
+        	e.text_view.completeRedrawToDS(tv_ds);
+        }
     }
 }

@@ -237,12 +237,12 @@ class Form : Widget
     				mouse_focused_widget = event.mouseFocusedWidget;
     				if (old !is null)
     				{
-    					old.visuallyRelease(this, old, event);
+    					old.intVisuallyRelease(this, old, event);
     					old.intMouseLeave(this, old, mouse_focused_widget, event);
     				}
     				if (this.pressrelease_sequence_started && this.pressrelease_sequence_widget == mouse_focused_widget)
     				{
-    					mouse_focused_widget.visuallyPress(
+    					mouse_focused_widget.intVisuallyPress(
     						this, 
     						mouse_focused_widget, 
     						event
@@ -282,7 +282,7 @@ class Form : Widget
     							event.mouseFocusedWidget,
     							event
     							);
-    						event.mouseFocusedWidget.visuallyPress(
+    						event.mouseFocusedWidget.intVisuallyPress(
     							this,
     							event.mouseFocusedWidget,
     							event
@@ -294,7 +294,7 @@ class Form : Widget
     							event.mouseFocusedWidget,
     							event
     							);
-    						event.mouseFocusedWidget.visuallyRelease(
+    						event.mouseFocusedWidget.intVisuallyRelease(
     							this,
     							event.mouseFocusedWidget,
     							event

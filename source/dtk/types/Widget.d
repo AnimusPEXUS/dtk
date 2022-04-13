@@ -138,6 +138,7 @@ class Widget
 		this.childMinCount = childMinCount;
 		this.childMaxCount = childMaxCount;
 		mixin(mixin_multiple_properties_inst(WidgetProperties));
+		vm = new VisibilityMap!(Widget)();
 	}
 	
 	static foreach(v; ["Width", "Height", "X", "Y"])
@@ -268,36 +269,41 @@ class Widget
     
     final Form getForm()
     {
-    	auto ret = recursionGuard(
-    		getForm_recursion_protection_bool,
-    		getForm_recursion_protection_mutex,
-    		delegate Form()
-    		{
-    			throw new Exception("parent-children circul detected: this is wrong");
-    		},
-    		delegate Form()
-    		{
-    			Widget p = this.getParent();
-    			Form res;
-    			
-    			while (true)
+    	synchronized
+    	{
+    		if (getForm_recursion_protection_mutex is null)
+    			getForm_recursion_protection_mutex = new Mutex();
+    		
+    		auto ret = recursionGuard(
+    			getForm_recursion_protection_bool,
+    			getForm_recursion_protection_mutex,
+    			delegate Form()
     			{
-    				if (p is null)
-    				{
-    					return null;
-    				}
+    				throw new Exception("parent-children circul detected: this is wrong");
+    			},
+    			delegate Form()
+    			{
+    				Widget p = this;
+    				Form res;
     				
-    				res = cast(Form) p;
-    				if (res !is null)
+    				while (true)
     				{
-    					return res;
+    					res = cast(Form) p;
+    					if (res !is null)
+    					{
+    						return res;
+    					}
+    					
+    					p = p.getParent();
+    					if (p is null)
+    					{
+    						return null;
+    					}
     				}
-    				
-    				p = p.getParent();
     			}
-    		}
-    		);
-        return ret;
+    			);
+    		return ret;
+    	}
     }
     
     private
@@ -538,23 +544,30 @@ class Widget
     
     final void propagatePosAndSizeRecalc()
     {
-    	auto w = getWidth();
-    	auto h = getHeight();
-    	
-    	setViewPortWidth(w);
-    	setViewPortHeight(h);
-    	
-    	auto la = getLayoutEngine();
-    	
-    	if (la !is null)
-    		la.performLayout();
-    	
-    	foreach (v; children)
-        {
-        	v.child.propagatePosAndSizeRecalc();
+    	if (propagatePosAndSizeRecalcOverride !is null)
+    	{
+    		propagatePosAndSizeRecalcOverride();
+    	}
+    	else
+    	{
+    		auto w = getWidth();
+    		auto h = getHeight();
+    		
+    		setViewPortWidth(w);
+    		setViewPortHeight(h);
+    		
+    		auto la = getLayoutEngine();
+    		
+    		if (la !is null)
+    			la.performLayout();
+    		
+    		foreach (v; children)
+    		{
+    			v.child.propagatePosAndSizeRecalc();
+    		}
+    		
+    		recalcChildVisibilityMap();
         }
-        
-        recalcChildVisibilityMap();
     }
     
     final Image propagateRedraw()
@@ -747,45 +760,26 @@ class Widget
     	}
     }
     
-    void delegate (Widget form, Widget widget)
-    focusEnter;
+    void delegate() propagatePosAndSizeRecalcOverride;
     
-    void delegate(Widget form, Widget widget)
-    focusExit;
+    void intFocusEnter(Widget form, Widget widget) {}
+    void intFocusExit(Widget form, Widget widget) {}
     
-    bool delegate()
-    isVisuallyPressed;
+    bool intIsVisuallyPressed() {return false;}
+
+    void intVisuallyPress(Widget form, Widget widget, EventForm* event) {}
+    void intVisuallyRelease(Widget form, Widget widget, EventForm* event) {}
     
-    void delegate(Widget form, Widget widget, EventForm* event)
-    visuallyPress;
+    void intMousePress(Widget form, Widget widget, EventForm* event) {}
+    void intMouseRelease(Widget form, Widget widget, EventForm* event) {}
+    void intMousePressRelease(Widget form, Widget widget, EventForm* event) {}
     
-    void delegate(Widget form, Widget widget, EventForm* event)
-    visuallyRelease;
+    void intMouseLeave(Widget form, Widget old_w, Widget new_w, EventForm* event) {}
+    void intMouseEnter(Widget form, Widget old_w, Widget new_w, EventForm* event) {}
+    void intMouseMove(Widget form, Widget widget, EventForm* event) {}
     
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intMousePress;
+    void intKeyboardPress(Widget form, Widget widget, EventForm* event) {}
+    void intKeyboardRelease(Widget form, Widget widget, EventForm* event) {}
     
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intMouseRelease;
-    
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intMousePressRelease;
-    
-    void delegate(Widget form, Widget old_w, Widget new_w, EventForm* event)
-    intMouseLeave;
-    
-    void delegate(Widget form, Widget old_w, Widget new_w, EventForm* event)
-    intMouseEnter;
-    
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intMouseMove;
-    
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intKeyboardPress;
-    
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intKeyboardRelease;
-    
-    void delegate(Widget form, Widget widget, EventForm* event)
-    intTextInput;
+    void intTextInput(Widget form, Widget widget, EventForm* event) {}
 }
