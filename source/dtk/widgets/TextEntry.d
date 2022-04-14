@@ -67,7 +67,7 @@ class TextEntry : Widget
     mixin mixin_multiple_properties_define!(TextEntryProperties);
     mixin mixin_multiple_properties_forward!(TextEntryProperties, false);
     mixin mixin_Widget_renderImage!("TextEntry");
-        
+    
     TextView text_view;
     
     private {
@@ -364,67 +364,44 @@ class TextEntry : Widget
     	tv_height = h > p_tb ? h - p_tb : 0;
     }
     
-
-    // 
-    // override void focusEnter(Form form, Widget widget)
-    // {}
-    // override void focusExit(Form form, Widget widget)
-    // {}
-    // 
-    // override bool isVisuallyPressed()
-    // {return false;}
-    // override void visualPress(Form form, Widget widget, EventForm* event)
-    // {}
-    // override void visualRelease(Form form, Widget widget, EventForm* event)
-    // {}
-    // 
-    // override void intMousePress(Form form, Widget widget, EventForm* event)
-    // {}
-    // override void intMouseRelease(Form form, Widget widget, EventForm* event)
-    // {}
-    // override void intMousePressRelease(Form form, Widget widget, EventForm* event)
-    // {
-    	// text_view.click(
-    		// event.mouseFocusedWidget_x+padding_left,
-    		// event.mouseFocusedWidget_y+padding_top
-    		// );
-    // }
-    // 
-    // override void intMouseLeave(Form form, Widget old_w, Widget new_w, EventForm* event)
-    // {}
-    // override void intMouseEnter(Form form, Widget old_w, Widget new_w, EventForm* event)
-    // {}
-    // override void intMouseMove(Form form, Widget widget, EventForm* event)
-    // {
-    	// on_keyboard_internal(
-    		// "up",
-    		// event.event.ek,
-    		// event.mouseFocusedWidget_x+padding_left,
-    		// event.mouseFocusedWidget_y+padding_top
-    		// );
-    // }
-    // 
-    // 
-    // override void intKeyboardPress(Form form, Widget widget, EventForm* event)
-    // {
-    	// on_keyboard_internal(
-    		// "down",
-    		// event.event.ek,
-    		// event.mouseFocusedWidget_x+padding_left,
-    		// event.mouseFocusedWidget_y+padding_top
-    		// );
-    // }
-    // override void intKeyboardRelease(Form form, Widget widget, EventForm* event)
-    // {}
-    // 
-    // override void intTextInput(Form form, Widget widget, EventForm* event)
-    // {
-    	// assert(event !is null);
-    	// assert(event.event !is null);
-    	// assert(event.event.eti !is null);
-    	// assert(event.event.eti.text !is null);
-    	// auto x = event.event.eti.text;
-    	// text_view.textInput(x);
-    	// redraw();
-    // }
+    
+    override void intMousePressRelease(Form form, Widget widget, EventForm* event)
+    {
+    	text_view.click(
+    		event.mouseFocusedWidget_x+padding_left,
+    		event.mouseFocusedWidget_y+padding_top
+    		);
+    }
+    
+    override void intMouseMove(Form form, Widget widget, EventForm* event)
+    {
+    	on_keyboard_internal(
+    		"up",
+    		event.event.ek,
+    		event.mouseFocusedWidget_x+padding_left,
+    		event.mouseFocusedWidget_y+padding_top
+    		);
+    }
+    
+    
+    override void intKeyboardPress(Form form, Widget widget, EventForm* event)
+    {
+    	on_keyboard_internal(
+    		"down",
+    		event.event.ek,
+    		event.mouseFocusedWidget_x+padding_left,
+    		event.mouseFocusedWidget_y+padding_top
+    		);
+    }
+    
+    override void intTextInput(Form form, Widget widget, EventForm* event)
+    {
+    	assert(event !is null);
+    	assert(event.event !is null);
+    	assert(event.event.eti !is null);
+    	assert(event.event.eti.text !is null);
+    	auto x = event.event.eti.text;
+    	text_view.textInput(x);
+    	redraw();
+    }
 }

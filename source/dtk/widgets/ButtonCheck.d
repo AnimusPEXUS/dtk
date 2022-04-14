@@ -4,7 +4,7 @@ import std.stdio;
 import std.typecons;
 
 // import dtk.interfaces.LaFI;
-// import dtk.interfaces.WidgetI;
+// import dtk.interfaces.Widget;
 // import dtk.interfaces.ContainerI;
 
 import dtk.types.EventMouse;
@@ -39,52 +39,10 @@ class ButtonCheck : Widget
     	super(0, 1);
     	mixin(mixin_multiple_properties_inst(ButtonCheckProperties));
     }
-
-/*     override Tuple!(WidgetI, Position2D) getChildAtPosition(Position2D point)
-    {
-    	return tuple(cast(WidgetI)this, point);
-    }
     
-    override void focusEnter(Form form, WidgetI widget)
-    {}
-    override void focusExit(Form form, WidgetI widget) 
-    {}
-
-    override bool isVisuallyPressed()
-    {return false;}
-    override void visualPress(Form form, WidgetI widget, EventForm* event)
+    override void intMousePressRelease(Form form, Widget widget, EventForm* event) 
     {
-    	
-    }
-    
-    override void visualRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-
-    override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    {
-    }
-    
-    override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
-    {}
-    
-    override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
-    {
-    	setChecked(!getChecked());
+    	setToggledOn(!getToggledOn());
         redraw();
     }
-    
-    override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    
-    override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    {}
-    
-    override void intMouseMove(Form form, WidgetI widget, EventForm* event)
-    {}
-
-         
-    override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
-    override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
-    
-    override void intTextInput(Form form, WidgetI widget, EventForm* event) {} */
 }

@@ -73,46 +73,13 @@ class ButtonRadio : Widget
             );
     }
     
-    // override void focusEnter(Form form, WidgetI widget)
-    // {}
-    // override void focusExit(Form form, WidgetI widget) 
-    // {}
-// 
-    // override bool isVisuallyPressed()
-    // {return false;}
-    // override void visualPress(Form form, WidgetI widget, EventForm* event)
-    // {}
-    // override void visualRelease(Form form, WidgetI widget, EventForm* event)
-    // {}
-// 
-    // override void intMousePress(Form form, WidgetI widget, EventForm* event)
-    // {
-        // redraw();
-    // }
-    // override void intMouseRelease(Form form, WidgetI widget, EventForm* event)
-    // {
-    	// 
-    // }
-    // override void intMousePressRelease(Form form, WidgetI widget, EventForm* event) 
-    // {
-    	// auto rg = getRadioGroup();
-        // if (rg !is null)
-        // {
-            // rg.selectButton(this);
-        // }
-        // redraw();
-    // }
-    // override void intMouseLeave(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    // {}
-    // override void intMouseEnter(Form form, WidgetI old_w, WidgetI new_w, EventForm* event)
-    // {}
-    // override void intMouseMove(Form form, WidgetI widget, EventForm* event)
-    // {}
-    // 
-         // 
-    // override void intKeyboardPress(Form form, WidgetI widget, EventForm* event) {}
-    // override void intKeyboardRelease(Form form, WidgetI widget, EventForm* event) {}
-    // 
-    // override void intTextInput(Form form, WidgetI widget, EventForm* event) {}
-    
+    override void intMousePressRelease(Form form, Widget widget, EventForm* event) 
+    {
+    	auto rg = getRadioGroup();
+    	if (rg !is null)
+    	{
+    		rg.selectButton(this);
+    	}
+    	redraw();
+    }
 }
