@@ -762,24 +762,24 @@ class Widget
     
     void delegate() propagatePosAndSizeRecalcOverride;
     
-    void intFocusEnter(Widget form, Widget widget) {}
-    void intFocusExit(Widget form, Widget widget) {}
+    void intFocusEnter(Form form, Widget widget) {}
+    void intFocusExit(Form form, Widget widget) {}
     
     bool intIsVisuallyPressed() {return false;}
 
-    void intVisuallyPress(Widget form, Widget widget, EventForm* event) {}
-    void intVisuallyRelease(Widget form, Widget widget, EventForm* event) {}
+    void intVisuallyPress(Form form, Widget widget, EventForm* event) {}
+    void intVisuallyRelease(Form form, Widget widget, EventForm* event) {}
     
-    void intMousePress(Widget form, Widget widget, EventForm* event) {}
-    void intMouseRelease(Widget form, Widget widget, EventForm* event) {}
-    void intMousePressRelease(Widget form, Widget widget, EventForm* event) {}
+    void intMousePress(Form form, Widget widget, EventForm* event) {}
+    void intMouseRelease(Form form, Widget widget, EventForm* event) {}
+    void intMousePressRelease(Form form, Widget widget, EventForm* event) {}
     
-    void intMouseLeave(Widget form, Widget old_w, Widget new_w, EventForm* event) {}
-    void intMouseEnter(Widget form, Widget old_w, Widget new_w, EventForm* event) {}
-    void intMouseMove(Widget form, Widget widget, EventForm* event) {}
+    void intMouseLeave(Form form, Widget old_w, Widget new_w, EventForm* event) {}
+    void intMouseEnter(Form form, Widget old_w, Widget new_w, EventForm* event) {}
+    void intMouseMove(Form form, Widget widget, EventForm* event) {}
     
-    void intKeyboardPress(Widget form, Widget widget, EventForm* event) {}
-    void intKeyboardRelease(Widget form, Widget widget, EventForm* event) {}
+    void intKeyboardPress(Form form, Widget widget, EventForm* event) {}
+    void intKeyboardRelease(Form form, Widget widget, EventForm* event) {}
     
-    void intTextInput(Widget form, Widget widget, EventForm* event) {}
+    void intTextInput(Form form, Widget widget, EventForm* event) {}
 }

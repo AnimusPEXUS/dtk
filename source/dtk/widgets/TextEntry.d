@@ -364,6 +364,7 @@ class TextEntry : Widget
     	tv_height = h > p_tb ? h - p_tb : 0;
     }
     
+
     // 
     // override void focusEnter(Form form, Widget widget)
     // {}

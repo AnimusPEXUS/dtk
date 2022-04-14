@@ -68,4 +68,23 @@ class Button : Widget
     );
     }
     } */
+    
+    override bool intIsVisuallyPressed()
+    {
+    	return getVisuallyPressed();
+    }
+    
+    override void intVisuallyPress(Form form, Widget widget, EventForm* event)
+    {
+    	setVisuallyPressed(true);
+    	redraw();
+    }
+    override void intVisuallyRelease(Form form, Widget widget, EventForm* event)
+    {
+    	setVisuallyPressed(false);
+    	redraw();
+    }
+    
+    override void intMousePressRelease(Form form, Widget widget, EventForm* event)
+    {debug writeln("click");}
 }
