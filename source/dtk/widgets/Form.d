@@ -83,6 +83,8 @@ class Form : Widget
     	super(0, 1);
     	mixin(mixin_multiple_properties_inst(FormProperties));
     	
+    	setFocusedWidget(this);
+    	
     	sc_windowChange = connectToWindow_onAfterChanged(
     		delegate void(
     			WindowI o,
