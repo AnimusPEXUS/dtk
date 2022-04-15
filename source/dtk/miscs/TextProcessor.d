@@ -965,25 +965,37 @@ class TextLine
         // TODO: optimization required
         int required_size;
         
-        if (text_view.getVirtualWrapBySpace()
-            || text_view.getVirtualWrapByChar())
+        auto line_chars_layout = parent_text.getLineCharsLayout();
+        auto fixedSoftWrapSizeEnabled = text_view.getFixedSoftWrapSizeEnabled();
+        auto fixedSoftWrapSize = text_view.getFixedSoftWrapSize();
+        
+        if (fixedSoftWrapSizeEnabled)
         {
-            switch (parent_text.getLineCharsLayout())
-            {
-            default:
-                throw new Exception(
-                    "not supported parent_text.getLineCharsLayout ",
-                    to!string(parent_text.getLineCharsLayout())
-                    );
-                case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
-                case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
-                    required_size = text_view.getWidth();
-                    break;
-                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
-                case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
-                    required_size = text_view.getHeight();
-                    break;
-            }
+        	required_size = fixedSoftWrapSize;
+        }
+        else
+        {
+        	
+        	if (text_view.getVirtualWrapBySpace()
+        		|| text_view.getVirtualWrapByChar())
+        	{
+        		switch (line_chars_layout)
+        		{
+        		default:
+        			throw new Exception(
+        				"not supported parent_text.getLineCharsLayout ",
+        				to!string(line_chars_layout)
+        				);
+        			case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
+        			case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
+        				required_size = text_view.getWidth();
+        				break;
+        			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignLeft:
+        			case GenVisibilityMapForSubitemsLayout.verticalTopToBottomAlignRight:
+        				required_size = text_view.getHeight();
+        				break;
+        		}
+        	}
         }
         
         int current_size = 0;
@@ -999,12 +1011,12 @@ class TextLine
             
             // auto tc_state = tc.getState(text_view);
             
-            switch (parent_text.getLineCharsLayout())
+            switch (line_chars_layout)
             {
             default:
                 throw new Exception(
                     "not supported parent_text.getLineCharsLayout ",
-                    to!string(parent_text.getLineCharsLayout())
+                    to!string(line_chars_layout)
                     );
                 case GenVisibilityMapForSubitemsLayout.horizontalLeftToRightAlignTop:
                 case GenVisibilityMapForSubitemsLayout.horizontalRightToLeftAlignTop:
@@ -1021,7 +1033,7 @@ class TextLine
             {
                 if (s > required_size)
                 {
-                    // NOTE: not error
+                    // NOTE: not error, because continuing is impossible
                     return;
                 }
             }
@@ -1421,21 +1433,26 @@ class Text
         // sl.recalculateWidthAndHeight(text_view);
         // }
         //
+        auto old_width = state.width; 
+        auto old_height = state.height; 
         state.width = 0;
         state.height = 0;
         
         scope (exit)
         {
-        	if (this == text_view.text)
+        	if (old_width != state.width || old_height != state.height)
         	{
-        		if (text_view.getViewResizeByContent())
+        		if (this == text_view.text)
         		{
-        			// TODO: make this smarter
-        			text_view.setWidth(state.width);
-        			text_view.setHeight(state.height);
-        			if (text_view.viewResized !is null)
+        			if (text_view.getViewResizeByContent())
         			{
-        				text_view.viewResized();
+        				// TODO: make this smarter
+        				text_view.setWidth(state.width);
+        				text_view.setHeight(state.height);
+        				if (text_view.viewResized !is null)
+        				{
+        					text_view.viewResized();
+        				}
         			}
         		}
         	}
@@ -1539,13 +1556,18 @@ class Text
     // it's width and height
     void reprocess(TextView text_view)
     {
-        // obviously, each character's size have to be known
-        // in systems with freetype this also renders characters at once
-        reprocessUnits(text_view);
+    	// obviously, each character's size have to be known
+    	// in systems with freetype this also renders characters at once
+    	reprocessUnits(text_view);
+    	
+    	// disect Lines to Sublines
+    	recreateSublines(text_view);
         
-        // disect Lines to Sublines
-        recreateSublines(text_view);
-        
+    	reprocessSizes(text_view);
+    }
+    
+    void reprocessSizes(TextView text_view)
+    {
         // sublines widths and heights necessary to know lines widths and
         // heights
         recalculateSublinesWidthsAndHeights(text_view);
@@ -1905,6 +1927,9 @@ PropSetting("gs_w_d", "bool", "readOnly", "ReadOnly", "false"),
 
 PropSetting("gs_w_d", "TextViewMode", "textViewMode", "TextViewMode", "TextViewMode.singleLine"),
 
+PropSetting("gs_w_d", "bool", "fixedSoftWrapSizeEnabled", "FixedSoftWrapSizeEnabled", "false"),
+PropSetting("gs_w_d", "int", "fixedSoftWrapSize", "FixedSoftWrapSize", "300"),
+
 PropSetting("gs_w_d", "bool", "virtualWrapBySpace", "VirtualWrapBySpace", "true"),
 PropSetting("gs_w_d", "bool", "virtualWrapByChar", "VirtualWrapByChar", "true"),
 PropSetting("gs_w_d", "bool", "view_resize_by_content", "ViewResizeByContent", "false"),
@@ -2039,9 +2064,9 @@ class TextView
         return getPlatform().getFontManager();
     }
     
-    void reprocess()
-    {
-        if (linesRecalcRequired)
+    void reprocess(bool force=false)
+    {    	
+        if (linesRecalcRequired || force)
         {
             getText().reprocess(this);
             linesRecalcRequired = false;

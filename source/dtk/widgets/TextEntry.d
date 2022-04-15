@@ -49,14 +49,16 @@ PropSetting("gs_w_d", "bool", "text_editable", "TextEditable", "false"),
 PropSetting("gs_w_d", "bool", "cursor_enabled", "CursorEnabled", "false"),
 PropSetting("gs_w_d", "bool", "view_resize_by_content", "ViewResizeByContent", "false"),
 PropSetting("gs_w_d", "bool", "entry_resize_by_content", "EntryResizeByContent", "false"),
+PropSetting("gs_w_d", "bool", "fixedSoftWrapSizeEnabled", "FixedSoftWrapSizeEnabled", "false"),
+PropSetting("gs_w_d", "int", "fixedSoftWrapSize", "FixedSoftWrapSize", "300"),
 ];
 
-TextEntry NewLineEditor(dstring text)
+TextEntry LineEditor(dstring text)
 {
 	return new TextEntry().setModePreset("line-editor").setText(text);
 }
 
-TextEntry NewLabel(dstring text)
+TextEntry Label(dstring text)
 {
 	return new TextEntry().setModePreset("label").setText(text);
 }
@@ -89,6 +91,8 @@ class TextEntry : Widget
     		setCursorEnabled(true);
     		setBewelBackgroundColor(Color(cast(ubyte[3])[255,255,255]));
     		setViewResizeByContent(false);
+    		setEntryResizeByContent(false);
+    		setFixedSoftWrapSizeEnabled(false);
     		break;
     	case "multiline-editor":
     		setDrawBewelAndBackground(true);
@@ -98,6 +102,9 @@ class TextEntry : Widget
     		setCursorEnabled(true);
     		setBewelBackgroundColor(Color(cast(ubyte[3])[255,255,255]));
     		setViewResizeByContent(false);
+    		setEntryResizeByContent(false);
+    		setFixedSoftWrapSizeEnabled(true);
+    		setFixedSoftWrapSize(300);
     		break;
     	case "label":
     	case "label-noninteractive":
@@ -108,8 +115,11 @@ class TextEntry : Widget
     		setCursorEnabled(false);
     		setBewelBackgroundColor(Color(0xc0c0c0));
     		setViewResizeByContent(true);
+    		setEntryResizeByContent(true);
+    		setFixedSoftWrapSizeEnabled(true);
+    		setFixedSoftWrapSize(300);
     		break;
-    	case "label-interactive":
+    	case "label-interactive": 
     		setDrawBewelAndBackground(false);
     		setMultiline(true);
     		setTextEditable(true);
@@ -117,6 +127,9 @@ class TextEntry : Widget
     		setCursorEnabled(true);
     		setBewelBackgroundColor(Color(0xc0c0c0));
     		setViewResizeByContent(true);
+    		setEntryResizeByContent(true);
+    		setFixedSoftWrapSizeEnabled(true);
+    		setFixedSoftWrapSize(300);
     		break;
     	}
     	return this;
@@ -125,13 +138,6 @@ class TextEntry : Widget
     this()
     {
     	super(0, 0);
-    	
-    	propagatePosAndSizeRecalcOverride = delegate void()
-    	{
-    		recalcTVSize();
-    		text_view.setWidth(tv_width);
-    		text_view.setHeight(tv_height);
-    	};
     	
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	// mixin(mixin_propagateParentChangeEmission_this());
@@ -167,10 +173,13 @@ class TextEntry : Widget
     		
     		text_view.viewResized = delegate void()
     		{
+    			debug writeln("text_view.viewResized called");
     			if (getEntryResizeByContent())
     			{
     				setWidth(text_view.getWidth());
     				setHeight(text_view.getHeight());
+    				
+    				debug writeln("TextEntry resized by %s x %s".format(getWidth(), getHeight()));
     			}
     		};
         }
@@ -201,6 +210,8 @@ class TextEntry : Widget
             stname("TextSelectable", "bool"),
             stname("TextEditable", "bool"),
             stname("CursorEnabled", "bool"),
+            stname("FixedSoftWrapSizeEnabled", "bool"),
+            stname("FixedSoftWrapSize", "int"),
             ]
             )
         {
@@ -324,6 +335,8 @@ class TextEntry : Widget
         text_view.setReadOnly(!getTextEditable());
         text_view.setCursorEnabled(getCursorEnabled());
         text_view.setViewResizeByContent(getViewResizeByContent());
+        text_view.setFixedSoftWrapSizeEnabled(getFixedSoftWrapSizeEnabled());
+        text_view.setFixedSoftWrapSize(getFixedSoftWrapSize());
     }
     
     public
@@ -403,5 +416,21 @@ class TextEntry : Widget
     	auto x = event.event.eti.text;
     	text_view.textInput(x);
     	redraw();
+    }
+    
+    override void propagatePosAndSizeRecalc()
+    {
+    	if (!getViewResizeByContent())
+    	{
+    		recalcTVSize();
+    		text_view.setWidth(tv_width);
+    		text_view.setHeight(tv_height);
+    	}
+    	else
+    	{
+    		text_view.reprocess(true);
+    		setWidth(text_view.getWidth());
+    		setHeight(text_view.getHeight());
+    	}
     }
 }

@@ -6,6 +6,7 @@ should be visually transformed to such using it's properties.
 
 module dtk.widgets.Button;
 
+import std.format;
 import std.stdio;
 import std.datetime;
 import std.typecons;
@@ -53,10 +54,11 @@ class Button : Widget
     
     Button setTextLabel(dstring text)
     {
-    	setChild(NewLabel(text));
+    	setChild(Label(text));
     	return this;
     }
-    
+
+
     /*     override void propagatePosAndSizeRecalc()
     {
     if (getChild() !is null)
@@ -87,4 +89,39 @@ class Button : Widget
     
     override void intMousePressRelease(Form form, Widget widget, EventForm* event)
     {debug writeln("click");}
+    
+    override void propagatePosAndSizeRecalcBefore()
+    {
+    	auto cc = getChildCount();
+    	debug writeln("Button child count %s".format(cc));
+    	/* if (text_view !is null)
+    	{
+    		text_view.recalculateWidthAndHeight();
+    	} */
+    	if (cc != 0)
+    	{
+    		auto c = getChild();
+    		debug writeln(
+    			"Button child x: %s, y: %s, w: %s, h: %s".format(
+    				c.getX(),
+    				c.getY(),
+    				c.getWidth(),
+    				c.getHeight()
+    				)
+    			);
+    	}
+    }
+    
+    override void propagatePosAndSizeRecalcAfter()
+    {
+    	if (getChild() !is null)
+    	{
+    		alignParentChild(
+    			0.5, 0.5,
+    			this,
+    			getChild()
+    			);
+    	}
+    }
+    
 }

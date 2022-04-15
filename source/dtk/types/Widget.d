@@ -542,14 +542,15 @@ class Widget
         return ret;
     }
     
-    final void propagatePosAndSizeRecalc()
+    void propagatePosAndSizeRecalc()
     {
-    	if (propagatePosAndSizeRecalcOverride !is null)
+    	// if (propagatePosAndSizeRecalcOverride !is null)
+    	// {
+    		// propagatePosAndSizeRecalcOverride();
+    	// }
+    	// else
     	{
-    		propagatePosAndSizeRecalcOverride();
-    	}
-    	else
-    	{
+    		propagatePosAndSizeRecalcBefore();
     		auto w = getWidth();
     		auto h = getHeight();
     		
@@ -566,6 +567,7 @@ class Widget
     			v.child.propagatePosAndSizeRecalc();
     		}
     		
+    		propagatePosAndSizeRecalcAfter();
     		recalcChildVisibilityMap();
         }
     }
@@ -760,7 +762,9 @@ class Widget
     	}
     }
     
-    void delegate() propagatePosAndSizeRecalcOverride;
+    // void delegate() propagatePosAndSizeRecalcOverride;
+    void propagatePosAndSizeRecalcBefore() {};
+    void propagatePosAndSizeRecalcAfter() {};
     
     void intFocusEnter(Form form, Widget widget) {}
     void intFocusExit(Form form, Widget widget) {}

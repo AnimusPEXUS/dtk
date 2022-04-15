@@ -22,14 +22,14 @@ int ch
 )
     {
     	
-    	assert(vpx >= 0);
-    	assert(vpy >= 0);
-    	assert(vpw >= 0);
-    	assert(vph >= 0);
-    	assert(cx >= 0);
-    	assert(cy >= 0);
-    	assert(cw >= 0);
-    	assert(ch >= 0);
+    	// assert(vpx >= 0);
+    	// assert(vpy >= 0);
+    	// assert(vpw >= 0);
+    	// assert(vph >= 0);
+    	// assert(cx >= 0);
+    	// assert(cy >= 0);
+    	// assert(cw >= 0);
+    	// assert(ch >= 0);
     	
     	auto ret_invisible = tuple(
     		false,
