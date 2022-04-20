@@ -176,15 +176,18 @@ class Chicago98Laf : LaFI
     {
         assert(ds !is null);
         
-        auto pos_x = cast(int) 0;
-        auto pos_y = cast(int) 0;
-        auto size_w = cast(int) e.getWidth();
-        auto size_h = cast(int) e.getHeight();
+        const int pos_x = 0;
+        const int pos_y = 0;
+        int size_w = e.getWidth();
+        int size_h = e.getHeight();
+        
+        const int indicatorSize = 12;
+        const int indicatorSizeHalf = indicatorSize/2;
         
         // TODO: this have to be more flexible
         auto step = 2 * PI / 32;
         
-        auto p = Position2D(6, 6);
+        auto p = Position2D(indicatorSizeHalf, indicatorSizeHalf);
         
         ds.drawRectangle(
         	Position2D(pos_x, pos_y),
@@ -193,13 +196,13 @@ class Chicago98Laf : LaFI
         	nullable(FillStyle(formBackground))
         	);
         
-        ds.drawArc(p, 6, P_M45, P_135, step, elementLightedColor);
-        ds.drawArc(p, 6, P_135, P_135M2, step, elementDarkedColor2);
+        ds.drawArc(p, indicatorSizeHalf, P_M45, P_135, step, elementLightedColor);
+        ds.drawArc(p, indicatorSizeHalf, P_135, P_135M2, step, elementDarkedColor2);
         
-        ds.drawArc(p, 5, P_M45, P_135, step, elementLightedColor2);
-        ds.drawArc(p, 5, P_135, P_135M2, step, elementDarkedColor);
+        ds.drawArc(p, indicatorSizeHalf-1, P_M45, P_135, step, elementLightedColor2);
+        ds.drawArc(p, indicatorSizeHalf-1, P_135, P_135M2, step, elementDarkedColor);
         
-        ds.drawCircle(p, 4, step, Color(0xffffff));
+        ds.drawCircle(p, indicatorSizeHalf-2, step, Color(0xffffff));
         
         auto fillColor = Color(0xffffff);
         if (e.getToggledOn())
@@ -207,7 +210,7 @@ class Chicago98Laf : LaFI
             fillColor = Color(0);
         }
         
-        for (int i = 3; i != 0; i--)
+        for (int i = indicatorSizeHalf-3; i != 0; i--)
         {
             ds.drawCircle(p, i, step, fillColor);
         }
@@ -217,7 +220,7 @@ class Chicago98Laf : LaFI
             id.color = fillColor;
             id.enabled=true;
             id.intensivity=1;
-            ds.drawDot(Position2D(6, 6), id);
+            ds.drawDot(Position2D(indicatorSizeHalf, indicatorSizeHalf), id);
         }
         
         if (e.getForm().getFocusedWidget() == e)
@@ -237,16 +240,30 @@ class Chicago98Laf : LaFI
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
     void drawButtonCheck(ButtonCheck e, DrawingSurfaceI ds)
     {
-        int pos_x = 0;
-        int pos_y = 0;
-        int size_w = 12;
-        int size_h = 12;
+        const int pos_x = 0;
+        const int pos_y = 0;
+        int size_w = e.getWidth();
+        int size_h = e.getHeight();
         
-        drawBewel(ds, Position2D(pos_x, pos_y), Size2D(size_w, size_h), true);
+        const int indicatorSize = 12;
+        
+        ds.drawRectangle(
+        	Position2D(pos_x, pos_y),
+        	Size2D(size_w + 1, size_h + 1),
+        	LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
+        	);
+        
+        drawBewel(
+        	ds, 
+        	Position2D(pos_x, pos_y), 
+        	Size2D(indicatorSize, indicatorSize), 
+        	true
+        	);
         
         ds.drawRectangle(
         	Position2D(pos_x + 2, pos_y + 2),
-        	Size2D(size_w - 4, size_h - 4),
+        	Size2D(indicatorSize - 4, indicatorSize - 4),
         	LineStyle(Color(0xffffff)),
         	nullable(FillStyle(Color(0xffffff)))
         	);
@@ -267,7 +284,7 @@ class Chicago98Laf : LaFI
         {
         	ds.drawRectangle(
         		Position2D(pos_x + 3, pos_y + 3),
-        		Size2D(size_w - 6, size_h - 6),
+        		Size2D(indicatorSize - 6, indicatorSize - 6),
         		LineStyle(Color(0)),
         		nullable(FillStyle(Color(0)))
         		);
