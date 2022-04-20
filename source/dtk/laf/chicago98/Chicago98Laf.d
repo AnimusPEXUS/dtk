@@ -29,7 +29,7 @@ import dtk.miscs.DrawingSurfaceShift;
 
 import dtk.widgets.Form;
 import dtk.widgets.Button;
-import dtk.widgets.ButtonRadio;
+// import dtk.widgets.ButtonRadio;
 import dtk.widgets.ButtonCheck;
 // import dtk.widgets.Picture;
 import dtk.widgets.Layout;
@@ -172,7 +172,7 @@ class Chicago98Laf : LaFI
     }
     
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
-    void drawButtonRadio(ButtonRadio e, DrawingSurfaceI ds)
+    void drawButtonRadio(ButtonCheck e, DrawingSurfaceI ds)
     {
         assert(ds !is null);
         
@@ -237,10 +237,10 @@ class Chicago98Laf : LaFI
     // TODO: Radio and Check Buttons have to be scalable, not fixed;
     void drawButtonCheck(ButtonCheck e, DrawingSurfaceI ds)
     {
-        auto pos_x = cast(int) 0;
-        auto pos_y = cast(int) 0;
-        auto size_w = cast(int) e.getWidth();
-        auto size_h = cast(int) e.getHeight();
+        int pos_x = 0;
+        int pos_y = 0;
+        int size_w = 12;
+        int size_h = 12;
         
         drawBewel(ds, Position2D(pos_x, pos_y), Size2D(size_w, size_h), true);
         
@@ -265,15 +265,14 @@ class Chicago98Laf : LaFI
         
         if (e.getToggledOn())
         {
-            fillColor = Color(0);
+        	ds.drawRectangle(
+        		Position2D(pos_x + 3, pos_y + 3),
+        		Size2D(size_w - 6, size_h - 6),
+        		LineStyle(Color(0)),
+        		nullable(FillStyle(Color(0)))
+        		);
         }
         
-        ds.drawRectangle(
-        	Position2D(pos_x + 3, pos_y + 3),
-        	Size2D(size_w - 6, size_h - 6),
-        	LineStyle(Color(0)),
-        	nullable(FillStyle(fillColor))
-        	);
     }
     
     // void drawPicture(Widget e, DrawingSurfaceI ds)

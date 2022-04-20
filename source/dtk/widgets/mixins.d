@@ -123,17 +123,7 @@ mixin template mixin_Widget_renderImage(
 				
 				auto ds = new Image(w, h);
 				
-				// static if (__traits(hasMember, this, "renderImageBeforeDraw"))
-				// {
-					// this.renderImageBeforeDraw(ds);
-				// }
-				
 				laf.draw%1$s(this, ds);
-				
-				// static if (__traits(hasMember, this, "renderImageAfterDraw"))
-				// {
-					// this.renderImageAfterDraw(ds);
-				// }
 				
 				return ds;
 			}

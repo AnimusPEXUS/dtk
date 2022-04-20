@@ -22,7 +22,6 @@ import dtk.widgets.Form;
 import dtk.widgets.Layout;
 import dtk.widgets.Button;
 import dtk.widgets.ButtonCheck;
-import dtk.widgets.ButtonRadio;
 import dtk.widgets.TextEntry;
 
 void main()
@@ -65,11 +64,13 @@ void main()
     
     lo.setX(10).setY(10).setWidth(290).setHeight(290);
     
+    auto rg = new RadioGroup();
+    
     auto btn = new Button().setTextLabel("Button 1");
     auto btn2 = new Button().setTextLabel("Button 2");
-    auto btn3 = new ButtonRadio();
+    auto btn3 = new ButtonCheck().setTextLabel("ButtonRadio 1").setRadioGroup(rg);
     auto btn4 = new ButtonCheck();
-    auto btn5 = new ButtonRadio();
+    auto btn5 = new ButtonCheck().setTextLabel("ButtonRadio 2").setRadioGroup(rg);
     auto lbl1 = new TextEntry();
     auto lbl2 = Label("text2");
     
@@ -93,18 +94,13 @@ void main()
     lbl1.setTextEditable(true);
     lbl1.setCursorEnabled(true);
     
-    auto rg = new RadioGroup();
-    
-    btn3.setRadioGroup(rg);
-    btn5.setRadioGroup(rg);
-    
     rg.selectButton(btn5);
     
     btn.setX(10).setY(10).setWidth(40).setHeight(40);
-    btn2.setX(10).setY(60).setWidth(10).setHeight(10);
-    btn3.setX(10).setY(80).setWidth(12).setHeight(12);
-    btn4.setX(10).setY(100).setWidth(12).setHeight(12);
-    btn5.setX(10).setY(120).setWidth(12).setHeight(12);
+    btn2.setX(10).setY(60).setWidth(100).setHeight(20);
+    btn3.setX(10).setY(80).setWidth(100).setHeight(20);
+    btn4.setX(10).setY(100).setWidth(100).setHeight(20);
+    btn5.setX(10).setY(120).setWidth(100).setHeight(20);
     lbl1.setX(10).setY(140).setWidth(500).setHeight(100);
     lbl2.setX(10).setY(260).setWidth(500).setHeight(20);
     

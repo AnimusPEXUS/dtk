@@ -7,7 +7,7 @@ import dtk.types.Widget;
 
 import dtk.widgets.Form;
 import dtk.widgets.Button;
-import dtk.widgets.ButtonRadio;
+//import dtk.widgets.ButtonRadio;
 import dtk.widgets.ButtonCheck;
 // import dtk.widgets.Picture;
 import dtk.widgets.Layout;
@@ -18,7 +18,7 @@ interface LaFI
 {
     void drawForm(Form e, DrawingSurfaceI ds);
     void drawButton(Button e, DrawingSurfaceI ds);
-    void drawButtonRadio(ButtonRadio e, DrawingSurfaceI ds);
+    void drawButtonRadio(ButtonCheck e, DrawingSurfaceI ds);
     void drawButtonCheck(ButtonCheck e, DrawingSurfaceI ds);
     //void drawPicture(Picture e, DrawingSurfaceI ds);
     void drawLayout(Layout e, DrawingSurfaceI ds);

@@ -113,6 +113,7 @@ class Widget
     {
     	assert(childMinCount >= 0);
     	assert(childMaxCount == -1 || (childMaxCount >= childMinCount));
+    	assert(childMaxCount < 1000); // TODO: think about this
     }
 	
 	private
@@ -410,6 +411,10 @@ class Widget
     
     final Widget addChild(Widget child)
     {
+    	if (childMaxCount != -1 && children.length == childMaxCount)
+    	{
+    		throw new Exception("maximum children count reached");
+    	}
     	if (!haveChild(child))
     	{
     		children ~= new WidgetChild(child);

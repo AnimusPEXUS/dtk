@@ -5,16 +5,16 @@ module dtk.miscs.RadioGroup;
 import std.stdio;
 import std.typecons;
 
-import dtk.widgets.ButtonRadio;
+import dtk.widgets.ButtonCheck;
 
 class RadioGroup
 {
     public
     {
-        ButtonRadio[] buttons;
+        ButtonCheck[] buttons;
     }
     
-    void add(ButtonRadio b)
+    void add(ButtonCheck b)
     {
         if (!isIn(b))
             buttons ~= b;
@@ -26,7 +26,7 @@ class RadioGroup
         }
     }
     
-    void remove(ButtonRadio b)
+    void remove(ButtonCheck b)
     {
         for (int i = cast(int) buttons.length - 1; i != -1; i += -1)
             if (buttons[i] == b)
@@ -36,7 +36,7 @@ class RadioGroup
             b.unsetRadioGroup();
     }
     
-    bool isIn(ButtonRadio b)
+    bool isIn(ButtonCheck b)
     {
         foreach (v; buttons)
         {
@@ -46,7 +46,7 @@ class RadioGroup
         return false;
     }
     
-    void selectButton(ButtonRadio b)
+    void selectButton(ButtonCheck b)
     {
         foreach (v; buttons)
         {
@@ -57,14 +57,14 @@ class RadioGroup
         }
     }
     
-    ButtonRadio getSelectedButton()
+    ButtonCheck getSelectedButton()
     {
         foreach (v; buttons)
         {
         	if (v.getToggledOn())
         		return v;
         }
-        return cast(ButtonRadio) null;
+        return cast(ButtonCheck) null;
     }
     
 }
