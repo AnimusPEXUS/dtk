@@ -254,12 +254,20 @@ class TextEntry : Widget
     {
     	text_view.setText(txt);
     	
-    	auto x = collectException({text_view.reprocess();}());
+    	/* auto x = collectException({text_view.reprocess();}());
     	if (x !is null)
-    		debug writeln("text_view.reprocess error: ", x);
+    	debug writeln("text_view.reprocess error: ", x); */
     	
     	
-    	x = collectException({redraw();}());
+    	auto x = collectException(
+    		{
+    			auto p = getParent();
+    			if (p)
+    			{
+    				p.redraw();
+    			}
+    		}()
+    		);
     	if (x !is null)
     		debug writeln("redraw error: ", x);
     	

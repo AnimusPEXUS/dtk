@@ -120,7 +120,7 @@ void main()
     			); 
     		debug writeln(x);
     		lbl2.setText(x);
-    		debug writeln("lbl2 text %s".format(lbl2.getText()));
+    		// debug writeln("lbl2 text %s".format(lbl2.getText()));
     	}
     	return false;
     };
