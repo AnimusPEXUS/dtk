@@ -1,5 +1,6 @@
 module dtk.types.Image;
 
+import std.format;
 import std.stdio;
 import std.typecons;
 import std.math;
@@ -74,8 +75,8 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     
     typeof(this) setDot(int x, int y, ImageDot new_value)
     {
-    	assert(x >= 0);
-    	assert(y >= 0);
+    	assert(x >= 0, "invalid x value: %s".format(x));
+    	assert(y >= 0, "invalid y value: %s".format(y));
         if (x > width)
             /* throw new Exception("invalid x"); */
         return this;
@@ -214,6 +215,8 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     
     void drawDot(Position2D pos, ImageDot dot)
     {
+    	assert(pos.x >= 0);
+    	assert(pos.y >= 0);
     	if (dot.enabled)
     		setDot(pos.x, pos.y, dot);
     }
@@ -225,11 +228,18 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     
     ImageDot getDot(Position2D pos)
     {
+    	assert(pos.x >= 0);
+    	assert(pos.y >= 0);
         return getDot(pos.x, pos.y);
     }
     
     void drawLine(Position2D pos, Position2D pos2, LineStyle style)
     {
+    	assert(pos.x >= 0);
+    	assert(pos.y >= 0);
+    	
+    	assert(pos2.x >= 0);
+    	assert(pos2.y >= 0);
     	
     	auto dots = calculateDotsInLine(pos, pos2);
     	
@@ -275,6 +285,14 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         )
     {
     	debug writefln("drawing %s rectangle: %s %s", fill_style, pos, size);
+    	
+    	assert(pos.x >= 0);
+    	assert(pos.y >= 0);
+    	
+    	if (size.width <= 0 || size.height <=0)
+    	{
+    		return;
+    	}
     	
     	// top+left
     	auto p1_x = pos.x;

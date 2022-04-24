@@ -15,6 +15,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
 
 import dtk.types.Event;
+import dtk.types.Widget;
 import dtk.types.Property;
 import dtk.types.WindowCreationSettings;
 
@@ -326,6 +327,31 @@ class SDLDesktopPlatform : PlatformI
         }
         
         return;
+    }
+
+    private 
+    {
+    	bool widgetInternalDraggingEventActive;
+    	Widget widgetInternalDraggingEventWidget;
+    	bool delegate() widgetInternalDraggingEventStopCheck;
+    }
+    
+    void startWidgetInternalDraggingEvent(
+    	Widget e,
+    	bool delegate() widgetInternalDraggingStopCheck
+    	)
+    {
+    	widgetInternalDraggingEventActive = true;
+    	widgetInternalDraggingEventWidget = e;
+    	this.widgetInternalDraggingEventStopCheck
+    	=widgetInternalDraggingEventStopCheck;
+    }
+    
+    void endWidgetInternalDraggingEvent()
+    {
+    	widgetInternalDraggingEventActive = false;
+    	widgetInternalDraggingEventWidget = null;
+    	this.widgetInternalDraggingEventStopCheck = null;
     }
     
 }

@@ -1508,7 +1508,7 @@ class Text
         
         scope(exit)
         {
-            signal_linesRecalcRequired.emit();
+        	signal_linesRecalcRequired.emit();
         }
         
         auto line_ended = false;
@@ -2064,9 +2064,9 @@ class TextView
         return getPlatform().getFontManager();
     }
     
-    void reprocess(bool force=false)
+    void reprocess()
     {    	
-        if (linesRecalcRequired || force)
+        if (linesRecalcRequired)
         {
             getText().reprocess(this);
             linesRecalcRequired = false;
@@ -2077,6 +2077,7 @@ class TextView
         if (visibilityMapRecalcRequired)
         {
             genVisibilityMap();
+            imageRegenRequired = true;
         }
         
         // genImage() uses visibilityMap to speed up rendering, so it must
@@ -2095,6 +2096,7 @@ class TextView
     
     void completeRedrawToDS(DrawingSurfaceI ds=null)
     {
+    	reprocess();
     	if (ds is null)
     		ds = getDrawingSurface();
         int x;
@@ -2158,11 +2160,12 @@ class TextView
         }
     }
     
-    void setTextString(dstring txt = "")
+    void setTextString(dstring txt)
     {
         if (text is null)
         {
-            text = new Text();
+            auto t = new Text();
+            setText(t);
         }
         
         text.setText(txt);
@@ -2188,6 +2191,7 @@ class TextView
     void setText(Text txt)
     {
         text = txt;
+        linesRecalcRequired=true;
         text_linesRecalcRequired_sc = text.connectToSignal_LinesRecalcRequired(
             delegate void() nothrow
             {
@@ -2199,7 +2203,7 @@ class TextView
     Text getText()
     {
         if (text is null)
-            setTextString();
+            setTextString("");
         return text;
     }
     

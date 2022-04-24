@@ -56,6 +56,9 @@ class Form : Widget
     mixin mixin_multiple_properties_forward!(FormProperties, false);
     mixin mixin_Widget_renderImage!("Form");
     
+    bool delegate(EventForm *ef) onFormSignalBeforeProcessing;
+    void delegate(EventForm *ef) onFormSignalAfterProcessing;
+    
     private
     {
     	SignalConnection sc_childChange;
@@ -67,16 +70,6 @@ class Form : Widget
     	
     	SignalConnection sc_formEventHandler;
     }
-    
-    bool pressrelease_sequence_started;
-    Widget pressrelease_sequence_widget;
-    EnumMouseButton pressrelease_sequence_btn;
-
-    // bool kb_pressrelease_sequence_started;
-    // Widget kb_pressrelease_sequence_widget;
-    // EnumMouseButton kb_pressrelease_sequence_btn;
-    
-    Widget mouse_focused_widget;
     
     this()
     {
@@ -229,28 +222,60 @@ class Form : Widget
     		);
     }
     
+    private {
+    	bool pressreleaseSequenceStarted;
+    	Widget pressreleaseSequenceWidget;
+    	EnumMouseButton pressreleaseSequenceBtn;
+    	
+    	Widget mouseFocusedWidget;
+    }
+    
+    
     void onFormSignal(EventForm* event) nothrow
     {
     	auto err = collectException(
     		{
-    			if (event.mouseFocusedWidget != mouse_focused_widget)
+    			if (onFormSignalBeforeProcessing !is null)
     			{
-    				Widget old = mouse_focused_widget;
-    				mouse_focused_widget = event.mouseFocusedWidget;
+    				auto res = onFormSignalBeforeProcessing(event);
+    				if (res == true)
+    				{
+    					return;
+    				}
+    			}
+    			
+    			scope(exit)
+    			{
+    				if (onFormSignalAfterProcessing !is null)
+    				{
+    					onFormSignalAfterProcessing(event);
+    				}
+    			}
+    			
+    			if (event.mouseFocusedWidget != mouseFocusedWidget)
+    			{
+    				Widget old = mouseFocusedWidget;
+    				mouseFocusedWidget = event.mouseFocusedWidget;
     				if (old !is null)
     				{
     					old.intVisuallyRelease(this, old, event);
-    					old.intMouseLeave(this, old, mouse_focused_widget, event);
+    					old.intMouseLeave(this, old, mouseFocusedWidget, event);
     				}
-    				if (this.pressrelease_sequence_started && this.pressrelease_sequence_widget == mouse_focused_widget)
+    				if (this.pressreleaseSequenceStarted
+    					&& this.pressreleaseSequenceWidget == mouseFocusedWidget)
     				{
-    					mouse_focused_widget.intVisuallyPress(
-    						this, 
-    						mouse_focused_widget, 
+    					mouseFocusedWidget.intVisuallyPress(
+    						this,
+    						mouseFocusedWidget,
     						event
     						);
     				}
-    				mouse_focused_widget.intMouseEnter(this, old, mouse_focused_widget, event);
+    				mouseFocusedWidget.intMouseEnter(
+    					this,
+    					old,
+    					mouseFocusedWidget,
+    					event
+    					);
     			}
     			
     			switch (event.event.type)
@@ -275,9 +300,9 @@ class Form : Widget
     					default:
     						return;
     					case EnumMouseButtonState.pressed:
-    						pressrelease_sequence_started = true;
-    						pressrelease_sequence_widget = event.mouseFocusedWidget;
-    						pressrelease_sequence_btn = event.event.em.button;
+    						pressreleaseSequenceStarted = true;
+    						pressreleaseSequenceWidget = event.mouseFocusedWidget;
+    						pressreleaseSequenceBtn = event.event.em.button;
     						setFocusedWidget(event.mouseFocusedWidget);
     						event.mouseFocusedWidget.intMousePress(
     							this,
@@ -301,9 +326,9 @@ class Form : Widget
     							event.mouseFocusedWidget,
     							event
     							);
-    						if (pressrelease_sequence_started
-    							&& pressrelease_sequence_widget == event.mouseFocusedWidget
-    						&& pressrelease_sequence_btn == event.event.em.button)
+    						if (pressreleaseSequenceStarted
+    							&& pressreleaseSequenceWidget == event.mouseFocusedWidget
+    						&& pressreleaseSequenceBtn == event.event.em.button)
     						{
     							event.mouseFocusedWidget.intMousePressRelease(
     								this,
@@ -311,7 +336,7 @@ class Form : Widget
     								event
     								);
     						}
-    						pressrelease_sequence_started = false;
+    						pressreleaseSequenceStarted = false;
     						return;
     					}
     				}
@@ -333,7 +358,7 @@ class Form : Widget
     						event.focusedWidget,
     						event
     						);
-    					return; 
+    					return;
     				}
     			case EventType.textInput:
     				switch (event.event.ek.keyState)

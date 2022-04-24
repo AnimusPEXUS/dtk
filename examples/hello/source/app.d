@@ -1,3 +1,5 @@
+
+import std.format;
 import std.stdio;
 import std.typecons;
 import std.math;
@@ -6,6 +8,7 @@ import dtk.main;
 
 import dtk.interfaces.LaFI;
 
+import dtk.types.EventForm;
 import dtk.types.Color;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
@@ -103,6 +106,24 @@ void main()
     btn5.setX(10).setY(120).setWidth(100).setHeight(20);
     lbl1.setX(10).setY(140).setWidth(500).setHeight(100);
     lbl2.setX(10).setY(260).setWidth(500).setHeight(20);
+    
+    form.onFormSignalBeforeProcessing =  delegate bool(EventForm *event)
+    {
+    	if (event 
+    		&& event.event.type==EventType.mouse 
+    	&& event.event.em.type == EventMouseType.movement
+    	)
+    	{
+    		auto x ="x: %s, y: %s"d.format(
+    			event.event.mouseX, 
+    			event.event.mouseY
+    			); 
+    		debug writeln(x);
+    		lbl2.setText(x);
+    		debug writeln("lbl2 text %s".format(lbl2.getText()));
+    	}
+    	return false;
+    };
     
     pl.mainLoop();
     

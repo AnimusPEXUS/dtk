@@ -76,9 +76,9 @@ class Window : WindowI
     
     private
     {
-    	bool mouse_in;
-    	int mouse_x;
-    	int mouse_y;
+    	bool mouseIn;
+    	int mouseX;
+    	int mouseY;
     }
     
 	mixin mixin_multiple_properties_define!(WindowProperties);
@@ -242,13 +242,13 @@ class Window : WindowI
     				&& event.em.type == EventMouseType.movement)
     			{
     				// TODO: save relative values too?
-    				mouse_x = event.em.x;
-    				mouse_y = event.em.y;
+    				mouseX = event.em.x;
+    				mouseY = event.em.y;
     			}
     			
     			{
-    				event.mouse_x = cast(int)mouse_x;
-    				event.mouse_y = cast(int)mouse_y;
+    				event.mouseX = mouseX;
+    				event.mouseY = mouseY;
     			}
     			
     			if (event.type == EventType.window)
@@ -282,7 +282,7 @@ class Window : WindowI
     
     Tuple!(bool, Position2D) getMousePosition()
     {
-    	return tuple(mouse_in, Position2D(cast(int)mouse_x,cast(int)mouse_y));
+    	return tuple(mouseIn, Position2D(mouseX, mouseY));
     }
     
     void redraw()

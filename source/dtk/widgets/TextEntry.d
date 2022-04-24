@@ -253,7 +253,17 @@ class TextEntry : Widget
     TextEntry setText(dstring txt)
     {
     	text_view.setText(txt);
-    	return this;
+    	
+    	auto x = collectException({text_view.reprocess();}());
+    	if (x !is null)
+    		debug writeln("text_view.reprocess error: ", x);
+    	
+    	
+    	x = collectException({redraw();}());
+    	if (x !is null)
+    		debug writeln("redraw error: ", x);
+    	
+     	return this;
     }
     
     DrawingSurfaceI getDrawingSurfaceForTextView()
@@ -428,7 +438,7 @@ class TextEntry : Widget
     	}
     	else
     	{
-    		text_view.reprocess(true);
+    		text_view.reprocess();
     		setWidth(text_view.getWidth());
     		setHeight(text_view.getHeight());
     	}

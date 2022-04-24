@@ -666,13 +666,9 @@ class Widget
     	if (!res[0])
     		return;
     	
-    	// auto img = child.renderImage(cast(int)res[1], res[2], res[3], res[4]);
     	ds.drawImage(
-    		Position2D(
-    			0, 0
-    			// NOTE: ds should be already shifted to correct position
-    			// cast(int)res[5], cast(int)res[6]
-    			),
+    		// NOTE: ds should be already shifted to correct position
+    		Position2D(0, 0),
     		img.getImage(res[1], res[2], res[3], res[4])
     		);
     }

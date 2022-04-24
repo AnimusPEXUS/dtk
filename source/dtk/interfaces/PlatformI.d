@@ -7,6 +7,7 @@ import dtk.interfaces.FontMgrI;
 
 import dtk.types.WindowCreationSettings;
 import dtk.types.Event;
+import dtk.types.Widget;
 
 import dtk.miscs.signal_tools;
 
@@ -36,6 +37,12 @@ interface PlatformI
     void init();
     void mainLoop();
     void destroy();
+    
+    void startWidgetInternalDraggingEvent(
+    	Widget e,
+    	bool delegate() widgetInternalDraggingStopCheck
+    	);
+    void endWidgetInternalDraggingEvent();
     
     mixin(mixin_PlatformSignals(true));
 }

@@ -335,10 +335,10 @@ class Chicago98Laf : LaFI
     
     void drawTextEntry(TextEntry e, DrawingSurfaceI ds)
     {
-        auto pos_x = cast(int) 0;
-        auto pos_y = cast(int) 0;
-        auto size_w = cast(int) e.getWidth();
-        auto size_h = cast(int) e.getHeight();
+        int pos_x = 0;
+        int pos_y = 0;
+        auto size_w = e.getWidth();
+        auto size_h = e.getHeight();
         // auto draw_bewel = false;
         // auto bewel_bg_color = Color(cast(ubyte[])[255,255,255]);
         auto draw_bewel = e.getDrawBewelAndBackground();

@@ -21,8 +21,8 @@ struct Event
 {
 	EventType type;
 	WindowI window;
-	int mouse_x;
-	int mouse_y;
+	int mouseX;
+	int mouseY;
 	union
 	{
 		EventWindow *ew;
