@@ -8,5 +8,5 @@
 	"name": "hello",
 	"dependencies": {
             "dtk": "~master",
-    },
+	}
 }

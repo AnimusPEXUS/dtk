@@ -128,10 +128,10 @@ mixin template mixin_Widget_renderImage(
 				return ds;
 			}
 			
-			%2$s Image renderImage(int x, int y, int w, int h)
+			/* %2$s Image renderImage(int x, int y, int w, int h)
 			{
 				return renderImage().getImage(x,y,w,h);
-			}
+			} */
 			
 		}.format(widgetType, override_str)
 		);

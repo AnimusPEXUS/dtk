@@ -33,7 +33,7 @@ import dtk.widgets.Button;
 import dtk.widgets.ButtonCheck;
 // import dtk.widgets.Picture;
 import dtk.widgets.Layout;
-// import dtk.widgets.ScrollBar;
+import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
 
 // TODO: deprecate Position2D and Size2D and pass values directly
@@ -329,9 +329,15 @@ class Chicago98Laf : LaFI
     // {
     // }
     
-    // void drawScrollBar(Widget e, DrawingSurfaceI ds)
-    // {
-    // }
+    void drawScrollBar(ScrollBar e, DrawingSurfaceI ds)
+    {
+        int pos_x = 0;
+        int pos_y = 0;
+        auto size_w = e.getWidth();
+        auto size_h = e.getHeight();
+
+    	
+    }
     
     void drawTextEntry(TextEntry e, DrawingSurfaceI ds)
     {

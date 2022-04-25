@@ -11,7 +11,7 @@ import dtk.widgets.Button;
 import dtk.widgets.ButtonCheck;
 // import dtk.widgets.Picture;
 import dtk.widgets.Layout;
-// import dtk.widgets.ScrollBar;
+import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
 
 interface LaFI
@@ -25,6 +25,6 @@ interface LaFI
     // void drawMenu(Menu widget, DrawingSurfaceI ds);
     // void drawMenuItem(MenuItem widget, DrawingSurfaceI ds);
     // void drawBar(Bar widget, DrawingSurfaceI ds);
-    //void drawScrollBar(ScrollBar e, DrawingSurfaceI ds);
+    void drawScrollBar(ScrollBar e, DrawingSurfaceI ds);
     void drawTextEntry(TextEntry e, DrawingSurfaceI ds);
 }

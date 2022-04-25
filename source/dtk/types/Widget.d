@@ -257,9 +257,9 @@ class Widget
     	throw new Exception("override this");
     }
     
-    Image renderImage(int x, int y, int w, int h)
+    final Image renderImage(int x, int y, int w, int h)
     {
-    	throw new Exception("override this");
+    	return renderImage().getImage(x,y, w, h);
     }
     
     private
@@ -418,16 +418,17 @@ class Widget
     	if (!haveChild(child))
     	{
     		children ~= new WidgetChild(child);
-    		if (child.getParent() != this)
-    		{
-    			child.setParent(this);
-    		}
+    		checkChildParent(child);
     	}
     	return this;
     }
     
     final Widget removeChild(Widget child)
     {
+    	if (children.length == childMinCount)
+    	{
+    		throw new Exception("minimum children count reached");
+    	}
     	if (!haveChild(child))
     		return this;
     	
@@ -475,7 +476,7 @@ class Widget
 	}
 	
 	// TODO: do something with this
-	private void checkChildren()
+	private void checkChildrenParents()
     {
     	foreach_reverse (i, v; children)
     	{
@@ -485,10 +486,16 @@ class Widget
     			continue;
     		}
     		
-    		if (v.child.getParent() != this)
-    		{
-    			v.child.setParent(this);
-    		}
+    		checkChildParent(v.child);
+    	}
+    }
+    
+    	// TODO: do something with this
+	private void checkChildParent(Widget child)
+    {
+    	if (child.getParent() != this)
+    	{
+    		child.setParent(this);
     	}
     }
     

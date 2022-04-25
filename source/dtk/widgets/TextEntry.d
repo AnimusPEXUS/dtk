@@ -261,11 +261,7 @@ class TextEntry : Widget
     	
     	auto x = collectException(
     		{
-    			auto p = getParent();
-    			if (p)
-    			{
-    				p.redraw();
-    			}
+    			redraw();
     		}()
     		);
     	if (x !is null)
