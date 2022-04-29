@@ -1,5 +1,7 @@
 module dtk.platforms.sdl_desktop.Window;
 
+import std.conv;
+import std.string;
 import std.typecons;
 import std.stdio;
 import std.algorithm;
@@ -126,8 +128,10 @@ class Window : WindowI
         	flags |= SDL_WINDOW_RESIZABLE;
         }
         
+        string tt = to!string(window_settings.title);
+        
         sdl_window = SDL_CreateWindow(
-        	cast(char*) window_settings.title,
+        	tt.toStringz(),
         	getX(),
         	getY(),
         	cast(int) getWidth(),
