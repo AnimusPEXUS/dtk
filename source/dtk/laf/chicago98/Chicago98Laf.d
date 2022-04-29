@@ -19,6 +19,7 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Image;
 import dtk.types.Widget;
+import dtk.types.Orientation;
 
 import dtk.interfaces.LaFI;
 import dtk.interfaces.WindowI;
@@ -265,9 +266,9 @@ class Chicago98Laf : LaFI
         	);
         
         drawBewel(
-        	ds, 
-        	Position2D(pos_x, pos_y), 
-        	Size2D(indicatorSize, indicatorSize), 
+        	ds,
+        	Position2D(pos_x, pos_y),
+        	Size2D(indicatorSize, indicatorSize),
         	true
         	);
         
@@ -318,7 +319,7 @@ class Chicago98Laf : LaFI
     {
     	auto size_w = e.getWidth();
     	auto size_h = e.getHeight();
-        
+    	
     	ds.drawRectangle(
     		Position2D(0, 0),
     		Size2D(size_w, size_h),
@@ -342,11 +343,40 @@ class Chicago98Laf : LaFI
         	nullable(FillStyle(formBackground))
         	);
         
-        debug writeln(
-        	"drawing ScroollBar bewel %sx%sx%sx%s".format(
-        		e.scopeBewelX, e.scopeBewelY,
-        		e.scopeBewelW, e.scopeBewelH
-        		)
+        auto c0 = e.getChild(0);
+        auto c1 = e.getChild(1);
+        
+        bool flipper;
+        if (e.getOrientation() == Orientation.horizontal)
+        {
+        	for (auto i = 0; i != e.buttonSize; i++)
+        	{
+        		ds.drawLine(
+        			Position2D(e.buttonSize, i),
+        			Position2D(size_w - e.buttonSize, i),
+        			LineStyle(elementLightedColor2, [flipper, !flipper]),
+        			);
+        		flipper = !flipper;
+        	}
+        }
+        else
+        {
+        	for (auto i = 0; i != e.buttonSize; i++)
+        	{
+        		ds.drawLine(
+        			Position2D(i, e.buttonSize),
+        			Position2D(i, size_h - e.buttonSize),
+        			LineStyle(elementLightedColor2, [flipper, !flipper]),
+        			);
+        		flipper = !flipper;
+        	}
+        }
+        
+        ds.drawRectangle(
+        	Position2D(e.scopeBewelX, e.scopeBewelY),
+        	Size2D(e.scopeBewelW, e.scopeBewelH),
+        	LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
         	);
         
         drawBewel(
