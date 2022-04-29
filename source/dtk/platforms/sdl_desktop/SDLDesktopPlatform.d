@@ -18,6 +18,7 @@ import dtk.types.Event;
 import dtk.types.Widget;
 import dtk.types.Property;
 import dtk.types.WindowCreationSettings;
+import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 
 import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
@@ -322,6 +323,45 @@ class SDLDesktopPlatform : PlatformI
             	}
             	e.window = w;
             	
+            	if (widgetInternalDraggingEventActive)
+            	{
+            		if (widgetInternalDraggingEventStopCheck is null)
+            		{
+            			widgetInternalDraggingEventEnd(
+            				EnumWidgetInternalDraggingEventEndReason.abort
+            				);
+            			return;
+            		}
+            		if (widgetInternalDraggingEventWidget is null)
+            		{
+            			widgetInternalDraggingEventEnd(
+            				EnumWidgetInternalDraggingEventEndReason.abort
+            				);
+            			return;
+            		}
+            		{
+            			auto res_drag_stop_check = widgetInternalDraggingEventStopCheck(e);
+            			if (res_drag_stop_check != EnumWidgetInternalDraggingEventEndReason.notEnd)
+            			{
+            				widgetInternalDraggingEventEnd(res_drag_stop_check);
+            				return;
+            			}
+            		}
+
+            		if (e.type == EventType.mouse 
+            			&& e.em.type == EventMouseType.movement)
+            		{
+            			widgetInternalDraggingEventWidget.intInternalDraggingEvent(
+            				widgetInternalDraggingEventWidget,
+            				widgetInternalDraggingEventInitX,
+            				widgetInternalDraggingEventInitY,
+            				0,0
+            				);
+            		}
+
+            		return;
+            	}
+
             	emitSignal_Event(e);
             }
         }
@@ -333,25 +373,43 @@ class SDLDesktopPlatform : PlatformI
     {
     	bool widgetInternalDraggingEventActive;
     	Widget widgetInternalDraggingEventWidget;
-    	bool delegate() widgetInternalDraggingEventStopCheck;
+    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e)  widgetInternalDraggingEventStopCheck;
+    	int widgetInternalDraggingEventInitX;
+    	int widgetInternalDraggingEventInitY;
     }
     
-    void startWidgetInternalDraggingEvent(
-    	Widget e,
-    	bool delegate() widgetInternalDraggingStopCheck
+    void widgetInternalDraggingEventStart(
+    	Widget widget,
+    	int initX, int initY,
+    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e) 
+    	widgetInternalDraggingStopCheck
     	)
     {
     	widgetInternalDraggingEventActive = true;
-    	widgetInternalDraggingEventWidget = e;
+    	widgetInternalDraggingEventWidget = widget;
     	this.widgetInternalDraggingEventStopCheck
     	=widgetInternalDraggingEventStopCheck;
     }
     
-    void endWidgetInternalDraggingEvent()
+    void widgetInternalDraggingEventEnd(
+    	EnumWidgetInternalDraggingEventEndReason reason
+    	)
     {
+		if (reason == EnumWidgetInternalDraggingEventEndReason.notEnd)
+		{
+			return;
+		}
+
+		widgetInternalDraggingEventWidget.intInternalDraggingEventEnd(
+			widgetInternalDraggingEventWidget,
+			reason,
+			widgetInternalDraggingEventInitX,
+			widgetInternalDraggingEventInitY
+			);
+		
     	widgetInternalDraggingEventActive = false;
     	widgetInternalDraggingEventWidget = null;
     	this.widgetInternalDraggingEventStopCheck = null;
     }
-    
+
 }

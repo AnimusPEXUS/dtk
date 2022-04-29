@@ -1,5 +1,6 @@
 module dtk.themes.chicago98.Chicago98Laf;
 
+import std.format;
 import std.stdio;
 import std.typecons;
 import std.math;
@@ -96,16 +97,25 @@ class Chicago98Laf : LaFI
     
     void drawForm(Form e, DrawingSurfaceI ds)
     {
-        auto pos_x = cast(int) 0;
-        auto pos_y = cast(int) 0;
-        auto size_w = cast(int) e.getWidth();
-        auto size_h = cast(int) e.getHeight();
+        const int pos_x = 0;
+        const int pos_y = 0;
+        auto size_w = e.getWidth();
+        auto size_h = e.getHeight();
+        
+        /*         ds.drawRectangle(
+        Position2D(pos_x, pos_y),
+        Size2D(size_w, size_h),
+        LineStyle(formBackground),
+        LineStyle(formBackground),
+        LineStyle(formBackground),
+        LineStyle(formBackground),
+        nullable(FillStyle(formBackground))
+        );
+        */
+        
         ds.drawRectangle(
         	Position2D(pos_x, pos_y),
         	Size2D(size_w, size_h),
-        	LineStyle(formBackground),
-        	LineStyle(formBackground),
-        	LineStyle(formBackground),
         	LineStyle(formBackground),
         	nullable(FillStyle(formBackground))
         	);
@@ -306,28 +316,17 @@ class Chicago98Laf : LaFI
     
     void drawLayout(Layout e, DrawingSurfaceI ds)
     {
-        // auto size_w = cast(int) widget.getWidth();
-        // auto size_h = cast(int) widget.getHeight();
-        //
-        // ds.drawRectangle(
-        // Position2D(0, 0),
-        // Size2D(size_w, size_h),
-        // LineStyle(Color(cast(ubyte[3])[55,55,55])),
-        // nullable(FillStyle(Color(cast(ubyte[3])[100,100,100])))
-        // );
+    	auto size_w = e.getWidth();
+    	auto size_h = e.getHeight();
+        
+    	ds.drawRectangle(
+    		Position2D(0, 0),
+    		Size2D(size_w, size_h),
+    		LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
+        	);
     }
     
-    // void drawMenu(Widget e, DrawingSurfaceI ds)
-    // {
-    // }
-    //
-    // void drawMenuItem(Widget e, DrawingSurfaceI ds)
-    // {
-    // }
-    //
-    // void drawBar(Widget e, DrawingSurfaceI ds)
-    // {
-    // }
     
     void drawScrollBar(ScrollBar e, DrawingSurfaceI ds)
     {
@@ -335,8 +334,27 @@ class Chicago98Laf : LaFI
         int pos_y = 0;
         auto size_w = e.getWidth();
         auto size_h = e.getHeight();
-
-    	
+        
+        ds.drawRectangle(
+        	Position2D(pos_x, pos_y),
+        	Size2D(size_w, size_h),
+        	LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
+        	);
+        
+        debug writeln(
+        	"drawing ScroollBar bewel %sx%sx%sx%s".format(
+        		e.scopeBewelX, e.scopeBewelY,
+        		e.scopeBewelW, e.scopeBewelH
+        		)
+        	);
+        
+        drawBewel(
+        	ds,
+        	Position2D(e.scopeBewelX, e.scopeBewelY),
+        	Size2D(e.scopeBewelW, e.scopeBewelH),
+        	false
+        	);
     }
     
     void drawTextEntry(TextEntry e, DrawingSurfaceI ds)

@@ -40,8 +40,6 @@ PropSetting(
 	"Orientation",
 	q{Orientation.horizontal}
 	),
-PropSetting("gs_w_d", "float", "minValue", "MinValue", q{0}),
-PropSetting("gs_w_d", "float", "maxValue", "MaxValue", q{1}),
 PropSetting("gs_w_d", "float", "value", "Value", q{0.2}),
 PropSetting("gs_w_d", "float", "buttonStep", "ButtonStep", q{0.1}),
 PropSetting("gs_w_d", "float", "visibleScope", "VisibleScope", q{0.3}),
@@ -54,9 +52,14 @@ class ScrollBar : Widget
     mixin mixin_multiple_properties_forward!(ScrollBarProperties, false);
     mixin mixin_Widget_renderImage!("ScrollBar");
     
-    private
+    public
     {
-    	const buttonSize = 12;
+    	const float minValue = 0;
+    	const float maxValue = 1;
+    	const buttonSize = 16;
+    	
+    	int min;
+    	int max;
     	
     	int scopeBewelX;
     	int scopeBewelY;
@@ -71,32 +74,43 @@ class ScrollBar : Widget
     {
     	super(2, 2);
     	mixin(mixin_multiple_properties_inst(ScrollBarProperties));
-    	addChild(new Button().setTextLabel("1"));
-    	addChild(new Button().setTextLabel("2"));
+    	addChild(new Button().setTextLabel("⯇"));
+    	addChild(new Button().setTextLabel("⯈"));
     }
     
-    void recalcScopeSpaceAndBewelSize()
+    private void recalcScrollBar()
+    {
+    	recalcScopeSpaceAndBewelSize();
+    	recalcIndicatorAndChildrenPositions();
+    }
+    
+    private void recalcScopeSpaceAndBewelSize()
     {
     	if (getOrientation() == Orientation.horizontal)
     	{
-    		scopeSpaceSize = getWidth() - (buttonSize * 2);
+    		scopeSpaceSize = getWidth();
     	}
     	else
     	{
-    		scopeSpaceSize = getHeight() - (buttonSize * 2);
+    		scopeSpaceSize = getHeight();
     	}
     	
+    	scopeSpaceSize -= (buttonSize * 2);
+    	
+    	// TODO: this method of checking maybe and error prone. redo
     	if (scopeSpaceSize < 0)
     		scopeSpaceSize = 0;
     	
     	scopeBewelSize = cast(int)(
     		cast(float)scopeSpaceSize * getVisibleScope()
     		);
+    	
+    	if (scopeBewelSize < buttonSize)
+    		scopeBewelSize = buttonSize;
     }
     
-    void recalcIndicatorAndChildrenPositions()
+    private void recalcIndicatorAndChildrenPositions()
     {
-    	recalcScopeSpaceAndBewelSize();
     	auto c0 = getChild(0);
     	auto c1 = getChild(1);
     	auto thisWidth = getWidth();
@@ -113,8 +127,10 @@ class ScrollBar : Widget
     		c1.setWidth(buttonSize);
     		c1.setHeight(thisHeight);
     		
-    		scopeBewelX = buttonSize; // here
-    		scopeBewelY = thisHeight;
+    		scopeBewelX = cast(int)(
+    			cast(float)buttonSize + (scopeSpaceSize * getValue())
+    			);
+    		scopeBewelY = 0;
     		scopeBewelW = scopeBewelSize;
     		scopeBewelH = thisHeight;
     	}
@@ -130,8 +146,10 @@ class ScrollBar : Widget
     		c1.setWidth(thisWidth);
     		c1.setHeight(buttonSize);
     		
-    		scopeBewelX = thisWidth;
-    		scopeBewelY = buttonSize; // here
+    		scopeBewelX = 0;
+    		scopeBewelY = cast(int)(
+    			cast(float)buttonSize + (scopeSpaceSize * getValue())
+    			);
     		scopeBewelW = thisWidth;
     		scopeBewelH = scopeBewelSize;
     	}
@@ -139,7 +157,62 @@ class ScrollBar : Widget
     
     override void propagatePosAndSizeRecalcBefore()
     {
-    	recalcIndicatorAndChildrenPositions();
+    	recalcScrollBar();
     }
     
+    void setScrollingFromIntegers(int min, int max, int sMin, int sMax)
+    {
+    	if (min > max)
+    	{
+    		throw new Exception("invalid min/max");
+    	}
+    	
+    	if (sMin > sMax)
+    	{
+    		throw new Exception("invalid min/max");
+    	}
+    	
+    	// TODO: allow scrolling outside of area
+    	if (sMin < min || sMax > max)
+    	{
+    		throw new Exception("visibility area is larger than area itself");
+    	}
+    	
+    	this.min = min;
+    	this.max = max;
+    	
+    	// TODO: replace divisions with multiplications, 
+    	//       or make exclusions on zero divisions
+    	
+    	setVisibleScope((cast(float)max-min) / (sMax-sMin));
+    	if (sMin < min)
+    		setValue(0);
+    	else if ((sMin >= max))
+    		setValue(1);
+    	else
+    		setValue(1.0/((cast(float)max-min)/sMin));
+    	recalcScrollBar();
+    	redraw();
+    }
+    
+    Tuple!(int, int, int, int) calcScrollingIntegers()
+    {
+    	int sMin;
+    	int sMax;
+    	
+    	sMin = cast(int)(
+    		min + ((cast(float)max-min)*getValue())
+    		);
+    	
+    	sMax = cast(int)(
+    		sMin+((cast(float)max-min)*getVisibleScope())
+    		);
+    	
+    	return tuple(min, max, sMin, sMax);
+    }
+    
+    override void intMousePress(Widget widget, EventForm* event)
+    {
+    	debug writeln("ScrollBar Mouse down");
+    }
 }

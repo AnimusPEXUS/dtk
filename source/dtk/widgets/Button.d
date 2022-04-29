@@ -76,18 +76,18 @@ class Button : Widget
     	return getVisuallyPressed();
     }
     
-    override void intVisuallyPress(Form form, Widget widget, EventForm* event)
+    override void intVisuallyPress(Widget widget, EventForm* event)
     {
     	setVisuallyPressed(true);
     	redraw();
     }
-    override void intVisuallyRelease(Form form, Widget widget, EventForm* event)
+    override void intVisuallyRelease(Widget widget, EventForm* event)
     {
     	setVisuallyPressed(false);
     	redraw();
     }
     
-    override void intMousePressRelease(Form form, Widget widget, EventForm* event)
+    override void intMousePressRelease(Widget widget, EventForm* event)
     {debug writeln("click");}
     
     override void propagatePosAndSizeRecalcBefore()

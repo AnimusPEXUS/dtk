@@ -295,7 +295,7 @@ class ButtonCheck : Widget
             );
     }
     
-    override void intMousePressRelease(Form form, Widget widget, EventForm* event)
+    override void intMousePressRelease(Widget widget, EventForm* event)
     {
     	auto rg = getRadioGroup();
     	if (rg !is null)

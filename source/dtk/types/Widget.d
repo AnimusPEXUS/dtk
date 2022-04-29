@@ -11,7 +11,6 @@ import std.format;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LaFI;
-import dtk.interfaces.LayoutEngineI;
 import dtk.interfaces.LayoutChildSettingsI;
 
 import dtk.types.Property;
@@ -20,6 +19,7 @@ import dtk.types.Event;
 import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.VisibilityMap;
+import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 
 import dtk.miscs.signal_tools;
 import dtk.miscs.calculateVisiblePart;
@@ -76,8 +76,6 @@ const auto WidgetProperties = cast(PropSetting[]) [
 PropSetting("gsun", "Widget", "parent", "Parent", q{null}),
 PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
 
-PropSetting("gsun", "LayoutEngineI", "layout_engine", "LayoutEngine", "null"),
-
 PropSetting("gs_w_d", "int", "viewportX", "ViewPortX", "0"),
 PropSetting("gs_w_d", "int", "viewportY", "ViewPortY", "0"),
 PropSetting("gs_w_d", "int", "viewportWidth", "ViewPortWidth", "0"),
@@ -107,6 +105,8 @@ class Widget
     {
 		const int childMinCount;
 		const int childMaxCount;
+		
+		void delegate(Widget w) performLayout;
     }
     
     invariant
@@ -569,10 +569,8 @@ class Widget
     		setViewPortWidth(w);
     		setViewPortHeight(h);
     		
-    		auto la = getLayoutEngine();
-    		
-    		if (la !is null)
-    			la.performLayout();
+    		if (performLayout !is null)
+    			performLayout(this);
     		
     		foreach (v; children)
     		{
@@ -773,25 +771,38 @@ class Widget
     // void delegate() propagatePosAndSizeRecalcOverride;
     void propagatePosAndSizeRecalcBefore() {};
     void propagatePosAndSizeRecalcAfter() {};
-    
-    void intFocusEnter(Form form, Widget widget) {}
-    void intFocusExit(Form form, Widget widget) {}
+
+    // TODO: mabe remove 'Form form' from events
+    void intFocusEnter(Widget widget) {}
+    void intFocusExit(Widget widget) {}
     
     bool intIsVisuallyPressed() {return false;}
 
-    void intVisuallyPress(Form form, Widget widget, EventForm* event) {}
-    void intVisuallyRelease(Form form, Widget widget, EventForm* event) {}
+    void intVisuallyPress(Widget widget, EventForm* event) {}
+    void intVisuallyRelease(Widget widget, EventForm* event) {}
     
-    void intMousePress(Form form, Widget widget, EventForm* event) {}
-    void intMouseRelease(Form form, Widget widget, EventForm* event) {}
-    void intMousePressRelease(Form form, Widget widget, EventForm* event) {}
+    void intMousePress(Widget widget, EventForm* event) {}
+    void intMouseRelease(Widget widget, EventForm* event) {}
+    void intMousePressRelease(Widget widget, EventForm* event) {}
     
-    void intMouseLeave(Form form, Widget old_w, Widget new_w, EventForm* event) {}
-    void intMouseEnter(Form form, Widget old_w, Widget new_w, EventForm* event) {}
-    void intMouseMove(Form form, Widget widget, EventForm* event) {}
+    void intMouseLeave(Widget old_w, Widget new_w, EventForm* event) {}
+    void intMouseEnter(Widget old_w, Widget new_w, EventForm* event) {}
+    void intMouseMove(Widget widget, EventForm* event) {}
     
-    void intKeyboardPress(Form form, Widget widget, EventForm* event) {}
-    void intKeyboardRelease(Form form, Widget widget, EventForm* event) {}
+    void intKeyboardPress(Widget widget, EventForm* event) {}
+    void intKeyboardRelease(Widget widget, EventForm* event) {}
     
-    void intTextInput(Form form, Widget widget, EventForm* event) {}
+    void intTextInput(Widget widget, EventForm* event) {}
+    
+    void intInternalDraggingEvent(
+    	Widget widget, 
+    	int initX, int initY,
+    	int newX, int newY
+    	) {}
+
+    void intInternalDraggingEventEnd(
+    	Widget widget, 
+    	EnumWidgetInternalDraggingEventEndReason reason,
+    	int initX, int initY
+    	) {}
 }

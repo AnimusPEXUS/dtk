@@ -8,6 +8,7 @@ import dtk.interfaces.FontMgrI;
 import dtk.types.WindowCreationSettings;
 import dtk.types.Event;
 import dtk.types.Widget;
+import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 
 import dtk.miscs.signal_tools;
 
@@ -38,11 +39,15 @@ interface PlatformI
     void mainLoop();
     void destroy();
     
-    void startWidgetInternalDraggingEvent(
+    void widgetInternalDraggingEventStart(
     	Widget e,
-    	bool delegate() widgetInternalDraggingStopCheck
+    	int initX, int initY,
+    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e) 
+    	widgetInternalDraggingStopCheck
     	);
-    void endWidgetInternalDraggingEvent();
+    void widgetInternalDraggingEventEnd(
+    	EnumWidgetInternalDraggingEventEndReason
+    	);
     
     mixin(mixin_PlatformSignals(true));
 }

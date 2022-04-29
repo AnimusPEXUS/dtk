@@ -258,20 +258,18 @@ class Form : Widget
     				mouseFocusedWidget = event.mouseFocusedWidget;
     				if (old !is null)
     				{
-    					old.intVisuallyRelease(this, old, event);
-    					old.intMouseLeave(this, old, mouseFocusedWidget, event);
+    					old.intVisuallyRelease(old, event);
+    					old.intMouseLeave(old, mouseFocusedWidget, event);
     				}
     				if (this.pressreleaseSequenceStarted
     					&& this.pressreleaseSequenceWidget == mouseFocusedWidget)
     				{
     					mouseFocusedWidget.intVisuallyPress(
-    						this,
     						mouseFocusedWidget,
     						event
     						);
     				}
     				mouseFocusedWidget.intMouseEnter(
-    					this,
     					old,
     					mouseFocusedWidget,
     					event
@@ -289,7 +287,6 @@ class Form : Widget
     					return;
     				case EventMouseType.movement:
     					event.mouseFocusedWidget.intMouseMove(
-    						this,
     						event.mouseFocusedWidget,
     						event
     						);
@@ -305,24 +302,20 @@ class Form : Widget
     						pressreleaseSequenceBtn = event.event.em.button;
     						setFocusedWidget(event.mouseFocusedWidget);
     						event.mouseFocusedWidget.intMousePress(
-    							this,
     							event.mouseFocusedWidget,
     							event
     							);
     						event.mouseFocusedWidget.intVisuallyPress(
-    							this,
     							event.mouseFocusedWidget,
     							event
     							);
     						return;
     					case EnumMouseButtonState.released:
     						event.mouseFocusedWidget.intMouseRelease(
-    							this,
     							event.mouseFocusedWidget,
     							event
     							);
     						event.mouseFocusedWidget.intVisuallyRelease(
-    							this,
     							event.mouseFocusedWidget,
     							event
     							);
@@ -331,7 +324,6 @@ class Form : Widget
     						&& pressreleaseSequenceBtn == event.event.em.button)
     						{
     							event.mouseFocusedWidget.intMousePressRelease(
-    								this,
     								event.mouseFocusedWidget,
     								event
     								);
@@ -347,14 +339,12 @@ class Form : Widget
     					return;
     				case EnumKeyboardKeyState.pressed:
     					event.focusedWidget.intKeyboardPress(
-    						this,
     						event.focusedWidget,
     						event
     						);
     					return;
     				case EnumKeyboardKeyState.released:
     					event.focusedWidget.intKeyboardRelease(
-    						this,
     						event.focusedWidget,
     						event
     						);
@@ -367,7 +357,6 @@ class Form : Widget
     					return;
     				case EnumKeyboardKeyState.pressed:
     					event.focusedWidget.intTextInput(
-    						this,
     						event.focusedWidget,
     						event
     						);

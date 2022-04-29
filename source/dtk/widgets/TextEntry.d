@@ -392,7 +392,7 @@ class TextEntry : Widget
     }
     
     
-    override void intMousePressRelease(Form form, Widget widget, EventForm* event)
+    override void intMousePressRelease(Widget widget, EventForm* event)
     {
     	text_view.click(
     		event.mouseFocusedWidget_x+padding_left,
@@ -400,7 +400,7 @@ class TextEntry : Widget
     		);
     }
     
-    override void intMouseMove(Form form, Widget widget, EventForm* event)
+    override void intMouseMove(Widget widget, EventForm* event)
     {
     	on_keyboard_internal(
     		"up",
@@ -411,7 +411,7 @@ class TextEntry : Widget
     }
     
     
-    override void intKeyboardPress(Form form, Widget widget, EventForm* event)
+    override void intKeyboardPress(Widget widget, EventForm* event)
     {
     	on_keyboard_internal(
     		"down",
@@ -421,7 +421,7 @@ class TextEntry : Widget
     		);
     }
     
-    override void intTextInput(Form form, Widget widget, EventForm* event)
+    override void intTextInput(Widget widget, EventForm* event)
     {
     	assert(event !is null);
     	assert(event.event !is null);
