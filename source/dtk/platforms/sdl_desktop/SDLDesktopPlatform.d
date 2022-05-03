@@ -2,6 +2,7 @@ module dtk.platforms.sdl_desktop.SDLDesktopPlatform;
 
 import core.thread.osthread;
 
+import std.format;
 import std.stdio;
 import std.algorithm;
 import std.parallelism;
@@ -252,7 +253,7 @@ class SDLDesktopPlatform : PlatformI
         
         main_loop: while (!stop_flag)
         {
-        	
+        	debug writeln("---------------------------- new loop");
             auto res = SDL_WaitEvent(event);
             
             if (res == 0) // TODO: use GetError()
@@ -327,28 +328,32 @@ class SDLDesktopPlatform : PlatformI
             	{
             		if (widgetInternalDraggingEventStopCheck is null)
             		{
+            			debug writeln("error: widgetInternalDraggingEventStopCheck is null");
             			widgetInternalDraggingEventEnd(
             				EnumWidgetInternalDraggingEventEndReason.abort
             				);
-            			return;
+            			continue main_loop;
             		}
             		if (widgetInternalDraggingEventWidget is null)
             		{
+            			debug writeln("error: widgetInternalDraggingEventWidget is null");
             			widgetInternalDraggingEventEnd(
             				EnumWidgetInternalDraggingEventEndReason.abort
             				);
-            			return;
+            			continue main_loop;
             		}
             		{
             			auto res_drag_stop_check = widgetInternalDraggingEventStopCheck(e);
-            			if (res_drag_stop_check != EnumWidgetInternalDraggingEventEndReason.notEnd)
+            			debug writeln("error: res_drag_stop_check == %s".format(res_drag_stop_check));
+            			if (res_drag_stop_check !=
+            				EnumWidgetInternalDraggingEventEndReason.notEnd)
             			{
             				widgetInternalDraggingEventEnd(res_drag_stop_check);
-            				return;
+            				continue main_loop;
             			}
             		}
-
-            		if (e.type == EventType.mouse 
+            		
+            		if (e.type == EventType.mouse
             			&& e.em.type == EventMouseType.movement)
             		{
             			widgetInternalDraggingEventWidget.intInternalDraggingEvent(
@@ -358,22 +363,23 @@ class SDLDesktopPlatform : PlatformI
             				0,0
             				);
             		}
-
-            		return;
+            		
+            		continue main_loop;
             	}
-
+            	
             	emitSignal_Event(e);
             }
         }
         
         return;
     }
-
-    private 
+    
+    private
     {
     	bool widgetInternalDraggingEventActive;
     	Widget widgetInternalDraggingEventWidget;
-    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e)  widgetInternalDraggingEventStopCheck;
+    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e)
+    	widgetInternalDraggingEventStopCheck;
     	int widgetInternalDraggingEventInitX;
     	int widgetInternalDraggingEventInitY;
     }
@@ -381,25 +387,56 @@ class SDLDesktopPlatform : PlatformI
     void widgetInternalDraggingEventStart(
     	Widget widget,
     	int initX, int initY,
-    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e) 
+    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e)
     	widgetInternalDraggingStopCheck
     	)
     {
-    	widgetInternalDraggingEventActive = true;
+    	assert(widget !is null);
+    	assert(widgetInternalDraggingStopCheck !is null);
+    	debug writeln("widgetInternalDraggingEventStart start");
+    	debug writeln("widgetInternalDraggingStopCheck is null? ",
+    		widgetInternalDraggingStopCheck is null);
+    	
+    	debug writeln("widgetInternalDraggingStopCheck = ",
+    		widgetInternalDraggingStopCheck);
+    	
     	widgetInternalDraggingEventWidget = widget;
-    	this.widgetInternalDraggingEventStopCheck
-    	=widgetInternalDraggingEventStopCheck;
+    	
+    	debug writeln("this.widgetInternalDraggingEventStopCheck 1 = ",
+    		this.widgetInternalDraggingEventStopCheck);
+    	
+    	debug writeln("is null? ", this.widgetInternalDraggingEventStopCheck is null);
+    	
+    	auto x = widgetInternalDraggingEventStopCheck;
+
+    	debug writeln("x = ", x);
+    	
+    	debug writeln("is null? ", x is null);
+    	
+
+    	this.widgetInternalDraggingEventStopCheck = x;
+    	
+    	debug writeln("this.widgetInternalDraggingEventStopCheck 2 = ",
+    		this.widgetInternalDraggingEventStopCheck);
+    	
+    	debug writeln("is null? ", this.widgetInternalDraggingEventStopCheck is null);
+    	
+    	widgetInternalDraggingEventActive = true;
+    	debug writeln("widgetInternalDraggingEventStart end");
+    	assert(widgetInternalDraggingEventWidget !is null);
+    	assert(this.widgetInternalDraggingEventStopCheck !is null);
     }
     
     void widgetInternalDraggingEventEnd(
     	EnumWidgetInternalDraggingEventEndReason reason
     	)
     {
+    	debug writeln("widgetInternalDraggingEventEnd start");
 		if (reason == EnumWidgetInternalDraggingEventEndReason.notEnd)
 		{
 			return;
 		}
-
+		
 		widgetInternalDraggingEventWidget.intInternalDraggingEventEnd(
 			widgetInternalDraggingEventWidget,
 			reason,
@@ -410,6 +447,7 @@ class SDLDesktopPlatform : PlatformI
     	widgetInternalDraggingEventActive = false;
     	widgetInternalDraggingEventWidget = null;
     	this.widgetInternalDraggingEventStopCheck = null;
+    	debug writeln("widgetInternalDraggingEventEnd end");
     }
-
+    
 }

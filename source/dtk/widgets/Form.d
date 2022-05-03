@@ -150,8 +150,8 @@ class Form : Widget
     			Widget focusedWidget = this.getFocusedWidget();
     			Widget mouseFocusedWidget;
     			
-    			int mouseFocusedWidget_x = 0;
-    			int mouseFocusedWidget_y = 0;
+    			int mouseFocusedWidgetX = 0;
+    			int mouseFocusedWidgetY = 0;
     			
     			{
     				int form_mouse_x;
@@ -168,15 +168,15 @@ class Form : Widget
     					);
     				mouseFocusedWidget = res[0];
     				auto pos = res[1];
-    				mouseFocusedWidget_x = pos.x;
-    				mouseFocusedWidget_y = pos.y;
+    				mouseFocusedWidgetX = pos.x;
+    				mouseFocusedWidgetY = pos.y;
     			}
     			
     			fe.event = event;
     			fe.focusedWidget = focusedWidget;
     			fe.mouseFocusedWidget = mouseFocusedWidget;
-    			fe.mouseFocusedWidget_x = mouseFocusedWidget_x;
-    			fe.mouseFocusedWidget_y = mouseFocusedWidget_y;
+    			fe.mouseFocusedWidgetX = mouseFocusedWidgetX;
+    			fe.mouseFocusedWidgetY = mouseFocusedWidgetY;
     			
     			this.emitSignal_Event(fe);
     		}()

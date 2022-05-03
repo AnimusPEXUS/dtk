@@ -11,6 +11,6 @@ struct EventForm
 	Event* event;
 	Widget focusedWidget;
 	Widget mouseFocusedWidget;
-	int mouseFocusedWidget_x;
-	int mouseFocusedWidget_y;
+	int mouseFocusedWidgetX;
+	int mouseFocusedWidgetY;
 }

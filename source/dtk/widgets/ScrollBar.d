@@ -14,6 +14,7 @@ import dtk.types.Color;
 import dtk.types.Event;
 import dtk.types.Widget;
 import dtk.types.Orientation;
+import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 
 // import dtk.interfaces.ContainerI;
 // import dtk.interfaces.ContainerableI;
@@ -214,5 +215,55 @@ class ScrollBar : Widget
     override void intMousePress(Widget widget, EventForm* event)
     {
     	debug writeln("ScrollBar Mouse down");
+    	
+    	// TODO: check precision
+    	if 
+    	(
+    		event.mouseFocusedWidgetX >= scopeBewelX 
+    		&& event.mouseFocusedWidgetX < scopeBewelX+scopeBewelW
+    		
+    		&&
+    		
+    		event.mouseFocusedWidgetY >= scopeBewelY 
+    		&& event.mouseFocusedWidgetY < scopeBewelY+scopeBewelH
+    	) 
+    	{
+    		debug writeln("ScrollBar scope bewel Mouse down");
+    		
+    		auto p = findPlatform();
+    		assert(p !is null);
+    		if (p is null)
+    		{
+    			throw new Exception("can't get platform");
+    		}
+    		
+    		p.widgetInternalDraggingEventStart(
+    			this,
+    			event.mouseFocusedWidgetX,
+    			event.mouseFocusedWidgetY,
+    			delegate EnumWidgetInternalDraggingEventEndReason(Event *e)
+    			{
+    				if (e.type == EventType.mouse 
+    					&& e.em.type==EventMouseType.button
+    				&&	((e.em.button & EnumMouseButton.bl) != 0)
+    				&& e.em.buttonState == EnumMouseButtonState.released
+    				)
+    				{
+    					debug writeln("SB drag success");
+    					return EnumWidgetInternalDraggingEventEndReason.success;
+    				}
+    				return  EnumWidgetInternalDraggingEventEndReason.notEnd;
+    			}
+    			);
+    	}
+    }
+    
+    override void intInternalDraggingEvent(
+    	Widget widget, 
+    	int initX, int initY,
+    	int newX, int newY
+    	) 
+    {
+    	debug writeln("intInternalDraggingEvent happened");
     }
 }

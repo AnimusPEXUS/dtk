@@ -395,8 +395,8 @@ class TextEntry : Widget
     override void intMousePressRelease(Widget widget, EventForm* event)
     {
     	text_view.click(
-    		event.mouseFocusedWidget_x+padding_left,
-    		event.mouseFocusedWidget_y+padding_top
+    		event.mouseFocusedWidgetX+padding_left,
+    		event.mouseFocusedWidgetY+padding_top
     		);
     }
     
@@ -405,8 +405,8 @@ class TextEntry : Widget
     	on_keyboard_internal(
     		"up",
     		event.event.ek,
-    		event.mouseFocusedWidget_x+padding_left,
-    		event.mouseFocusedWidget_y+padding_top
+    		event.mouseFocusedWidgetX+padding_left,
+    		event.mouseFocusedWidgetY+padding_top
     		);
     }
     
@@ -416,8 +416,8 @@ class TextEntry : Widget
     	on_keyboard_internal(
     		"down",
     		event.event.ek,
-    		event.mouseFocusedWidget_x+padding_left,
-    		event.mouseFocusedWidget_y+padding_top
+    		event.mouseFocusedWidgetX+padding_left,
+    		event.mouseFocusedWidgetY+padding_top
     		);
     }
     

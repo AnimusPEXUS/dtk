@@ -8,6 +8,7 @@ import std.typecons;
 import std.variant;
 import std.format;
 
+import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LaFI;
@@ -305,6 +306,32 @@ class Widget
     			);
     		return ret;
     	}
+    }
+
+    final WindowI findWindow()
+    {
+    	WindowI ret;
+    	
+    	auto f = getForm();
+    	if (f !is null)
+    	{
+    		ret = f.getWindow();
+    	}
+    	
+    	return ret;
+    }
+
+    final PlatformI findPlatform()
+    {
+    	PlatformI ret;
+    	
+    	auto w = findWindow();
+    	if (w !is null)
+    	{
+    		ret = w.getPlatform();
+    	}
+    	
+    	return ret;
     }
     
     private
