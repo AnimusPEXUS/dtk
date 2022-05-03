@@ -388,41 +388,17 @@ class SDLDesktopPlatform : PlatformI
     	Widget widget,
     	int initX, int initY,
     	EnumWidgetInternalDraggingEventEndReason delegate(Event *e)
-    	widgetInternalDraggingStopCheck
+    	widgetInternalDraggingEventStopCheck
     	)
     {
     	assert(widget !is null);
-    	assert(widgetInternalDraggingStopCheck !is null);
-    	debug writeln("widgetInternalDraggingEventStart start");
-    	debug writeln("widgetInternalDraggingStopCheck is null? ",
-    		widgetInternalDraggingStopCheck is null);
-    	
-    	debug writeln("widgetInternalDraggingStopCheck = ",
-    		widgetInternalDraggingStopCheck);
-    	
+    	assert(widgetInternalDraggingEventStopCheck !is null);
     	widgetInternalDraggingEventWidget = widget;
     	
-    	debug writeln("this.widgetInternalDraggingEventStopCheck 1 = ",
-    		this.widgetInternalDraggingEventStopCheck);
-    	
-    	debug writeln("is null? ", this.widgetInternalDraggingEventStopCheck is null);
-    	
-    	auto x = widgetInternalDraggingEventStopCheck;
-
-    	debug writeln("x = ", x);
-    	
-    	debug writeln("is null? ", x is null);
-    	
-
-    	this.widgetInternalDraggingEventStopCheck = x;
-    	
-    	debug writeln("this.widgetInternalDraggingEventStopCheck 2 = ",
-    		this.widgetInternalDraggingEventStopCheck);
-    	
-    	debug writeln("is null? ", this.widgetInternalDraggingEventStopCheck is null);
+    	this.widgetInternalDraggingEventStopCheck = widgetInternalDraggingEventStopCheck;
     	
     	widgetInternalDraggingEventActive = true;
-    	debug writeln("widgetInternalDraggingEventStart end");
+
     	assert(widgetInternalDraggingEventWidget !is null);
     	assert(this.widgetInternalDraggingEventStopCheck !is null);
     }
