@@ -821,15 +821,23 @@ class Widget
     
     void intTextInput(Widget widget, EventForm* event) {}
     
+    void intInternalDraggingEventStart(
+    	Widget widget, 
+    	int initX, int initY
+    	) {}
+
     void intInternalDraggingEvent(
     	Widget widget, 
     	int initX, int initY,
-    	int newX, int newY
+    	int newX, int newY,
+    	int relX, int relY
     	) {}
 
     void intInternalDraggingEventEnd(
     	Widget widget, 
     	EnumWidgetInternalDraggingEventEndReason reason,
-    	int initX, int initY
+    	int initX, int initY,
+    	int newX, int newY,
+    	int relX, int relY
     	) {}
 }

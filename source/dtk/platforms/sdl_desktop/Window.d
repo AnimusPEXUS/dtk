@@ -76,7 +76,7 @@ class Window : WindowI
     	SignalConnection platform_signal_connection;
     }
     
-    private
+    public
     {
     	bool mouseIn;
     	int mouseX;
@@ -241,19 +241,20 @@ class Window : WindowI
     				debug writeln("event.type == EventType.none");
     				return;
     			}
-    			
-    			if (event.type == EventType.mouse
-    				&& event.em.type == EventMouseType.movement)
-    			{
-    				// TODO: save relative values too?
-    				mouseX = event.em.x;
-    				mouseY = event.em.y;
-    			}
-    			
-    			{
-    				event.mouseX = mouseX;
-    				event.mouseY = mouseY;
-    			}
+
+    			// NOTE: this moved to platform
+    			// if (event.type == EventType.mouse
+    				// && event.em.type == EventMouseType.movement)
+    			// {
+    				// // TODO: save relative values too?
+    				// mouseX = event.em.x;
+    				// mouseY = event.em.y;
+    			// }
+    			// 
+    			// {
+    				// event.mouseX = mouseX;
+    				// event.mouseY = mouseY;
+    			// }
     			
     			if (event.type == EventType.window)
     			{

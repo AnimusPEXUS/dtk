@@ -46,7 +46,8 @@ interface PlatformI
     	widgetInternalDraggingStopCheck
     	);
     void widgetInternalDraggingEventEnd(
-    	EnumWidgetInternalDraggingEventEndReason
+    	Event* e,
+    	EnumWidgetInternalDraggingEventEndReason reason
     	);
     
     mixin(mixin_PlatformSignals(true));

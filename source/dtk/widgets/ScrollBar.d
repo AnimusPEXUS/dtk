@@ -57,18 +57,54 @@ class ScrollBar : Widget
     {
     	const float minValue = 0;
     	const float maxValue = 1;
+    	
+    	// TODO: for a while this is constant here. but should be moved to LaF
     	const buttonSize = 16;
     	
+    	// corresponding to something scrollable. set by user via function
     	int min;
     	int max;
     	
+    	// graphical. pixels
+    	// (total scrollable space (without buttons))
+    	// (changes via scrollbar resize)
+    	int scopeSpaceSize;
+    	// bewel inside of scopeSpaceSize
+    	int scopeBewelSize;
+    	
+    	// scopeSpaceSize - scopeBewelSize
+    	int scopeFreeSpaceSize;
+    	
+    	// graphical. pixels. depends on scrollbar space size and current Value
     	int scopeBewelX;
     	int scopeBewelY;
     	int scopeBewelW;
     	int scopeBewelH;
     	
-    	int scopeSpaceSize;
-    	int scopeBewelSize;
+    	// minimum x or y for left or top edge of bewel relative to DS (DS includes buttons)
+    	// (pixels)
+    	int minVisible;
+    	// maximum x or y for right or bottom edge of bewel relative to DS (DS includes buttons):
+    	// this is widget size - button size - bewel size;
+    	// (pixels)
+    	int maxVisible;
+    	
+    	// (pixels)
+    	const minVisibleValue = 0;
+    	// (pixels) same as scopeFreeSpaceSize. should not be changed
+    	alias maxVisibleValue = scopeFreeSpaceSize;
+    	
+    	float onePixelValue;
+    	
+    	// this should be true, if scrollbar size doesn't allows sanely drag bewel.
+    	// if true, scrollbar should not allow user to interact with scope
+    	// space and bewel.
+    	bool scopeSpaceActionsDisabled;
+    }
+    
+    private
+    {
+    	SignalConnection sc_valueChange;
     }
     
     this()
@@ -77,6 +113,23 @@ class ScrollBar : Widget
     	mixin(mixin_multiple_properties_inst(ScrollBarProperties));
     	addChild(new Button().setTextLabel("⯇"));
     	addChild(new Button().setTextLabel("⯈"));
+    	
+    	sc_valueChange = connectToValue_onAfterChanged(
+    		delegate void(
+    			float o,
+    			float n
+    			)
+    		{
+    			collectException(
+    				{
+    					// debug writeln("commanding scrollbar to redraw();");
+    					recalcIndicatorAndChildrenPositions();
+						redraw();    					
+    				}()
+    				);
+    		}
+    		);
+
     }
     
     private void recalcScrollBar()
@@ -87,7 +140,10 @@ class ScrollBar : Widget
     
     private void recalcScopeSpaceAndBewelSize()
     {
-    	if (getOrientation() == Orientation.horizontal)
+    	
+    	auto orient = getOrientation();
+    	
+    	if (orient == Orientation.horizontal)
     	{
     		scopeSpaceSize = getWidth();
     	}
@@ -106,8 +162,31 @@ class ScrollBar : Widget
     		cast(float)scopeSpaceSize * getVisibleScope()
     		);
     	
+    	scopeFreeSpaceSize = scopeSpaceSize - scopeBewelSize;
+    	
     	if (scopeBewelSize < buttonSize)
     		scopeBewelSize = buttonSize;
+    	
+    	if (scopeFreeSpaceSize < buttonSize)
+    		scopeFreeSpaceSize = buttonSize;
+    	
+    	// this assumes button 0 is always present;
+    	minVisible = buttonSize;
+    	
+    	{
+    		if (orient == Orientation.horizontal)
+    		{
+    			maxVisible =  getWidth();
+    		}
+    		else
+    		{
+    			maxVisible = getHeight();
+    		}
+    		
+    		maxVisible -= buttonSize;
+    	}
+    	
+    	onePixelValue = 1.0 / scopeFreeSpaceSize;
     }
     
     private void recalcIndicatorAndChildrenPositions()
@@ -182,7 +261,7 @@ class ScrollBar : Widget
     	this.min = min;
     	this.max = max;
     	
-    	// TODO: replace divisions with multiplications, 
+    	// TODO: replace divisions with multiplications,
     	//       or make exclusions on zero divisions
     	
     	setVisibleScope((cast(float)max-min) / (sMax-sMin));
@@ -217,16 +296,16 @@ class ScrollBar : Widget
     	debug writeln("ScrollBar Mouse down");
     	
     	// TODO: check precision
-    	if 
+    	if
     	(
-    		event.mouseFocusedWidgetX >= scopeBewelX 
+    		event.mouseFocusedWidgetX >= scopeBewelX
     		&& event.mouseFocusedWidgetX < scopeBewelX+scopeBewelW
     		
     		&&
     		
-    		event.mouseFocusedWidgetY >= scopeBewelY 
+    		event.mouseFocusedWidgetY >= scopeBewelY
     		&& event.mouseFocusedWidgetY < scopeBewelY+scopeBewelH
-    	) 
+    		)
     	{
     		debug writeln("ScrollBar scope bewel Mouse down");
     		
@@ -239,11 +318,11 @@ class ScrollBar : Widget
     		
     		p.widgetInternalDraggingEventStart(
     			this,
-    			event.mouseFocusedWidgetX,
-    			event.mouseFocusedWidgetY,
+    			event.event.mouseX,
+    			event.event.mouseY,
     			delegate EnumWidgetInternalDraggingEventEndReason(Event *e)
     			{
-    				if (e.type == EventType.mouse 
+    				if (e.type == EventType.mouse
     					&& e.em.type==EventMouseType.button
     				&&	((e.em.button & EnumMouseButton.bl) != 0)
     				&& e.em.buttonState == EnumMouseButtonState.released
@@ -259,11 +338,91 @@ class ScrollBar : Widget
     }
     
     override void intInternalDraggingEvent(
-    	Widget widget, 
+    	Widget widget,
     	int initX, int initY,
-    	int newX, int newY
-    	) 
+    	int newX, int newY,
+    	int relX, int relY
+    	)
     {
-    	debug writeln("intInternalDraggingEvent happened");
+    	// debug writeln(
+    	// ("intInternalDraggingEvent happened\n"~
+    	// "ini x: %s, y: %s\n"~
+    	// "new x: %s, y: %s\n"~
+    	// "rel x: %s, y: %s"~
+    	// "").format(
+    	// initX, initY,
+    	// newX, newY,
+    	// relX, relY
+    	// )
+    	// );
+    	
+    	int delta;
+    	
+    	if (getOrientation() == Orientation.horizontal)
+    	{
+    		delta = relX;
+    	}
+    	else
+    	{
+    		delta = relY;
+    	}
+    	
+    	setValue(
+    		intInternalDraggingEventStartValue + (onePixelValue * delta)
+    		);
+    }
+    
+    override void intInternalDraggingEventEnd(
+    	Widget widget,
+    	EnumWidgetInternalDraggingEventEndReason reason,
+    	int initX, int initY,
+    	int newX, int newY,
+    	int relX, int relY
+    	)
+    {
+    	if (reason != EnumWidgetInternalDraggingEventEndReason.success)
+    	{
+    		setValue(intInternalDraggingEventStartValue);
+    	}
+    	else
+    	{
+    		int delta;
+    		
+    		if (getOrientation() == Orientation.horizontal)
+    		{
+    			delta = relX;
+    		}
+    		else
+    		{
+    			delta = relY;
+    		}
+    		
+    		setValue(
+    			intInternalDraggingEventStartValue + (onePixelValue * delta)
+    			);
+    	}
+    }
+    
+    private
+    {
+    	float intInternalDraggingEventStartValue;
+    	int intInternalDraggingEventStartVisualValue;
+    }
+    
+    override void intInternalDraggingEventStart(
+    	Widget widget,
+    	int initX, int initY
+    	)
+    {
+    	if (getOrientation() == Orientation.horizontal)
+    	{
+    		intInternalDraggingEventStartVisualValue = initX;
+    	}
+    	else
+    	{
+    		intInternalDraggingEventStartVisualValue = initY;
+    	}
+    	
+    	intInternalDraggingEventStartValue = getValue();
     }
 }
