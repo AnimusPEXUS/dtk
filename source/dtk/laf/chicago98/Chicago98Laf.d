@@ -336,12 +336,12 @@ class Chicago98Laf : LaFI
         auto size_w = e.getWidth();
         auto size_h = e.getHeight();
         
-        // ds.drawRectangle(
-        	// Position2D(pos_x, pos_y),
-        	// Size2D(size_w, size_h),
-        	// LineStyle(formBackground),
-        	// nullable(FillStyle(formBackground))
-        	// );
+        ds.drawRectangle(
+        	Position2D(pos_x, pos_y),
+        	Size2D(size_w, size_h),
+        	LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
+        	);
         
         bool flipper;
         if (e.getOrientation() == Orientation.horizontal)

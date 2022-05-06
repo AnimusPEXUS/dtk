@@ -245,10 +245,10 @@ class SDLDesktopPlatform : PlatformI
         auto timer500 = task(&timer500Loop);
         timer500.executeInNewThread();
         scope(exit) {
-        	writeln("mainLoop exiting..");
+        	debug writeln("mainLoop exiting.. waiting for threads exit");
         	stop_flag=true;
         	timer500.workForce();
-        	writeln("mainLoop exited.");
+        	debug writeln("mainLoop exited.");
         }
         
         main_loop: while (!stop_flag)
@@ -362,9 +362,9 @@ class SDLDesktopPlatform : PlatformI
             		{
             			auto res_drag_stop_check = widgetInternalDraggingEventStopCheck(e);
             			debug writeln("res_drag_stop_check == %s".format(res_drag_stop_check));
-            			if (res_drag_stop_check != 
+            			if (res_drag_stop_check !=
             				EnumWidgetInternalDraggingEventEndReason.notEnd
-            				)
+            			)
             			{
             				widgetInternalDraggingEventEnd(
             					e,
@@ -418,6 +418,8 @@ class SDLDesktopPlatform : PlatformI
     	assert(widget !is null);
     	assert(widgetInternalDraggingEventStopCheck !is null);
     	
+    	SDL_CaptureMouse(SDL_TRUE);
+    	
     	widgetInternalDraggingEventInitX = initX;
     	widgetInternalDraggingEventInitY = initY;
     	
@@ -426,7 +428,7 @@ class SDLDesktopPlatform : PlatformI
     	this.widgetInternalDraggingEventStopCheck = widgetInternalDraggingEventStopCheck;
     	
     	widgetInternalDraggingEventActive = true;
-
+    	
     	assert(widgetInternalDraggingEventWidget !is null);
     	assert(this.widgetInternalDraggingEventStopCheck !is null);
     	
@@ -446,6 +448,8 @@ class SDLDesktopPlatform : PlatformI
 		{
 			return;
 		}
+		
+		SDL_CaptureMouse(SDL_FALSE);
 		
 		widgetInternalDraggingEventWidget.intInternalDraggingEventEnd(
 			widgetInternalDraggingEventWidget,

@@ -41,7 +41,7 @@ PropSetting(
 	"Orientation",
 	q{Orientation.horizontal}
 	),
-PropSetting("gs_w_d", "float", "value", "Value", q{0.2}),
+// PropSetting("gs_w_d", "float", "value", "Value", q{0.2}),
 PropSetting("gs_w_d", "float", "buttonStep", "ButtonStep", q{0.1}),
 PropSetting("gs_w_d", "float", "visibleScope", "VisibleScope", q{0.3}),
 ];
@@ -58,6 +58,7 @@ class ScrollBar : Widget
     	const float minValue = 0;
     	const float maxValue = 1;
     	
+    	float value = 0;
     	// TODO: for a while this is constant here. but should be moved to LaF
     	const buttonSize = 16;
     	
@@ -104,7 +105,7 @@ class ScrollBar : Widget
     
     private
     {
-    	SignalConnection sc_valueChange;
+    	// SignalConnection sc_valueChange;
     }
     
     this()
@@ -114,22 +115,45 @@ class ScrollBar : Widget
     	addChild(new Button().setTextLabel("⯇"));
     	addChild(new Button().setTextLabel("⯈"));
     	
-    	sc_valueChange = connectToValue_onAfterChanged(
-    		delegate void(
-    			float o,
-    			float n
-    			)
-    		{
-    			collectException(
-    				{
-    					// debug writeln("commanding scrollbar to redraw();");
-    					recalcIndicatorAndChildrenPositions();
-						redraw();    					
-    				}()
-    				);
-    		}
-    		);
-
+    	// sc_valueChange = connectToValue_onAfterChanged(
+    	// delegate void(
+    	// float o,
+    	// float n
+    	// )
+    	// {
+    	// collectException(
+    	// {
+    	// // debug writeln("commanding scrollbar to redraw();");
+    	// recalcIndicatorAndChildrenPositions();
+    	// redraw();
+    	// }()
+    	// );
+    	// }
+    	// );
+    	
+    }
+    
+    // TODO: make this better. even better is to modify property,
+    // so Value's Propery BeforeChange event could allow to modify passed value
+    typeof(this) setValue(float value)
+    {
+    	debug writeln("value ", value);
+    	if (value < 0)
+    		value = 0;
+    	if (value > 1)
+    		value = 1;
+    	debug writeln("value 01 ", value);
+    	
+    	this.value = value;
+    	
+    	recalcIndicatorAndChildrenPositions();
+    	redraw();
+    	return this;
+    }
+    
+    float getValue()
+    {
+    	return value;
     }
     
     private void recalcScrollBar()
@@ -189,6 +213,7 @@ class ScrollBar : Widget
     	onePixelValue = 1.0 / scopeFreeSpaceSize;
     }
     
+    // separate bewel calculations
     private void recalcIndicatorAndChildrenPositions()
     {
     	auto c0 = getChild(0);
@@ -208,7 +233,7 @@ class ScrollBar : Widget
     		c1.setHeight(thisHeight);
     		
     		scopeBewelX = cast(int)(
-    			cast(float)buttonSize + (scopeSpaceSize * getValue())
+    			cast(float)buttonSize + (scopeFreeSpaceSize * getValue())
     			);
     		scopeBewelY = 0;
     		scopeBewelW = scopeBewelSize;
@@ -228,7 +253,7 @@ class ScrollBar : Widget
     		
     		scopeBewelX = 0;
     		scopeBewelY = cast(int)(
-    			cast(float)buttonSize + (scopeSpaceSize * getValue())
+    			cast(float)buttonSize + (scopeFreeSpaceSize * getValue())
     			);
     		scopeBewelW = thisWidth;
     		scopeBewelH = scopeBewelSize;
@@ -367,9 +392,11 @@ class ScrollBar : Widget
     		delta = relY;
     	}
     	
-    	setValue(
-    		intInternalDraggingEventStartValue + (onePixelValue * delta)
-    		);
+    	float newValue = intInternalDraggingEventStartValue + (onePixelValue * delta);
+    	if (getValue() != newValue)
+    	{
+    		setValue(newValue);
+    	}
     }
     
     override void intInternalDraggingEventEnd(
@@ -397,9 +424,11 @@ class ScrollBar : Widget
     			delta = relY;
     		}
     		
-    		setValue(
-    			intInternalDraggingEventStartValue + (onePixelValue * delta)
-    			);
+    		float newValue = intInternalDraggingEventStartValue + (onePixelValue * delta);
+    		if (getValue() != newValue)
+    		{
+    			setValue(newValue);
+    		}
     	}
     }
     
