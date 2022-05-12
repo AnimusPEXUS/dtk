@@ -110,28 +110,40 @@ class ScrollBar : Widget
     
     this()
     {
-    	super(2, 2);
+    	super(0, 0);
     	mixin(mixin_multiple_properties_inst(ScrollBarProperties));
-    	addChild(new Button().setTextLabel("⯇"));
-    	addChild(new Button().setTextLabel("⯈"));
     	
-    	// sc_valueChange = connectToValue_onAfterChanged(
-    	// delegate void(
-    	// float o,
-    	// float n
-    	// )
-    	// {
-    	// collectException(
-    	// {
-    	// // debug writeln("commanding scrollbar to redraw();");
-    	// recalcIndicatorAndChildrenPositions();
-    	// redraw();
-    	// }()
-    	// );
-    	// }
-    	// );
-    	
+    	{
+    		auto x = new Button().setTextLabel("⯇");
+    		x.setParent(this);
+    		button0 = new WidgetChild(x);
+    		
+    		x = new Button().setTextLabel("⯈");
+    		x.setParent(this);
+    		button1 = new WidgetChild(x);
+    	}
     }
+    
+    private
+    {
+    	WidgetChild button0;
+    	WidgetChild button1;
+    }
+    
+    WidgetChild getButton0()
+    {
+    	return button0;
+    }
+    
+    WidgetChild getButton1()
+    {
+    	return button1;
+    }
+    
+	override WidgetChild[] calcWidgetServiceChildrenArray()
+    {
+    	return [button0, button1];
+    }    
     
     // TODO: make this better. even better is to modify property,
     // so Value's Propery BeforeChange event could allow to modify passed value
@@ -216,8 +228,8 @@ class ScrollBar : Widget
     // separate bewel calculations
     private void recalcIndicatorAndChildrenPositions()
     {
-    	auto c0 = getChild(0);
-    	auto c1 = getChild(1);
+    	auto c0 = getButton0();
+    	auto c1 = getButton1();
     	auto thisWidth = getWidth();
     	auto thisHeight = getHeight();
     	if (getOrientation() == Orientation.horizontal)

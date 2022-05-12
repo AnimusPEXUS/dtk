@@ -35,6 +35,8 @@ import dtk.widgets.Button;
 import dtk.widgets.ButtonCheck;
 // import dtk.widgets.Picture;
 import dtk.widgets.Layout;
+import dtk.widgets.Menu;
+import dtk.widgets.MenuItem;
 import dtk.widgets.ScrollBar;
 import dtk.widgets.TextEntry;
 
@@ -328,6 +330,36 @@ class Chicago98Laf : LaFI
         	);
     }
     
+    void drawMenu(Menu e, DrawingSurfaceI ds)
+    {
+        int pos_x = 0;
+        int pos_y = 0;
+        auto size_w = e.getWidth();
+        auto size_h = e.getHeight();
+        
+        ds.drawRectangle(
+        	Position2D(pos_x, pos_y),
+        	Size2D(size_w, size_h),
+        	LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
+        	);
+        
+    }
+    
+    void drawMenuItem(MenuItem e, DrawingSurfaceI ds)
+    {
+        int pos_x = 0;
+        int pos_y = 0;
+        auto size_w = e.getWidth();
+        auto size_h = e.getHeight();
+        
+        ds.drawRectangle(
+        	Position2D(pos_x, pos_y),
+        	Size2D(size_w, size_h),
+        	LineStyle(formBackground),
+        	nullable(FillStyle(formBackground))
+        	);
+    }
     
     void drawScrollBar(ScrollBar e, DrawingSurfaceI ds)
     {

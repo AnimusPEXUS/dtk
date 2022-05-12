@@ -12,7 +12,7 @@ import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LaFI;
-import dtk.interfaces.LayoutChildSettingsI;
+// import dtk.interfaces.LayoutChildSettingsI;
 
 import dtk.types.Property;
 import dtk.types.Image;
@@ -48,15 +48,18 @@ enum LayoutType : ubyte
 
 
 const auto WidgetChildProperties = cast(PropSetting[]) [
-PropSetting("gs_w_d", "int", "x", "X", "0"),
-PropSetting("gs_w_d", "int", "y", "Y", "0"),
-PropSetting("gs_w_d", "int", "width", "Width", "0"),
-PropSetting("gs_w_d", "int", "height", "Height", "0"),
+PropSetting("gs_w_d", "int", "x", "X", q{0}),
+PropSetting("gs_w_d", "int", "y", "Y", q{0}),
+PropSetting("gs_w_d", "int", "width", "Width", q{0}),
+PropSetting("gs_w_d", "int", "height", "Height", q{0}),
+
+PropSetting("gs_w_d", "bool", "expand", "Expand", q{false}),
+PropSetting("gs_w_d", "bool", "fill", "Fill", q{false}),
 
 // Each Layout Engine have it's own set of parameters for each child,
 // so LayoutChild somehow have to store settings for any engine child.
 // here's how it does this.
-PropSetting("gsun", "LayoutChildSettingsI", "settings", "Settings", "null"),
+//PropSetting("gsun", "LayoutChildSettingsI", "settings", "Settings", "null"),
 ];
 
 
@@ -116,7 +119,7 @@ class Widget
     	assert(childMaxCount == -1 || (childMaxCount >= childMinCount));
     	assert(childMaxCount < 1000); // TODO: think about this
     }
-	
+    
 	private
     {
     	SignalConnection sc_windowChange;
@@ -307,7 +310,7 @@ class Widget
     		return ret;
     	}
     }
-
+    
     final WindowI findWindow()
     {
     	WindowI ret;
@@ -320,7 +323,7 @@ class Widget
     	
     	return ret;
     }
-
+    
     final PlatformI findPlatform()
     {
     	PlatformI ret;
@@ -353,6 +356,8 @@ class Widget
     			propagateParentChangeEmission_recursion_protection_mtx,
     			0,
     			delegate int() {
+    				
+    				auto children = calcWidgetCompleteChildrenArray();
     				
     				Form f = cast(Form) this;
     				
@@ -402,6 +407,21 @@ class Widget
 		return;
 	}
 	
+	WidgetChild[] calcWidgetServiceChildrenArray()
+    {
+    	return [];
+    }
+
+    final WidgetChild[] calcWidgetNormalChildrenArray()
+    {
+    	return children;
+    }
+
+	final WidgetChild[] calcWidgetCompleteChildrenArray()
+    {
+    	return calcWidgetServiceChildrenArray() ~ children;
+    }
+    
     final int getChildCount()
     {
     	return cast(int) children.length;
@@ -419,7 +439,7 @@ class Widget
     	}
     }
     
-    // removes all children and adds passed child as only one 
+    // removes all children and adds passed child as only one
     final Widget setChild(Widget child)
     {
     	removeAllChildren();
@@ -436,8 +456,11 @@ class Widget
     	return children[i].child;
     }
     
+    void exceptionIfChildInvalid(Widget child) {}
+    
     final Widget addChild(Widget child)
     {
+    	exceptionIfChildInvalid(child);
     	if (childMaxCount != -1 && children.length == childMaxCount)
     	{
     		throw new Exception("maximum children count reached");
@@ -479,7 +502,7 @@ class Widget
     
     final Widget removeAllChildren()
     {
-    	auto children_copy = children; 
+    	auto children_copy = children;
     	foreach(v; children_copy)
     	{
     		if (v.child !is null)
@@ -490,9 +513,21 @@ class Widget
     	return this;
     }
     
+    final bool haveCompleteChild(Widget e)
+	{
+		foreach (v; calcWidgetCompleteChildrenArray())
+		{
+			if (v.child == e)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	final bool haveChild(Widget e)
 	{
-		foreach (v;children)
+		foreach (v; children)
 		{
 			if (v.child == e)
 			{
@@ -507,17 +542,22 @@ class Widget
     {
     	foreach_reverse (i, v; children)
     	{
+    		// TODO: maybe it's better to throw exception, instead of 
+    		//       trying to guess fix
     		if (v.child is null)
     		{
     			children = children[0 .. i] ~ children[i+1 .. $];
     			continue;
     		}
-    		
+    	}
+    	
+    	foreach (v; calcWidgetCompleteChildrenArray())
+    	{
     		checkChildParent(v.child);
     	}
     }
     
-    	// TODO: do something with this
+    // TODO: do something with this
 	private void checkChildParent(Widget child)
     {
     	if (child.getParent() != this)
@@ -548,7 +588,7 @@ class Widget
 		Widget child
 		)
     {
-    	if (!haveChild(child))
+    	if (!haveCompleteChild(child))
     		throw new Exception("not a child");
     	
         auto vp_x = getViewPortX();
@@ -585,7 +625,7 @@ class Widget
     {
     	// if (propagatePosAndSizeRecalcOverride !is null)
     	// {
-    		// propagatePosAndSizeRecalcOverride();
+    	// propagatePosAndSizeRecalcOverride();
     	// }
     	// else
     	{
@@ -599,7 +639,7 @@ class Widget
     		if (performLayout !is null)
     			performLayout(this);
     		
-    		foreach (v; children)
+    		foreach (v; calcWidgetCompleteChildrenArray())
     		{
     			v.child.propagatePosAndSizeRecalc();
     		}
@@ -634,7 +674,7 @@ class Widget
     		);
     	
     	bool started;
-    	foreach (v; children)
+    	foreach (v; calcWidgetCompleteChildrenArray())
     	{
     		auto res = vm.put(
     			v.getX(),
@@ -652,9 +692,10 @@ class Widget
     	return;
     }
     
+    // this searches through complete child list
     final WidgetChild getWidgetChildByChild(Widget child)
     {
-    	foreach (v; children)
+    	foreach (v; calcWidgetCompleteChildrenArray())
     	{
     		if (v.child == child)
     		{
@@ -798,13 +839,13 @@ class Widget
     // void delegate() propagatePosAndSizeRecalcOverride;
     void propagatePosAndSizeRecalcBefore() {};
     void propagatePosAndSizeRecalcAfter() {};
-
+    
     // TODO: mabe remove 'Form form' from events
     void intFocusEnter(Widget widget) {}
     void intFocusExit(Widget widget) {}
     
     bool intIsVisuallyPressed() {return false;}
-
+    
     void intVisuallyPress(Widget widget, EventForm* event) {}
     void intVisuallyRelease(Widget widget, EventForm* event) {}
     
@@ -822,19 +863,19 @@ class Widget
     void intTextInput(Widget widget, EventForm* event) {}
     
     void intInternalDraggingEventStart(
-    	Widget widget, 
+    	Widget widget,
     	int initX, int initY
     	) {}
-
+    
     void intInternalDraggingEvent(
-    	Widget widget, 
+    	Widget widget,
     	int initX, int initY,
     	int newX, int newY,
     	int relX, int relY
     	) {}
-
+    
     void intInternalDraggingEventEnd(
-    	Widget widget, 
+    	Widget widget,
     	EnumWidgetInternalDraggingEventEndReason reason,
     	int initX, int initY,
     	int newX, int newY,

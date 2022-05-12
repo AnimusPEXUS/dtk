@@ -2,39 +2,36 @@ module dtk.miscs.layoutCollection;
 
 import std.format;
 
+import dtk.types.Orientation;
 import dtk.types.Widget;
-// import dtk.interfaces.WidgetI;
 
-// Button
-
-void alignParentChild(
-	float valign,
-	float halign,
-	Widget parent,
-	Widget child
-	)
-in
+// TODO: add alignment?
+void linearLayout(Widget w, Orientation o)
 {
-	assert(valign >=0 && valign <=1);
-	assert(halign >=0 && halign <=1);
-	assert(parent !is null);
-	assert(child !is null);
-}
-do
-{
-	if (!parent.haveChild(child))
+	auto wWidth = w.getWidth();
+	auto wHeight = w.getHeight();
+	Widget c;
+	int currentOffset = 0;
+	if (o == Orientation.horizontal)
 	{
-		throw new Exception("child not the Parent's child");
+		for (int i = 0 ; i != w.getChildCount(); i++)
+		{
+			c = w.getChild(i);
+			c.setX(currentOffset);
+			c.setY(0);
+			c.setHeight(wHeight);
+			currentOffset += c.getWidth();
+		}
 	}
-	
-	auto w = parent.getWidth();
-	auto h = parent.getHeight();
-	
-	auto cw = child.getWidth();		 
-	auto ch = child.getHeight();
-	
-	child.setX(cast(int)((w - cw)*halign));
-	child.setY(cast(int)((h - ch)*valign));		
-	
-	return;
+	else
+	{
+		for (int i = 0 ; i != w.getChildCount(); i++)
+		{
+			c = w.getChild(i);
+			c.setX(0);
+			c.setY(currentOffset);
+			currentOffset += c.getHeight();
+			c.setWidth(wWidth);
+		}
+	}		
 }

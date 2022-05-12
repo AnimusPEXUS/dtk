@@ -29,6 +29,7 @@ import dtk.types.Widget;
 import dtk.miscs.RadioGroup;
 import dtk.miscs.signal_tools;
 import dtk.miscs.layoutCollection;
+import dtk.miscs.layoutTools;
 import dtk.miscs.DrawingSurfaceShift;
 
 import dtk.widgets.Form;
@@ -37,6 +38,7 @@ import dtk.widgets.mixins;
 
 
 const auto ButtonProperties = cast(PropSetting[]) [
+// PropSetting("gsun", "WidgetChild", "captionWidget", "CaptionWidget", q{null}),
 ];
 
 class Button : Widget
@@ -48,28 +50,32 @@ class Button : Widget
     
     this()
     {
-    	super(0, 1);
+    	super(0, 0);
     	mixin(mixin_multiple_properties_inst(ButtonProperties));
     }
     
+    private
+    {
+    	WidgetChild captionWidget;
+    }
+    
+    WidgetChild getCaptionWidget()
+    {
+    	return captionWidget;
+    }
+
+	override WidgetChild[] calcWidgetServiceChildrenArray()
+    {
+    	return [captionWidget];
+    }    
+
     Button setTextLabel(dstring text)
     {
-    	setChild(Label(text));
+    	auto cWidget = Label(text);
+    	cWidget.setParent(this);
+    	captionWidget = new WidgetChild(cWidget);
     	return this;
     }
-
-
-    /*     override void propagatePosAndSizeRecalc()
-    {
-    if (getChild() !is null)
-    {
-    alignParentChild(
-    0.5, 0.5,
-    this,
-    getChild()
-    );
-    }
-    } */
     
     override bool intIsVisuallyPressed()
     {
@@ -100,7 +106,7 @@ class Button : Widget
     	} */
     	if (cc != 0)
     	{
-    		auto c = getChild();
+    		auto c = getCaptionWidget();
     		debug writeln(
     			"Button child x: %s, y: %s, w: %s, h: %s".format(
     				c.getX(),
@@ -114,13 +120,10 @@ class Button : Widget
     
     override void propagatePosAndSizeRecalcAfter()
     {
-    	if (getChild() !is null)
+    	auto c = getCaptionWidget();
+    	if (c !is null)
     	{
-    		alignParentChild(
-    			0.5, 0.5,
-    			this,
-    			getChild()
-    			);
+    		alignParentChild(0.5, 0.5, this, c.child);
     	}
     }
     
