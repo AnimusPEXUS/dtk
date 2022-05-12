@@ -99,25 +99,12 @@ class Widget
     
     private
     {
-		// TODO: make children available by implementing special functions at
-		//       Widget class
-		WidgetChild[] children;
-		VisibilityMap!(Widget) vm;
+    	VisibilityMap!(Widget) vm;
     }
     
     public
     {
-		const int childMinCount;
-		const int childMaxCount;
-		
 		void delegate(Widget w) performLayout;
-    }
-    
-    invariant
-    {
-    	assert(childMinCount >= 0);
-    	assert(childMaxCount == -1 || (childMaxCount >= childMinCount));
-    	assert(childMaxCount < 1000); // TODO: think about this
     }
     
 	private
@@ -138,12 +125,10 @@ class Widget
 	// childMaxCount=-1;
 	// }
 	
-	this(int childMinCount, int childMaxCount)
+	this()
 	{
-		this.childMinCount = childMinCount;
-		this.childMaxCount = childMaxCount;
 		mixin(mixin_multiple_properties_inst(WidgetProperties));
-		vm = new VisibilityMap!(Widget)();
+		vm = new VisibilityMap!(Widget)();		
 	}
 	
 	static foreach(v; ["Width", "Height", "X", "Y"])
@@ -412,108 +397,48 @@ class Widget
     	return [];
     }
 
-    final WidgetChild[] calcWidgetNormalChildrenArray()
+    WidgetChild[] calcWidgetNormalChildrenArray()
     {
-    	return children;
+    	return [];
     }
 
 	final WidgetChild[] calcWidgetCompleteChildrenArray()
     {
-    	return calcWidgetServiceChildrenArray() ~ children;
+    	return calcWidgetServiceChildrenArray() 
+    	~ calcWidgetNormalChildrenArray();
     }
     
     final int getChildCount()
     {
-    	return cast(int) children.length;
+    	return cast(int) calcWidgetNormalChildrenArray().length;
     }
     
-    final Widget getChild()
+    final int getCompleteChildCount()
     {
-    	if (children.length == 0)
-    	{
-    		return null;
-    	}
-    	else
-    	{
-    		return children[0].child;
-    	}
+    	return cast(int) calcWidgetCompleteChildrenArray().length;
     }
+    
+    // final Widget getChild()
+    // {
+    	// if (children.length == 0)
+    	// {
+    		// return null;
+    	// }
+    	// else
+    	// {
+    		// return children[0].child;
+    	// }
+    // }
     
     // removes all children and adds passed child as only one
-    final Widget setChild(Widget child)
-    {
-    	removeAllChildren();
-    	addChild(child);
-    	return this;
-    }
+    // final Widget setChild(Widget child)
+    // {
+    	// removeAllChildren();
+    	// addChild(child);
+    	// return this;
+    // }
     
-    final Widget getChild(int i)
-    {
-    	if (children.length == 0)
-    		return null;
-    	if (!(i >= 0 && i < children.length))
-    		return null;
-    	return children[i].child;
-    }
-    
-    void exceptionIfChildInvalid(Widget child) {}
-    
-    final Widget addChild(Widget child)
-    {
-    	exceptionIfChildInvalid(child);
-    	if (childMaxCount != -1 && children.length == childMaxCount)
-    	{
-    		throw new Exception("maximum children count reached");
-    	}
-    	if (!haveChild(child))
-    	{
-    		children ~= new WidgetChild(child);
-    		checkChildParent(child);
-    	}
-    	return this;
-    }
-    
-    final Widget removeChild(Widget child)
-    {
-    	if (children.length == childMinCount)
-    	{
-    		throw new Exception("minimum children count reached");
-    	}
-    	if (!haveChild(child))
-    		return this;
-    	
-    	Widget[] removed;
-    	
-    	foreach_reverse (i, v; children)
-    	{
-    		if (v.child == child)
-    		{
-    			removed~=v.child;
-    			children = children[0 .. i] ~ children[i+1 .. $];
-    		}
-    	}
-    	
-    	foreach(v;removed)
-    	{
-    		v.unsetParent();
-    	}
-    	return this;
-    }
-    
-    final Widget removeAllChildren()
-    {
-    	auto children_copy = children;
-    	foreach(v; children_copy)
-    	{
-    		if (v.child !is null)
-    		{
-    			removeChild(v.child);
-    		}
-    	}
-    	return this;
-    }
-    
-    final bool haveCompleteChild(Widget e)
+	bool haveChild(Widget e)
 	{
 		foreach (v; calcWidgetCompleteChildrenArray())
 		{
@@ -524,41 +449,11 @@ class Widget
 		}
 		return false;
 	}
-
-	final bool haveChild(Widget e)
-	{
-		foreach (v; children)
-		{
-			if (v.child == e)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
 	
-	// TODO: do something with this
-	private void checkChildrenParents()
-    {
-    	foreach_reverse (i, v; children)
-    	{
-    		// TODO: maybe it's better to throw exception, instead of 
-    		//       trying to guess fix
-    		if (v.child is null)
-    		{
-    			children = children[0 .. i] ~ children[i+1 .. $];
-    			continue;
-    		}
-    	}
-    	
-    	foreach (v; calcWidgetCompleteChildrenArray())
-    	{
-    		checkChildParent(v.child);
-    	}
-    }
-    
+	alias haveCompleteChild = haveChild; 
+	
     // TODO: do something with this
-	private void checkChildParent(Widget child)
+	void fixChildParent(Widget child)
     {
     	if (child.getParent() != this)
     	{
@@ -566,7 +461,7 @@ class Widget
     	}
     }
     
-	final Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+	Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
     {
     	Widget c;
     	Position2D cp;

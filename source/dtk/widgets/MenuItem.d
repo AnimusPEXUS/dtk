@@ -18,7 +18,6 @@ class MenuItem : Widget
     
     this()
     {
-    	super(1, 1);
     	mixin(mixin_multiple_properties_inst(MenuItemProperties));
     }
     

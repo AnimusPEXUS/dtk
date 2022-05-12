@@ -22,7 +22,7 @@ in
 }
 do
 {
-	if (!parent.haveCompleteChild(child))
+	if (!parent.haveChild(child))
 	{
 		throw new Exception("child not the Parent's child");
 	}

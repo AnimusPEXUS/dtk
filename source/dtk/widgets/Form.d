@@ -41,6 +41,7 @@ import dtk.miscs.DrawingSurfaceShift;
 import dtk.signal_mixins.Form;
 
 const auto FormProperties = cast(PropSetting[]) [
+// PropSetting("gsun", "WidgetChild", "mainWidget", "MainWidget", ""),
 PropSetting("gsun", "WindowI", "window", "Window", ""),
 // PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", ""),
 // PropSetting("gsun", "Widget", "child", "Child", ""),
@@ -73,7 +74,6 @@ class Form : Widget
     
     this()
     {
-    	super(0, 1);
     	mixin(mixin_multiple_properties_inst(FormProperties));
     	
     	setFocusedWidget(this);
@@ -140,7 +140,29 @@ class Form : Widget
     	
     	sc_formEventHandler = this.connectToSignal_Event(&onFormSignal);
     }
+
+    private
+    {
+    	WidgetChild mainWidget;
+    }
     
+    WidgetChild getMainWidget()
+    {
+    	return mainWidget;
+    }
+
+    Form setMainWidget(Widget w)
+    {
+    	w.setParent(this);
+    	mainWidget = new WidgetChild(w); 
+    	return this;
+    }
+    
+	override WidgetChild[] calcWidgetServiceChildrenArray()
+    {
+    	return [mainWidget];
+    }    
+        
     void onWindowOtherEvent(Event* event) nothrow
     {
     	collectException(

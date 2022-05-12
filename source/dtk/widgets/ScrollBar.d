@@ -110,7 +110,6 @@ class ScrollBar : Widget
     
     this()
     {
-    	super(0, 0);
     	mixin(mixin_multiple_properties_inst(ScrollBarProperties));
     	
     	{
@@ -130,14 +129,14 @@ class ScrollBar : Widget
     	WidgetChild button1;
     }
     
-    WidgetChild getButton0()
+    Widget getButton0()
     {
-    	return button0;
+    	return button0.child;
     }
     
-    WidgetChild getButton1()
+    Widget getButton1()
     {
-    	return button1;
+    	return button1.child;
     }
     
 	override WidgetChild[] calcWidgetServiceChildrenArray()

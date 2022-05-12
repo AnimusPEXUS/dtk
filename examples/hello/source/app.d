@@ -32,8 +32,6 @@ import dtk.widgets.ScrollBar;
 
 void main()
 {
-	
-	
     auto pl = instantiatePlatform();
     
     pl.init();
@@ -65,7 +63,7 @@ void main()
     auto lo = new Layout();
     
     writeln("before form.setChild");
-    form.setChild(lo);
+    form.setMainWidget(lo);
     writeln("after form.setChild");
     
     lo.setX(10).setY(10).setWidth(780).setHeight(780);
@@ -119,20 +117,21 @@ void main()
     // lbl1.setX(10).setY(140).setWidth(500).setHeight(100);
     // lbl2.setX(10).setY(260).setWidth(500).setHeight(20);
     // sb1.setX(10).setY(280).setWidth(500).setHeight(16);
-
-    form.performLayout = delegate void(Widget w) 
+    
+    form.performLayout = delegate void(Widget w)
     {
-    	auto c = w.getChild();
+    	auto ww = cast(Form) w;
+    	auto c = ww.getMainWidget();
     	if (c)
     	{
     		c.setX(5);
     		c.setY(5);
-    		c.setWidth(w.getWidth()-10);
-    		c.setHeight(w.getHeight()-10);
+    		c.setWidth(ww.getWidth()-10);
+    		c.setHeight(ww.getHeight()-10);
     	}
     };
     
-    lo.performLayout = delegate void(Widget w) 
+    lo.performLayout = delegate void(Widget w)
     {
     	auto wm20 = w.getWidth()-20;
     	btn.setX(10).setY(10).setWidth(wm20).setHeight(40);

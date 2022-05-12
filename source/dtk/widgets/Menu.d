@@ -3,6 +3,7 @@ module dtk.widgets.Menu;
 import dtk.types.Property;
 import dtk.types.Widget;
 
+import dtk.widgets.Layout;
 import dtk.widgets.MenuItem;
 import dtk.widgets.mixins;
 
@@ -15,19 +16,42 @@ class Menu : Widget
     mixin mixin_multiple_properties_forward!(MenuProperties, false);
     mixin mixin_Widget_renderImage!("Menu");
     
-    this()
+    private
     {
-    	super(0, 1);
-    	mixin(mixin_multiple_properties_inst(MenuProperties));
+    	WidgetChild layout;
     }
     
-    override void exceptionIfChildInvalid(Widget child)
+    this()
     {
-    	if (cast(MenuItem) child is null)
+    	mixin(mixin_multiple_properties_inst(MenuProperties));
+    	
+    	auto l = new Layout();
+    	layout = new WidgetChild(l);
+    	
+    	l.exceptionIfChildInvalid = delegate void(Widget child)
     	{
-    		throw new Exception(
-    			"child didn'd passed exceptionIfChildInvalid check"
-    			);
-    	}
+    		if (cast(MenuItem) child is null)
+    		{
+    			throw new Exception(
+    				"child didn'd passed exceptionIfChildInvalid check"
+    				);
+    		}
+    	};
     }
+    
+    Widget getLayout()
+    {
+    	return layout.child;
+    }
+    
+	override WidgetChild[] calcWidgetServiceChildrenArray()
+    {
+    	return [layout];
+    }
+    
+    override WidgetChild[] calcWidgetNormalChildrenArray()
+    {
+    	return [];
+    }
+    
 }

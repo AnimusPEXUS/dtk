@@ -137,8 +137,6 @@ class TextEntry : Widget
     
     this()
     {
-    	super(0, 0);
-    	
     	mixin(mixin_multiple_properties_inst(TextEntryProperties));
     	// mixin(mixin_propagateParentChangeEmission_this());
     	

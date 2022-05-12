@@ -69,21 +69,37 @@ class ButtonCheck : Widget
     
 	mixin mixin_multiple_properties_define!(ButtonCheckProperties);
     mixin mixin_multiple_properties_forward!(ButtonCheckProperties, false);
-    
+
     this()
     {
-    	super(0, 1);
     	mixin(mixin_multiple_properties_inst(ButtonCheckProperties));
     	
         con_cont.add(connectToRadioGroup_onBeforeChanged(&handleRadioGroup_onBeforeChanged));
         con_cont.add(connectToRadioGroup_onAfterChanged(&handleRadioGroup_onAfterChanged));
     }
+
+    private
+    {
+    	WidgetChild captionWidget;
+    }
     
+    Widget getCaptionWidget()
+    {
+    	return captionWidget.child;
+    }
+
+	override WidgetChild[] calcWidgetServiceChildrenArray()
+    {
+    	return [captionWidget];
+    }    
+
     ButtonCheck setTextLabel(dstring text)
     {
-    	setChild(Label(text));
+    	auto cWidget = Label(text);
+    	cWidget.setParent(this);
+    	captionWidget = new WidgetChild(cWidget);
     	return this;
-    }    
+    }
     
     private
     {
@@ -182,7 +198,7 @@ class ButtonCheck : Widget
     		goto case ButtonCheckIndicatorAlignment.CornerBottomRight;
     	}
     	
-    	auto child = getChild();
+    	auto child = getCaptionWidget();
     	
     	if (child !is null)
     	{

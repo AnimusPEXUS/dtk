@@ -5,8 +5,10 @@ import std.format;
 import dtk.types.Orientation;
 import dtk.types.Widget;
 
+import dtk.widgets.Layout;
+
 // TODO: add alignment?
-void linearLayout(Widget w, Orientation o)
+void linearLayout(Layout w, Orientation o)
 {
 	auto wWidth = w.getWidth();
 	auto wHeight = w.getHeight();

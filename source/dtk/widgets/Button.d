@@ -50,7 +50,6 @@ class Button : Widget
     
     this()
     {
-    	super(0, 0);
     	mixin(mixin_multiple_properties_inst(ButtonProperties));
     }
     
@@ -59,9 +58,9 @@ class Button : Widget
     	WidgetChild captionWidget;
     }
     
-    WidgetChild getCaptionWidget()
+    Widget getCaptionWidget()
     {
-    	return captionWidget;
+    	return captionWidget.child;
     }
 
 	override WidgetChild[] calcWidgetServiceChildrenArray()
@@ -123,7 +122,7 @@ class Button : Widget
     	auto c = getCaptionWidget();
     	if (c !is null)
     	{
-    		alignParentChild(0.5, 0.5, this, c.child);
+    		alignParentChild(0.5, 0.5, this, c);
     	}
     }
     
