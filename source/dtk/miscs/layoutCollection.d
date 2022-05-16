@@ -1,5 +1,6 @@
 module dtk.miscs.layoutCollection;
 
+import std.stdio;
 import std.format;
 
 import dtk.types.Orientation;
@@ -14,26 +15,31 @@ void linearLayout(Layout w, Orientation o)
 	auto wHeight = w.getHeight();
 	Widget c;
 	int currentOffset = 0;
-	if (o == Orientation.horizontal)
+	for (int i = 0 ; i != w.getLayoutChildCount(); i++)
 	{
-		for (int i = 0 ; i != w.getChildCount(); i++)
+		c = w.getLayoutChild(i);
+		if (o == Orientation.horizontal)
 		{
-			c = w.getChild(i);
 			c.setX(currentOffset);
 			c.setY(0);
+			// c.setWidth(50);
 			c.setHeight(wHeight);
 			currentOffset += c.getWidth();
 		}
-	}
-	else
-	{
-		for (int i = 0 ; i != w.getChildCount(); i++)
+		else
 		{
-			c = w.getChild(i);
 			c.setX(0);
 			c.setY(currentOffset);
-			currentOffset += c.getHeight();
 			c.setWidth(wWidth);
+			// c.setHeight(50);
+			currentOffset += c.getHeight();
 		}
-	}		
+		debug writeln("linearLayout child %s aligned: %sx%s %sx%s".format(
+			i,
+			c.getX(),
+			c.getY(),
+			c.getWidth(),
+			c.getHeight(),
+			));
+	}
 }

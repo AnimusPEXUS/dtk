@@ -110,7 +110,7 @@ class Form : Widget
     							);
     					}
     					
-    					propagateParentChangeEmission();
+    					// propagateParentChangeEmission();
     					
     				}()
     				);
@@ -146,21 +146,24 @@ class Form : Widget
     	WidgetChild mainWidget;
     }
     
-    WidgetChild getMainWidget()
+    Widget getMainWidget()
     {
-    	return mainWidget;
+    	return mainWidget.child;
     }
 
     Form setMainWidget(Widget w)
     {
+    	mainWidget = new WidgetChild(this, w); 
     	w.setParent(this);
-    	mainWidget = new WidgetChild(w); 
     	return this;
     }
     
-	override WidgetChild[] calcWidgetServiceChildrenArray()
+	override WidgetChild[] calcWidgetChildrenArray()
     {
-    	return [mainWidget];
+    	WidgetChild[] ret;
+    	if (mainWidget)
+    		ret ~= mainWidget;
+    	return ret;
     }    
         
     void onWindowOtherEvent(Event* event) nothrow
@@ -182,7 +185,7 @@ class Form : Widget
     				form_mouse_x = cast(int)event.em.x;
     				form_mouse_y = cast(int)event.em.y;
     				
-    				auto res = this.getChildAtPosition(
+    				auto res = getChildAtPosition(
     					Position2D(
     						cast(int)form_mouse_x,
     						cast(int)form_mouse_y
@@ -308,6 +311,7 @@ class Form : Widget
     				default:
     					return;
     				case EventMouseType.movement:
+    					debug writeln("mouse widget: ", mouseFocusedWidget);
     					event.mouseFocusedWidget.intMouseMove(
     						event.mouseFocusedWidget,
     						event

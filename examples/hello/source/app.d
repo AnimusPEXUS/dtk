@@ -20,15 +20,77 @@ import dtk.types.EnumKeyboardModCode;
 
 import dtk.miscs.RadioGroup;
 import dtk.miscs.TextProcessor;
+import dtk.miscs.layoutCollection;
 
 import dtk.laf.chicago98.Chicago98Laf;
 
 import dtk.widgets.Form;
+import dtk.widgets.Menu;
+import dtk.widgets.MenuItem;
 import dtk.widgets.Layout;
 import dtk.widgets.Button;
 import dtk.widgets.ButtonCheck;
 import dtk.widgets.TextEntry;
 import dtk.widgets.ScrollBar;
+
+Menu makeMainMenu()
+{
+	Menu m0 = MenuBar();
+	Layout m0lo = new Layout();
+	MenuItem m0mi0 = new MenuItem();
+	m0.setLayout(m0lo);
+	m0lo.addLayoutChild(m0mi0);
+	
+	Menu m1 = MenuPopup();
+	Layout m1lo = new Layout();
+	MenuItem m1mi0 = new MenuItem();
+	MenuItem m1mi1 = new MenuItem();
+	m1.setLayout(m1lo);
+	m1lo.addLayoutChild(m1mi0);
+	m1lo.addLayoutChild(m1mi1);
+	
+	m0mi0.setWidget(Label("File"));
+	m0mi0.setSubmenu(m1);
+	
+	m1mi0.setWidget(Label("Open"));
+	m1mi1.setWidget(Label("Save"));
+	
+	m0.setPerformLayout(
+		delegate void(Widget w)
+		{
+			auto w2 = cast(Menu) w;
+			auto c = w2.getLayout();
+			c.setWidth(w.getWidth());
+			c.setHeight(w.getHeight());
+			debug writeln(
+				"m0 layout activated: wh = %s, ch = %s".format(
+					w.getHeight(),
+					c.getHeight()
+					)
+				);
+		}
+		);
+	
+	m0lo.setPerformLayout(
+		delegate void(Widget w)
+		{
+			auto l = cast(Layout) w;
+			debug writeln("m0lo layout activated");
+			linearLayout(l, Orientation.horizontal);
+		}
+		);
+	
+	m1lo.setPerformLayout(
+		delegate void(Widget w)
+		{
+			auto l = cast(Layout) w;
+			debug writeln("m1lo layout activated");
+			linearLayout(l, Orientation.vertical);
+		}
+		);
+	
+	return m0;
+}
 
 void main()
 {
@@ -70,6 +132,8 @@ void main()
     
     auto rg = new RadioGroup();
     
+    auto mm = makeMainMenu();
+    
     auto btn = new Button().setTextLabel("Button 1");
     auto btn2 = new Button().setTextLabel("Button 2");
     auto btn3 = new ButtonCheck().setTextLabel("ButtonRadio 1").setRadioGroup(rg);
@@ -81,6 +145,7 @@ void main()
     auto sb1 = new ScrollBar().setOrientation(Orientation.horizontal);
     
     foreach(v; [
+    	mm,
     	btn,
     	btn2,
     	btn3,
@@ -91,7 +156,7 @@ void main()
     	sb1
     	])
     {
-    	lo.addChild(v);
+    	lo.addLayoutChild(v);
     }
     
     lbl1.setText(
@@ -124,24 +189,26 @@ void main()
     	auto c = ww.getMainWidget();
     	if (c)
     	{
-    		c.setX(5);
-    		c.setY(5);
-    		c.setWidth(ww.getWidth()-10);
-    		c.setHeight(ww.getHeight()-10);
+    		c.setX(0);
+    		c.setY(0);
+    		c.setWidth(ww.getWidth());
+    		c.setHeight(ww.getHeight());
     	}
     };
     
     lo.performLayout = delegate void(Widget w)
     {
-    	auto wm20 = w.getWidth()-20;
-    	btn.setX(10).setY(10).setWidth(wm20).setHeight(40);
-    	btn2.setX(10).setY(60).setWidth(wm20).setHeight(20);
-    	btn3.setX(10).setY(80).setWidth(wm20).setHeight(20);
-    	btn4.setX(10).setY(100).setWidth(wm20).setHeight(20);
-    	btn5.setX(10).setY(120).setWidth(wm20).setHeight(20);
-    	lbl1.setX(10).setY(140).setWidth(wm20).setHeight(100);
-    	lbl2.setX(10).setY(260).setWidth(wm20).setHeight(20);
-    	sb1.setX(10).setY(280).setWidth(wm20).setHeight(16);
+    	auto wm = w.getWidth();
+    	auto wm20 = wm-20;
+    	mm.setX(0).setY(0).setWidth(wm).setHeight(20);
+    	btn.setX(10).setY(mm.getY()+mm.getHeight()+5).setWidth(wm20/4).setHeight(20);
+    	btn2.setX(btn.getX()+btn.getWidth()+5).setY(btn.getY()).setWidth(wm-(btn.getX()*2)-btn.getWidth()-5).setHeight(20);
+    	btn3.setX(10).setY(btn2.getY()+btn2.getHeight()+5).setWidth(wm20).setHeight(12);
+    	btn4.setX(10).setY(btn3.getY()+btn3.getHeight()+5).setWidth(wm20).setHeight(12);
+    	btn5.setX(10).setY(btn4.getY()+btn4.getHeight()+5).setWidth(wm20).setHeight(12);
+    	lbl1.setX(10).setY(btn5.getY()+btn5.getHeight()+5).setWidth(wm20).setHeight(100);
+    	lbl2.setX(10).setY(lbl1.getY()+lbl1.getHeight()+5).setWidth(wm20).setHeight(20);
+    	sb1.setX(10).setY(lbl2.getY()+lbl2.getHeight()+5).setWidth(wm20).setHeight(16);
     };
     
     /*     form.onFormSignalBeforeProcessing =  delegate bool(EventForm *event)

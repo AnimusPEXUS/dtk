@@ -115,11 +115,11 @@ class ScrollBar : Widget
     	{
     		auto x = new Button().setTextLabel("⯇");
     		x.setParent(this);
-    		button0 = new WidgetChild(x);
+    		button0 = new WidgetChild(this, x);
     		
     		x = new Button().setTextLabel("⯈");
     		x.setParent(this);
-    		button1 = new WidgetChild(x);
+    		button1 = new WidgetChild(this, x);
     	}
     }
     
@@ -139,8 +139,9 @@ class ScrollBar : Widget
     	return button1.child;
     }
     
-	override WidgetChild[] calcWidgetServiceChildrenArray()
+	override WidgetChild[] calcWidgetChildrenArray()
     {
+    	// NOTE: scrollbar always have those buttons, so checking isn't needed
     	return [button0, button1];
     }    
     
@@ -271,9 +272,10 @@ class ScrollBar : Widget
     	}
     }
     
-    override void propagatePosAndSizeRecalcBefore()
+    override void propagatePosAndSizeRecalc()
     {
     	recalcScrollBar();
+    	super.propagatePosAndSizeRecalc();
     }
     
     void setScrollingFromIntegers(int min, int max, int sMin, int sMax)

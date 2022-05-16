@@ -31,20 +31,31 @@ import dtk.widgets.Form;
 
 // import dtk.signal_mixins.Widget;
 
-enum LayoutOverflowBehavior
+enum ViewPortChildrenPosAndSizeReaction : ubyte
 {
     Ignore, // do nothing
-    Scroll, // show scrollbar
-    Clip, // don't draw overflow areas
-    Resize, // resize self to fit everything
+    Clip = Ignore, // don't draw overflows
+    Scroll, // show scrollbars
+    Resize, // resize ViewPort by contents
 }
 
-enum LayoutType : ubyte
+enum WidgetAgainstViewPortSizePolicy : ubyte
 {
-    undefined,
-    linearScrolled,
-    linearWrapped,
+	ViewPortResizeByWidget,
+	WidgetResizeByViewPort,
 }
+
+enum WidgetResizeAndViewportPolicy : ubyte
+{
+	WidgetDictatesChild
+}
+
+// enum LayoutType : ubyte
+// {
+// undefined,
+// linearScrolled,
+// linearWrapped,
+// }
 
 
 const auto WidgetChildProperties = cast(PropSetting[]) [
@@ -65,25 +76,66 @@ PropSetting("gs_w_d", "bool", "fill", "Fill", q{false}),
 
 class WidgetChild
 {
+	Widget widget;
 	Widget child;
 	
     mixin mixin_multiple_properties_define!(WidgetChildProperties);
     mixin mixin_multiple_properties_forward!(WidgetChildProperties, false);
-    this(Widget child)
+    
+    private
+    {
+    	SignalConnection sc_xChange;
+    	SignalConnection sc_yChange;
+    	SignalConnection sc_wChange;
+    	SignalConnection sc_hChange;
+    }
+    
+    this(Widget widget, Widget child)
     {
     	mixin(mixin_multiple_properties_inst(WidgetChildProperties));
+    	
+    	this.widget = widget;
     	this.child = child;
+    	
+    	sc_xChange = connectToX_onAfterChanged(&onXYchanged);
+    	sc_yChange = connectToY_onAfterChanged(&onXYchanged);
+    	sc_wChange = connectToWidth_onAfterChanged(&onWHchanged);
+    	sc_hChange = connectToHeight_onAfterChanged(&onWHchanged);
+    }
+    
+    void onXYchanged(int o, int n) nothrow
+    {
+    	collectException(
+    		{
+    			widget.childChangedXY(this);
+    			onXYWHchanged();
+    		}()
+    		);
+    }
+    
+    void onWHchanged(int o, int n) nothrow
+    {
+    	collectException(
+    		{
+    			widget.childChangedWH(this);
+    			onXYWHchanged();
+    		}()
+    		);
+    }
+    
+    void onXYWHchanged() nothrow
+    {
+    	collectException(
+    		{
+    			widget.childChangedXYWH(this);
+    		}()
+    		);
     }
 }
 
 const auto WidgetProperties = cast(PropSetting[]) [
 PropSetting("gsun", "Widget", "parent", "Parent", q{null}),
 PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
-
-PropSetting("gs_w_d", "int", "viewportX", "ViewPortX", "0"),
-PropSetting("gs_w_d", "int", "viewportY", "ViewPortY", "0"),
-PropSetting("gs_w_d", "int", "viewportWidth", "ViewPortWidth", "0"),
-PropSetting("gs_w_d", "int", "viewportHeight", "ViewPortHeight", "0"),
 
 PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
 // PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "0"),
@@ -99,12 +151,6 @@ class Widget
     
     private
     {
-    	VisibilityMap!(Widget) vm;
-    }
-    
-    public
-    {
-		void delegate(Widget w) performLayout;
     }
     
 	private
@@ -128,9 +174,19 @@ class Widget
 	this()
 	{
 		mixin(mixin_multiple_properties_inst(WidgetProperties));
-		vm = new VisibilityMap!(Widget)();		
 	}
 	
+	public
+    {
+		void delegate(Widget w) performLayout;
+    }
+    
+    Widget setPerformLayout(void delegate(Widget w) performLayout)
+    {
+    	this.performLayout = performLayout;
+    	return this;
+    }
+    
 	static foreach(v; ["Width", "Height", "X", "Y"])
 	{
 		mixin(
@@ -143,6 +199,11 @@ class Widget
 					Form f;
 					
 					parent = getParent();
+					// if (parent is null)
+					// {
+					// throw new Exception("couldn't get parent");
+					// }
+					
 					f = cast(Form) this;
 					if (f !is null)
 					{
@@ -179,6 +240,7 @@ class Widget
 					Form f;
 					
 					parent = getParent();
+					
 					f = cast(Form) this;
 					if (f !is null)
 					{
@@ -199,7 +261,7 @@ class Widget
 					}
 					else
 					{
-						throw new Exception("root doesn't have parent so can't change own size or position");
+						throw new Exception("nor window nor parent is set - can't change own size or position");
 					}
 					
 					return this;
@@ -322,49 +384,49 @@ class Widget
     	return ret;
     }
     
-    private
-    {
-    	bool propagateParentChangeEmission_recursion_protection;
-    	Mutex propagateParentChangeEmission_recursion_protection_mtx;
-    }
-    
-    final void propagateParentChangeEmission()
-    {
-    	
-    	synchronized
-    	{
-    		if (propagateParentChangeEmission_recursion_protection_mtx is null)
-    			propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
-    		
-    		recursionGuard(
-    			propagateParentChangeEmission_recursion_protection,
-    			propagateParentChangeEmission_recursion_protection_mtx,
-    			0,
-    			delegate int() {
-    				
-    				auto children = calcWidgetCompleteChildrenArray();
-    				
-    				Form f = cast(Form) this;
-    				
-    				if (f !is null)
-    				{
-    					f.setWindow(f.getWindow());
-    				}
-    				else
-    				{
-    					setParent(getParent());
-    				}
-    				
-    				foreach (c; children)
-    				{
-    					c.child.propagateParentChangeEmission();
-    				}
-    				
-    				return 0;
-    			}
-    			);
-    	}
-    }
+    // private
+    // {
+    // bool propagateParentChangeEmission_recursion_protection;
+    // Mutex propagateParentChangeEmission_recursion_protection_mtx;
+    // }
+    //
+    // final void propagateParentChangeEmission()
+    // {
+    //
+    // synchronized
+    // {
+    // if (propagateParentChangeEmission_recursion_protection_mtx is null)
+    // propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
+    //
+    // recursionGuard(
+    // propagateParentChangeEmission_recursion_protection,
+    // propagateParentChangeEmission_recursion_protection_mtx,
+    // 0,
+    // delegate int() {
+    //
+    // auto children = calcWidgetChildrenArray();
+    //
+    // Form f = cast(Form) this;
+    //
+    // if (f !is null)
+    // {
+    // f.setWindow(f.getWindow());
+    // }
+    // else
+    // {
+    // setParent(getParent());
+    // }
+    //
+    // foreach (c; children)
+    // {
+    // c.child.propagateParentChangeEmission();
+    // }
+    //
+    // return 0;
+    // }
+    // );
+    // }
+    // }
     
     // TODO: delete this function?
 	final Widget getFormDefaultWidget()
@@ -392,55 +454,39 @@ class Widget
 		return;
 	}
 	
-	WidgetChild[] calcWidgetServiceChildrenArray()
+	WidgetChild[] calcWidgetChildrenArray()
     {
     	return [];
     }
-
-    WidgetChild[] calcWidgetNormalChildrenArray()
-    {
-    	return [];
-    }
-
-	final WidgetChild[] calcWidgetCompleteChildrenArray()
-    {
-    	return calcWidgetServiceChildrenArray() 
-    	~ calcWidgetNormalChildrenArray();
-    }
     
-    final int getChildCount()
+    final int calcWidgetChildrenCount()
     {
-    	return cast(int) calcWidgetNormalChildrenArray().length;
-    }
-    
-    final int getCompleteChildCount()
-    {
-    	return cast(int) calcWidgetCompleteChildrenArray().length;
+    	return cast(int) calcWidgetChildrenArray().length;
     }
     
     // final Widget getChild()
     // {
-    	// if (children.length == 0)
-    	// {
-    		// return null;
-    	// }
-    	// else
-    	// {
-    		// return children[0].child;
-    	// }
+    // if (children.length == 0)
+    // {
+    // return null;
+    // }
+    // else
+    // {
+    // return children[0].child;
+    // }
     // }
     
     // removes all children and adds passed child as only one
     // final Widget setChild(Widget child)
     // {
-    	// removeAllChildren();
-    	// addChild(child);
-    	// return this;
+    // removeAllChildren();
+    // addChild(child);
+    // return this;
     // }
     
-	bool haveChild(Widget e)
+	final bool haveChild(Widget e)
 	{
-		foreach (v; calcWidgetCompleteChildrenArray())
+		foreach (v; calcWidgetChildrenArray())
 		{
 			if (v.child == e)
 			{
@@ -450,10 +496,7 @@ class Widget
 		return false;
 	}
 	
-	alias haveCompleteChild = haveChild; 
-	
-    // TODO: do something with this
-	void fixChildParent(Widget child)
+	final void fixChildParent(Widget child)
     {
     	if (child.getParent() != this)
     	{
@@ -461,21 +504,58 @@ class Widget
     	}
     }
     
-	Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+	final void fixChildrenParents()
     {
-    	Widget c;
-    	Position2D cp;
+    	foreach_reverse (i, v; calcWidgetChildrenArray())
     	{
-    		auto res = vm.getByPoint(point, false);
-    		if (res.length == 0)
-    			return tuple(cast(Widget)this, point);
-    		auto x = res[$-1];
-    		c = x[0].o;
-    		cp = x[1];
-    		assert(c !is null);
+    		fixChildParent(v.child);
     	}
     	
-    	return c.getChildAtPosition(cp);
+    }
+    
+	Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+    {
+    	auto px = point.x;
+		auto py = point.y;
+		
+		auto children = calcWidgetChildrenArray();
+		
+		debug
+		{
+			writeln("calcWidgetChildrenArray():");
+			foreach (i, v; children)
+			{
+				writeln("%03d: %s :: %s".format(i, v, v.child));
+			}
+		}
+		
+		// NOTE: it's better to do in reverse order
+    	foreach_reverse (v; calcWidgetChildrenArray())
+    	{
+    		auto vx = v.getX();
+    		auto vy = v.getY();
+    		auto vw = v.getWidth();
+    		auto vh = v.getHeight();
+    		
+    		if (
+				px >= vx
+			&& px < vx+vw
+			
+			&& py >= vy
+			&& py < vy+vh
+			)
+			{
+				auto rec_res = v.child.getChildAtPosition(
+					Position2D((px - vx), (py - vy))
+					);
+				
+				return rec_res;
+			}
+    	}
+    	
+    	debug writeln("mouse in ", this, " pointing at nothing");
+    	
+    	return tuple(cast(Widget)this, point);
     }
     
     final DrawingSurfaceI shiftDrawingSurfaceForChild(
@@ -483,34 +563,16 @@ class Widget
 		Widget child
 		)
     {
-    	if (!haveCompleteChild(child))
+    	if (!haveChild(child))
     		throw new Exception("not a child");
-    	
-        auto vp_x = getViewPortX();
-    	auto vp_y = getViewPortY();
-    	auto vp_w = getViewPortWidth();
-    	auto vp_h = getViewPortHeight();
     	
     	auto cx = getChildX(child);
     	auto cy = getChildY(child);
-    	auto cw = getChildWidth(child);
-    	auto ch = getChildHeight(child);
-    	
-    	auto res = calculateVisiblePart(
-    		vp_x,
-    		vp_y,
-    		vp_w,
-    		vp_h,
-    		cx,
-    		cy,
-    		cw,
-    		ch
-    		);
     	
         auto ret = new DrawingSurfaceShift(
         	ds,
-        	cast(int)res[5],
-        	cast(int)res[6]
+        	cx,
+        	cy
         	);
         
         return ret;
@@ -518,79 +580,38 @@ class Widget
     
     void propagatePosAndSizeRecalc()
     {
-    	// if (propagatePosAndSizeRecalcOverride !is null)
-    	// {
-    	// propagatePosAndSizeRecalcOverride();
-    	// }
-    	// else
+    	// propagatePosAndSizeRecalcBefore();
+    	if (performLayout !is null)
+    		performLayout(this);
+    	
+    	foreach (v; calcWidgetChildrenArray())
     	{
-    		propagatePosAndSizeRecalcBefore();
-    		auto w = getWidth();
-    		auto h = getHeight();
-    		
-    		setViewPortWidth(w);
-    		setViewPortHeight(h);
-    		
-    		if (performLayout !is null)
-    			performLayout(this);
-    		
-    		foreach (v; calcWidgetCompleteChildrenArray())
-    		{
-    			v.child.propagatePosAndSizeRecalc();
-    		}
-    		
-    		propagatePosAndSizeRecalcAfter();
-    		recalcChildVisibilityMap();
-        }
+    		v.child.propagatePosAndSizeRecalc();
+    	}
+    	
+    	// propagatePosAndSizeRecalcAfter();
     }
     
-    final Image propagateRedraw()
+    Image propagateRedraw()
     {
     	auto img = this.renderImage();
     	// auto ds = getDrawingSurface();
     	// ds.drawImage(Position2D(0,0),img);
     	
-    	foreach (c; vm.map)
+    	foreach (c; calcWidgetChildrenArray())
     	{
-    		assert(c.o !is null);
-    		auto c_img = c.o.propagateRedraw();
-    		this.drawChild(img, c.o, c_img);
+    		assert(c.child !is null);
+    		auto c_img = c.child.propagateRedraw();
+    		this.drawChild(img, c.child, c_img);
     	}
+    	
     	return img;
-    }
-    
-    final void recalcChildVisibilityMap()
-    {
-    	vm.init(
-    		getViewPortX(),
-    		getViewPortY(),
-    		getViewPortWidth(),
-    		getViewPortHeight()
-    		);
-    	
-    	bool started;
-    	foreach (v; calcWidgetCompleteChildrenArray())
-    	{
-    		auto res = vm.put(
-    			v.getX(),
-    			v.getY(),
-    			v.getWidth(),
-    			v.getHeight(),
-    			v.child
-    			);
-    		if (!started && res)
-    			started=true;
-    		if (started && !res)
-    			break;
-    	}
-    	
-    	return;
     }
     
     // this searches through complete child list
     final WidgetChild getWidgetChildByChild(Widget child)
     {
-    	foreach (v; calcWidgetCompleteChildrenArray())
+    	foreach (v; calcWidgetChildrenArray())
     	{
     		if (v.child == child)
     		{
@@ -610,34 +631,10 @@ class Widget
     final void drawChild(DrawingSurfaceI ds, Widget child, Image img)
     {
     	ds = shiftDrawingSurfaceForChild(ds, child);
-    	
-    	auto vp_x = getViewPortX();
-    	auto vp_y = getViewPortY();
-    	auto vp_w = getViewPortWidth();
-    	auto vp_h = getViewPortHeight();
-    	
-    	auto cx = getChildX(child);
-    	auto cy = getChildY(child);
-    	auto cw = getChildWidth(child);
-    	auto ch = getChildHeight(child);
-    	
-    	auto res = calculateVisiblePart(
-    		vp_x,
-    		vp_y,
-    		vp_w,
-    		vp_h,
-    		cx,
-    		cy,
-    		cw,
-    		ch
-    		);
-    	if (!res[0])
-    		return;
-    	
     	ds.drawImage(
     		// NOTE: ds should be already shifted to correct position
     		Position2D(0, 0),
-    		img.getImage(res[1], res[2], res[3], res[4])
+    		img
     		);
     }
     
@@ -731,9 +728,15 @@ class Widget
     	}
     }
     
+    void childChangedXY(WidgetChild c) {}
+    void childChangedWH(WidgetChild c) {}
+    void childChangedXYWH(WidgetChild c) {}
+    void viewPortResizedSelf() {
+    }
+    
     // void delegate() propagatePosAndSizeRecalcOverride;
-    void propagatePosAndSizeRecalcBefore() {};
-    void propagatePosAndSizeRecalcAfter() {};
+    // void propagatePosAndSizeRecalcBefore() {};
+    // void propagatePosAndSizeRecalcAfter() {};
     
     // TODO: mabe remove 'Form form' from events
     void intFocusEnter(Widget widget) {}

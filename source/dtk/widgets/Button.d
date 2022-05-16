@@ -62,17 +62,20 @@ class Button : Widget
     {
     	return captionWidget.child;
     }
-
-	override WidgetChild[] calcWidgetServiceChildrenArray()
+    
+	override WidgetChild[] calcWidgetChildrenArray()
     {
-    	return [captionWidget];
-    }    
-
+    	WidgetChild[] ret;
+    	if (this.captionWidget)
+    		ret ~= this.captionWidget;
+    	return ret;
+    }
+    
     Button setTextLabel(dstring text)
     {
     	auto cWidget = Label(text);
     	cWidget.setParent(this);
-    	captionWidget = new WidgetChild(cWidget);
+    	captionWidget = new WidgetChild(this, cWidget);
     	return this;
     }
     
@@ -95,17 +98,12 @@ class Button : Widget
     override void intMousePressRelease(Widget widget, EventForm* event)
     {debug writeln("click");}
     
-    override void propagatePosAndSizeRecalcBefore()
+    
+    override void propagatePosAndSizeRecalc()
     {
-    	auto cc = getChildCount();
-    	debug writeln("Button child count %s".format(cc));
-    	/* if (text_view !is null)
+    	auto c = getCaptionWidget();
+    	if (c)
     	{
-    		text_view.recalculateWidthAndHeight();
-    	} */
-    	if (cc != 0)
-    	{
-    		auto c = getCaptionWidget();
     		debug writeln(
     			"Button child x: %s, y: %s, w: %s, h: %s".format(
     				c.getX(),
@@ -115,15 +113,16 @@ class Button : Widget
     				)
     			);
     	}
-    }
-    
-    override void propagatePosAndSizeRecalcAfter()
-    {
-    	auto c = getCaptionWidget();
-    	if (c !is null)
+    	else
+    	{
+    		debug writeln("button caption widget is not set");
+    	}
+    	
+    	super.propagatePosAndSizeRecalc();
+    	
+    	if (c)
     	{
     		alignParentChild(0.5, 0.5, this, c);
     	}
     }
-    
 }

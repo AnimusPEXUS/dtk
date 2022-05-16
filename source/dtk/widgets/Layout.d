@@ -1,6 +1,8 @@
 module dtk.widgets.Layout;
 
 import core.sync.mutex;
+
+import std.format;
 import std.conv;
 import std.stdio;
 import std.container;
@@ -31,6 +33,13 @@ import dtk.miscs.DrawingSurfaceShift;
 
 
 const auto LayoutProperties = cast(PropSetting[]) [
+PropSetting("gs_w_d", "int", "viewportposX", "ViewPortPosX", "0"),
+PropSetting("gs_w_d", "int", "viewportposY", "ViewPortPosY", "0"),
+
+PropSetting("gs_w_d", "int", "viewportX", "ViewPortX", "0"),
+PropSetting("gs_w_d", "int", "viewportY", "ViewPortY", "0"),
+PropSetting("gs_w_d", "int", "viewportWidth", "ViewPortWidth", "0"),
+PropSetting("gs_w_d", "int", "viewportHeight", "ViewPortHeight", "0"),
 ];
 
 
@@ -42,30 +51,52 @@ class Layout : Widget
     
     private
     {
+    	//WidgetChild scrollbarH;
+    	//WidgetChild scrollbarV;
 		WidgetChild[] children;
+		VisibilityMap!(Widget) vm;
     }
     
     this()
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
+    	vm = new VisibilityMap!(Widget)();
     }
-
-	override WidgetChild[] calcWidgetServiceChildrenArray()
+    
+	override WidgetChild[] calcWidgetChildrenArray()
     {
-    	return [];
+    	WidgetChild[] ret;
+    	// if (this.scrollbarH)
+    	// ret ~= this.scrollbarH;
+    	// if (this.scrollbarV)
+    	// ret ~= this.scrollbarV;
+    	ret ~= children;
+    	return ret;
     }
-
-    override WidgetChild[] calcWidgetNormalChildrenArray()
-    {
-    	return children;
-    }
-
+    
     public
     {
-    	void delegate(Widget child) exceptionIfChildInvalid; 
+    	void delegate(Widget child) exceptionIfLayoutChildInvalid;
     }
-
-    final Widget getChild(int i)
+    
+    int getLayoutChildCount()
+    {
+    	return cast(int) children.length;
+    }
+    
+    bool haveLayoutChild(Widget child)
+    {
+    	foreach (c; children)
+    	{
+    		if (c.child == child)
+    		{
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    Widget getLayoutChild(int i)
     {
     	if (children.length == 0)
     		return null;
@@ -74,31 +105,31 @@ class Layout : Widget
     	return children[i].child;
     }
     
-    final Widget addChild(Widget child)
+    Layout addLayoutChild(Widget child)
     {
-    	if (exceptionIfChildInvalid !is null)
+    	if (exceptionIfLayoutChildInvalid !is null)
     	{
-    		exceptionIfChildInvalid(child);
+    		exceptionIfLayoutChildInvalid(child);
     	}
     	// if (childMaxCount != -1 && children.length == childMaxCount)
     	// {
-    		// throw new Exception("maximum children count reached");
+    	// throw new Exception("maximum children count reached");
     	// }
     	if (!haveChild(child))
     	{
-    		children ~= new WidgetChild(child);
+    		children ~= new WidgetChild(this, child);
     		fixChildParent(child);
     	}
     	return this;
     }
     
-    final Widget removeChild(Widget child)
+    Layout removeLayoutChild(Widget child)
     {
     	// if (children.length == childMinCount)
     	// {
-    		// throw new Exception("minimum children count reached");
+    	// throw new Exception("minimum children count reached");
     	// }
-    	if (!haveChild(child))
+    	if (!haveLayoutChild(child))
     		return this;
     	
     	Widget[] removed;
@@ -119,49 +150,24 @@ class Layout : Widget
     	return this;
     }
     
-    final Widget removeAllChildren()
+    Layout removeAllLayoutChildren()
     {
     	auto children_copy = children;
     	foreach(v; children_copy)
     	{
     		if (v.child !is null)
     		{
-    			removeChild(v.child);
+    			removeLayoutChild(v.child);
     		}
     	}
     	return this;
     }
     
-    final bool haveCompleteChild(Widget e)
-	{
-		foreach (v; calcWidgetCompleteChildrenArray())
-		{
-			if (v.child == e)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	final override bool haveChild(Widget e)
-	{
-		foreach (v; children)
-		{
-			if (v.child == e)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	// TODO: do something with this
-	void fixChildrenParents()
+	void fixLayoutChildrenParents()
     {
     	foreach_reverse (i, v; children)
     	{
-    		// TODO: maybe it's better to throw exception, instead of 
+    		// TODO: maybe it's better to throw exception, instead of
     		//       trying to guess fix
     		if (v.child is null)
     		{
@@ -170,12 +176,162 @@ class Layout : Widget
     		}
     	}
     	
-    	foreach (v; calcWidgetCompleteChildrenArray())
+    	foreach (v; children)
     	{
     		fixChildParent(v.child);
     	}
     }
     
-	
-
+    override void propagatePosAndSizeRecalc()
+    {
+    	auto w = getWidth();
+    	auto h = getHeight();
+    	
+    	setViewPortWidth(w);
+    	setViewPortHeight(h);
+    	
+    	super.propagatePosAndSizeRecalc();
+    	
+    	recalcChildrenVisibilityMap();
+    }
+    
+    // override void propagatePosAndSizeRecalcAfter()
+    // {
+    // recalcChildrenVisibilityMap();
+    // };
+    
+    void recalcChildrenVisibilityMap()
+    {
+    	vm.init(
+    		getViewPortX(),
+    		getViewPortY(),
+    		getViewPortWidth(),
+    		getViewPortHeight()
+    		);
+    	
+    	bool started;
+    	foreach (v; children)
+    	{
+    		auto res = vm.put(
+    			v.getX(),
+    			v.getY(),
+    			v.getWidth(),
+    			v.getHeight(),
+    			v.child
+    			);
+    		if (!started && res)
+    			started=true;
+    		if (started && !res)
+    			break;
+    	}
+    	
+    	return;
+    }
+    
+    override Image propagateRedraw()
+    {
+    	auto img = super.propagateRedraw();
+    	
+    	foreach (c; vm.map)
+    	{
+    		assert(c.o !is null);
+    		auto c_img = c.o.propagateRedraw();
+    		this.drawChild(img, c.o, c_img);
+    	}
+    	
+    	return img;
+    }
+    
+    DrawingSurfaceI shiftDrawingSurfaceForLayoutChild(
+		DrawingSurfaceI ds,
+		Widget child
+		)
+    {
+    	if (!haveLayoutChild(child))
+    		throw new Exception("not a layout child");
+    	
+        auto vp_x = getViewPortX();
+    	auto vp_y = getViewPortY();
+    	auto vp_w = getViewPortWidth();
+    	auto vp_h = getViewPortHeight();
+    	
+    	auto cx = getChildX(child);
+    	auto cy = getChildY(child);
+    	auto cw = getChildWidth(child);
+    	auto ch = getChildHeight(child);
+    	
+    	auto res = calculateVisiblePart(
+    		vp_x,
+    		vp_y,
+    		vp_w,
+    		vp_h,
+    		cx,
+    		cy,
+    		cw,
+    		ch
+    		);
+    	
+        auto ret = new DrawingSurfaceShift(
+        	ds,
+        	cast(int)res[5],
+        	cast(int)res[6]
+        	);
+        
+        return ret;
+    }
+    
+    void drawLayoutChild(DrawingSurfaceI ds, Widget child, Image img)
+    {
+    	ds = shiftDrawingSurfaceForChild(ds, child);
+    	
+    	auto vp_x = getViewPortX();
+    	auto vp_y = getViewPortY();
+    	auto vp_w = getViewPortWidth();
+    	auto vp_h = getViewPortHeight();
+    	
+    	auto cx = getChildX(child);
+    	auto cy = getChildY(child);
+    	auto cw = getChildWidth(child);
+    	auto ch = getChildHeight(child);
+    	
+    	auto res = calculateVisiblePart(
+    		vp_x,
+    		vp_y,
+    		vp_w,
+    		vp_h,
+    		cx,
+    		cy,
+    		cw,
+    		ch
+    		);
+    	if (!res[0])
+    		return;
+    	
+    	ds.drawImage(
+    		// NOTE: ds should be already shifted to correct position
+    		Position2D(0, 0),
+    		img.getImage(res[1], res[2], res[3], res[4])
+    		);
+    }
+    
+    deprecated 
+    {
+    	static foreach(v;["X", "Y", "Width", "Height"])
+    	{
+    		mixin(
+    			q{
+    				int getLayoutChild%1$s(Widget child)
+    				{
+    					throw new Exception("this function should not be used or implemented");
+    				}
+    				
+    				void setLayoutChild%1$s(Widget child, int v)
+    				{
+    					throw new Exception("this function should not be used or implemented");
+    				}
+    			}.format(v)
+    			);
+    	}
+    }
+    
 }

@@ -7,8 +7,18 @@ import dtk.widgets.Layout;
 import dtk.widgets.MenuItem;
 import dtk.widgets.mixins;
 
+enum MenuMode : ubyte
+{
+	bar,
+	popup
+}
+
 const auto MenuProperties = cast(PropSetting[]) [
+ PropSetting("gs_w_d", "MenuMode", "mode", "Mode", q{MenuMode.popup}),
 ];
+
+Menu MenuBar() {return new Menu(MenuMode.bar);}
+Menu MenuPopup() {return new Menu(MenuMode.popup);}
 
 class Menu : Widget
 {
@@ -21,14 +31,26 @@ class Menu : Widget
     	WidgetChild layout;
     }
     
-    this()
+    this(MenuMode mode)
     {
     	mixin(mixin_multiple_properties_inst(MenuProperties));
     	
-    	auto l = new Layout();
-    	layout = new WidgetChild(l);
+    	setMode(mode);
     	
-    	l.exceptionIfChildInvalid = delegate void(Widget child)
+    	setLayout(new Layout());
+    }
+    
+    Widget getLayout()
+    {
+    	return layout.child;
+    }
+    
+    Menu setLayout(Layout l)
+    {
+    	layout = new WidgetChild(this, l);
+    	l.setParent(this);
+    	
+    	l.exceptionIfLayoutChildInvalid = delegate void(Widget child)
     	{
     		if (cast(MenuItem) child is null)
     		{
@@ -37,21 +59,15 @@ class Menu : Widget
     				);
     		}
     	};
+    	return this;
     }
     
-    Widget getLayout()
+	override WidgetChild[] calcWidgetChildrenArray()
     {
-    	return layout.child;
-    }
-    
-	override WidgetChild[] calcWidgetServiceChildrenArray()
-    {
-    	return [layout];
-    }
-    
-    override WidgetChild[] calcWidgetNormalChildrenArray()
-    {
-    	return [];
+    	WidgetChild[] ret;
+    	if (this.layout)
+    		ret ~= this.layout;
+    	return ret;
     }
     
 }

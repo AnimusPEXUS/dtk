@@ -88,7 +88,7 @@ class ButtonCheck : Widget
     	return captionWidget.child;
     }
 
-	override WidgetChild[] calcWidgetServiceChildrenArray()
+	override WidgetChild[] calcWidgetChildrenArray()
     {
     	return [captionWidget];
     }    
@@ -97,7 +97,7 @@ class ButtonCheck : Widget
     {
     	auto cWidget = Label(text);
     	cWidget.setParent(this);
-    	captionWidget = new WidgetChild(cWidget);
+    	captionWidget = new WidgetChild(this, cWidget);
     	return this;
     }
     
@@ -248,9 +248,10 @@ class ButtonCheck : Widget
     	
     }
     
-    override void propagatePosAndSizeRecalcBefore()
+    override void propagatePosAndSizeRecalc()
     {
     	recalcIndicatorAndChildPositions();
+    	super.propagatePosAndSizeRecalc();
     }
     
     override Image renderImage()

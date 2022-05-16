@@ -440,7 +440,15 @@ class TextEntry : Widget
     	}
     	else
     	{
-    		text_view.reprocess();
+    		if (getForm() !is null)
+    		{
+    			text_view.reprocess();
+    		}
+    		setWidth(text_view.getWidth());
+    		setHeight(text_view.getHeight());
+    	}
+    	if (getEntryResizeByContent())
+    	{
     		setWidth(text_view.getWidth());
     		setHeight(text_view.getHeight());
     	}
