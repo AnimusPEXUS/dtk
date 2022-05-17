@@ -76,7 +76,7 @@ PropSetting("gs_w_d", "bool", "fill", "Fill", q{false}),
 
 class WidgetChild
 {
-	Widget widget;
+	Widget self;
 	Widget child;
 	
     mixin mixin_multiple_properties_define!(WidgetChildProperties);
@@ -90,11 +90,11 @@ class WidgetChild
     	SignalConnection sc_hChange;
     }
     
-    this(Widget widget, Widget child)
+    this(Widget self, Widget child)
     {
     	mixin(mixin_multiple_properties_inst(WidgetChildProperties));
     	
-    	this.widget = widget;
+    	this.self = self;
     	this.child = child;
     	
     	sc_xChange = connectToX_onAfterChanged(&onXYchanged);
@@ -107,7 +107,7 @@ class WidgetChild
     {
     	collectException(
     		{
-    			widget.childChangedXY(this);
+    			self.childChangedXY(this);
     			onXYWHchanged();
     		}()
     		);
@@ -117,7 +117,7 @@ class WidgetChild
     {
     	collectException(
     		{
-    			widget.childChangedWH(this);
+    			self.childChangedWH(this);
     			onXYWHchanged();
     		}()
     		);
@@ -127,7 +127,7 @@ class WidgetChild
     {
     	collectException(
     		{
-    			widget.childChangedXYWH(this);
+    			self.childChangedXYWH(this);
     		}()
     		);
     }
@@ -384,50 +384,6 @@ class Widget
     	return ret;
     }
     
-    // private
-    // {
-    // bool propagateParentChangeEmission_recursion_protection;
-    // Mutex propagateParentChangeEmission_recursion_protection_mtx;
-    // }
-    //
-    // final void propagateParentChangeEmission()
-    // {
-    //
-    // synchronized
-    // {
-    // if (propagateParentChangeEmission_recursion_protection_mtx is null)
-    // propagateParentChangeEmission_recursion_protection_mtx = new Mutex();
-    //
-    // recursionGuard(
-    // propagateParentChangeEmission_recursion_protection,
-    // propagateParentChangeEmission_recursion_protection_mtx,
-    // 0,
-    // delegate int() {
-    //
-    // auto children = calcWidgetChildrenArray();
-    //
-    // Form f = cast(Form) this;
-    //
-    // if (f !is null)
-    // {
-    // f.setWindow(f.getWindow());
-    // }
-    // else
-    // {
-    // setParent(getParent());
-    // }
-    //
-    // foreach (c; children)
-    // {
-    // c.child.propagateParentChangeEmission();
-    // }
-    //
-    // return 0;
-    // }
-    // );
-    // }
-    // }
-    
     // TODO: delete this function?
 	final Widget getFormDefaultWidget()
 	{
@@ -464,26 +420,6 @@ class Widget
     	return cast(int) calcWidgetChildrenArray().length;
     }
     
-    // final Widget getChild()
-    // {
-    // if (children.length == 0)
-    // {
-    // return null;
-    // }
-    // else
-    // {
-    // return children[0].child;
-    // }
-    // }
-    
-    // removes all children and adds passed child as only one
-    // final Widget setChild(Widget child)
-    // {
-    // removeAllChildren();
-    // addChild(child);
-    // return this;
-    // }
-    
 	final bool haveChild(Widget e)
 	{
 		foreach (v; calcWidgetChildrenArray())
@@ -519,15 +455,6 @@ class Widget
 		auto py = point.y;
 		
 		auto children = calcWidgetChildrenArray();
-		
-		debug
-		{
-			writeln("calcWidgetChildrenArray():");
-			foreach (i, v; children)
-			{
-				writeln("%03d: %s :: %s".format(i, v, v.child));
-			}
-		}
 		
 		// NOTE: it's better to do in reverse order
     	foreach_reverse (v; calcWidgetChildrenArray())
@@ -569,11 +496,7 @@ class Widget
     	auto cx = getChildX(child);
     	auto cy = getChildY(child);
     	
-        auto ret = new DrawingSurfaceShift(
-        	ds,
-        	cx,
-        	cy
-        	);
+        auto ret = new DrawingSurfaceShift(ds, cx, cy);
         
         return ret;
     }
@@ -595,14 +518,13 @@ class Widget
     Image propagateRedraw()
     {
     	auto img = this.renderImage();
-    	// auto ds = getDrawingSurface();
-    	// ds.drawImage(Position2D(0,0),img);
     	
     	foreach (c; calcWidgetChildrenArray())
     	{
-    		assert(c.child !is null);
-    		auto c_img = c.child.propagateRedraw();
-    		this.drawChild(img, c.child, c_img);
+    		auto cc = c.child;
+    		assert(cc !is null);
+    		auto c_img = cc.propagateRedraw();
+    		this.drawChild(img, cc, c_img);
     	}
     	
     	return img;

@@ -128,7 +128,7 @@ void main()
     form.setMainWidget(lo);
     writeln("after form.setChild");
     
-    lo.setX(10).setY(10).setWidth(780).setHeight(780);
+    // lo.setX(10).setY(10).setWidth(780).setHeight(780);
     
     auto rg = new RadioGroup();
     
@@ -189,10 +189,10 @@ void main()
     	auto c = ww.getMainWidget();
     	if (c)
     	{
-    		c.setX(0);
-    		c.setY(0);
-    		c.setWidth(ww.getWidth());
-    		c.setHeight(ww.getHeight());
+    		c.setX(10);
+    		c.setY(10);
+    		c.setWidth(ww.getWidth()-20);
+    		c.setHeight(ww.getHeight()-20);
     	}
     };
     

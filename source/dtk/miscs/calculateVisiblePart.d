@@ -2,9 +2,12 @@ module dtk.miscs.calculateVisiblePart;
 
 import std.typecons;
 
+// If there is space, which have object c on it and parto of space is viewed
+// via viewport vp - get visible part of c and c position in viewport
+
 // result values:
 //  0 - visible?
-//  1, 2, 3, 4 - visible image part
+//  1, 2, 3, 4 - visible image (object) part
 //  5, 6 - vertical and horizontal offset where to put visible part
 Tuple!(
 	bool,
@@ -36,6 +39,7 @@ int ch
     		0, 0, 0, 0,
     		0, 0
     		);
+    	
     	int x;
     	int y;
     	int w;

@@ -195,6 +195,14 @@ class Form : Widget
     				auto pos = res[1];
     				mouseFocusedWidgetX = pos.x;
     				mouseFocusedWidgetY = pos.y;
+    				
+    				debug writeln(
+    					"onWindowOtherEvent %s %sx%s".format(
+    						mouseFocusedWidget,
+    						mouseFocusedWidgetX,
+    						mouseFocusedWidgetY
+    						)
+    					);
     			}
     			
     			fe.event = event;

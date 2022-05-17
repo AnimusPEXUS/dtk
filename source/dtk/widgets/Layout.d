@@ -232,14 +232,82 @@ class Layout : Widget
     {
     	auto img = super.propagateRedraw();
     	
+    	foreach (c; calcWidgetChildrenArray())
+    	{
+    		auto cc = c.child;
+    		assert(cc !is null);
+    		
+    		// NOTE: the loop is stopped with first viewport child
+    		if (haveLayoutChild(cc))
+    			break;
+    		
+    		auto c_img = cc.propagateRedraw();
+    		this.drawChild(img, cc, c_img);
+    	}
+    	
     	foreach (c; vm.map)
     	{
-    		assert(c.o !is null);
-    		auto c_img = c.o.propagateRedraw();
-    		this.drawChild(img, c.o, c_img);
+    		auto co = c.o;
+    		assert(co !is null);
+    		auto c_img = co.propagateRedraw();
+    		this.drawLayoutChild(img, co, c_img);
     	}
     	
     	return img;
+    }
+    
+    override Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+    {
+    	auto px = point.x;
+		auto py = point.y;
+		
+    	auto vpx = getViewPortPosX();
+    	auto vpy = getViewPortPosY();
+    	auto vx = getViewPortX();
+    	auto vy = getViewPortY();
+    	auto vw = getViewPortWidth();
+    	auto vh = getViewPortHeight();
+    	
+    	debug writeln("pointer in viewport?");
+    	if (
+    		px >= vpx
+    	&& px < vpx+vw
+    	
+    	&& py >= vpy
+    	&& py < vpy+vh
+    	)
+    	{
+    		debug writeln("   yes");
+    		auto vp_pos = Position2D((px - vpx + vx), (py - vpy + vy));
+    		auto res = vm.getByPoint(vp_pos, true);
+    		if (res.length != 0)
+    		{
+    			auto viewport_child = res[$-1];
+    			debug writeln("viewport_child: ", viewport_child);
+    			auto viewport_child_visibility = viewport_child[0];
+    			auto viewport_child_visibility_object = viewport_child_visibility.o;
+    			assert(viewport_child_visibility_object !is null);
+    			Position2D op = viewport_child[1];
+    			debug writeln(
+    				"      viewport child %s: try to get object under %sx%s".format(
+    					viewport_child_visibility_object,
+    					op.x,
+    					op.y
+    					)
+    				);
+    			return viewport_child_visibility_object.getChildAtPosition(op);
+    		}
+    		else
+    		{
+    			debug writeln("   no objects under cursor");
+    			return tuple(cast(Widget)this, point);
+    		}
+    	}
+    	else
+    	{
+    		debug writeln("   no");
+    		return super.getChildAtPosition(point);
+    	}
     }
     
     DrawingSurfaceI shiftDrawingSurfaceForLayoutChild(
@@ -282,7 +350,10 @@ class Layout : Widget
     
     void drawLayoutChild(DrawingSurfaceI ds, Widget child, Image img)
     {
-    	ds = shiftDrawingSurfaceForChild(ds, child);
+    	if (!haveLayoutChild(child))
+    		throw new Exception("not a layout child");
+    	
+    	ds = shiftDrawingSurfaceForLayoutChild(ds, child);
     	
     	auto vp_x = getViewPortX();
     	auto vp_y = getViewPortY();
@@ -314,7 +385,7 @@ class Layout : Widget
     		);
     }
     
-    deprecated 
+    deprecated
     {
     	static foreach(v;["X", "Y", "Width", "Height"])
     	{
@@ -322,12 +393,16 @@ class Layout : Widget
     			q{
     				int getLayoutChild%1$s(Widget child)
     				{
-    					throw new Exception("this function should not be used or implemented");
+    					throw new Exception(
+    						"this function should not be used or implemented"
+    						);
     				}
     				
     				void setLayoutChild%1$s(Widget child, int v)
     				{
-    					throw new Exception("this function should not be used or implemented");
+    					throw new Exception(
+    						"this function should not be used or implemented"
+    						);
     				}
     			}.format(v)
     			);

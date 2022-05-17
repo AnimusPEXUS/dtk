@@ -17,6 +17,9 @@ class Visibility(T)
 	T o;
 }
 
+// viewport of space. calculates objects visible in viewport, eactly wisible 
+// parts of those objects and position of visible object's XY relatively to 
+// viewport XY
 class VisibilityMap(T)
 {
 	int vp_x;
@@ -40,7 +43,8 @@ class VisibilityMap(T)
 		this.map = this.map[0 .. 0]; 
 	}
 	
-	// visible?
+	// put object into viewport. if object not visible at all, object will not 
+	// be remembered. xy it relative to scene xy
 	bool put(
 		int x,
     	int y,
@@ -78,6 +82,9 @@ class VisibilityMap(T)
     	return true;
     }
 	
+    // determine object and it's visibility parameters.
+    // input point is relative to scene xy.
+    // output point is relative to object xy.
 	Tuple!(Visibility!(T), Position2D)[] getByPoint(
 		Position2D point,
 		bool only_last
