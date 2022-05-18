@@ -88,7 +88,7 @@ class ButtonCheck : Widget
     	return captionWidget.child;
     }
 
-	override WidgetChild[] calcWidgetChildrenArray()
+	override WidgetChild[] calcWidgetChildren()
     {
     	return [captionWidget];
     }    

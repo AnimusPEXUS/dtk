@@ -196,9 +196,13 @@ void main()
     	}
     };
     
-    lo.performLayout = delegate void(Widget w)
+    lo.performLayout = delegate void(Widget w1)
     {
-    	auto wm = w.getWidth();
+    	Layout w = cast(Layout)w1;
+    	w.setViewPortPosX(100);
+    	w.setViewPortPosY(300);
+    	w.setViewPortWidth(w.getWidth()-w.getViewPortPosX()-150);
+    	auto wm = w.getViewPortWidth();
     	auto wm20 = wm-20;
     	mm.setX(0).setY(0).setWidth(wm).setHeight(20);
     	btn.setX(10).setY(mm.getY()+mm.getHeight()+5).setWidth(wm20/4).setHeight(20);

@@ -321,13 +321,27 @@ class Chicago98Laf : LaFI
     {
     	auto size_w = e.getWidth();
     	auto size_h = e.getHeight();
-    	
+
     	ds.drawRectangle(
     		Position2D(0, 0),
     		Size2D(size_w, size_h),
     		LineStyle(formBackground),
         	nullable(FillStyle(formBackground))
         	);
+        
+        debug
+        {
+        	if (e.drawRectangleAroundViewPort)
+        	{
+        		ds.drawRectangle(
+        			Position2D(e.getViewPortPosX(), e.getViewPortPosY()),
+        			Size2D(e.getViewPortWidth(), e.getViewPortHeight()),
+        			LineStyle(elementDarkedColor),
+        			Nullable!FillStyle()
+        			);
+        	}
+        }
+
     }
     
     void drawMenu(Menu e, DrawingSurfaceI ds)

@@ -139,7 +139,7 @@ class ScrollBar : Widget
     	return button1.child;
     }
     
-	override WidgetChild[] calcWidgetChildrenArray()
+	override WidgetChild[] calcWidgetChildren()
     {
     	// NOTE: scrollbar always have those buttons, so checking isn't needed
     	return [button0, button1];

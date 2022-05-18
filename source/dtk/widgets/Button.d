@@ -63,7 +63,7 @@ class Button : Widget
     	return captionWidget.child;
     }
     
-	override WidgetChild[] calcWidgetChildrenArray()
+	override WidgetChild[] calcWidgetChildren()
     {
     	WidgetChild[] ret;
     	if (this.captionWidget)

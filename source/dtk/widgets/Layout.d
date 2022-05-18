@@ -57,21 +57,31 @@ class Layout : Widget
 		VisibilityMap!(Widget) vm;
     }
     
+    public
+    {
+    	debug bool drawRectangleAroundViewPort = true;
+    }
+    
     this()
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
     	vm = new VisibilityMap!(Widget)();
     }
     
-	override WidgetChild[] calcWidgetChildrenArray()
+	override WidgetChild[] calcWidgetChildren()
     {
     	WidgetChild[] ret;
-    	// if (this.scrollbarH)
-    	// ret ~= this.scrollbarH;
-    	// if (this.scrollbarV)
-    	// ret ~= this.scrollbarV;
-    	ret ~= children;
     	return ret;
+    }
+    
+	WidgetChild[] calcWidgetLayoutChildren()
+    {
+    	return children;
+    }
+    
+    final int calcWidgetLayoutChildrenCount()
+    {
+    	return cast(int) calcWidgetLayoutChildren().length;
     }
     
     public
@@ -192,6 +202,11 @@ class Layout : Widget
     	
     	super.propagatePosAndSizeRecalc();
     	
+    	foreach (c; calcWidgetLayoutChildren())
+    	{
+    		c.child.propagatePosAndSizeRecalc();
+    	}
+    	
     	recalcChildrenVisibilityMap();
     }
     
@@ -232,19 +247,6 @@ class Layout : Widget
     {
     	auto img = super.propagateRedraw();
     	
-    	foreach (c; calcWidgetChildrenArray())
-    	{
-    		auto cc = c.child;
-    		assert(cc !is null);
-    		
-    		// NOTE: the loop is stopped with first viewport child
-    		if (haveLayoutChild(cc))
-    			break;
-    		
-    		auto c_img = cc.propagateRedraw();
-    		this.drawChild(img, cc, c_img);
-    	}
-    	
     	foreach (c; vm.map)
     	{
     		auto co = c.o;
@@ -255,6 +257,19 @@ class Layout : Widget
     	
     	return img;
     }
+
+    override WidgetChild getWidgetChildByChild(Widget child)
+    {
+    	foreach (v; calcWidgetLayoutChildren())
+    	{
+    		if (v.child == child)
+    		{
+    			return v;
+    		}
+    	}
+    	return super.getWidgetChildByChild(child);
+    }
+
     
     override Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
     {
@@ -310,6 +325,17 @@ class Layout : Widget
     	}
     }
     
+    override DrawingSurfaceI shiftDrawingSurfaceForChild(
+		DrawingSurfaceI ds,
+		Widget child
+		)
+    {
+    	if (haveLayoutChild(child))
+    		return shiftDrawingSurfaceForLayoutChild(ds, child);
+    	
+        return super.shiftDrawingSurfaceForChild(ds, child);
+    }
+    
     DrawingSurfaceI shiftDrawingSurfaceForLayoutChild(
 		DrawingSurfaceI ds,
 		Widget child
@@ -317,6 +343,9 @@ class Layout : Widget
     {
     	if (!haveLayoutChild(child))
     		throw new Exception("not a layout child");
+    	
+        auto vp_px = getViewPortPosX();
+    	auto vp_py = getViewPortPosY();
     	
         auto vp_x = getViewPortX();
     	auto vp_y = getViewPortY();
@@ -340,9 +369,13 @@ class Layout : Widget
     		);
     	
         auto ret = new DrawingSurfaceShift(
-        	ds,
-        	cast(int)res[5],
-        	cast(int)res[6]
+        	new DrawingSurfaceShift(
+        		ds,
+        		cast(int)res[5],
+        		cast(int)res[6]
+        		),
+        	vp_px,
+        	vp_py
         	);
         
         return ret;
@@ -354,6 +387,9 @@ class Layout : Widget
     		throw new Exception("not a layout child");
     	
     	ds = shiftDrawingSurfaceForLayoutChild(ds, child);
+
+        // auto vp_px = getViewPortPosX();
+    	// auto vp_py = getViewPortPosY();
     	
     	auto vp_x = getViewPortX();
     	auto vp_y = getViewPortY();

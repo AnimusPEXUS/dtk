@@ -158,7 +158,7 @@ class Form : Widget
     	return this;
     }
     
-	override WidgetChild[] calcWidgetChildrenArray()
+	override WidgetChild[] calcWidgetChildren()
     {
     	WidgetChild[] ret;
     	if (mainWidget)

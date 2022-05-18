@@ -280,9 +280,9 @@ class Widget
     				auto c = getWidgetChildByChild(child);
     				if (c is null)
     				{
-    					debug writeln(child, " is not a layout child");
+    					debug writeln(child, " is not a child of current widget");
     					// TODO: is this good place for exception
-    					throw new Exception("object is not in layout");
+    					throw new Exception("object is not a child of current widget");
     				}
     				return c.get%1$s();
     			}
@@ -292,9 +292,9 @@ class Widget
     				auto c = getWidgetChildByChild(child);
     				if (c is null)
     				{
-    					debug writeln(child, " is not a layout child");
+    					debug writeln(child, " is not a child of current widget");
     					// TODO: is this good place for exception
-    					throw new Exception("object is not in layout");
+    					throw new Exception("object is not a child of current widget");
     				}
     				c.set%1$s(v);
     				return;
@@ -410,19 +410,19 @@ class Widget
 		return;
 	}
 	
-	WidgetChild[] calcWidgetChildrenArray()
+	WidgetChild[] calcWidgetChildren()
     {
     	return [];
     }
     
     final int calcWidgetChildrenCount()
     {
-    	return cast(int) calcWidgetChildrenArray().length;
+    	return cast(int) calcWidgetChildren().length;
     }
     
 	final bool haveChild(Widget e)
 	{
-		foreach (v; calcWidgetChildrenArray())
+		foreach (v; calcWidgetChildren())
 		{
 			if (v.child == e)
 			{
@@ -442,7 +442,7 @@ class Widget
     
 	final void fixChildrenParents()
     {
-    	foreach_reverse (i, v; calcWidgetChildrenArray())
+    	foreach_reverse (i, v; calcWidgetChildren())
     	{
     		fixChildParent(v.child);
     	}
@@ -454,10 +454,8 @@ class Widget
     	auto px = point.x;
 		auto py = point.y;
 		
-		auto children = calcWidgetChildrenArray();
-		
 		// NOTE: it's better to do in reverse order
-    	foreach_reverse (v; calcWidgetChildrenArray())
+    	foreach_reverse (v; calcWidgetChildren())
     	{
     		auto vx = v.getX();
     		auto vy = v.getY();
@@ -485,13 +483,13 @@ class Widget
     	return tuple(cast(Widget)this, point);
     }
     
-    final DrawingSurfaceI shiftDrawingSurfaceForChild(
+    DrawingSurfaceI shiftDrawingSurfaceForChild(
 		DrawingSurfaceI ds,
 		Widget child
 		)
     {
     	if (!haveChild(child))
-    		throw new Exception("not a child");
+    		throw new Exception("not a widget child");
     	
     	auto cx = getChildX(child);
     	auto cy = getChildY(child);
@@ -507,7 +505,7 @@ class Widget
     	if (performLayout !is null)
     		performLayout(this);
     	
-    	foreach (v; calcWidgetChildrenArray())
+    	foreach (v; calcWidgetChildren())
     	{
     		v.child.propagatePosAndSizeRecalc();
     	}
@@ -519,7 +517,7 @@ class Widget
     {
     	auto img = this.renderImage();
     	
-    	foreach (c; calcWidgetChildrenArray())
+    	foreach (c; calcWidgetChildren())
     	{
     		auto cc = c.child;
     		assert(cc !is null);
@@ -530,10 +528,9 @@ class Widget
     	return img;
     }
     
-    // this searches through complete child list
-    final WidgetChild getWidgetChildByChild(Widget child)
+    WidgetChild getWidgetChildByChild(Widget child)
     {
-    	foreach (v; calcWidgetChildrenArray())
+    	foreach (v; calcWidgetChildren())
     	{
     		if (v.child == child)
     		{

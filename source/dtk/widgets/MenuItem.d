@@ -51,7 +51,7 @@ class MenuItem : Widget
     	return this.widget.child;
     }
     
-	override WidgetChild[] calcWidgetChildrenArray()
+	override WidgetChild[] calcWidgetChildren()
     {
     	WidgetChild[] ret;
     	if (this.widget)
