@@ -41,13 +41,13 @@ enum ViewPortChildrenPosAndSizeReaction : ubyte
 
 // enum WidgetAgainstViewPortSizePolicy : ubyte
 // {
-	// ViewPortResizeByWidget,
-	// WidgetResizeByViewPort,
+// ViewPortResizeByWidget,
+// WidgetResizeByViewPort,
 // }
 
 // enum WidgetResizeAndViewportPolicy : ubyte
 // {
-	// WidgetDictatesChild
+// WidgetDictatesChild
 // }
 
 // enum LayoutType : ubyte
@@ -144,10 +144,10 @@ PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
 PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
 
 PropSetting(
-	"gs_w_d", 
-	"bool", 
-	"triggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange", 
-	"TriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange", 
+	"gs_w_d",
+	"bool",
+	"triggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange",
+	"TriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange",
 	"true"
 	),
 
@@ -192,20 +192,23 @@ class Widget
     {
     	// Set laying out function.
     	
-    	// This function can (but not required to) use children's desired XYWH 
+    	// This function can (but not required to) use children's desired XYWH
     	// to position children on widdget (set children's actual XYWH).
     	
     	// This function is allowed to set desired XYWH of current widget.
     	
     	// THIS FUNCTION SHOULD NOT CHANGE CURRENT WIDGET'S ACTUAL XYWH.
-
+    	
     	// THIS FUNCTION SHOULD NOT CHANGE CHILDREN'S DESIRED XYWH.
-
-    	// CURRENT WIDGET'S ACTUAL XYWH IS ONLY ALLOWED TO BE CHANGED BY 
+    	
+    	// CURRENT WIDGET'S ACTUAL XYWH IS ONLY ALLOWED TO BE CHANGED BY
     	// PARRENT'S performLayout().
     	
-    	// on widgets with viewport, this function is allowed to change 
+    	// on widgets with viewport, this function is allowed to change
     	// ViewPort positions (both external and internal) and sizes.
+    	
+    	// NOTE: Layout ViewPort is never resized by it self. use performLayout to
+    	//       position and resize ViewPort
 		void delegate(Widget w) performLayout;
 	}
 	
@@ -279,7 +282,7 @@ class Widget
 					
 					return ret;
 				}
-
+				
 				Widget set%1$s(int value)
 				{
 					Widget parent;
@@ -349,7 +352,7 @@ class Widget
     		}.format(v)
     		);
     }
-
+    
     Image renderImage()
     {
     	throw new Exception("override this");

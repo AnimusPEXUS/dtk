@@ -88,6 +88,9 @@ Menu makeMainMenu()
 					)
 				);
 			
+			w.setViewPortWidth(w.getWidth());
+			w.setViewPortHeight(w.getHeight());
+			
 			// move this into linearLayout
 			int height;
 			

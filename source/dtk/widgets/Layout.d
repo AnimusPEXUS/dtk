@@ -42,7 +42,8 @@ PropSetting("gs_w_d", "int", "viewportWidth", "ViewPortWidth", "0"),
 PropSetting("gs_w_d", "int", "viewportHeight", "ViewPortHeight", "0"),
 ];
 
-
+// NOTE: Layout ViewPort is never resized by it self. use performLayout to 
+//       position and resize ViewPort
 class Layout : Widget
 {
     mixin mixin_multiple_properties_define!(LayoutProperties);
