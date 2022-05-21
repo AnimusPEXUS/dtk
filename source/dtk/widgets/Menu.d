@@ -37,11 +37,13 @@ class Menu : Widget
     	
     	setMode(mode);
     	
-    	setLayout(new Layout());
+    	//setLayout();
     }
     
     Widget getLayout()
     {
+    	if (!layout || !layout.child)
+    		return null;
     	return layout.child;
     }
     

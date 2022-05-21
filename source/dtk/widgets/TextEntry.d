@@ -174,8 +174,8 @@ class TextEntry : Widget
     			debug writeln("text_view.viewResized called");
     			if (getEntryResizeByContent())
     			{
-    				setWidth(text_view.getWidth());
-    				setHeight(text_view.getHeight());
+    				setDesiredWidth(text_view.getWidth());
+    				setDesiredHeight(text_view.getHeight());
     				
     				debug writeln("TextEntry resized by %s x %s".format(getWidth(), getHeight()));
     			}

@@ -39,16 +39,16 @@ enum ViewPortChildrenPosAndSizeReaction : ubyte
     Resize, // resize ViewPort by contents
 }
 
-enum WidgetAgainstViewPortSizePolicy : ubyte
-{
-	ViewPortResizeByWidget,
-	WidgetResizeByViewPort,
-}
+// enum WidgetAgainstViewPortSizePolicy : ubyte
+// {
+	// ViewPortResizeByWidget,
+	// WidgetResizeByViewPort,
+// }
 
-enum WidgetResizeAndViewportPolicy : ubyte
-{
-	WidgetDictatesChild
-}
+// enum WidgetResizeAndViewportPolicy : ubyte
+// {
+	// WidgetDictatesChild
+// }
 
 // enum LayoutType : ubyte
 // {
@@ -63,9 +63,6 @@ PropSetting("gs_w_d", "int", "x", "X", q{0}),
 PropSetting("gs_w_d", "int", "y", "Y", q{0}),
 PropSetting("gs_w_d", "int", "width", "Width", q{0}),
 PropSetting("gs_w_d", "int", "height", "Height", q{0}),
-
-PropSetting("gs_w_d", "bool", "expand", "Expand", q{false}),
-PropSetting("gs_w_d", "bool", "fill", "Fill", q{false}),
 
 // Each Layout Engine have it's own set of parameters for each child,
 // so LayoutChild somehow have to store settings for any engine child.
@@ -135,9 +132,25 @@ class WidgetChild
 
 const auto WidgetProperties = cast(PropSetting[]) [
 PropSetting("gsun", "Widget", "parent", "Parent", q{null}),
+
+PropSetting("gs_w_d", "int", "desiredX", "DesiredX", q{0}),
+PropSetting("gs_w_d", "int", "desiredY", "DesiredY", q{0}),
+PropSetting("gs_w_d", "int", "desiredWidth", "DesiredWidth", q{0}),
+PropSetting("gs_w_d", "int", "desiredHeight", "DesiredHeight", q{0}),
+
+
 PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
 
 PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
+
+PropSetting(
+	"gs_w_d", 
+	"bool", 
+	"triggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange", 
+	"TriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange", 
+	"true"
+	),
+
 // PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "0"),
 ];
 
@@ -149,10 +162,6 @@ class Widget
 	mixin mixin_multiple_properties_define!(WidgetProperties);
     mixin mixin_multiple_properties_forward!(WidgetProperties, false);
     
-    private
-    {
-    }
-    
 	private
     {
     	SignalConnection sc_windowChange;
@@ -162,32 +171,70 @@ class Widget
     	SignalConnection sc_windowEvents;
     	
     	SignalConnection sc_formEventHandler;
+    	
+    	SignalConnection sc_desiredXChange;
+    	SignalConnection sc_desiredYChange;
+    	SignalConnection sc_desiredWidthChange;
+    	SignalConnection sc_desiredHeightChange;
     }
     
-	// this()
-	// {
-	// mixin(mixin_multiple_properties_inst(WidgetProperties));
-	// childMinCount=-1;
-	// childMaxCount=-1;
-	// }
-	
 	this()
 	{
 		mixin(mixin_multiple_properties_inst(WidgetProperties));
+		
+    	sc_desiredXChange = connectToDesiredX_onAfterChanged(&desiredXYWHchangedInformParent);
+    	sc_desiredYChange = connectToDesiredY_onAfterChanged(&desiredXYWHchangedInformParent);
+    	sc_desiredWidthChange = connectToDesiredWidth_onAfterChanged(&desiredXYWHchangedInformParent);
+    	sc_desiredHeightChange = connectToDesiredHeight_onAfterChanged(&desiredXYWHchangedInformParent);
 	}
 	
 	public
     {
+    	// Set laying out function.
+    	
+    	// This function can (but not required to) use children's desired XYWH 
+    	// to position children on widdget (set children's actual XYWH).
+    	
+    	// This function is allowed to set desired XYWH of current widget.
+    	
+    	// THIS FUNCTION SHOULD NOT CHANGE CURRENT WIDGET'S ACTUAL XYWH.
+
+    	// THIS FUNCTION SHOULD NOT CHANGE CHILDREN'S DESIRED XYWH.
+
+    	// CURRENT WIDGET'S ACTUAL XYWH IS ONLY ALLOWED TO BE CHANGED BY 
+    	// PARRENT'S performLayout().
+    	
+    	// on widgets with viewport, this function is allowed to change 
+    	// ViewPort positions (both external and internal) and sizes.
 		void delegate(Widget w) performLayout;
-    }
-    
+	}
+	
     Widget setPerformLayout(void delegate(Widget w) performLayout)
     {
     	this.performLayout = performLayout;
     	return this;
     }
     
-	static foreach(v; ["Width", "Height", "X", "Y"])
+    private void desiredXYWHchangedInformParent(int int0, int int1) nothrow
+    {
+    	collectException(
+    		{
+    			auto p = getParent();
+    			if (p)
+    				p.childWidgetXYWHChanged(this);
+    		}()
+    		);
+    }
+    
+    private void childWidgetXYWHChanged(Widget w)
+    {
+    	if (getTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange())
+    	{
+    		propagatePosAndSizeRecalc();
+    	}
+    }
+    
+ 	static foreach(v; ["Width", "Height", "X", "Y"])
 	{
 		mixin(
 			q{
@@ -232,7 +279,7 @@ class Widget
 					
 					return ret;
 				}
-				
+
 				Widget set%1$s(int value)
 				{
 					Widget parent;
@@ -302,7 +349,7 @@ class Widget
     		}.format(v)
     		);
     }
-    
+
     Image renderImage()
     {
     	throw new Exception("override this");

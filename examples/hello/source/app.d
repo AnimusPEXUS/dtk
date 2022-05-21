@@ -56,15 +56,21 @@ Menu makeMainMenu()
 	m1mi1.setWidget(Label("Save"));
 	
 	m0.setPerformLayout(
-		delegate void(Widget w)
+		delegate void(Widget w1)
 		{
-			auto w2 = cast(Menu) w;
-			auto c = w2.getLayout();
+			auto w = cast(Menu) w1;
+			auto c = w.getLayout();
+			
+			// w.setDesiredWidth(w.getWidth());
+			// w.setDesiredHeight(w.getHeight());
+			
 			c.setWidth(w.getWidth());
-			c.setHeight(w.getHeight());
+			c.setHeight(c.getDesiredHeight());
 			debug writeln(
-				"m0 layout activated: wh = %s, ch = %s".format(
+				"m0 layout activated: ww = %s, wh = %s, cw = %s, ch = %s".format(
+					w.getWidth(),
 					w.getHeight(),
+					c.getWidth(),
 					c.getHeight()
 					)
 				);
@@ -72,20 +78,63 @@ Menu makeMainMenu()
 		);
 	
 	m0lo.setPerformLayout(
-		delegate void(Widget w)
+		delegate void(Widget w1)
 		{
-			auto l = cast(Layout) w;
-			debug writeln("m0lo layout activated");
-			linearLayout(l, Orientation.horizontal);
+			auto w = cast(Layout) w1;
+			debug writeln(
+				"m0lo layout activated: ww = %s, wh = %s".format(
+					w.getWidth(),
+					w.getHeight(),
+					)
+				);
+			
+			// move this into linearLayout
+			int height;
+			
+			for (int i = 0; i != w.getLayoutChildCount(); i++)
+			{
+				auto c = w.getLayoutChild(i);
+				auto ch = c.getDesiredHeight();
+				if (ch > height)
+					height = ch;
+			}
+			
+			w.setDesiredHeight(height);
+			
+			linearLayout(w, Orientation.horizontal);
+			for (int i = 0; i != w.getLayoutChildCount(); i++)
+			{
+				auto c = w.getLayoutChild(i);
+				debug writeln(
+					"   m0lo child %d: x = %s, y = %s, w = %s, h = %s".format(
+						i,
+						c.getX(),
+						c.getY(),
+						c.getWidth(),
+						c.getHeight()
+						)
+					);
+			}
 		}
 		);
 	
 	m1lo.setPerformLayout(
-		delegate void(Widget w)
+		delegate void(Widget w1)
 		{
-			auto l = cast(Layout) w;
+			auto w = cast(Layout) w1;
 			debug writeln("m1lo layout activated");
-			linearLayout(l, Orientation.vertical);
+			
+			int width;
+			
+			for (int i = 0; i != w.getLayoutChildCount(); i++)
+			{
+				auto c = w.getLayoutChild(i);
+				auto cw = c.getDesiredWidth();
+				if (cw > width)
+					width = cw;
+			}
+			
+			linearLayout(w, Orientation.vertical);
 		}
 		);
 	
@@ -199,9 +248,10 @@ void main()
     lo.performLayout = delegate void(Widget w1)
     {
     	Layout w = cast(Layout)w1;
-    	w.setViewPortPosX(100);
-    	w.setViewPortPosY(300);
-    	w.setViewPortWidth(w.getWidth()-w.getViewPortPosX()-150);
+    	w.setViewPortPosX(0);
+    	w.setViewPortPosY(0);
+    	w.setViewPortWidth(w.getWidth());
+    	w.setViewPortHeight(w.getHeight());
     	auto wm = w.getViewPortWidth();
     	auto wm20 = wm-20;
     	mm.setX(0).setY(0).setWidth(wm).setHeight(20);

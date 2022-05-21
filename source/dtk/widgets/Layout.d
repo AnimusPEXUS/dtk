@@ -66,6 +66,7 @@ class Layout : Widget
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
     	vm = new VisibilityMap!(Widget)();
+    	setTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange(false);
     }
     
 	override WidgetChild[] calcWidgetChildren()
@@ -74,14 +75,17 @@ class Layout : Widget
     	return ret;
     }
     
-	WidgetChild[] calcWidgetLayoutChildren()
+    deprecated 
     {
-    	return children;
-    }
-    
-    final int calcWidgetLayoutChildrenCount()
-    {
-    	return cast(int) calcWidgetLayoutChildren().length;
+    	WidgetChild[] calcWidgetLayoutChildren()
+    	{
+    		return children;
+    	}
+    	
+    	final int calcWidgetLayoutChildrenCount()
+    	{
+    		return cast(int) calcWidgetLayoutChildren().length;
+    	}
     }
     
     public
@@ -197,12 +201,9 @@ class Layout : Widget
     	auto w = getWidth();
     	auto h = getHeight();
     	
-    	setViewPortWidth(w);
-    	setViewPortHeight(h);
-    	
     	super.propagatePosAndSizeRecalc();
     	
-    	foreach (c; calcWidgetLayoutChildren())
+    	foreach (c; children)
     	{
     		c.child.propagatePosAndSizeRecalc();
     	}
@@ -260,7 +261,7 @@ class Layout : Widget
 
     override WidgetChild getWidgetChildByChild(Widget child)
     {
-    	foreach (v; calcWidgetLayoutChildren())
+    	foreach (v; children)
     	{
     		if (v.child == child)
     		{

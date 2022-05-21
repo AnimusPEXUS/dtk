@@ -22,7 +22,7 @@ void linearLayout(Layout w, Orientation o)
 		{
 			c.setX(currentOffset);
 			c.setY(0);
-			// c.setWidth(50);
+			c.setWidth(c.getDesiredWidth());
 			c.setHeight(wHeight);
 			currentOffset += c.getWidth();
 		}
@@ -31,7 +31,7 @@ void linearLayout(Layout w, Orientation o)
 			c.setX(0);
 			c.setY(currentOffset);
 			c.setWidth(wWidth);
-			// c.setHeight(50);
+			c.setHeight(c.getDesiredHeight());
 			currentOffset += c.getHeight();
 		}
 		debug writeln("linearLayout child %s aligned: %sx%s %sx%s".format(
