@@ -241,10 +241,10 @@ void main()
     	auto c = ww.getMainWidget();
     	if (c)
     	{
-    		c.setX(10);
-    		c.setY(10);
-    		c.setWidth(ww.getWidth()-20);
-    		c.setHeight(ww.getHeight()-20);
+    		c.setX(0);
+    		c.setY(0);
+    		c.setWidth(ww.getWidth());
+    		c.setHeight(ww.getHeight());
     	}
     };
     

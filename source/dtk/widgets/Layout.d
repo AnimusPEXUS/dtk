@@ -60,7 +60,7 @@ class Layout : Widget
     
     public
     {
-    	debug bool drawRectangleAroundViewPort = true;
+    	debug bool drawRectangleAroundViewPort = false;
     }
     
     this()
