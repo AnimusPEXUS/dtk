@@ -5,6 +5,7 @@ import std.format;
 
 import dtk.types.Property;
 import dtk.types.Widget;
+import dtk.types.EventForm;
 
 import dtk.widgets.Menu;
 import dtk.widgets.mixins;
@@ -97,5 +98,12 @@ class MenuItem : Widget
     	if (this.widget)
     		ret ~= this.widget;
     	return ret;
+    }
+
+    override void intMousePressRelease(Widget widget, EventForm* event)
+    {
+    	debug writeln("click");
+    	if (onMousePressRelease)
+    		onMousePressRelease(event);
     }
 }

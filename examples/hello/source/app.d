@@ -126,6 +126,9 @@ Menu makeMainMenu()
 		{
 			auto w = cast(Layout) w1;
 			debug writeln("m1lo layout activated");
+
+			w.setViewPortWidth(w.getWidth());
+			w.setViewPortHeight(w.getHeight());
 			
 			int width;
 			
@@ -226,15 +229,6 @@ void main()
     
     rg.selectButton(btn5);
     
-    // btn.setX(10).setY(10).setWidth(40).setHeight(40);
-    // btn2.setX(10).setY(60).setWidth(100).setHeight(20);
-    // btn3.setX(10).setY(80).setWidth(100).setHeight(20);
-    // btn4.setX(10).setY(100).setWidth(100).setHeight(20);
-    // btn5.setX(10).setY(120).setWidth(100).setHeight(20);
-    // lbl1.setX(10).setY(140).setWidth(500).setHeight(100);
-    // lbl2.setX(10).setY(260).setWidth(500).setHeight(20);
-    // sb1.setX(10).setY(280).setWidth(500).setHeight(16);
-    
     form.performLayout = delegate void(Widget w)
     {
     	auto ww = cast(Form) w;
@@ -267,26 +261,7 @@ void main()
     	lbl2.setX(10).setY(lbl1.getY()+lbl1.getHeight()+5).setWidth(wm20).setHeight(20);
     	sb1.setX(10).setY(lbl2.getY()+lbl2.getHeight()+5).setWidth(wm20).setHeight(16);
     };
-    
-    /*     form.onFormSignalBeforeProcessing =  delegate bool(EventForm *event)
-    {
-    if (event
-    && event.event.type==EventType.mouse
-    && event.event.em.type == EventMouseType.movement
-    )
-    {
-    auto x ="x: %s, y: %s"d.format(
-    event.event.mouseX,
-    event.event.mouseY
-    );
-    debug writeln(x);
-    lbl2.setText(x);
-    // debug writeln("lbl2 text %s".format(lbl2.getText()));
-    }
-    return false;
-    };
-    */
-    
+
     pl.mainLoop();
     
     pl.destroy();

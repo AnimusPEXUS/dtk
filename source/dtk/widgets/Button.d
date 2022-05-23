@@ -96,8 +96,11 @@ class Button : Widget
     }
     
     override void intMousePressRelease(Widget widget, EventForm* event)
-    {debug writeln("click");}
-    
+    {
+    	debug writeln("click");
+    	if (onMousePressRelease)
+    		onMousePressRelease(event);
+    }
     
     override void propagatePosAndSizeRecalc()
     {

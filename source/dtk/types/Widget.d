@@ -718,6 +718,9 @@ class Widget
     
     void intMousePress(Widget widget, EventForm* event) {}
     void intMouseRelease(Widget widget, EventForm* event) {}
+    
+    public void delegate(EventForm* event) onMousePressRelease;
+    
     void intMousePressRelease(Widget widget, EventForm* event) {}
     
     void intMouseLeave(Widget old_w, Widget new_w, EventForm* event) {}

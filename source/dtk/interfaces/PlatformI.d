@@ -27,6 +27,7 @@ interface PlatformI
     FontMgrI getFontManager();
     
     bool canCreateWindow();
+    
     WindowI createWindow(WindowCreationSettings window_settings);
     
     void addWindow(WindowI win);
