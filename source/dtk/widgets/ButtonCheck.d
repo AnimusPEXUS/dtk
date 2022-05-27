@@ -90,12 +90,16 @@ class ButtonCheck : Widget
 
 	override WidgetChild[] calcWidgetChildren()
     {
-    	return [captionWidget];
+    	WidgetChild[] ret;
+    	if (captionWidget)
+    		ret ~= captionWidget;
+    	return ret;
     }    
 
     ButtonCheck setTextLabel(dstring text)
     {
     	auto cWidget = Label(text);
+    	cWidget.captionMode=true;
     	cWidget.setParent(this);
     	captionWidget = new WidgetChild(this, cWidget);
     	return this;
@@ -248,10 +252,10 @@ class ButtonCheck : Widget
     	
     }
     
-    override void propagatePosAndSizeRecalc()
+    override void propagatePerformLayout()
     {
     	recalcIndicatorAndChildPositions();
-    	super.propagatePosAndSizeRecalc();
+    	super.propagatePerformLayout(); // TODO: is this needed?
     }
     
     override Image renderImage()

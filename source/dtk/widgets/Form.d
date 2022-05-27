@@ -33,7 +33,7 @@ import dtk.types.Image;
 import dtk.types.Widget;
 
 import dtk.widgets.mixins;
-// import dtk.widgets.Widget;
+import dtk.widgets.TextEntry;
 
 import dtk.miscs.signal_tools;
 import dtk.miscs.DrawingSurfaceShift;
@@ -174,6 +174,7 @@ class Form : Widget
     			
     			Widget focusedWidget = this.getFocusedWidget();
     			Widget mouseFocusedWidget;
+    			Tuple!(Widget, Position2D)[] mouseFocusedWidgetBreadCrumbs;
     			
     			int mouseFocusedWidgetX = 0;
     			int mouseFocusedWidgetY = 0;
@@ -185,20 +186,54 @@ class Form : Widget
     				form_mouse_x = cast(int)event.em.x;
     				form_mouse_y = cast(int)event.em.y;
     				
-    				auto res = getChildAtPosition(
+    				getChildAtPosition(
     					Position2D(
     						cast(int)form_mouse_x,
     						cast(int)form_mouse_y
-    						)
+    						),
+    					mouseFocusedWidgetBreadCrumbs
     					);
-    				mouseFocusedWidget = res[0];
-    				auto pos = res[1];
+    				
+    				if (mouseFocusedWidgetBreadCrumbs.length == 0)
+    				{
+    					return;
+    				}
+
+    				auto breadCrumb = mouseFocusedWidgetBreadCrumbs[$-1];
+    				mouseFocusedWidget = breadCrumb[0];    				
+    				
+    				if (
+    					{
+    						auto w = cast(TextEntry)mouseFocusedWidget;
+    						debug writeln("TextEntry under action");
+    						if (w !is null)
+    						{
+    							return w.captionMode;
+    						}
+    						else
+    						{
+    							return false;
+    						}
+    					}
+    					())
+    				{
+    					if (mouseFocusedWidgetBreadCrumbs.length < 2)
+    					{
+    						throw new Exception(
+    							"parend breadcrumb is needed, but absend"
+    							);
+    					}
+    					breadCrumb = mouseFocusedWidgetBreadCrumbs[$-2];
+    					mouseFocusedWidget = breadCrumb[0];
+    				}
+
+    				auto pos = breadCrumb[1];
     				mouseFocusedWidgetX = pos.x;
     				mouseFocusedWidgetY = pos.y;
     				
     				debug writeln(
     					"onWindowOtherEvent %s %sx%s".format(
-    						mouseFocusedWidget,
+    						mouseFocusedWidgetBreadCrumbs,
     						mouseFocusedWidgetX,
     						mouseFocusedWidgetY
     						)
@@ -207,6 +242,7 @@ class Form : Widget
     			
     			fe.event = event;
     			fe.focusedWidget = focusedWidget;
+    			fe.mouseFocusedWidgetBreadCrumbs= mouseFocusedWidgetBreadCrumbs;
     			fe.mouseFocusedWidget = mouseFocusedWidget;
     			fe.mouseFocusedWidgetX = mouseFocusedWidgetX;
     			fe.mouseFocusedWidgetY = mouseFocusedWidgetY;
@@ -243,8 +279,8 @@ class Form : Widget
     							debug writeln(new Exception("drawing surface unavailable"));
     							return;
     						}
-    						debug writeln("calling propagatePosAndSizeRecalc");
-    						propagatePosAndSizeRecalc();
+    						debug writeln("calling propagatePerformLayout");
+    						propagatePerformLayout();
     						debug writeln("calling redraw");
     						redraw();
     					}

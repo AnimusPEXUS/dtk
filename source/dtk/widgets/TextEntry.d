@@ -70,11 +70,15 @@ class TextEntry : Widget
     mixin mixin_multiple_properties_forward!(TextEntryProperties, false);
     mixin mixin_Widget_renderImage!("TextEntry");
     
-    TextView text_view;
-    
     private {
         SignalConnectionContainer con_cont;
         SignalConnection textViewConnCon;
+    }
+    
+    public
+    {
+    	TextView text_view;
+    	bool captionMode;
     }
     
     TextEntry setModePreset(string value)
@@ -177,7 +181,11 @@ class TextEntry : Widget
     				setDesiredWidth(text_view.getWidth());
     				setDesiredHeight(text_view.getHeight());
     				
-    				debug writeln("TextEntry resized by %s x %s".format(getWidth(), getHeight()));
+    				debug writeln("TextEntry: set des size %sx%s".format(
+    					getWidth(), 
+    					getHeight()
+    					)
+    					);
     			}
     		};
         }
@@ -430,7 +438,7 @@ class TextEntry : Widget
     	redraw();
     }
     
-    override void propagatePosAndSizeRecalc()
+    override void propagatePerformLayout()
     {
     	if (!getViewResizeByContent())
     	{
@@ -442,15 +450,27 @@ class TextEntry : Widget
     	{
     		if (getForm() !is null)
     		{
+    			debug writeln("TextEntry: calling text_view.reprocess()");
     			text_view.reprocess();
     		}
-    		setWidth(text_view.getWidth());
-    		setHeight(text_view.getHeight());
+    		
+    		auto txt_state = text_view.getText().getState(text_view);
+    		
+    		text_view.setWidth(txt_state.width);
+    		text_view.setHeight(txt_state.height);
+    		
+    		debug writeln(
+    			"TextEntry: text_view resized to: %sx%s".format(
+    				text_view.getWidth(),
+    				text_view.getHeight()
+    				)
+    			);
     	}
+    	
     	if (getEntryResizeByContent())
     	{
-    		setWidth(text_view.getWidth());
-    		setHeight(text_view.getHeight());
+    		setDesiredWidth(text_view.getWidth());
+    		setDesiredHeight(text_view.getHeight());
     	}
     }
 }

@@ -11,13 +11,15 @@ import dtk.widgets.Layout;
 // TODO: add alignment?
 void linearLayout(Layout w, Orientation o)
 {
-	auto wWidth = w.getWidth();
-	auto wHeight = w.getHeight();
+	auto wWidth = w.getViewPortWidth();
+	auto wHeight = w.getViewPortHeight();
 	Widget c;
 	int currentOffset = 0;
 	for (int i = 0 ; i != w.getLayoutChildCount(); i++)
 	{
 		c = w.getLayoutChild(i);
+		if (!c)
+			continue;
 		if (o == Orientation.horizontal)
 		{
 			c.setX(currentOffset);
@@ -34,7 +36,8 @@ void linearLayout(Layout w, Orientation o)
 			c.setHeight(c.getDesiredHeight());
 			currentOffset += c.getHeight();
 		}
-		debug writeln("linearLayout child %s aligned: %sx%s %sx%s".format(
+		debug writeln("linearLayout (%s) child %s aligned: %sx%s %sx%s".format(
+			o,
 			i,
 			c.getX(),
 			c.getY(),

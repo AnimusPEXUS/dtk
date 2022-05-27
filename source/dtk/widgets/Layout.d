@@ -42,7 +42,7 @@ PropSetting("gs_w_d", "int", "viewportWidth", "ViewPortWidth", "0"),
 PropSetting("gs_w_d", "int", "viewportHeight", "ViewPortHeight", "0"),
 ];
 
-// NOTE: Layout ViewPort is never resized by it self. use performLayout to 
+// NOTE: Layout ViewPort is never resized by it self. use performLayout to
 //       position and resize ViewPort
 class Layout : Widget
 {
@@ -60,14 +60,14 @@ class Layout : Widget
     
     public
     {
-    	debug bool drawRectangleAroundViewPort = false;
+    	debug bool drawRectangleAroundViewPort = true;
     }
     
     this()
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
     	vm = new VisibilityMap!(Widget)();
-    	setTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange(false);
+    	// setTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange(true);
     }
     
 	override WidgetChild[] calcWidgetChildren()
@@ -76,7 +76,7 @@ class Layout : Widget
     	return ret;
     }
     
-    deprecated 
+    deprecated
     {
     	WidgetChild[] calcWidgetLayoutChildren()
     	{
@@ -197,16 +197,24 @@ class Layout : Widget
     	}
     }
     
-    override void propagatePosAndSizeRecalc()
+    final void propagatePerformLayoutToLayoutChildren()
     {
-    	auto w = getWidth();
-    	auto h = getHeight();
-    	
-    	super.propagatePosAndSizeRecalc();
-    	
-    	foreach (c; children)
+    	foreach (v; children)
     	{
-    		c.child.propagatePosAndSizeRecalc();
+    		v.child.propagatePerformLayout();
+    	}
+    }
+    
+    override void propagatePerformLayout()
+    {
+    	if (performLayout !is null)
+    	{
+    		performLayout(this);
+    	}
+    	else
+    	{
+    		propagatePerformLayoutToChildren();
+    		propagatePerformLayoutToLayoutChildren();
     	}
     	
     	recalcChildrenVisibilityMap();
@@ -259,7 +267,7 @@ class Layout : Widget
     	
     	return img;
     }
-
+    
     override WidgetChild getWidgetChildByChild(Widget child)
     {
     	foreach (v; children)
@@ -271,9 +279,12 @@ class Layout : Widget
     	}
     	return super.getWidgetChildByChild(child);
     }
-
     
-    override Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+    
+    override void getChildAtPosition(
+		Position2D point,
+		ref Tuple!(Widget, Position2D)[] breadCrumbs
+		)
     {
     	auto px = point.x;
 		auto py = point.y;
@@ -312,18 +323,26 @@ class Layout : Widget
     					op.y
     					)
     				);
-    			return viewport_child_visibility_object.getChildAtPosition(op);
+
+    			breadCrumbs ~= tuple(cast(Widget)this, point);
+		
+    			viewport_child_visibility_object.getChildAtPosition(
+    				op,
+    				breadCrumbs
+    				);
+    			return;
     		}
     		else
     		{
     			debug writeln("   no objects under cursor");
-    			return tuple(cast(Widget)this, point);
+    			return;
     		}
     	}
     	else
     	{
     		debug writeln("   no");
-    		return super.getChildAtPosition(point);
+    		super.getChildAtPosition(point, breadCrumbs);
+    		return;
     	}
     }
     
@@ -389,7 +408,7 @@ class Layout : Widget
     		throw new Exception("not a layout child");
     	
     	ds = shiftDrawingSurfaceForLayoutChild(ds, child);
-
+    	
         // auto vp_px = getViewPortPosX();
     	// auto vp_py = getViewPortPosY();
     	

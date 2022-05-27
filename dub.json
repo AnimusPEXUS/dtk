@@ -17,7 +17,7 @@
 			"name": "platform-sdl-desktop",
 			"targetType": "library",
 			"versions": [
-				"SDL_204",
+				"SDL_205",
 				"BindSDL_Static",
 				"SDL_Image",
 				"BindFT_Static",

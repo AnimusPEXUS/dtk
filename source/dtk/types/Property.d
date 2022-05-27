@@ -604,6 +604,16 @@ string mixin_multiple_properties_inst(const PropSetting[] settings)
 				v.default_value,
 				);
 		}
+		else if (v.mode == "gs_w_d_nrp")
+		{
+			ret ~= q{
+				this.%2$s = makeProperty_gs_w_d_nrp!(%1$s)(%3$s);
+			}.format(
+				v.type,
+				v.var_name,
+				v.default_value,
+				);
+		}
 		else if (v.mode == "gsu" || v.mode == "gs" || v.mode == "gsun")
 		{
 			ret ~= q{

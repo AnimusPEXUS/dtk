@@ -32,4 +32,5 @@ struct WindowCreationSettings
     Nullable!bool maximized;
     Nullable!bool input_grabbed;
     Nullable!bool allow_highdpi;
+    Nullable!bool popup_menu;
 }

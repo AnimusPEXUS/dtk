@@ -128,6 +128,13 @@ class Window : WindowI
         	flags |= SDL_WINDOW_RESIZABLE;
         }
         
+        if (!window_settings.popup_menu.isNull()
+        	&& window_settings.popup_menu.get())
+        {
+        	flags |= SDL_WINDOW_POPUP_MENU;
+        }
+        
+        
         string tt = to!string(window_settings.title);
         
         sdl_window = SDL_CreateWindow(
@@ -241,19 +248,19 @@ class Window : WindowI
     				debug writeln("event.type == EventType.none");
     				return;
     			}
-
+    			
     			// NOTE: this moved to platform
     			// if (event.type == EventType.mouse
-    				// && event.em.type == EventMouseType.movement)
+    			// && event.em.type == EventMouseType.movement)
     			// {
-    				// // TODO: save relative values too?
-    				// mouseX = event.em.x;
-    				// mouseY = event.em.y;
+    			// // TODO: save relative values too?
+    			// mouseX = event.em.x;
+    			// mouseY = event.em.y;
     			// }
-    			// 
+    			//
     			// {
-    				// event.mouseX = mouseX;
-    				// event.mouseY = mouseY;
+    			// event.mouseX = mouseX;
+    			// event.mouseY = mouseY;
     			// }
     			
     			if (event.type == EventType.window)
@@ -270,6 +277,11 @@ class Window : WindowI
     						this.sdl_window,
     						&w,
     						&h,
+    						);
+    					debug writeln(
+    						"Setting window form size to %sx%s".format(
+    							w,h
+    							)
     						);
     					setFormWidth(w);
     					setFormHeight(h);
@@ -324,33 +336,5 @@ class Window : WindowI
         	);
     }
     
-    // private void installForm(Form form)
-    // {
-    // uninstallForm();
-    //
-    // setForm(form);
-    // auto x = getForm();
-    // assert(x !is null);
-    // x.setWindow(this);
-    // /* x.setDrawingSurface(this._drawing_surface); */
-    // x.setLaf(getPlatform().getLaf());
-    // }
-    //
-    // private void uninstallForm()
-    // {
-    // auto x = getForm();
-    // if (x !is null)
-    // {
-    // x.unsetLaf();
-    // /* x.unsetDrawingSurface(); */
-    // x.unsetWindow();
-    // }
-    // this.unsetForm();
-    // }
-    
-    /* static foreach(v; ["Window", "Keyboard", "Mouse", "TextInput"])
-    {
-    mixin(mixin_event_handler_reg(v));
-    } */
     
 }

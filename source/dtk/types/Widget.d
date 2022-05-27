@@ -28,6 +28,7 @@ import dtk.miscs.DrawingSurfaceShift;
 import dtk.miscs.recursionGuard;
 
 import dtk.widgets.Form;
+import dtk.widgets.Menu;
 
 // import dtk.signal_mixins.Widget;
 
@@ -79,77 +80,36 @@ class WidgetChild
     mixin mixin_multiple_properties_define!(WidgetChildProperties);
     mixin mixin_multiple_properties_forward!(WidgetChildProperties, false);
     
-    private
-    {
-    	SignalConnection sc_xChange;
-    	SignalConnection sc_yChange;
-    	SignalConnection sc_wChange;
-    	SignalConnection sc_hChange;
-    }
-    
     this(Widget self, Widget child)
     {
     	mixin(mixin_multiple_properties_inst(WidgetChildProperties));
     	
     	this.self = self;
     	this.child = child;
-    	
-    	sc_xChange = connectToX_onAfterChanged(&onXYchanged);
-    	sc_yChange = connectToY_onAfterChanged(&onXYchanged);
-    	sc_wChange = connectToWidth_onAfterChanged(&onWHchanged);
-    	sc_hChange = connectToHeight_onAfterChanged(&onWHchanged);
     }
     
-    void onXYchanged(int o, int n) nothrow
-    {
-    	collectException(
-    		{
-    			self.childChangedXY(this);
-    			onXYWHchanged();
-    		}()
-    		);
-    }
-    
-    void onWHchanged(int o, int n) nothrow
-    {
-    	collectException(
-    		{
-    			self.childChangedWH(this);
-    			onXYWHchanged();
-    		}()
-    		);
-    }
-    
-    void onXYWHchanged() nothrow
-    {
-    	collectException(
-    		{
-    			self.childChangedXYWH(this);
-    		}()
-    		);
-    }
 }
 
 const auto WidgetProperties = cast(PropSetting[]) [
 PropSetting("gsun", "Widget", "parent", "Parent", q{null}),
 
-PropSetting("gs_w_d", "int", "desiredX", "DesiredX", q{0}),
-PropSetting("gs_w_d", "int", "desiredY", "DesiredY", q{0}),
-PropSetting("gs_w_d", "int", "desiredWidth", "DesiredWidth", q{0}),
-PropSetting("gs_w_d", "int", "desiredHeight", "DesiredHeight", q{0}),
+PropSetting("gs_w_d_nrp", "int", "desiredX", "DesiredX", q{0}),
+PropSetting("gs_w_d_nrp", "int", "desiredY", "DesiredY", q{0}),
+PropSetting("gs_w_d_nrp", "int", "desiredWidth", "DesiredWidth", q{0}),
+PropSetting("gs_w_d_nrp", "int", "desiredHeight", "DesiredHeight", q{0}),
 
 
 PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
 
 PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
 
-PropSetting(
-	"gs_w_d",
-	"bool",
-	"triggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange",
-	"TriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange",
-	"true"
-	),
+/* PropSetting(
+"gs_w_d",
+"bool",
+"triggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange",
+"TriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange",
+"true"
+), */
 
 // PropSetting("gs_w_d", "bool", "toggledOn", "ToggledOn", "0"),
 ];
@@ -220,6 +180,9 @@ class Widget
     
     private void desiredXYWHchangedInformParent(int int0, int int1) nothrow
     {
+    	if (int0 == int1)
+    		return;
+    	
     	collectException(
     		{
     			auto p = getParent();
@@ -231,10 +194,20 @@ class Widget
     
     private void childWidgetXYWHChanged(Widget w)
     {
-    	if (getTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange())
-    	{
-    		propagatePosAndSizeRecalc();
-    	}
+    	debug writeln(
+    		"%s child %s desired values changed: %sx%s %sx%s".format(
+    			this,
+    			w,
+    			w.getDesiredX(),
+    			w.getDesiredY(),
+    			w.getDesiredWidth(),
+    			w.getDesiredHeight(),
+    			)
+    		);
+    	// if (getTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange())
+    	// {
+    	propagatePerformLayout();
+    	// }
     }
     
  	static foreach(v; ["Width", "Height", "X", "Y"])
@@ -257,6 +230,10 @@ class Widget
 					f = cast(Form) this;
 					if (f !is null)
 					{
+						assert(
+							!(parent && window),
+							"on Form only parent or window can be set semiltaniously"
+							);
 						window = f.getWindow();
 					}
 					
@@ -294,6 +271,10 @@ class Widget
 					f = cast(Form) this;
 					if (f !is null)
 					{
+						assert(
+							!(parent && window),
+							"on Form only parent or window can be set semiltaniously"
+							);
 						window = f.getWindow();
 					}
 					
@@ -408,6 +389,52 @@ class Widget
     	}
     }
     
+    private
+    {
+    	bool getMenu_recursion_protection_bool;
+    	Mutex getMenu_recursion_protection_mutex;
+    }
+    
+    // Returns lates enclosing Menu, if any
+    final Menu getMenu()
+    {
+    	synchronized
+    	{
+    		if (getMenu_recursion_protection_mutex is null)
+    			getMenu_recursion_protection_mutex = new Mutex();
+    		
+    		auto ret = recursionGuard(
+    			getMenu_recursion_protection_bool,
+    			getMenu_recursion_protection_mutex,
+    			delegate Menu()
+    			{
+    				throw new Exception("parent-children circul detected: this is wrong");
+    			},
+    			delegate Menu()
+    			{
+    				Widget p = this;
+    				Menu res;
+    				
+    				while (true)
+    				{
+    					res = cast(Menu) p;
+    					if (res !is null)
+    					{
+    						return res;
+    					}
+    					
+    					p = p.getParent();
+    					if (p is null)
+    					{
+    						return null;
+    					}
+    				}
+    			}
+    			);
+    		return ret;
+    	}
+    }
+    
     final WindowI findWindow()
     {
     	WindowI ret;
@@ -499,20 +526,25 @@ class Widget
     	
     }
     
-	Tuple!(Widget, Position2D) getChildAtPosition(Position2D point)
+	void getChildAtPosition(
+		Position2D point,
+		ref Tuple!(Widget, Position2D)[] breadCrumbs
+		)
     {
+		breadCrumbs ~= tuple(cast(Widget)this, point);
+		
     	auto px = point.x;
 		auto py = point.y;
 		
 		// NOTE: it's better to do in reverse order
-    	foreach_reverse (v; calcWidgetChildren())
-    	{
-    		auto vx = v.getX();
-    		auto vy = v.getY();
-    		auto vw = v.getWidth();
-    		auto vh = v.getHeight();
-    		
-    		if (
+		foreach_reverse (v; calcWidgetChildren())
+		{
+			auto vx = v.getX();
+			auto vy = v.getY();
+			auto vw = v.getWidth();
+			auto vh = v.getHeight();
+			
+			if (
 				px >= vx
 			&& px < vx+vw
 			
@@ -520,17 +552,16 @@ class Widget
 			&& py < vy+vh
 			)
 			{
-				auto rec_res = v.child.getChildAtPosition(
-					Position2D((px - vx), (py - vy))
+				v.child.getChildAtPosition(
+					Position2D((px - vx), (py - vy)),
+					breadCrumbs
 					);
 				
-				return rec_res;
+				return;
 			}
     	}
     	
-    	debug writeln("mouse in ", this, " pointing at nothing");
-    	
-    	return tuple(cast(Widget)this, point);
+    	return;
     }
     
     DrawingSurfaceI shiftDrawingSurfaceForChild(
@@ -549,22 +580,33 @@ class Widget
         return ret;
     }
     
-    void propagatePosAndSizeRecalc()
+    final void propagatePerformLayoutToChildren()
     {
-    	// propagatePosAndSizeRecalcBefore();
-    	if (performLayout !is null)
-    		performLayout(this);
-    	
     	foreach (v; calcWidgetChildren())
     	{
-    		v.child.propagatePosAndSizeRecalc();
+    		v.child.propagatePerformLayout();
     	}
-    	
-    	// propagatePosAndSizeRecalcAfter();
+    }
+    
+    void propagatePerformLayout()
+    {
+    	if (performLayout !is null)
+    	{
+    		performLayout(this);
+    	}
+    	else
+    	{
+    		propagatePerformLayoutToChildren();
+    	}
     }
     
     Image propagateRedraw()
     {
+    	// if (getForm() is null)
+    	// {
+    	// return new Image(1, 1);
+    	// }
+    	
     	auto img = this.renderImage();
     	
     	foreach (c; calcWidgetChildren())
@@ -697,11 +739,10 @@ class Widget
     	}
     }
     
-    void childChangedXY(WidgetChild c) {}
-    void childChangedWH(WidgetChild c) {}
-    void childChangedXYWH(WidgetChild c) {}
-    void viewPortResizedSelf() {
-    }
+    // void childChangedXY(WidgetChild c) {}
+    // void childChangedWH(WidgetChild c) {}
+    // void childChangedXYWH(WidgetChild c) {}
+    // void viewPortResizedSelf() {}
     
     // void delegate() propagatePosAndSizeRecalcOverride;
     // void propagatePosAndSizeRecalcBefore() {};

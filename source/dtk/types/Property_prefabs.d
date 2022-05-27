@@ -111,3 +111,22 @@ Property!(T, PropertySettings!(T)) makeProperty_gs_w_d(T)(T default_value)
 	auto ret = new Property!(T)(settings);
 	return ret;
 }
+
+Property!(T, PropertySettings!(T)) makeProperty_gs_w_d_nrp(T)(T default_value)
+{
+	PropertySettings!T settings = {
+		init_value : default_value,
+		default_value: default_value,
+		
+		gettable: true,
+		settable: true,
+		unsettable: false,
+		resettable: false,
+		
+		initially_value_is_default: true,
+		recursiveChangeProtection: false,
+	};
+	auto ret = new Property!(T)(settings);
+	return ret;
+}
+

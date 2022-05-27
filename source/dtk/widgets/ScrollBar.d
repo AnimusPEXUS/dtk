@@ -272,10 +272,10 @@ class ScrollBar : Widget
     	}
     }
     
-    override void propagatePosAndSizeRecalc()
+    override void propagatePerformLayout()
     {
     	recalcScrollBar();
-    	super.propagatePosAndSizeRecalc();
+    	super.propagatePerformLayout();
     }
     
     void setScrollingFromIntegers(int min, int max, int sMin, int sMax)

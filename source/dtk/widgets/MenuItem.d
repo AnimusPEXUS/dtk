@@ -6,8 +6,11 @@ import std.format;
 import dtk.types.Property;
 import dtk.types.Widget;
 import dtk.types.EventForm;
+import dtk.types.WindowCreationSettings;
 
+import dtk.widgets.Form;
 import dtk.widgets.Menu;
+import dtk.widgets.TextEntry;
 import dtk.widgets.mixins;
 
 import dtk.miscs.layoutTools;
@@ -28,17 +31,27 @@ class MenuItem : Widget
     {
     	mixin(mixin_multiple_properties_inst(MenuItemProperties));
     	setWidget(w);
-    	performLayout = delegate void(Widget w)
+    	performLayout = delegate void(Widget w1)
     	{
-    		if (widget && widget.child)
+    		auto w = cast(MenuItem) w1;
+    		auto c = w.getWidget();
+    		
+    		if (c)
     		{
-    			auto c = widget.child;
-    			
+    			debug writeln("MenuItem propagates PL to child");
+    			c.propagatePerformLayout();
+    			debug writeln(" [[MenuItem propagates PL to child]]:end");
     			auto dw = c.getDesiredWidth();
     			auto dh = c.getDesiredHeight();
+    			debug writeln(" [[MenuItem child desired WxH]]: %sx%s".format(dw,dh));
     			
     			setDesiredWidth(dw+5);
     			setDesiredHeight(dh+5);
+    			
+    			c.setWidth(w.getWidth());
+    			c.setHeight(w.getHeight());
+    			
+    			// c.propagatePerformLayout();
     			
     			//widget.setWidth(getWidth()-5);
     			//widget.setHeight(getHeight()-5);
@@ -83,13 +96,22 @@ class MenuItem : Widget
     	{
     		this.widget = new WidgetChild(this, w);
     		w.setParent(this);
+    		{
+    			auto w2 = cast(TextEntry) w;
+    			if (w2)
+    			{
+    				w2.captionMode=true;
+    			}
+    		}
     	}
     	return this;
     }
     
     Widget getWidget()
     {
-    	return this.widget.child;
+    	if (widget && widget.child)
+    		return widget.child;
+    	return null;
     }
     
 	override WidgetChild[] calcWidgetChildren()
@@ -103,7 +125,51 @@ class MenuItem : Widget
     override void intMousePressRelease(Widget widget, EventForm* event)
     {
     	debug writeln("click");
-    	if (onMousePressRelease)
-    		onMousePressRelease(event);
+    	// if (onMousePressRelease)
+    		// onMousePressRelease(event);
+    	showSubmenu();
+    }
+    
+    void showSubmenu()
+    {
+    	WindowCreationSettings wcs = {
+    		title: "Popup",
+    		x: 200,
+    		y: 200,
+    		width: 50,
+    		height: 50,
+    		resizable: true,
+    		//popup_menu: true,
+    	};
+    	
+    	auto p = getForm().getWindow().getPlatform();
+    	auto w = p.createWindow(wcs);
+    	
+    	auto f = new Form();
+    	w.setForm(f);
+    	f.setMainWidget(getSubmenu());
+    	
+    	f.performLayout = delegate void(Widget w1)
+    	{
+    		auto w = cast(Form) w1;
+    		auto c = w.getMainWidget();
+    		if (c)
+    		{
+    			c.propagatePerformLayout();
+    			
+    			auto cdw = c.getDesiredWidth();
+    			auto cdh = c.getDesiredHeight();
+    			
+    			// TODO: make those functions work in Form
+    			w.setDesiredWidth(cdw);
+    			w.setDesiredHeight(cdh);
+    			
+    			c.setWidth(cdw);
+    			c.setHeight(cdh);
+    			
+    			alignParentChild(0.5, 0.5, this, c);
+    		}
+    	};
+    	
     }
 }

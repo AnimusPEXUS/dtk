@@ -36,26 +36,26 @@ import dtk.widgets.ScrollBar;
 Menu makeMainMenu()
 {
 	Menu m0 = MenuBar();
-	Layout m0lo = new Layout();
+	Layout m0lo = m0.getLayout();
 	MenuItem m0mi0 = new MenuItem();
-	m0.setLayout(m0lo);
+	// m0.setLayout(m0lo);
 	m0lo.addLayoutChild(m0mi0);
 	
+	m0mi0.setWidget(Label("File"));
+	
 	Menu m1 = MenuPopup();
-	Layout m1lo = new Layout();
+	m0mi0.setSubmenu(m1);
+	Layout m1lo = m1.getLayout();
 	MenuItem m1mi0 = new MenuItem();
 	MenuItem m1mi1 = new MenuItem();
-	m1.setLayout(m1lo);
+	// m1.setLayout(m1lo);
 	m1lo.addLayoutChild(m1mi0);
 	m1lo.addLayoutChild(m1mi1);
-	
-	m0mi0.setWidget(Label("File"));
-	m0mi0.setSubmenu(m1);
 	
 	m1mi0.setWidget(Label("Open"));
 	m1mi1.setWidget(Label("Save"));
 	
-	m0.setPerformLayout(
+	/* m0.setPerformLayout(
 		delegate void(Widget w1)
 		{
 			auto w = cast(Menu) w1;
@@ -74,13 +74,29 @@ Menu makeMainMenu()
 					c.getHeight()
 					)
 				);
+			w.propagatePerformLayoutToChildren();
 		}
 		);
-	
-	m0lo.setPerformLayout(
+	 */
+	/* m0lo.setPerformLayout(
 		delegate void(Widget w1)
 		{
 			auto w = cast(Layout) w1;
+    		auto m = w.getMenu();
+    		
+    		if (!m)
+    		{
+    			throw new Exception("MenuItem must be inside of Menu");
+    		}
+    		
+    		final switch (m.getMode())
+    		{
+    			case MenuMode.bar:
+    				break;
+    			case MenuMode.popup:
+    				break;
+    		}
+			
 			debug writeln(
 				"m0lo layout activated: ww = %s, wh = %s".format(
 					w.getWidth(),
@@ -91,7 +107,7 @@ Menu makeMainMenu()
 			w.setViewPortWidth(w.getWidth());
 			w.setViewPortHeight(w.getHeight());
 			
-			// move this into linearLayout
+			// TODO: move this into linearLayout
 			int height;
 			
 			for (int i = 0; i != w.getLayoutChildCount(); i++)
@@ -118,6 +134,8 @@ Menu makeMainMenu()
 						)
 					);
 			}
+			w.propagatePerformLayoutToChildren();
+			w.propagatePerformLayoutToLayoutChildren();
 		}
 		);
 	
@@ -125,10 +143,25 @@ Menu makeMainMenu()
 		delegate void(Widget w1)
 		{
 			auto w = cast(Layout) w1;
+			assert(w !is null);
 			debug writeln("m1lo layout activated");
 
 			w.setViewPortWidth(w.getWidth());
 			w.setViewPortHeight(w.getHeight());
+			
+			debug writeln(
+				"m1lo WxH %sx%s".format(
+					w.getWidth(), 
+					w.getHeight()
+					)
+				);
+			
+			debug writeln(
+				"resized VP to %sx%s".format(
+					w.getViewPortWidth(), 
+					w.getViewPortHeight()
+					)
+				);
 			
 			int width;
 			
@@ -141,8 +174,23 @@ Menu makeMainMenu()
 			}
 			
 			linearLayout(w, Orientation.vertical);
+			for (int i = 0; i != w.getLayoutChildCount(); i++)
+			{
+				auto c = w.getLayoutChild(i);
+				debug writeln(
+					"   m1lo child %d: x = %s, y = %s, w = %s, h = %s".format(
+						i,
+						c.getX(),
+						c.getY(),
+						c.getWidth(),
+						c.getHeight()
+						)
+					);
+			}
+			w.propagatePerformLayoutToChildren();
+			w.propagatePerformLayoutToLayoutChildren();
 		}
-		);
+		); */
 	
 	return m0;
 }
@@ -229,17 +277,18 @@ void main()
     
     rg.selectButton(btn5);
     
-    form.performLayout = delegate void(Widget w)
+    form.performLayout = delegate void(Widget w1)
     {
-    	auto ww = cast(Form) w;
-    	auto c = ww.getMainWidget();
+    	auto w = cast(Form) w1;
+    	auto c = w.getMainWidget();
     	if (c)
     	{
     		c.setX(0);
     		c.setY(0);
-    		c.setWidth(ww.getWidth());
-    		c.setHeight(ww.getHeight());
+    		c.setWidth(w.getWidth());
+    		c.setHeight(w.getHeight());
     	}
+    	w.propagatePerformLayoutToChildren();
     };
     
     lo.performLayout = delegate void(Widget w1)
@@ -260,6 +309,8 @@ void main()
     	lbl1.setX(10).setY(btn5.getY()+btn5.getHeight()+5).setWidth(wm20).setHeight(100);
     	lbl2.setX(10).setY(lbl1.getY()+lbl1.getHeight()+5).setWidth(wm20).setHeight(20);
     	sb1.setX(10).setY(lbl2.getY()+lbl2.getHeight()+5).setWidth(wm20).setHeight(16);
+    	w.propagatePerformLayoutToChildren();
+    	w.propagatePerformLayoutToLayoutChildren();
     };
 
     pl.mainLoop();

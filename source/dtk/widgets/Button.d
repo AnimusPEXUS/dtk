@@ -74,6 +74,7 @@ class Button : Widget
     Button setTextLabel(dstring text)
     {
     	auto cWidget = Label(text);
+    	cWidget.captionMode=true;
     	cWidget.setParent(this);
     	captionWidget = new WidgetChild(this, cWidget);
     	return this;
@@ -102,11 +103,21 @@ class Button : Widget
     		onMousePressRelease(event);
     }
     
-    override void propagatePosAndSizeRecalc()
+    override void propagatePerformLayout()
     {
     	auto c = getCaptionWidget();
     	if (c)
     	{
+    		c.propagatePerformLayout();
+    		
+    		auto cdw = c.getDesiredWidth();
+    		auto cdh = c.getDesiredHeight();
+    		
+    		c.setWidth(cdw);
+    		c.setHeight(cdh);
+    		
+    		alignParentChild(0.5, 0.5, this, c);
+    		
     		debug writeln(
     			"Button child x: %s, y: %s, w: %s, h: %s".format(
     				c.getX(),
@@ -116,16 +127,6 @@ class Button : Widget
     				)
     			);
     	}
-    	else
-    	{
-    		debug writeln("button caption widget is not set");
-    	}
     	
-    	super.propagatePosAndSizeRecalc();
-    	
-    	if (c)
-    	{
-    		alignParentChild(0.5, 0.5, this, c);
-    	}
     }
 }
