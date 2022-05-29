@@ -30,6 +30,21 @@ import dtk.miscs.recursionGuard;
 import dtk.widgets.Form;
 import dtk.widgets.Menu;
 
+
+class ExcParentRequiredButMissing : Exception 
+{
+	this(string msg, string file = __FILE__, size_t line = __LINE__) {
+        super(msg, file, line);
+    }
+}
+
+class ExcNotAParentsChild : Exception 
+{
+	this(string msg, string file = __FILE__, size_t line = __LINE__) {
+        super(msg, file, line);
+    }
+}
+
 // import dtk.signal_mixins.Widget;
 
 enum ViewPortChildrenPosAndSizeReaction : ubyte
@@ -309,11 +324,11 @@ class Widget
     			int getChild%1$s(Widget child)
     			{
     				auto c = getWidgetChildByChild(child);
-    				if (c is null)
+    				if (!c)
     				{
-    					debug writeln(child, " is not a child of current widget");
-    					// TODO: is this good place for exception
-    					throw new Exception("object is not a child of current widget");
+    					throw new ExcNotAParentsChild(
+    						"%s is not a child of %s".format(child, this)
+    						);
     				}
     				return c.get%1$s();
     			}
@@ -321,11 +336,11 @@ class Widget
     			void setChild%1$s(Widget child, int v)
     			{
     				auto c = getWidgetChildByChild(child);
-    				if (c is null)
+    				if (!c)
     				{
-    					debug writeln(child, " is not a child of current widget");
-    					// TODO: is this good place for exception
-    					throw new Exception("object is not a child of current widget");
+    					throw new ExcNotAParentsChild(
+    						"%s is not a child of %s".format(child, this)
+    						);
     				}
     				c.set%1$s(v);
     				return;
@@ -739,16 +754,89 @@ class Widget
     	}
     }
     
-    // void childChangedXY(WidgetChild c) {}
-    // void childChangedWH(WidgetChild c) {}
-    // void childChangedXYWH(WidgetChild c) {}
-    // void viewPortResizedSelf() {}
+    final Position2D getLeftTopPos()
+    {
+    	return Position2D(getX(), getY());
+    }
+
+    final Position2D getRightTopPos()
+    {
+    	return Position2D(getX()+getWidth(), getY());
+    }
+
+    final Position2D getLeftBottomPos()
+    {
+    	return Position2D(getX(), getY()+getHeight());
+    }
+
+    final Position2D getRightBottomPos()
+    {
+    	return Position2D(getX()+getWidth(), getY()+getHeight());
+    }
     
-    // void delegate() propagatePosAndSizeRecalcOverride;
-    // void propagatePosAndSizeRecalcBefore() {};
-    // void propagatePosAndSizeRecalcAfter() {};
-    
-    // TODO: mabe remove 'Form form' from events
+    Position2D calcPosRelativeToForm(Position2D pos)
+    {
+    	int retX;
+    	int retY;
+    	
+    	debug writeln("calcPosRelativeToForm");
+    	
+    	Widget p = this;
+    	Widget prev_p;
+    	
+    	// bool thisIsLast;
+    	
+    	while (true)
+    	{
+    		retX += pos.x;
+    		retY += pos.y;
+    		
+    		debug writeln(
+    			"  calcPosRelativeToForm:\n",
+    			"        widget: %s\n".format(this),
+    			"      added XY: %s x %s\n".format(pos.x, pos.y),
+    			"        ret XY: %s x %s".format(retX, retY),
+    			);
+    		
+    		
+    		if (cast(Form) p)
+    		{
+    			break;
+    		}
+
+    		prev_p = p;
+    		
+    		p = prev_p.getParent();
+    		if (!p)
+    		{
+    			throw new ExcParentRequiredButMissing(
+    				"parent required but missing"
+    				);
+    		}
+
+    		pos = p.calcWidgetRelativePos(prev_p);
+
+    		// if (thisIsLast)
+    			// break;
+    		
+    	}
+    	return Position2D(retX, retY);
+    }
+
+    // override this, if your widget have special widget position treatment
+    // TODO: this maybe a duplicate dunction or code. investigate/
+    Position2D calcWidgetRelativePos(Widget child)
+    {
+    	auto c = getWidgetChildByChild(child);
+    	if (!c)
+    	{
+    		throw new ExcNotAParentsChild(
+    			"%s not a child of %s".format(child, this)
+    			);
+    	}
+    	return Position2D(c.getX(), c.getY());
+    }
+
     void intFocusEnter(Widget widget) {}
     void intFocusExit(Widget widget) {}
     

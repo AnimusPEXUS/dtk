@@ -11,6 +11,7 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Widget;
+import dtk.types.WindowBorderSizes;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -30,8 +31,8 @@ interface WindowI
     LaFI getLaf();
 
     LaFI getForcedLaf();
-    typeof(this) setForcedLaf(LaFI);
-    typeof(this) unsetForcedLaf();    
+    WindowI setForcedLaf(LaFI);
+    WindowI unsetForcedLaf();    
     
     WindowI setForm(Form form);
     WindowI unsetForm();
@@ -56,6 +57,8 @@ interface WindowI
     WindowI setTitle(dstring value);
     
     Tuple!(bool, Position2D) getMousePosition();
+    
+    WindowBorderSizes getBorderSizes();
     
     void redraw();
     

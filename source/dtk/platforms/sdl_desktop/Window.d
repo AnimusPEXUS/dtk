@@ -30,6 +30,7 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Property;
 import dtk.types.Widget;
+import dtk.types.WindowBorderSizes;
 
 // import dtk.miscs.WindowEventMgr;
 // import dtk.miscs.mixin_event_handler_reg;
@@ -285,8 +286,29 @@ class Window : WindowI
     						);
     					setFormWidth(w);
     					setFormHeight(h);
+    					
+    					auto bs = getBorderSizes();
+    					setWidth(w+bs.leftTop.width+bs.rightBottom.width);
+    					setHeight(h+bs.leftTop.height+bs.rightBottom.height);
+    					break;
+    				case EnumWindowEvent.move:
+    					int x;
+    					int y;
+    					SDL_GetWindowPosition(
+    						this.sdl_window,
+    						&x,
+    						&y,
+    						);
+    					debug writeln(
+    						"Setting window form size to %sx%s".format(
+    							x,y
+    							)
+    						);
+    					setX(x);
+    					setY(y);
     				}
     				emitSignal_WindowEvents(event.ew);
+
     			}
     			else
     			{
@@ -334,6 +356,26 @@ class Window : WindowI
         		getFormHeight()
         		)
         	);
+    }
+    
+    // return bool true on success
+    WindowBorderSizes getBorderSizes()
+    {
+    	
+    	WindowBorderSizes ret;
+    	auto res = SDL_GetWindowBordersSize(
+    		sdl_window,
+    		&ret.leftTop.height,
+    		&ret.leftTop.width,
+    		&ret.rightBottom.height,
+    		&ret.rightBottom.width,
+    		);
+    	// TODO: add exception here
+    	if (res != 0)
+    	{
+    		throw new Exception("can't get window border sizes");
+    	}
+    	return ret;
     }
     
     

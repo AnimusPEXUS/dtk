@@ -132,17 +132,29 @@ class MenuItem : Widget
     
     void showSubmenu()
     {
+    	auto pos = calcPosRelativeToForm(getLeftBottomPos());
+    	
+    	auto win = getForm().getWindow(); 
+    	
+    	auto p = win.getPlatform();
+
+    	auto borderSizes = win.getBorderSizes();
+    	
+    	// auto window_pos = win.getPosition();
+    	
+    	pos.x += borderSizes.leftTop.height + win.getX();
+    	pos.y += borderSizes.leftTop.width + win.getY();
+    	
     	WindowCreationSettings wcs = {
     		title: "Popup",
-    		x: 200,
-    		y: 200,
+    		x: pos.x,
+    		y: pos.y,
     		width: 50,
     		height: 50,
     		resizable: true,
     		//popup_menu: true,
     	};
     	
-    	auto p = getForm().getWindow().getPlatform();
     	auto w = p.createWindow(wcs);
     	
     	auto f = new Form();
