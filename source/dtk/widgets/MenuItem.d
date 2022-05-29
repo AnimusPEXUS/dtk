@@ -142,8 +142,8 @@ class MenuItem : Widget
     	
     	// auto window_pos = win.getPosition();
     	
-    	pos.x += borderSizes.leftTop.height + win.getX();
-    	pos.y += borderSizes.leftTop.width + win.getY();
+    	pos.x += borderSizes.leftTop.width + win.getX();
+    	pos.y += borderSizes.leftTop.height + win.getY();
     	
     	WindowCreationSettings wcs = {
     		title: "Popup",

@@ -54,8 +54,11 @@ PropSetting("gs_w_d", "int", "x", "X", "0"),
 PropSetting("gs_w_d", "int", "y", "Y", "0"),
 PropSetting("gs_w_d", "int", "width", "Width", "0"),
 PropSetting("gs_w_d", "int", "height", "Height", "0"),
-PropSetting("gs_w_d", "int", "form_width", "FormWidth", "0"),
-PropSetting("gs_w_d", "int", "form_height", "FormHeight", "0"),
+
+PropSetting("gs_w_d", "int", "formX", "FormX", "0"),
+PropSetting("gs_w_d", "int", "formY", "FormY", "0"),
+PropSetting("gs_w_d", "int", "formWidth", "FormWidth", "0"),
+PropSetting("gs_w_d", "int", "formHeight", "FormHeight", "0"),
 ];
 
 class Window : WindowI
@@ -290,7 +293,10 @@ class Window : WindowI
     					auto bs = getBorderSizes();
     					setWidth(w+bs.leftTop.width+bs.rightBottom.width);
     					setHeight(h+bs.leftTop.height+bs.rightBottom.height);
-    					break;
+    					
+    					// NOTE: falling through here, because resizing may
+    					//       imply movement
+    					goto case;
     				case EnumWindowEvent.move:
     					int x;
     					int y;
@@ -300,12 +306,17 @@ class Window : WindowI
     						&y,
     						);
     					debug writeln(
-    						"Setting window form size to %sx%s".format(
+    						"Setting window position to %sx%s".format(
     							x,y
     							)
     						);
-    					setX(x);
-    					setY(y);
+    					// NOTE: on SDL SDL_GetWindowPosition returns values 
+    					//       with borders added
+    					auto bs = getBorderSizes();
+    					setX(x-bs.leftTop.width);
+    					setY(y-bs.leftTop.height);
+    					setFormX(x);
+    					setFormY(y);
     				}
     				emitSignal_WindowEvents(event.ew);
 
