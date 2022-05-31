@@ -121,41 +121,42 @@ class MenuItem : Widget
     		ret ~= this.widget;
     	return ret;
     }
-
+    
     override void intMousePressRelease(Widget widget, EventForm* event)
     {
     	debug writeln("click");
     	// if (onMousePressRelease)
-    		// onMousePressRelease(event);
+    	// onMousePressRelease(event);
     	showSubmenu();
     }
     
     void showSubmenu()
     {
+    	int desX;
+    	int desY;
+    	
+    	auto win = getForm().getWindow();
+    	auto p = win.getPlatform();
+    	auto borderSizes = win.getBorderSizes();
     	auto pos = calcPosRelativeToForm(getLeftBottomPos());
     	
-    	auto win = getForm().getWindow(); 
-    	
-    	auto p = win.getPlatform();
-
-    	auto borderSizes = win.getBorderSizes();
-    	
-    	// auto window_pos = win.getPosition();
-    	
-    	pos.x += borderSizes.leftTop.width + win.getX();
-    	pos.y += borderSizes.leftTop.height + win.getY();
+    	desX = pos.x + borderSizes.leftTop.width + win.getX();
+    	desY = pos.y + borderSizes.leftTop.height + win.getY();
     	
     	WindowCreationSettings wcs = {
     		title: "Popup",
-    		x: pos.x,
-    		y: pos.y,
+    		x: desX,
+    		y: desY,
     		width: 50,
     		height: 50,
-    		resizable: true,
-    		//popup_menu: true,
+    		// resizable: true,
+    		popup_menu: true,
     	};
     	
     	auto w = p.createWindow(wcs);
+    	
+    	w.setX(desX);
+    	w.setY(desY);
     	
     	auto f = new Form();
     	w.setForm(f);
@@ -169,15 +170,15 @@ class MenuItem : Widget
     		{
     			c.propagatePerformLayout();
     			
+    			auto cdx = c.getDesiredX();
+    			auto cdy = c.getDesiredY();
     			auto cdw = c.getDesiredWidth();
     			auto cdh = c.getDesiredHeight();
     			
-    			// TODO: make those functions work in Form
+    			w.setDesiredX(cdx);
+    			w.setDesiredY(cdy);
     			w.setDesiredWidth(cdw);
     			w.setDesiredHeight(cdh);
-    			
-    			c.setWidth(cdw);
-    			c.setHeight(cdh);
     			
     			alignParentChild(0.5, 0.5, this, c);
     		}

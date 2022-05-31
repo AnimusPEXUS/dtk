@@ -200,9 +200,19 @@ class Widget
     	
     	collectException(
     		{
-    			auto p = getParent();
-    			if (p)
-    				p.childWidgetXYWHChanged(this);
+    			auto f = cast(Form) this; 
+    			if (!f)
+    			{
+    				auto p = getParent();
+    				if (p)
+    					p.childWidgetXYWHChanged(this);
+    			} 
+    			else
+    			{
+    				auto win = f.getWindow();
+    				if (win)
+    					win.formDesiredPosSizeChanged();
+    			}
     		}()
     		);
     }

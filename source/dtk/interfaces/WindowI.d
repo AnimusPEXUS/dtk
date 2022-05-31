@@ -44,14 +44,22 @@ interface WindowI
     int getY();
     int getWidth();
     int getHeight();
-    
+    int getFormX();
+    int getFormY();
     int getFormWidth();
     int getFormHeight();
     
+    // Setting values to this variables - does not actually changes window's 
+    // position or size. Use setPosition() and/or setSize() function to change
+    // window's position and/or size.
     WindowI setX(int v);
     WindowI setY(int v);
     WindowI setWidth(int v);
     WindowI setHeight(int v);
+    WindowI setFormX(int v);
+    WindowI setFormY(int v);
+    WindowI setFormWidth(int v);
+    WindowI setFormHeight(int v);
 
     dstring getTitle();
     WindowI setTitle(dstring value);
@@ -59,6 +67,11 @@ interface WindowI
     Tuple!(bool, Position2D) getMousePosition();
     
     WindowBorderSizes getBorderSizes();
+    
+    void formDesiredPosSizeChanged();
+    
+    void setPosition(Position2D pos);
+    void setSize(Size2D size);
     
     void redraw();
     

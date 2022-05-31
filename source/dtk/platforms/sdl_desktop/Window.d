@@ -50,11 +50,14 @@ PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", "null"),
 PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
 PropSetting("gs_w_d", "dstring", "title", "Title", q{""d}),
+
+// XYWH - XY relative to screen. XYWH = [form XYWH] plus window borders
 PropSetting("gs_w_d", "int", "x", "X", "0"),
 PropSetting("gs_w_d", "int", "y", "Y", "0"),
 PropSetting("gs_w_d", "int", "width", "Width", "0"),
 PropSetting("gs_w_d", "int", "height", "Height", "0"),
 
+// [form XYWH] - XY relative to screen. [form XYWH] = XYWH minus window borders
 PropSetting("gs_w_d", "int", "formX", "FormX", "0"),
 PropSetting("gs_w_d", "int", "formY", "FormY", "0"),
 PropSetting("gs_w_d", "int", "formWidth", "FormWidth", "0"),
@@ -76,6 +79,17 @@ class Window : WindowI
     	SignalConnection cs_PlatformChange;
     	// SignalConnection cs_LafChange;
     	SignalConnection cs_FormChange;
+    	
+    	static foreach (v;["X", "Y", "Width", "Height"])
+    	{
+    		mixin(
+    			q{
+    				SignalConnection cs_%1$sChange;
+    				SignalConnection cs_Form%1$sChange;
+    			}.format(v)
+    			);
+    		
+    	}
     	
     	SignalConnection platform_signal_connection;
     }
@@ -220,6 +234,234 @@ class Window : WindowI
         			);
         	}
         	);
+        
+        static foreach (v;["X", "Y", "Width", "Height"])
+    	{
+    		mixin(
+    			q{
+    				cs_%1$sChange = connectTo%1$s_onAfterChanged(
+    					delegate void(
+    						int old_value,
+    						int new_value
+    						)
+    					{
+    						collectException(
+    							{
+    								if (old_value == new_value)
+    									return;
+    								
+    								static if ("%1$s" == "X" || "%1$s" == "Y")
+    								{
+    									intWindowPosChanged();
+    								}
+    								else
+    								{
+    									intWindowSizeChanged();
+    								}
+    							}()
+    							);
+    					}
+    					);
+    				
+    				cs_Form%1$sChange = connectToForm%1$s_onAfterChanged(
+    					delegate void(
+    						int old_value,
+    						int new_value
+    						)
+    					{
+    						collectException(
+    							{
+    								if (old_value == new_value)
+    									return;
+    								
+    								static if ("%1$s" == "X" || "%1$s" == "Y")
+    								{
+    									intWindowFormPosChanged();
+    								}
+    								else
+    								{
+    									intWindowFormSizeChanged();
+    								}
+    							}()
+    							);
+    					}
+    					);
+    			}.format(v));
+    	}
+    }
+    
+    private void intWindowPosChanged()
+    {
+    	auto validFormXY = positionRemoveWindowBorder(
+    		Position2D(
+    			getX(), 
+    			getY()
+    			)
+    		);
+    	
+    	if (getFormX() != validFormXY.x)
+    		setFormX(validFormXY.x);
+    	
+    	if (getFormY() != validFormXY.y)
+    		setFormY(validFormXY.y);
+    }
+    
+    private void intWindowSizeChanged()
+    {
+    	auto validFormWH = sizeRemoveWindowBorder(
+    		Size2D(
+    			getWidth(), 
+    			getHeight()
+    			)
+    		);    	
+    	
+    	if (getFormWidth() != validFormWH.width)
+    		setFormWidth(validFormWH.width);
+    	
+    	if (getFormHeight() != validFormWH.height)
+    		setFormHeight(validFormWH.height);
+    }
+    
+    private void intWindowFormPosChanged()
+    {
+    	auto validXY = positionAddWindowBorder(
+    		Position2D(
+    			getFormX(), 
+    			getFormY()
+    			)
+    		);
+    	
+    	if (getX() != validXY.x)
+    	{
+    		setX(validXY.x);
+    	}
+    	
+    	if (getY() != validXY.y)
+    	{
+    		setY(validXY.y);
+    	}
+    	
+    	// int x;
+    	// int y;
+    	
+    	// SDL_GetWindowPosition(sdl_window, &x, &y);
+    	// if (x != getFormX() || y != getFormY())
+    	// SDL_SetWindowPosition(sdl_window, getFormX(), getFormY());
+    }
+    
+    private void intWindowFormSizeChanged()
+    {
+    	auto validWH = sizeAddWindowBorder(
+    		Size2D(
+    			getFormWidth(), 
+    			getFormHeight()
+    			)
+    		);    	
+    	
+    	if (getWidth() != validWH.width)
+    	{
+    		setWidth(validWH.width);
+    	}
+    	
+    	if (getHeight() != validWH.height)
+    	{
+    		setHeight(validWH.height);
+    	}
+    	
+    	// int w;
+    	// int h;
+    	// 
+    	// SDL_GetWindowSize(sdl_window, &w, &h);
+    	// if (w != getFormWidth() || h != getFormHeight())
+    		// SDL_SetWindowSize(sdl_window, getFormWidth(), getFormHeight());
+    }
+    
+    private void windowSyncPosition(bool externalStronger)
+    {
+    	int x;
+    	int y;
+    	SDL_GetWindowPosition(
+    		this.sdl_window,
+    		&x,
+    		&y,
+    		);
+    	
+    	auto fx = getFormX();
+    	auto fy = getFormY();
+    	
+    	bool changed_x = (x != fx);
+    	bool changed_y = (y != fy);
+    	
+    	WindowBorderSizes wbs;
+    	
+    	if (changed_x || changed_y)
+    	{
+    		wbs = getBorderSizes();
+    	}
+    	
+    	if (externalStronger)
+    	{
+    		if (changed_x)
+    		{
+    			setFormX(x);
+    		}
+    		if (changed_y)
+    		{
+    			setFormY(y);
+    		}
+    	}
+    	else
+    	{
+    		SDL_SetWindowPosition(
+    			this.sdl_window,
+    			fx,
+    			fy,
+    			);
+    	}
+    }
+    
+    private void windowSyncSize(bool externalStronger)
+    {
+    	int w;
+    	int h;
+    	SDL_GetWindowSize(
+    		this.sdl_window,
+    		&w,
+    		&h,
+    		);
+    	
+    	auto fw = getFormWidth();
+    	auto fh = getFormHeight();
+    	
+    	bool changed_w = (w != fw);
+    	bool changed_h = (h != fh);
+    	
+    	WindowBorderSizes wbs;
+    	
+    	if (changed_w || changed_h)
+    	{
+    		wbs = getBorderSizes();
+    	}
+    	
+    	if (externalStronger)
+    	{
+    		if (changed_w)
+    		{
+    			setFormWidth(w);
+    		}
+    		if (changed_w)
+    		{
+    			setFormHeight(h);
+    		}
+    	}
+    	else
+    	{
+    		SDL_SetWindowSize(
+    			this.sdl_window,
+    			fw,
+    			fh,
+    			);
+    	}
     }
     
     LaFI getLaf()
@@ -290,9 +532,7 @@ class Window : WindowI
     					setFormWidth(w);
     					setFormHeight(h);
     					
-    					auto bs = getBorderSizes();
-    					setWidth(w+bs.leftTop.width+bs.rightBottom.width);
-    					setHeight(h+bs.leftTop.height+bs.rightBottom.height);
+    					windowSyncSize(true);
     					
     					// NOTE: falling through here, because resizing may
     					//       imply movement
@@ -310,16 +550,17 @@ class Window : WindowI
     							x,y
     							)
     						);
-    					// NOTE: on SDL SDL_GetWindowPosition returns values 
+    					
+    					// NOTE: on SDL SDL_GetWindowPosition returns values
     					//       with borders added
-    					auto bs = getBorderSizes();
-    					setX(x-bs.leftTop.width);
-    					setY(y-bs.leftTop.height);
     					setFormX(x);
     					setFormY(y);
+    					
+    					windowSyncPosition(true);
     				}
+    				
     				emitSignal_WindowEvents(event.ew);
-
+    				
     			}
     			else
     			{
@@ -328,6 +569,18 @@ class Window : WindowI
     		}()
     		);
         return;
+    }
+    
+    void formDesiredPosSizeChanged()
+    {
+    	auto f = getForm();
+    	if (!f)
+    		return;
+    	//setFormX(f.getDesiredX());
+    	//setFormY(f.getDesiredY());
+    	setFormWidth(f.getDesiredWidth());
+    	setFormHeight(f.getDesiredHeight());
+    	windowSyncPosition(false);
     }
     
     Tuple!(bool, Position2D) getMousePosition()
@@ -389,5 +642,69 @@ class Window : WindowI
     	return ret;
     }
     
+    // convert value without border to value with border.
+    // Window Form XY should be passed as parameter
+    Position2D positionAddWindowBorder(Position2D pos)
+    {
+    	auto bs = getBorderSizes();
+    	auto ret = Position2D(
+    		pos.x - bs.leftTop.width,
+    		pos.y - bs.leftTop.height
+    		);
+    	return ret;
+    }
     
+    // convert value without border to value with border.
+    // Window XY should be passed as parameter
+    Position2D positionRemoveWindowBorder(Position2D pos)
+    {
+    	auto bs = getBorderSizes();
+    	auto ret = Position2D(
+    		pos.x + bs.leftTop.width,
+    		pos.y + bs.leftTop.height
+    		);
+    	return ret;
+    }
+    
+    Size2D sizeAddWindowBorder(Size2D size)
+    {
+    	auto bs = getBorderSizes();
+    	auto ret = Size2D(
+    		size.width + bs.leftTop.width + bs.rightBottom.width,
+    		size.height + bs.leftTop.height + bs.rightBottom.height,
+    		);
+    	return ret;
+    }
+
+    Size2D sizeRemoveWindowBorder(Size2D size)
+    {
+    	auto bs = getBorderSizes();
+    	auto ret = Size2D(
+    		size.width - bs.leftTop.width + bs.rightBottom.width,
+    		size.height - bs.leftTop.height + bs.rightBottom.height,
+    		);
+    	return ret;
+    }
+
+    void setPosition(Position2D pos)
+    {
+    	pos = positionRemoveWindowBorder(pos);
+    	setFormPosition(pos);
+    }
+
+    void setFormPosition(Position2D pos)
+    {
+    	SDL_SetWindowPosition(sdl_window, pos.x, pos.y);
+    }
+    
+    void setSize(Size2D size)
+    {
+    	size = sizeRemoveWindowBorder(size);
+    	setFormSize(size);
+    }
+
+    void setFormSize(Size2D size)
+    {
+    	SDL_SetWindowSize(sdl_window, size.width, size.height);
+    }
 }
