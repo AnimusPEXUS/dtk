@@ -54,5 +54,5 @@
 	"description": "A minimal D application.",
 	"license": "GPLv3",
 	"name": "dtk",
-	"version:: "0.0.0"
+	"version": "0.0.0"
 }
