@@ -3,9 +3,8 @@ module dtk.miscs.layoutTools;
 import std.format;
 
 import dtk.types.Widget;
-// import dtk.interfaces.WidgetI;
 
-// Button
+import dtk.widgets.Layout;
 
 void alignParentChild(
 	float valign,
@@ -22,19 +21,29 @@ in
 }
 do
 {
-	if (!parent.haveChild(child))
+	bool haveChild = parent.haveChild(child);
+	
 	{
-		throw new Exception("child not the Parent's child");
+		auto l = cast(Layout) parent;
+		if (l)
+			haveChild |= l.haveLayoutChild(child);
+	}
+	
+	if (!haveChild)
+	{
+		throw new Exception(
+			"%s not child of %s".format(child, parent)
+			);
 	}
 	
 	auto w = parent.getWidth();
 	auto h = parent.getHeight();
 	
-	auto cw = child.getWidth();		 
+	auto cw = child.getWidth();
 	auto ch = child.getHeight();
 	
 	child.setX(cast(int)((w - cw)*halign));
-	child.setY(cast(int)((h - ch)*valign));		
+	child.setY(cast(int)((h - ch)*valign));
 	
 	return;
 }

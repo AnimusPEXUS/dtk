@@ -48,12 +48,24 @@ Menu makeMainMenu()
 	Layout m1lo = m1.getLayout();
 	MenuItem m1mi0 = new MenuItem();
 	MenuItem m1mi1 = new MenuItem();
-	// m1.setLayout(m1lo);
+	MenuItem m1mi2 = new MenuItem();
+	MenuItem m1mi3 = new MenuItem();
+	MenuItem m1mi4 = new MenuItem();
+	MenuItem m1mi5 = new MenuItem();
+	
 	m1lo.addLayoutChild(m1mi0);
 	m1lo.addLayoutChild(m1mi1);
+	m1lo.addLayoutChild(m1mi2);
+	m1lo.addLayoutChild(m1mi3);
+	m1lo.addLayoutChild(m1mi4);
+	m1lo.addLayoutChild(m1mi5);
 	
 	m1mi0.setWidget(Label("Open"));
 	m1mi1.setWidget(Label("Save"));
+	m1mi2.setWidget(Label("Save as.."));
+	m1mi3.setWidget(Label("Print.."));
+	m1mi4.setWidget(Label("Export.."));
+	m1mi5.setWidget(Label("Close"));
 	
 	return m0;
 }

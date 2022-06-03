@@ -153,8 +153,18 @@ class Form : Widget
 
     Form setMainWidget(Widget w)
     {
-    	mainWidget = new WidgetChild(this, w); 
-    	w.setParent(this);
+    	if (mainWidget)
+    	{
+    		mainWidget.child.unsetParent();
+    		mainWidget = null;
+    	}
+    	
+    	if (w)
+    	{
+    		mainWidget = new WidgetChild(this, w); 
+    		w.setParent(this);
+    	}
+    	
     	return this;
     }
     
@@ -205,7 +215,7 @@ class Form : Widget
     				if (
     					{
     						auto w = cast(TextEntry)mouseFocusedWidget;
-    						debug writeln("TextEntry under action");
+    						// debug writeln("TextEntry under action");
     						if (w !is null)
     						{
     							return w.captionMode;
@@ -231,13 +241,13 @@ class Form : Widget
     				mouseFocusedWidgetX = pos.x;
     				mouseFocusedWidgetY = pos.y;
     				
-    				debug writeln(
-    					"onWindowOtherEvent %s %sx%s".format(
-    						mouseFocusedWidgetBreadCrumbs,
-    						mouseFocusedWidgetX,
-    						mouseFocusedWidgetY
-    						)
-    					);
+    				// debug writeln(
+    					// "onWindowOtherEvent %s %sx%s".format(
+    						// mouseFocusedWidgetBreadCrumbs,
+    						// mouseFocusedWidgetX,
+    						// mouseFocusedWidgetY
+    						// )
+    					// );
     			}
     			
     			fe.event = event;
@@ -260,7 +270,7 @@ class Form : Widget
     				{
     					bool propogate_resize_and_repaint = false;
     					
-    					debug writeln("form received window event: ", event.eventId);
+    					// debug writeln("form received window event: ", event.eventId);
     					
     					switch (event.eventId)
     					{
@@ -279,9 +289,9 @@ class Form : Widget
     							debug writeln(new Exception("drawing surface unavailable"));
     							return;
     						}
-    						debug writeln("calling propagatePerformLayout");
+    						// debug writeln("calling propagatePerformLayout");
     						propagatePerformLayout();
-    						debug writeln("calling redraw");
+    						// debug writeln("calling redraw");
     						redraw();
     					}
     				}()
@@ -355,7 +365,7 @@ class Form : Widget
     				default:
     					return;
     				case EventMouseType.movement:
-    					debug writeln("mouse widget: ", mouseFocusedWidget);
+    					// debug writeln("mouse widget: ", mouseFocusedWidget);
     					event.mouseFocusedWidget.intMouseMove(
     						event.mouseFocusedWidget,
     						event

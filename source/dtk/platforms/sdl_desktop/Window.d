@@ -37,6 +37,7 @@ import dtk.types.WindowBorderSizes;
 import dtk.miscs.signal_tools;
 
 import dtk.widgets.Form;
+import dtk.widgets.Menu;
 
 import dtk.signal_mixins.Window;
 
@@ -66,6 +67,11 @@ PropSetting("gs_w_d", "int", "formHeight", "FormHeight", "0"),
 
 class Window : WindowI
 {
+
+	public 
+	{
+		dstring debug_name;
+	}
 	
     // TODO: maybe this shouldn't be public
     public
@@ -169,7 +175,17 @@ class Window : WindowI
         }
         
         {
-            SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
+        	SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
+            
+        	// SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED);
+        	
+            // SDL_CreateRenderer(
+            	// sdl_window, 
+            	// -1, 
+            	// SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+            	// );
+            
+            
             // TODO: add SDL info print on debug build?
             // auto r = SDL_GetRenderer(sdl_window);
             // SDL_RendererInfo ri;
@@ -288,6 +304,11 @@ class Window : WindowI
     					);
     			}.format(v));
     	}
+    }
+    
+    void setDebugName(dstring value)
+    {
+    	debug_name = value;
     }
     
     private void intWindowPosChanged()
@@ -511,6 +532,13 @@ class Window : WindowI
     			
     			if (event.type == EventType.window)
     			{
+    				debug writeln(
+    					"window \"%s\" got event %s".format(
+    						debug_name, 
+    						event.ew.eventId
+    						)
+    					);
+    			
     				switch (event.ew.eventId)
     				{
     				default:
@@ -557,6 +585,30 @@ class Window : WindowI
     					setFormY(y);
     					
     					windowSyncPosition(true);
+    					break;
+    				case EnumWindowEvent.unFocus:
+    					
+    					auto f = getForm();
+    					if (!f)
+    						break;
+    					
+    					auto fc = f.getMainWidget();
+    					if (!fc)
+    						break;
+    					
+    					auto m = cast(Menu) fc;
+    					if (!m)
+    						break;
+    					
+    					if (m.getMode() == MenuMode.popup)
+    					{
+    						close();
+    					}
+    					break;
+    				case EnumWindowEvent.close:
+    					debug writeln("close signal");
+    					close();
+    					
     				}
     				
     				emitSignal_WindowEvents(event.ew);
@@ -569,6 +621,12 @@ class Window : WindowI
     		}()
     		);
         return;
+    }
+    
+    void close()
+    {
+    	unsetPlatform();
+    	SDL_DestroyWindow(sdl_window);
     }
     
     void formDesiredPosSizeChanged()
@@ -637,7 +695,10 @@ class Window : WindowI
     	// TODO: add exception here
     	if (res != 0)
     	{
-    		throw new Exception("can't get window border sizes");
+    		ret.leftTop.height=0;
+    		ret.leftTop.width=0;
+    		ret.rightBottom.height=0;
+    		ret.rightBottom.width=0;
     	}
     	return ret;
     }

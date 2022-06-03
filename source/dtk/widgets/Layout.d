@@ -296,7 +296,7 @@ class Layout : Widget
     	auto vw = getViewPortWidth();
     	auto vh = getViewPortHeight();
     	
-    	debug writeln("pointer in viewport?");
+    	// debug writeln("pointer in viewport?");
     	if (
     		px >= vpx
     	&& px < vpx+vw
@@ -305,24 +305,24 @@ class Layout : Widget
     	&& py < vpy+vh
     	)
     	{
-    		debug writeln("   yes");
+    		// debug writeln("   yes");
     		auto vp_pos = Position2D((px - vpx + vx), (py - vpy + vy));
     		auto res = vm.getByPoint(vp_pos, true);
     		if (res.length != 0)
     		{
     			auto viewport_child = res[$-1];
-    			debug writeln("viewport_child: ", viewport_child);
+    			// debug writeln("viewport_child: ", viewport_child);
     			auto viewport_child_visibility = viewport_child[0];
     			auto viewport_child_visibility_object = viewport_child_visibility.o;
     			assert(viewport_child_visibility_object !is null);
     			Position2D op = viewport_child[1];
-    			debug writeln(
-    				"      viewport child %s: try to get object under %sx%s".format(
-    					viewport_child_visibility_object,
-    					op.x,
-    					op.y
-    					)
-    				);
+    			// debug writeln(
+    				// "      viewport child %s: try to get object under %sx%s".format(
+    					// viewport_child_visibility_object,
+    					// op.x,
+    					// op.y
+    					// )
+    				// );
 
     			breadCrumbs ~= tuple(cast(Widget)this, point);
 		
@@ -334,13 +334,13 @@ class Layout : Widget
     		}
     		else
     		{
-    			debug writeln("   no objects under cursor");
+    			// debug writeln("   no objects under cursor");
     			return;
     		}
     	}
     	else
     	{
-    		debug writeln("   no");
+    		// debug writeln("   no");
     		super.getChildAtPosition(point, breadCrumbs);
     		return;
     	}

@@ -2,11 +2,14 @@
 	"authors": [
 		"animuspexus"
 	],
-	"copyright": "Copyright © 2021, animuspexus",
-	"description": "A minimal D application.",
-	"license": "proprietary",
+	"copyright": "Copyright © 2021-2022, animuspexus",
+	"description": "Example DTK Application",
+	"license": "GPLv3",
 	"name": "hello",
 	"dependencies": {
             "dtk": "~master",
+	},
+	"subConfigurations": {
+		"dtk": "platform-sdl-desktop"
 	}
 }

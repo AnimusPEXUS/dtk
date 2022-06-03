@@ -21,6 +21,7 @@ enum MenuMode : ubyte
 
 const auto MenuProperties = cast(PropSetting[]) [
 PropSetting("gs_w_d", "MenuMode", "mode", "Mode", q{MenuMode.popup}),
+PropSetting("gsu", "Widget", "isSubmenuFor", "IsSubmenuFor", q{null}),
 ];
 
 Menu MenuBar() {return new Menu(MenuMode.bar);}
@@ -157,6 +158,7 @@ class Menu : Widget
     			auto c = w.getLayoutChild(i);
     			if (!c)
     			{
+    				// TODO: assert? exception?
     				debug writeln("warning: getLayoutChild returned null");
     				continue;
     			}
@@ -170,6 +172,12 @@ class Menu : Widget
     		for (int i = 0; i != w.getLayoutChildCount(); i++)
     		{
     			auto c = w.getLayoutChild(i);
+    			if (!c)
+    			{
+    				// TODO: assert? exception?
+    				debug writeln("warning: getLayoutChild returned null");
+    				continue;
+    			}
     			auto cw = c.getDesiredWidth();
     			auto ch = c.getDesiredHeight();
     			c.setWidth(cw);
@@ -190,6 +198,12 @@ class Menu : Widget
     		for (int i = 0; i != w.getLayoutChildCount(); i++)
     		{
     			auto c = w.getLayoutChild(i);
+    			if (!c)
+    			{
+    				// TODO: assert? exception?
+    				debug writeln("warning: getLayoutChild returned null");
+    				continue;
+    			}
     			auto cw = c.getDesiredWidth();
     			auto ch = c.getDesiredHeight();
     			if (cw > targetW)
@@ -200,6 +214,12 @@ class Menu : Widget
     		for (int i = 0; i != w.getLayoutChildCount(); i++)
     		{
     			auto c = w.getLayoutChild(i);
+    			if (!c)
+    			{
+    				// TODO: assert? exception?
+    				debug writeln("warning: getLayoutChild returned null");
+    				continue;
+    			}
     			auto cw = c.getDesiredWidth();
     			auto ch = c.getDesiredHeight();
     			c.setWidth(targetW);

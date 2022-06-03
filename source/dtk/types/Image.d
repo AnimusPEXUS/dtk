@@ -136,8 +136,27 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
     
     void putImage(int x, int y, Image new_image)
     {
-    	assert(x >= 0);
-    	assert(y >= 0);
+    	// assert(x >= 0);
+    	// assert(y >= 0);
+    	
+    	// this allows passing negative x, y
+    	if (x < 0 || y < 0)
+    	{
+    		auto new_x = (x < 0 ? x*-1 : 0);
+    		auto new_y = (y < 0 ? y*-1 : 0);
+    		new_image = new_image.getImage(
+    			new_x, 
+    			new_y,
+    			new_image.width - new_x,
+    			new_image.height - new_y
+    			);
+    		
+    		if (x<0)
+    			x=0;
+
+    		if (y<0)
+    			y=0;
+    	}
     	
         if (x > width)
             return;

@@ -127,7 +127,10 @@ class MenuItem : Widget
     	debug writeln("click");
     	// if (onMousePressRelease)
     	// onMousePressRelease(event);
-    	showSubmenu();
+    	if (isSetSubmenu())
+    	{
+    		showSubmenu();
+    	}
     }
     
     void showSubmenu()
@@ -149,11 +152,14 @@ class MenuItem : Widget
     		y: desY,
     		width: 50,
     		height: 50,
-    		// resizable: true,
-    		popup_menu: true,
+    		resizable: true,
+    		// popup_menu: true,
+    		// borderless: true
     	};
     	
     	auto w = p.createWindow(wcs);
+    	
+    	w.setDebugName("menu window");
     	
     	w.setX(desX);
     	w.setY(desY);
@@ -180,8 +186,38 @@ class MenuItem : Widget
     			w.setDesiredWidth(cdw);
     			w.setDesiredHeight(cdh);
     			
-    			alignParentChild(0.5, 0.5, this, c);
+    			c.setWidth(cdw);
+    			c.setHeight(cdh);
+    			
+    			c.propagatePerformLayout();
+    			
+    			alignParentChild(0.5, 0.5, w, c);
     		}
+    		
+    		debug writeln(
+    			"popup form performLayout:\n",
+    			"   form size : %sx%s\n".format(
+    				getWidth(), 
+    				getHeight()
+    				),
+    			"   form dsize: %sx%s\n".format(
+    				getDesiredWidth(), 
+    				getDesiredHeight()
+    				),
+    			
+    			!c ?
+    			"   (no child)" :
+    			"   child size : %sx%s\n".format(
+    				c.getWidth(), 
+    				c.getHeight()
+    				) ~ 
+    			"   child dsize: %sx%s\n".format(
+    				c.getDesiredWidth(), 
+    				c.getDesiredHeight()
+    				) 
+    			
+    			
+    			);
     	};
     	
     }

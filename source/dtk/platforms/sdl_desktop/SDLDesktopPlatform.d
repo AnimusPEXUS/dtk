@@ -425,7 +425,8 @@ class SDLDesktopPlatform : PlatformI
     	
     	widgetInternalDraggingEventWidget = widget;
     	
-    	this.widgetInternalDraggingEventStopCheck = widgetInternalDraggingEventStopCheck;
+    	this.widgetInternalDraggingEventStopCheck = 
+    	widgetInternalDraggingEventStopCheck;
     	
     	widgetInternalDraggingEventActive = true;
     	

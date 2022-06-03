@@ -23,13 +23,30 @@
 				"BindFT_Static",
 				"DTK_PLATFORM_SDL_DESKTOP"
 			]
+		},
+		{
+			"dependencies": {
+				"bindbc-freetype": "~>1.0.2",
+				"wayland": "~>0.3.1",
+				"wayland:client": "~>0.1.0",
+				"fontconfig": "~>2.0.0"
+			},
+			"libs": [
+				"freetype"
+			],
+			"name": "platform-wayland-desktop",
+			"targetType": "library",
+			"versions": [
+				"BindFT_Static",
+				"DTK_PLATFORM_WAYLAND_DESKTOP"
+			]
 		}
 	],
-	"copyright": "Copyright © 2021, animuspexus",
+	"copyright": "Copyright © 2021-2022, animuspexus",
 	"dependencies": {
 		"observable": "~>1.0.0"
 	},
 	"description": "A minimal D application.",
-	"license": "gplv3",
+	"license": "GPLv3",
 	"name": "dtk"
 }

@@ -49,7 +49,7 @@ PropSetting("gs_w_d", "float", "visibleScope", "VisibleScope", q{0.3}),
 class ScrollBar : Widget
 {
 	
-    mixin mixin_multiple_properties_define!(ScrollBarProperties);
+	mixin mixin_multiple_properties_define!(ScrollBarProperties);
     mixin mixin_multiple_properties_forward!(ScrollBarProperties, false);
     mixin mixin_Widget_renderImage!("ScrollBar");
     
