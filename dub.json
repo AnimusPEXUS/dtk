@@ -5,9 +5,9 @@
 	"configurations": [
 		{
 			"dependencies": {
-				"bindbc-freetype": "~>1.0.2",
-				"bindbc-sdl": "~>1.0.0",
-				"fontconfig": "~>2.0.0"
+				"bindbc-freetype": ">=1.0.2",
+				"bindbc-sdl": ">=1.0.0",
+				"fontconfig": ">=2.0.0"
 			},
 			"libs": [
 				"SDL2",
@@ -28,10 +28,10 @@
 		},
 		{
 			"dependencies": {
-				"bindbc-freetype": "~>1.0.2",
-				"wayland": "~>0.3.1",
-				"wayland:client": "~>0.1.0",
-				"fontconfig": "~>2.0.0"
+				"bindbc-freetype": ">=1.0.2",
+				"wayland": ">=0.3.1",
+				"wayland:client": ">=0.1.0",
+				"fontconfig": ">=2.0.0"
 			},
 			"libs": [
 				"freetype"
@@ -49,9 +49,10 @@
 	],
 	"copyright": "Copyright © 2021-2022, animuspexus",
 	"dependencies": {
-		"observable": "~>1.0.0"
+		"observable": ">=1.0.0"
 	},
 	"description": "A minimal D application.",
 	"license": "GPLv3",
-	"name": "dtk"
+	"name": "dtk",
+	"version:: "0.0.0"
 }
