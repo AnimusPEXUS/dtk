@@ -7,7 +7,7 @@
 	"license": "GPLv3",
 	"name": "hello",
 	"dependencies": {
-            "dtk": "~master",
+            "dtk": "~master"
 	},
 	"subConfigurations": {
 		"dtk": "platform-sdl-desktop"

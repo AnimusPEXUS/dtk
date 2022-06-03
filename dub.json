@@ -14,13 +14,15 @@
 				"SDL2_image",
 				"freetype"
 			],
+			"subConfigurations": {
+                                "bindbc-sdl": "static",
+                                "bindbc-ft": "static"
+                        },
 			"name": "platform-sdl-desktop",
-			"targetType": "library",
+			"targetType": "staticLibrary",
 			"versions": [
 				"SDL_205",
-				"BindSDL_Static",
 				"SDL_Image",
-				"BindFT_Static",
 				"DTK_PLATFORM_SDL_DESKTOP"
 			]
 		},
@@ -34,8 +36,11 @@
 			"libs": [
 				"freetype"
 			],
+			"subConfigurations": {
+                                "bindbc-ft": "static"
+                        },
 			"name": "platform-wayland-desktop",
-			"targetType": "library",
+			"targetType": "staticLibrary",
 			"versions": [
 				"BindFT_Static",
 				"DTK_PLATFORM_WAYLAND_DESKTOP"
