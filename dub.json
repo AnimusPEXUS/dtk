@@ -16,7 +16,7 @@
 			],
 			"subConfigurations": {
                                 "bindbc-sdl": "static",
-                                "bindbc-ft": "static"
+                                "bindbc-freetype": "static"
                         },
 			"name": "platform-sdl-desktop",
 			"targetType": "staticLibrary",
@@ -37,7 +37,7 @@
 				"freetype"
 			],
 			"subConfigurations": {
-                                "bindbc-ft": "static"
+                                "bindbc-freetype": "static"
                         },
 			"name": "platform-wayland-desktop",
 			"targetType": "staticLibrary",
