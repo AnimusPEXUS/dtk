@@ -18,7 +18,7 @@ T2 recursionGuard(T2, T1...)
 	assert(call_mutex !is null);
 	assert(already_started_call !is null);
 	assert(target !is null);
-	
+
     synchronized (call_mutex)
     {
         if (already_called)
@@ -30,10 +30,10 @@ T2 recursionGuard(T2, T1...)
         	}
             return already_started_call();
         }
-        
+
         already_called = true;
         scope (exit) {already_called = false;}
-        
+
         return target(args);
     }
 }
@@ -59,16 +59,14 @@ T2 recursionGuard(T2, T1...)(
 
 unittest
 {
-	debug
-	{
-		import std.stdio;
-		writeln("Testing recursionGuard");
-	}
-	
+	import std.stdio;
+
+	writeln("Testing recursionGuard");
+
 	{
 		bool called;
 		Mutex mtx = new Mutex();
-		
+
 		int t1() {
 			int x = recursionGuard(
 				called,
@@ -83,7 +81,7 @@ unittest
 				);
 			return x;
 		}
-		
+
 		assert(t1() == 10);
 	}
 }
