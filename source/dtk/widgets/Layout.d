@@ -20,7 +20,7 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
 import dtk.types.Image;
-import dtk.types.VisibilityMap;
+import dtk.types.WidgetViewport;
 import dtk.types.Event;
 import dtk.types.Widget;
 
@@ -49,56 +49,75 @@ class Layout : Widget
     mixin mixin_multiple_properties_define!(LayoutProperties);
     mixin mixin_multiple_properties_forward!(LayoutProperties, false);
     mixin mixin_Widget_renderImage!("Layout");
-    
+
     private
     {
     	//WidgetChild scrollbarH;
     	//WidgetChild scrollbarV;
 		WidgetChild[] children;
-		VisibilityMap!(Widget) vm;
+		WidgetViewport vp;
     }
-    
+
     public
     {
     	debug bool drawRectangleAroundViewPort = true;
     }
-    
+
     this()
     {
     	mixin(mixin_multiple_properties_inst(LayoutProperties));
-    	vm = new VisibilityMap!(Widget)();
+
+    	vp = new WidgetViewport();
+
+        static foreach (v; ["X", "Y", "Width", "Height"])
+        {
+            mixin(
+                q{
+                    vp.get%1$s = delegate int()
+                    {
+                        return getViewPort%1$s();
+                    };
+                }.format(v)
+                );
+        }
+
+        vp.getWidgets = delegate WidgetChild[]()
+        {
+            // TODO: is it ok to use 'children' variable directly?
+            return children;
+        };
     	// setTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange(true);
     }
-    
+
 	override WidgetChild[] calcWidgetChildren()
     {
     	WidgetChild[] ret;
     	return ret;
     }
-    
+
     deprecated
     {
     	WidgetChild[] calcWidgetLayoutChildren()
     	{
     		return children;
     	}
-    	
+
     	final int calcWidgetLayoutChildrenCount()
     	{
     		return cast(int) calcWidgetLayoutChildren().length;
     	}
     }
-    
+
     public
     {
     	void delegate(Widget child) exceptionIfLayoutChildInvalid;
     }
-    
+
     int getLayoutChildCount()
     {
     	return cast(int) children.length;
     }
-    
+
     bool haveLayoutChild(Widget child)
     {
     	foreach (c; children)
@@ -110,7 +129,7 @@ class Layout : Widget
     	}
     	return false;
     }
-    
+
     Widget getLayoutChild(int i)
     {
     	if (children.length == 0)
@@ -119,7 +138,7 @@ class Layout : Widget
     		return null;
     	return children[i].child;
     }
-    
+
     Layout addLayoutChild(Widget child)
     {
     	if (exceptionIfLayoutChildInvalid !is null)
@@ -137,7 +156,7 @@ class Layout : Widget
     	}
     	return this;
     }
-    
+
     Layout removeLayoutChild(Widget child)
     {
     	// if (children.length == childMinCount)
@@ -146,9 +165,9 @@ class Layout : Widget
     	// }
     	if (!haveLayoutChild(child))
     		return this;
-    	
+
     	Widget[] removed;
-    	
+
     	foreach_reverse (i, v; children)
     	{
     		if (v.child == child)
@@ -157,14 +176,14 @@ class Layout : Widget
     			children = children[0 .. i] ~ children[i+1 .. $];
     		}
     	}
-    	
+
     	foreach(v;removed)
     	{
     		v.unsetParent();
     	}
     	return this;
     }
-    
+
     Layout removeAllLayoutChildren()
     {
     	auto children_copy = children;
@@ -177,7 +196,7 @@ class Layout : Widget
     	}
     	return this;
     }
-    
+
 	void fixLayoutChildrenParents()
     {
     	foreach_reverse (i, v; children)
@@ -190,13 +209,13 @@ class Layout : Widget
     			continue;
     		}
     	}
-    	
+
     	foreach (v; children)
     	{
     		fixChildParent(v.child);
     	}
     }
-    
+
     final void propagatePerformLayoutToLayoutChildren()
     {
     	foreach (v; children)
@@ -204,7 +223,7 @@ class Layout : Widget
     		v.child.propagatePerformLayout();
     	}
     }
-    
+
     override void propagatePerformLayout()
     {
     	if (performLayout !is null)
@@ -216,58 +235,36 @@ class Layout : Widget
     		propagatePerformLayoutToChildren();
     		propagatePerformLayoutToLayoutChildren();
     	}
-    	
+
     	recalcChildrenVisibilityMap();
     }
-    
+
     // override void propagatePosAndSizeRecalcAfter()
     // {
     // recalcChildrenVisibilityMap();
     // };
-    
+
     void recalcChildrenVisibilityMap()
     {
-    	vm.init(
-    		getViewPortX(),
-    		getViewPortY(),
-    		getViewPortWidth(),
-    		getViewPortHeight()
-    		);
-    	
-    	bool started;
-    	foreach (v; children)
-    	{
-    		auto res = vm.put(
-    			v.getX(),
-    			v.getY(),
-    			v.getWidth(),
-    			v.getHeight(),
-    			v.child
-    			);
-    		if (!started && res)
-    			started=true;
-    		if (started && !res)
-    			break;
-    	}
-    	
+        vp.recalcMap();
     	return;
     }
-    
+
     override Image propagateRedraw()
     {
     	auto img = super.propagateRedraw();
-    	
-    	foreach (c; vm.map)
+
+    	foreach (c; vp.map)
     	{
-    		auto co = c.o;
+    		auto co = c.widget;
     		assert(co !is null);
     		auto c_img = co.propagateRedraw();
     		this.drawLayoutChild(img, co, c_img);
     	}
-    	
+
     	return img;
     }
-    
+
     override WidgetChild getWidgetChildByChild(Widget child)
     {
     	foreach (v; children)
@@ -279,8 +276,8 @@ class Layout : Widget
     	}
     	return super.getWidgetChildByChild(child);
     }
-    
-    
+
+
     override void getChildAtPosition(
 		Position2D point,
 		ref Tuple!(Widget, Position2D)[] breadCrumbs
@@ -288,140 +285,150 @@ class Layout : Widget
     {
     	auto px = point.x;
 		auto py = point.y;
-		
+
     	auto vpx = getViewPortPosX();
     	auto vpy = getViewPortPosY();
-    	auto vx = getViewPortX();
-    	auto vy = getViewPortY();
+    	// auto vx = getViewPortX();
+    	// auto vy = getViewPortY();
     	auto vw = getViewPortWidth();
     	auto vh = getViewPortHeight();
-    	
-    	// debug writeln("pointer in viewport?");
+
+    	debug writeln("pointer in viewport?");
     	if (
     		px >= vpx
     	&& px < vpx+vw
-    	
+
     	&& py >= vpy
     	&& py < vpy+vh
     	)
     	{
-    		// debug writeln("   yes");
-    		auto vp_pos = Position2D((px - vpx + vx), (py - vpy + vy));
-    		auto res = vm.getByPoint(vp_pos, true);
-    		if (res.length != 0)
+    		debug writeln("   yes");
+    		auto vp_pos = Position2D((px - vpx), (py - vpy));
+    		auto res = vp.getByViewPortPoint(vp_pos, true);
+    		if (res.length == 0)
     		{
-    			auto viewport_child = res[$-1];
-    			// debug writeln("viewport_child: ", viewport_child);
-    			auto viewport_child_visibility = viewport_child[0];
-    			auto viewport_child_visibility_object = viewport_child_visibility.o;
-    			assert(viewport_child_visibility_object !is null);
-    			Position2D op = viewport_child[1];
-    			// debug writeln(
-    				// "      viewport child %s: try to get object under %sx%s".format(
-    					// viewport_child_visibility_object,
-    					// op.x,
-    					// op.y
-    					// )
-    				// );
+    			return;
+    		}
 
-    			breadCrumbs ~= tuple(cast(Widget)this, point);
-		
-    			viewport_child_visibility_object.getChildAtPosition(
-    				op,
-    				breadCrumbs
-    				);
-    			return;
-    		}
-    		else
-    		{
-    			// debug writeln("   no objects under cursor");
-    			return;
-    		}
+            auto viewport_child = res[$-1];
+            debug writeln("viewport_child: ", viewport_child);
+            auto viewport_child_visibility = viewport_child[0];
+            auto viewport_child_visibility_object = viewport_child_visibility.widget;
+            assert(viewport_child_visibility_object !is null);
+            Position2D op = viewport_child[1];
+             debug writeln(
+                 "      viewport child %s: try to get object under %sx%s".format(
+                     viewport_child_visibility_object,
+                     op.x,
+                     op.y
+                     )
+                 );
+
+            breadCrumbs ~= tuple(cast(Widget)this, point);
+
+            viewport_child_visibility_object.getChildAtPosition(
+                op,
+                breadCrumbs
+                );
     	}
     	else
     	{
-    		// debug writeln("   no");
+    		debug writeln("   no");
     		super.getChildAtPosition(point, breadCrumbs);
     		return;
     	}
     }
-    
+
     override DrawingSurfaceI shiftDrawingSurfaceForChild(
-		DrawingSurfaceI ds,
-		Widget child
-		)
+        DrawingSurfaceI ds,
+        Widget child
+        )
     {
-    	if (haveLayoutChild(child))
-    		return shiftDrawingSurfaceForLayoutChild(ds, child);
-    	
+        if (haveLayoutChild(child))
+        {
+            return shiftDrawingSurfaceForLayoutChild(ds, child);
+        }
+
         return super.shiftDrawingSurfaceForChild(ds, child);
     }
-    
+
     DrawingSurfaceI shiftDrawingSurfaceForLayoutChild(
-		DrawingSurfaceI ds,
-		Widget child
-		)
+        DrawingSurfaceI ds,
+        Widget child,
+        CalculateVisiblePartResult* precalculatedData = null
+        )
     {
-    	if (!haveLayoutChild(child))
-    		throw new Exception("not a layout child");
-    	
+        if (!haveLayoutChild(child))
+            throw new Exception("not a layout child");
+
         auto vp_px = getViewPortPosX();
-    	auto vp_py = getViewPortPosY();
-    	
-        auto vp_x = getViewPortX();
-    	auto vp_y = getViewPortY();
-    	auto vp_w = getViewPortWidth();
-    	auto vp_h = getViewPortHeight();
-    	
-    	auto cx = getChildX(child);
-    	auto cy = getChildY(child);
-    	auto cw = getChildWidth(child);
-    	auto ch = getChildHeight(child);
-    	
-    	auto res = calculateVisiblePart(
-    		vp_x,
-    		vp_y,
-    		vp_w,
-    		vp_h,
-    		cx,
-    		cy,
-    		cw,
-    		ch
-    		);
-    	
+        auto vp_py = getViewPortPosY();
+
+        CalculateVisiblePartResult* res;
+        if (precalculatedData)
+            res = precalculatedData;
+        else
+        {
+            auto vp_x = getViewPortX();
+            auto vp_y = getViewPortY();
+            auto vp_w = getViewPortWidth();
+            auto vp_h = getViewPortHeight();
+
+            auto cx = getChildX(child);
+            auto cy = getChildY(child);
+            auto cw = getChildWidth(child);
+            auto ch = getChildHeight(child);
+
+            res = calculateVisiblePart(
+                vp_x,
+                vp_y,
+                vp_w,
+                vp_h,
+                cx,
+                cy,
+                cw,
+                ch
+                );
+        }
+
+        if (!res)
+            throw new ExcDrawingSurfaceForInvisibleChild(
+                "trying to create surface for invisible child"
+                );
+
         auto ret = new DrawingSurfaceShift(
         	new DrawingSurfaceShift(
         		ds,
-        		cast(int)res[5],
-        		cast(int)res[6]
+        		res.vx,
+        		res.vy,
         		),
         	vp_px,
         	vp_py
         	);
-        
+
         return ret;
     }
-    
+
     void drawLayoutChild(DrawingSurfaceI ds, Widget child, Image img)
     {
     	if (!haveLayoutChild(child))
     		throw new Exception("not a layout child");
-    	
+
     	ds = shiftDrawingSurfaceForLayoutChild(ds, child);
-    	
+
         // auto vp_px = getViewPortPosX();
     	// auto vp_py = getViewPortPosY();
-    	
+
     	auto vp_x = getViewPortX();
     	auto vp_y = getViewPortY();
     	auto vp_w = getViewPortWidth();
     	auto vp_h = getViewPortHeight();
-    	
+
     	auto cx = getChildX(child);
     	auto cy = getChildY(child);
     	auto cw = getChildWidth(child);
     	auto ch = getChildHeight(child);
-    	
+
     	auto res = calculateVisiblePart(
     		vp_x,
     		vp_y,
@@ -432,16 +439,16 @@ class Layout : Widget
     		cw,
     		ch
     		);
-    	if (!res[0])
+    	if (!res)
     		return;
-    	
+
     	ds.drawImage(
     		// NOTE: ds should be already shifted to correct position
     		Position2D(0, 0),
-    		img.getImage(res[1], res[2], res[3], res[4])
+    		img.getImage(res.x, res.y, res.w, res.h)
     		);
     }
-    
+
     deprecated
     {
     	static foreach(v;["X", "Y", "Width", "Height"])
@@ -454,7 +461,7 @@ class Layout : Widget
     						"this function should not be used or implemented"
     						);
     				}
-    				
+
     				void setLayoutChild%1$s(Widget child, int v)
     				{
     					throw new Exception(
@@ -465,5 +472,5 @@ class Layout : Widget
     			);
     	}
     }
-    
+
 }

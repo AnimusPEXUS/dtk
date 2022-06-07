@@ -83,19 +83,16 @@ mixin template mixin_Widget_renderImage(
 			%2$s Image renderImage()
 			{
 				debug writeln(this, ".renderImage() called");
+				
 				Form form = this.getForm();
-				if (form is null)
-				{
+				if (!form)
 					throw new Exception(
 						this.toString() ~ ".renderImage() can't get Form"
 						);
-				}
 				
 				auto laf = form.getLaf();
-				if (laf is null)
-				{
+				if (!laf)
 					throw new Exception("Laf not set");
-				}
 				
 				auto w = getWidth();
 				auto h = getHeight();

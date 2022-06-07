@@ -1,0 +1,324 @@
+module dtk.types.VisibilityMap;
+
+import std.typecons;
+import std.stdio;
+import std.format;
+
+// import dtk.miscs.calculateVisiblePart;
+
+import dtk.types.Position2D;
+
+// object has it's own XY on it's parent and it's own WH.
+// XY in Visibility is positive and relative to object's XY
+// and WH in Visibility is size of object's visible part.
+class Visibility
+{
+	// visible image's (object's) part (NOTE: this is not same as object's XYWH)
+	// XY - relative to object's top-left corner
+	int visibilityStartX;
+	int visibilityStartY;
+
+	int visibleWidth;
+	int visibleHeight;
+
+	// XY relative to viewport
+	int viewportX;
+	int viewportY;
+
+	override string toString()
+	{
+		return "x: %s, y: %s, w: %s, h: %s, w: %s, vx: %s, vy: %s".format(
+			visibilityStartX,
+			visibilityStartY,
+			visibleWidth,
+			visibleHeight,
+			viewportX,
+			viewportY
+			);
+	}
+}
+
+class VisibilityMapObject(T) : Visibility
+{
+	T o;
+}
+
+// viewport of space. calculates objects visible in viewport, exactly visible
+// parts of those objects and position of visible object's XY relatively to
+// viewport XY
+class VisibilityMap(T)
+{
+	int vp_x;
+	int vp_y;
+	int vp_w;
+	int vp_h;
+
+	VisibilityMapObject!(T)[] map;
+
+	void init(
+		int vp_x,
+		int vp_y,
+		int vp_w,
+		int vp_h
+		)
+	{
+		assert(vp_w >= 0);
+		assert(vp_h >= 0);
+
+		this.vp_x = vp_x;
+		this.vp_y = vp_y;
+		this.vp_w = vp_w;
+		this.vp_h = vp_h;
+		this.map = this.map[0 .. 0];
+	}
+
+	// put object into viewport. if object not visible at all, object will not
+	// be remembered. xy it relative to scene xy
+	bool put(
+		int x,
+    	int y,
+    	int w,
+    	int h,
+    	T o
+    	)
+    {
+		assert(w >= 0);
+		assert(h >= 0);
+
+    	auto res = calculateVisiblePart(
+    		vp_x,
+    		vp_y,
+    		vp_w,
+    		vp_h,
+    		x,
+    		y,
+    		w,
+    		h
+    		);
+    	if (!res[0])
+    	{
+    		return false;
+    	}
+
+    	VisibilityMapObject!(T) vis = new VisibilityMapObject!(T)();
+
+    	vis.o = o;
+		{
+			auto res_1 = res[1];
+			vis.visibilityStartX=res_1.visibilityStartX;
+			vis.visibilityStartY=res_1.visibilityStartY;
+			vis.visibleWidth=res_1.visibleWidth;
+			vis.visibleHeight=res_1.visibleHeight;
+			vis.viewportX=res_1.viewportX;
+			vis.viewportY=res_1.viewportY;
+		}
+
+    	map ~= vis;
+    	return true;
+    }
+
+    // determine object and it's visibility parameters.
+    // input point is relative to viewport xy.
+    // output point is relative to object xy.
+	Tuple!(VisibilityMapObject!(T), Position2D)[] getByViewPortPoint(
+		Position2D point,
+		bool only_last
+		)
+	{
+		Tuple!(VisibilityMapObject!(T), Position2D)[] ret;
+
+		debug
+		{
+			scope(exit)
+			{
+				writeln(
+					"getByScenePoint((%s, %s), %s)\n".format(
+						point.x, point.y, only_last
+						),
+					"	result:\n",
+					{
+						auto ret1 = "";
+						foreach (v; ret)
+						{
+							ret1 ~= "   map element: %s\n".format(v[0].toString());
+							ret1 ~= "         point: %s, %s\n".format(v[1].x, v[1].y);
+						}
+						return ret1;
+					}()
+
+					);
+			}
+		}
+
+		auto p_x = point.x;
+		auto p_y = point.y;
+
+		foreach_reverse (k, v; map)
+		{
+			if (
+				p_x >= v.viewportX
+				&& p_x < v.viewportX+v.visibleWidth
+
+				&& p_y >= v.viewportY
+				&& p_y < v.viewportY+v.visibleHeight
+				)
+			{
+				ret = tuple(
+					v,
+					Position2D(
+						(p_x - v.x),
+						(p_y - v.y)
+						)
+					)
+				~ ret;
+				if (only_last)
+					break;
+			}
+		}
+
+		return ret;
+	}
+}
+
+// If there is space, which have object c on it and part of space is viewed
+// via viewport vp - get visible part of c and c position relative to viewport
+
+// result values:
+//  0 - visible at all?
+//  1 - see Visibility description
+Tuple!(bool, Visibility) calculateVisiblePart(
+		// viewport
+		int vpx,
+		int vpy,
+		int vpw,
+		int vph,
+		// child
+		int cx,
+		int cy,
+		int cw,
+		int ch
+		)
+{
+	assert(cw >= 0);
+	assert(ch >= 0);
+	assert(vpw >= 0);
+	assert(vph >= 0);
+
+	auto ret_invisible = tuple(false, cast(Visibility) null);
+
+	int x;
+	int y;
+	int w;
+	int h;
+	int vx;
+	int vy;
+
+	if (cw==0 || ch==0)
+	{
+		return ret_invisible;
+	}
+
+	auto cx_p_cw = cx + cw;
+	auto cy_p_ch = cy + ch;
+	auto vpx_p_vpw = vpx + vpw;
+	auto vpy_p_vph = vpy + vph;
+
+	if (
+		   vpx       > cx_p_cw
+		|| vpy       > cy_p_ch
+		|| vpx_p_vpw < cx
+		|| vpy_p_vph < cy
+		)
+	{
+		return ret_invisible;
+	}
+
+	{
+		if (vpx >= cx)
+		{
+			vx = 0;
+		}
+		else
+		{
+			vx = cx - vpx;
+		}
+
+		if (vpy >= cy)
+		{
+			vy = 0;
+		}
+		else
+		{
+			vy = cy - vpy;
+		}
+	}
+
+	{
+		if (vpx < cx)
+		{
+			x = 0;
+		}
+		else
+		{
+			x = vpx - cx;
+			w = cw - x;
+		}
+
+		if (vpy < cy)
+		{
+			y = 0;
+		}
+		else
+		{
+			y = vpy - cy;
+			h = ch - y;
+		}
+	}
+
+	{
+		if (vpx_p_vpw < cx_p_cw)
+		{
+			w = w - (cx_p_cw - vpx_p_vpw);
+		}
+
+		if (vpy_p_vph < cy_p_ch)
+		{
+			h = h - (cy_p_ch - vpy_p_vph);
+		}
+	}
+
+	/*
+	{
+		if (x > w)
+			w = 0;
+		else
+			w -= x;
+
+		if (y > h)
+			h = 0;
+		else
+			h -= y;
+	}
+	*/
+
+	if (w==0 || h==0)
+	{
+		return ret_invisible;
+	}
+
+	assert(w >= 0);
+	assert(h >= 0);
+
+	auto ret_obj = new Visibility();
+
+	ret_obj.visibilityStartX = x;
+	ret_obj.visibilityStartY = y;
+
+	ret_obj.visibleWidth = w;
+	ret_obj.visibleHeight = h;
+
+	ret_obj.viewportX = vx;
+	ret_obj.viewportY = vy;
+
+	return tuple(true, ret_obj);
+}
