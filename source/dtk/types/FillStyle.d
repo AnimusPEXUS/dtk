@@ -7,9 +7,9 @@ import dtk.types.Color;
 struct FillStyle
 {
     Color color;
-    
+
     string toString()
     {
-    	return "(color: %s)".format(color);
+        return "(color: %s)".format(color);
     }
 }

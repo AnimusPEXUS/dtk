@@ -35,16 +35,10 @@ class DrawingSurface : DrawingSurfaceI
 
     void drawDot(Position2D pos, ImageDot dot)
     {
-    	if (!dot.enabled)
-    		return;
+        if (!dot.enabled)
+            return;
         auto rndr = SDL_GetRenderer(w.sdl_window);
-        SDL_SetRenderDrawColor(
-            rndr,
-            dot.color.r,
-            dot.color.g,
-            dot.color.b,
-            dot.color.a
-            );
+        SDL_SetRenderDrawColor(rndr, dot.color.r, dot.color.g, dot.color.b, dot.color.a);
         SDL_RenderDrawPoint(rndr, pos.x, pos.y);
     }
 
@@ -80,8 +74,8 @@ class DrawingSurface : DrawingSurfaceI
                     {
                         auto id = ImageDot();
                         id.color = style.color;
-                        id.enabled=true;
-                        id.intensivity=1;
+                        id.enabled = true;
+                        id.intensivity = 1;
                         drawDot(v, id);
                     }
                 }
@@ -90,32 +84,17 @@ class DrawingSurface : DrawingSurfaceI
         }
     }
 
-    void drawRectangle(
-        Position2D pos,
-        Size2D size,
-        LineStyle top_style,
-        LineStyle left_style,
-        LineStyle bottom_style,
-        LineStyle right_style,
-        Nullable!FillStyle fill_style
-        )
+    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
+            LineStyle bottom_style, LineStyle right_style, Nullable!FillStyle fill_style)
     {
         auto rndr = SDL_GetRenderer(w.sdl_window);
         assert(rndr !is null);
 
-        if (top_style == left_style
-            && top_style == bottom_style
-            && top_style == right_style
-            && top_style.style == null
-            )
+        if (top_style == left_style && top_style == bottom_style
+                && top_style == right_style && top_style.style == null)
         {
-            SDL_SetRenderDrawColor(
-                rndr,
-                top_style.color.r,
-                top_style.color.g,
-                top_style.color.b,
-                top_style.color.a
-                );
+            SDL_SetRenderDrawColor(rndr, top_style.color.r, top_style.color.g,
+                    top_style.color.b, top_style.color.a);
             auto r = new SDL_Rect(pos.x, pos.y, size.width, size.height);
             SDL_RenderDrawRect(rndr, r);
         }
@@ -202,12 +181,9 @@ class DrawingSurface : DrawingSurfaceI
         {
             for (uint x = 0; x != image.width; x++)
             {
-            	auto xx = image.getDot(x, y);
-            	// xx.color.a = 255;
-                drawDot(
-                    Position2D(pos.x + x, pos.y + y),
-                    xx
-                    );
+                auto xx = image.getDot(x, y);
+                // xx.color.a = 255;
+                drawDot(Position2D(pos.x + x, pos.y + y), xx);
             }
         }
     }

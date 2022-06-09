@@ -9,10 +9,10 @@ import dtk.types.Position2D;
 
 struct EventForm
 {
-	Event* event;
-	Widget focusedWidget;
-	Widget mouseFocusedWidget;
-	Tuple!(Widget, Position2D)[] mouseFocusedWidgetBreadCrumbs;
-	int mouseFocusedWidgetX;
-	int mouseFocusedWidgetY;
+    Event* event;
+    Widget focusedWidget;
+    Widget mouseFocusedWidget;
+    Tuple!(Widget, Position2D)[] mouseFocusedWidgetBreadCrumbs;
+    int mouseFocusedWidgetX;
+    int mouseFocusedWidgetY;
 }

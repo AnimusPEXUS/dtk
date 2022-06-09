@@ -12,32 +12,24 @@ public import observable.signal : SignalConnection, SignalConnectionContainer;
 
 // import dtk.widgets.Form;
 
-
-mixin template mixin_installSignal(
-	string name,
-	string var_name,
-	bool for_interface,
-	P...
-	)
+mixin template mixin_installSignal(string name, string var_name, bool for_interface, P...)
 {
-	import std.format;
-	import observable.signal;
+    import std.format;
+    import observable.signal;
 
-	static if (!for_interface)
-	{
-		private {
-			mixin(
-				q{
+    static if (!for_interface)
+    {
+        private
+        {
+            mixin(q{
 					Signal!(P) %1$s;
-				}.format(var_name)
-				);
-		}
-	}
-	
-	static if (!for_interface)
-	{
-		mixin(
-			q{
+				}.format(var_name));
+        }
+    }
+
+    static if (!for_interface)
+    {
+        mixin(q{
 				SignalConnection connectToSignal_%1$s( void delegate(P) nothrow cb)
 				{
 					SignalConnection conn;
@@ -49,17 +41,13 @@ mixin template mixin_installSignal(
 				{
 					this.%2$s.emit(args);
 				}
-			}.format(name,var_name)
-			);
-	}
-	else
-	{
-		mixin(
-			q{
+			}.format(name, var_name));
+    }
+    else
+    {
+        mixin(q{
 				SignalConnection connectToSignal_%1$s( void delegate(P) nothrow cb);
 				void emitSignal_%1$s(P...)(P args);
-			}.format(name)
-			);
-	}
+			}.format(name));
+    }
 }
-

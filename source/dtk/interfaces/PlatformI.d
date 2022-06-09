@@ -1,6 +1,5 @@
 module dtk.interfaces.PlatformI;
 
-
 import dtk.interfaces.WindowI;
 import dtk.interfaces.LaFI;
 import dtk.interfaces.FontMgrI;
@@ -14,42 +13,34 @@ import dtk.miscs.signal_tools;
 
 import dtk.signal_mixins.Platform;
 
-
 interface PlatformI
 {
     string getName();
     string getDescription();
     string getSystemTriplet();
-    
+
     void setOnGetLaf(LaFI delegate());
     LaFI getLaf();
-    
+
     FontMgrI getFontManager();
-    
+
     bool canCreateWindow();
-    
+
     WindowI createWindow(WindowCreationSettings window_settings);
-    
+
     void addWindow(WindowI win);
     void removeWindow(WindowI win);
     bool haveWindow(WindowI win);
-    
+
     bool getFormCanResizeWindow();
-    
+
     void init();
     void mainLoop();
     void destroy();
-    
-    void widgetInternalDraggingEventStart(
-    	Widget e,
-    	int initX, int initY,
-    	EnumWidgetInternalDraggingEventEndReason delegate(Event *e) 
-    	widgetInternalDraggingStopCheck
-    	);
-    void widgetInternalDraggingEventEnd(
-    	Event* e,
-    	EnumWidgetInternalDraggingEventEndReason reason
-    	);
-    
+
+    void widgetInternalDraggingEventStart(Widget e, int initX, int initY,
+            EnumWidgetInternalDraggingEventEndReason delegate(Event* e) widgetInternalDraggingStopCheck);
+    void widgetInternalDraggingEventEnd(Event* e, EnumWidgetInternalDraggingEventEndReason reason);
+
     mixin(mixin_PlatformSignals(true));
 }

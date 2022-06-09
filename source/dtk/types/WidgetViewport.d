@@ -19,15 +19,12 @@ class VisibilityItem
         this.visibilityData = visibilityData;
     }
 
-	override string toString()
-	{
-		return "VisibilityItem: %s, x: %s, y: %s, w: %s, h: %s, w: %s, vx: %s, vy: %s;".format(
-            this,
-			visibilityData.x, visibilityData.y,
-			visibilityData.w, visibilityData.h,
-			visibilityData.vx, visibilityData.vy
-			);
-	}
+    override string toString()
+    {
+        return "VisibilityItem: %s, x: %s, y: %s, w: %s, h: %s, w: %s, vx: %s, vy: %s;".format(this,
+                visibilityData.x, visibilityData.y,
+                visibilityData.w, visibilityData.h, visibilityData.vx, visibilityData.vy);
+    }
 }
 
 class WidgetViewport
@@ -37,7 +34,7 @@ class WidgetViewport
     int delegate() getWidth;
     int delegate() getHeight;
 
-    WidgetChild[] delegate() getWidgets;
+    WidgetChild[]delegate() getWidgets;
 
     VisibilityItem[] map;
 
@@ -60,18 +57,10 @@ class WidgetViewport
         assert(vpw >= 0);
         assert(vph >= 0);
 
-        foreach(c; getWidgets())
+        foreach (c; getWidgets())
         {
-            auto res = calculateVisiblePart(
-                vpx,
-                vpy,
-                vpw,
-                vph,
-                c.getX(),
-                c.getY(),
-                c.getWidth(),
-                c.getHeight(),
-                );
+            auto res = calculateVisiblePart(vpx, vpy, vpw, vph, c.getX(),
+                    c.getY(), c.getWidth(), c.getHeight(),);
 
             if (!res)
                 continue;
@@ -83,10 +72,7 @@ class WidgetViewport
     // determine object and it's visibility parameters.
     // input point is relative to viewport xy.
     // output point is relative to object xy.
-    Tuple!(VisibilityItem, Position2D)[] getByViewPortPoint(
-        Position2D point,
-        bool only_last
-        )
+    Tuple!(VisibilityItem, Position2D)[] getByViewPortPoint(Position2D point, bool only_last)
     {
         Tuple!(VisibilityItem, Position2D)[] ret;
 
@@ -96,22 +82,9 @@ class WidgetViewport
         foreach_reverse (k, v; map)
         {
             auto vd = v.visibilityData;
-            if (
-                p_x >= vd.x
-                && p_x < vd.x+vd.w
-
-                && p_y >= vd.y
-                && p_y < vd.y+vd.h
-                )
+            if (p_x >= vd.vx && p_x < vd.vx + vd.w && p_y >= vd.vy && p_y < vd.vy + vd.h)
             {
-                ret = tuple(
-                    v,
-                    Position2D(
-                        (p_x - vd.x),
-                        (p_y - vd.y)
-                        )
-                    )
-                ~ ret;
+                ret = tuple(v, Position2D((p_x - vd.vx), (p_y - vd.vy))) ~ ret;
                 if (only_last)
                     break;
             }

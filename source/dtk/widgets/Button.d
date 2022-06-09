@@ -36,97 +36,91 @@ import dtk.widgets.Form;
 import dtk.widgets.TextEntry;
 import dtk.widgets.mixins;
 
-
-const auto ButtonProperties = cast(PropSetting[]) [
-// PropSetting("gsun", "WidgetChild", "captionWidget", "CaptionWidget", q{null}),
+const auto ButtonProperties = cast(PropSetting[])[
+    // PropSetting("gsun", "WidgetChild", "captionWidget", "CaptionWidget", q{null}),
 ];
 
 class Button : Widget
 {
-	mixin mixin_multiple_properties_define!(ButtonProperties);
+    mixin mixin_multiple_properties_define!(ButtonProperties);
     mixin mixin_multiple_properties_forward!(ButtonProperties, false);
     mixin mixin_Widget_renderImage!("Button");
     // mixin mixin_widget_redraw_using_propagateRedraw!();
-    
+
     this()
     {
-    	mixin(mixin_multiple_properties_inst(ButtonProperties));
+        mixin(mixin_multiple_properties_inst(ButtonProperties));
     }
-    
+
     private
     {
-    	WidgetChild captionWidget;
+        WidgetChild captionWidget;
     }
-    
+
     Widget getCaptionWidget()
     {
-    	return captionWidget.child;
+        return captionWidget.child;
     }
-    
-	override WidgetChild[] calcWidgetChildren()
+
+    override WidgetChild[] calcWidgetChildren()
     {
-    	WidgetChild[] ret;
-    	if (this.captionWidget)
-    		ret ~= this.captionWidget;
-    	return ret;
+        WidgetChild[] ret;
+        if (this.captionWidget)
+            ret ~= this.captionWidget;
+        return ret;
     }
-    
+
     Button setTextLabel(dstring text)
     {
-    	auto cWidget = Label(text);
-    	cWidget.captionMode=true;
-    	cWidget.setParent(this);
-    	captionWidget = new WidgetChild(this, cWidget);
-    	return this;
+        auto cWidget = Label(text);
+        cWidget.captionMode = true;
+        cWidget.setParent(this);
+        captionWidget = new WidgetChild(this, cWidget);
+        return this;
     }
-    
+
     override bool intIsVisuallyPressed()
     {
-    	return getVisuallyPressed();
+        return getVisuallyPressed();
     }
-    
+
     override void intVisuallyPress(Widget widget, EventForm* event)
     {
-    	setVisuallyPressed(true);
-    	redraw();
+        setVisuallyPressed(true);
+        redraw();
     }
+
     override void intVisuallyRelease(Widget widget, EventForm* event)
     {
-    	setVisuallyPressed(false);
-    	redraw();
+        setVisuallyPressed(false);
+        redraw();
     }
-    
+
     override void intMousePressRelease(Widget widget, EventForm* event)
     {
-    	debug writeln("click");
-    	if (onMousePressRelease)
-    		onMousePressRelease(event);
+        debug writeln("click");
+        if (onMousePressRelease)
+            onMousePressRelease(event);
     }
-    
+
     override void propagatePerformLayout()
     {
-    	auto c = getCaptionWidget();
-    	if (c)
-    	{
-    		c.propagatePerformLayout();
-    		
-    		auto cdw = c.getDesiredWidth();
-    		auto cdh = c.getDesiredHeight();
-    		
-    		c.setWidth(cdw);
-    		c.setHeight(cdh);
-    		
-    		alignParentChild(0.5, 0.5, this, c);
-    		
-    		debug writeln(
-    			"Button child x: %s, y: %s, w: %s, h: %s".format(
-    				c.getX(),
-    				c.getY(),
-    				c.getWidth(),
-    				c.getHeight()
-    				)
-    			);
-    	}
-    	
+        auto c = getCaptionWidget();
+        if (c)
+        {
+            c.propagatePerformLayout();
+
+            auto cdw = c.getDesiredWidth();
+            auto cdh = c.getDesiredHeight();
+
+            c.setWidth(cdw);
+            c.setHeight(cdh);
+
+            alignParentChild(0.5, 0.5, this, c);
+
+            debug writeln("Button child x: %s, y: %s, w: %s, h: %s".format(c.getX(),
+                    c.getY(), c.getWidth(), c.getHeight()));
+        }
+
     }
 }

@@ -40,51 +40,52 @@ Menu makeMainMenu()
 	MenuItem m0mi0 = new MenuItem();
 	// m0.setLayout(m0lo);
 	m0lo.addLayoutChild(m0mi0);
-	
+
 	m0mi0.setWidget(Label("File"));
-	
+
 	Menu m1 = MenuPopup();
 	m0mi0.setSubmenu(m1);
-	Layout m1lo = m1.getLayout();
+
 	MenuItem m1mi0 = new MenuItem();
 	MenuItem m1mi1 = new MenuItem();
 	MenuItem m1mi2 = new MenuItem();
 	MenuItem m1mi3 = new MenuItem();
 	MenuItem m1mi4 = new MenuItem();
 	MenuItem m1mi5 = new MenuItem();
-	
+
+	Layout m1lo = m1.getLayout();
 	m1lo.addLayoutChild(m1mi0);
 	m1lo.addLayoutChild(m1mi1);
 	m1lo.addLayoutChild(m1mi2);
 	m1lo.addLayoutChild(m1mi3);
 	m1lo.addLayoutChild(m1mi4);
 	m1lo.addLayoutChild(m1mi5);
-	
+
 	m1mi0.setWidget(Label("Open"));
 	m1mi1.setWidget(Label("Save"));
 	m1mi2.setWidget(Label("Save as.."));
 	m1mi3.setWidget(Label("Print.."));
 	m1mi4.setWidget(Label("Export.."));
 	m1mi5.setWidget(Label("Close"));
-	
+
 	return m0;
 }
 
 void main()
 {
     auto pl = instantiatePlatform();
-    
+
     pl.init();
-    
+
     auto laf = new Chicago98Laf;
-    
+
     pl.setOnGetLaf(
     	delegate LaFI()
     	{
     		return laf;
     	}
     	);
-    
+
     WindowCreationSettings wcs = {
         title: "Example",
         x: 200,
@@ -93,25 +94,25 @@ void main()
         height: 800,
         resizable: true,
     };
-    
+
     auto w = pl.createWindow(wcs);
-    
-    
+
+
     auto form = new Form();
     w.setForm(form);
-    
+
     auto lo = new Layout();
-    
+
     writeln("before form.setChild");
     form.setMainWidget(lo);
     writeln("after form.setChild");
-    
+
     // lo.setX(10).setY(10).setWidth(780).setHeight(780);
-    
+
     auto rg = new RadioGroup();
-    
+
     auto mm = makeMainMenu();
-    
+
     auto btn = new Button().setTextLabel("Button 1");
     auto btn2 = new Button().setTextLabel("Button 2");
     auto btn3 = new ButtonCheck().setTextLabel("ButtonRadio 1").setRadioGroup(rg);
@@ -119,9 +120,9 @@ void main()
     auto btn5 = new ButtonCheck().setTextLabel("ButtonRadio 2").setRadioGroup(rg);
     auto lbl1 = new TextEntry();
     auto lbl2 = Label("text2");
-    
+
     auto sb1 = new ScrollBar().setOrientation(Orientation.horizontal);
-    
+
     foreach(v; [
     	mm,
     	btn,
@@ -136,7 +137,7 @@ void main()
     {
     	lo.addLayoutChild(v);
     }
-    
+
     lbl1.setText(
         "1234567👍8abcАABCgqpабв|{,_}🏁🏴‍☠️🇮🇱🇺🇸🇷🇺🧑\n"
         ~"вторая строка\n"
@@ -149,9 +150,9 @@ void main()
     lbl1.setTextSelectable(true);
     lbl1.setTextEditable(true);
     lbl1.setCursorEnabled(true);
-    
+
     rg.selectButton(btn5);
-    
+
     form.performLayout = delegate void(Widget w1)
     {
     	auto w = cast(Form) w1;
@@ -165,7 +166,7 @@ void main()
     	}
     	w.propagatePerformLayoutToChildren();
     };
-    
+
     lo.performLayout = delegate void(Widget w1)
     {
     	Layout w = cast(Layout)w1;
@@ -189,6 +190,6 @@ void main()
     };
 
     pl.mainLoop();
-    
+
     pl.destroy();
 }

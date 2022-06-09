@@ -24,22 +24,22 @@ import dtk.widgets.Form;
 interface WindowI
 {
     mixin(mixin_WindowSignals(true));
-	// mixin(mixin_ContainerSignals(true));
-	
+    // mixin(mixin_ContainerSignals(true));
+
     PlatformI getPlatform();
 
     LaFI getLaf();
-    
+
     void setDebugName(dstring value);
 
     LaFI getForcedLaf();
     WindowI setForcedLaf(LaFI);
-    WindowI unsetForcedLaf();    
-    
+    WindowI unsetForcedLaf();
+
     WindowI setForm(Form form);
     WindowI unsetForm();
     Form getForm();
-    
+
     DrawingSurfaceI getDrawingSurface();
 
     int getX();
@@ -50,7 +50,7 @@ interface WindowI
     int getFormY();
     int getFormWidth();
     int getFormHeight();
-    
+
     // Setting values to this variables - does not actually changes window's 
     // position or size. Use setPosition() and/or setSize() function to change
     // window's position and/or size.
@@ -65,17 +65,17 @@ interface WindowI
 
     dstring getTitle();
     WindowI setTitle(dstring value);
-    
+
     Tuple!(bool, Position2D) getMousePosition();
-    
+
     WindowBorderSizes getBorderSizes();
-    
+
     void formDesiredPosSizeChanged();
-    
+
     void setPosition(Position2D pos);
     void setSize(Size2D size);
-    
+
     void redraw();
-    
+
     // void handleEvent(Event* event);
 }

@@ -26,9 +26,8 @@ class FontMgrLinux : FontMgrI
     FT_Library ft_library;
 
     FaceI[] face_cache;
-    
-    FcConfig* ftconfig;
 
+    FcConfig* ftconfig;
 
     this()
     {
@@ -37,10 +36,10 @@ class FontMgrLinux : FontMgrI
         {
             throw new Exception("FreeType library init error");
         }
-                   
+
         ftconfig = FcInitLoadConfigAndFonts();
         if (ftconfig is null)
-        	throw new Exception("couldn't load fontconfig");
+            throw new Exception("couldn't load fontconfig");
 
     }
 
@@ -49,15 +48,13 @@ class FontMgrLinux : FontMgrI
         /* FT_Done_Library(ft_library); */
         /* ft_library = null; */
         FcConfigDestroy(ftconfig);
-    	ftconfig = null; // segfaults without this
-    	FcFini();
+        ftconfig = null; // segfaults without this
+        FcFini();
     }
-
 
     FaceInfo*[] getFaceInfoList()
     {
         FaceInfo*[] ret;
-
 
         return ret;
     }
@@ -67,19 +64,17 @@ class FontMgrLinux : FontMgrI
         foreach (v; face_cache)
         {
             auto i = v.getFaceInfo();
-            if (
-            	i.on_fs == face_info.on_fs && 
-	            i.on_fs_filename == face_info.on_fs_filename && 
-	            i.face_index == face_info.face_index
-	            ) {
-            return v;
+            if (i.on_fs == face_info.on_fs && i.on_fs_filename == face_info.on_fs_filename
+                    && i.face_index == face_info.face_index)
+            {
+                return v;
             }
         }
         auto ret = new Face(this, face_info);
         face_cache ~= ret;
         return ret;
     }
-    
+
     FaceI loadFace(string filename, ulong index)
     {
         auto x = new FaceInfo;
@@ -88,51 +83,53 @@ class FontMgrLinux : FontMgrI
         x.face_index = index;
         return loadFace(x);
     }
-    
+
     FaceI loadFace(string faceFamily, string faceStyle)
     {
-    	auto res = findFaceFileAndIndex(faceFamily, faceStyle);
-    	if (res[0] is false)
-    		return null;
-    	return loadFace(res[1], res[2]);
+        auto res = findFaceFileAndIndex(faceFamily, faceStyle);
+        if (res[0] is false)
+            return null;
+        return loadFace(res[1], res[2]);
     }
-    
+
     Tuple!(bool, string, ulong) findFaceFileAndIndex(string faceFamily, string faceStyle)
     {
-    	import fontconfig.fontconfig;
-    	
-    	auto failureResult = tuple(false, "", 0UL);
+        import fontconfig.fontconfig;
 
-		FcPattern* pat =  FcPatternCreate();
-		scope (exit) FcPatternDestroy(pat);
-		
-		FcPatternAddString(pat, FC_FAMILY.toStringz, faceFamily.toStringz);
-		FcPatternAddString(pat, FC_STYLE.toStringz, faceStyle.toStringz);
-		
-		FcConfigSubstitute(ftconfig, pat, FcMatchKind.FcMatchPattern);
-		FcDefaultSubstitute(pat);
-		
-		FcResult res;
-		FcPattern* font = FcFontMatch(ftconfig, pat, &res);
-		if (font is null)
-		{
-			return failureResult;
-		}
-		
-		scope(exit) FcPatternDestroy(font);
-		
-		FcChar8* file = null;
-		string file_d;
-		if (FcPatternGetString(font, FC_FILE.toStringz, 0, &file) == FcResult.FcResultMatch)
-		{
-			file_d = to!string(fromStringz(file));
-		}
-		
-		int index_d;
-		FcPatternGetInteger(font, FC_INDEX.toStringz, 0, &index_d);
-	
-		return tuple(true, file_d, cast(ulong)index_d);		
-	}    
+        auto failureResult = tuple(false, "", 0UL);
+
+        FcPattern* pat = FcPatternCreate();
+        scope (exit)
+            FcPatternDestroy(pat);
+
+        FcPatternAddString(pat, FC_FAMILY.toStringz, faceFamily.toStringz);
+        FcPatternAddString(pat, FC_STYLE.toStringz, faceStyle.toStringz);
+
+        FcConfigSubstitute(ftconfig, pat, FcMatchKind.FcMatchPattern);
+        FcDefaultSubstitute(pat);
+
+        FcResult res;
+        FcPattern* font = FcFontMatch(ftconfig, pat, &res);
+        if (font is null)
+        {
+            return failureResult;
+        }
+
+        scope (exit)
+            FcPatternDestroy(font);
+
+        FcChar8* file = null;
+        string file_d;
+        if (FcPatternGetString(font, FC_FILE.toStringz, 0, &file) == FcResult.FcResultMatch)
+        {
+            file_d = to!string(fromStringz(file));
+        }
+
+        int index_d;
+        FcPatternGetInteger(font, FC_INDEX.toStringz, 0, &index_d);
+
+        return tuple(true, file_d, cast(ulong) index_d);
+    }
 }
 
 class Face : FaceI
@@ -311,7 +308,7 @@ class Face : FaceI
         // writeln("                      b_top: ", ret.bitmap_top);
         // writeln("                    b_width: ", ret.bitmap.width);
         // writeln("                   b_height: ", ret.bitmap.height);
-// 
+        // 
         // writeln("         metrics.size.width: ", ret.glyph_info.metrics.size.width);
         // writeln("        metrics.size.height: ", ret.glyph_info.metrics.size.height);
         // writeln("      metrics.horiBearing.x: ", ret.glyph_info.metrics.horiBearing.x);
@@ -320,35 +317,35 @@ class Face : FaceI
         // writeln("      metrics.vertBearing.y: ", ret.glyph_info.metrics.vertBearing.y);
         // writeln("      metrics.advance.width: ", ret.glyph_info.metrics.advance.width);
         // writeln("     metrics.advance.height: ", ret.glyph_info.metrics.advance.height);
-// 
+        // 
         // writeln("  linear_horizontal_advance: ", ret.glyph_info.linear_horizontal_advance);
         // writeln("    linear_vertical_advance: ", ret.glyph_info.linear_vertical_advance);
         // writeln("                  advance.x: ", ret.glyph_info.advance.x);
         // writeln("                  advance.y: ", ret.glyph_info.advance.y);
         // writeln("                  lsb_delta: ", ret.glyph_info.lsb_delta);
         // writeln("                  rsb_delta: ", ret.glyph_info.rsb_delta);
-// 
+        // 
         // writeln("              face ascender: ", ret.glyph_info.face_info.ascender);
         // writeln("             face descender: ", ret.glyph_info.face_info.descender);
         // writeln("                     height: ", ret.glyph_info.face_info.height);
         // writeln("          max_advance_width: ", ret.glyph_info.face_info.max_advance_width);
         // writeln("         max_advance_height: ", ret.glyph_info.face_info.max_advance_height);
-// 
+        // 
         // writeln("         bounding_box min x: ", ret.glyph_info.face_info.bounding_box.min.x);
         // writeln("         bounding_box min y: ", ret.glyph_info.face_info.bounding_box.min.y);
         // writeln("         bounding_box max x: ", ret.glyph_info.face_info.bounding_box.max.x);
         // writeln("         bounding_box max y: ", ret.glyph_info.face_info.bounding_box.max.y);
-// 
+        // 
         // writeln("                size.x_PPEM: ", ret.glyph_info.face_info.size.x_PPEM);
         // writeln("                size.y_PPEM: ", ret.glyph_info.face_info.size.y_PPEM);
-// 
+        // 
         // writeln("               size.x_scale: ", ret.glyph_info.face_info.size.x_scale);
         // writeln("               size.y_scale: ", ret.glyph_info.face_info.size.y_scale);
-// 
+        // 
         // writeln("              size.ascender: ", ret.glyph_info.face_info.size.ascender);
         // writeln("             size.descender: ", ret.glyph_info.face_info.size.descender);
         // writeln("                size.height: ", ret.glyph_info.face_info.size.height);
-// 
+        // 
         // writeln("           size.max_advance: ", ret.glyph_info.face_info.size.max_advance);
         // }
 
@@ -385,6 +382,5 @@ class Face : FaceI
 
         return ret;
     }
-    
 
 }
