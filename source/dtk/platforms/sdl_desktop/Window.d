@@ -36,16 +36,20 @@ import dtk.types.WindowBorderSizes;
 
 // import dtk.miscs.WindowEventMgr;
 // import dtk.miscs.mixin_event_handler_reg;
+import dtk.miscs.DrawingSurfaceShift;
 import dtk.miscs.signal_tools;
 
 import dtk.widgets.Form;
 import dtk.widgets.Menu;
 
-import dtk.signal_mixins.Window;
+import dtk.wm.WindowDecoration;
+
+// import dtk.signal_mixins.Window;
 
 const auto WindowProperties = cast(PropSetting[])[
     PropSetting("gsun", "SDLDesktopPlatform", "platform", "Platform", "null"),
     PropSetting("gsun", "Form", "form", "Form", "null"),
+    PropSetting("gsun", "WindowDecoration", "windowDecoration", "WindowDecoration", "null"),
     PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", "null"),
     // PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
     PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
@@ -71,6 +75,7 @@ class Window : WindowI
     public
     {
         dstring debug_name;
+		// WindowDecoration windowDecoration;
     }
 
     // TODO: maybe this shouldn't be public
@@ -85,6 +90,7 @@ class Window : WindowI
         SignalConnection cs_PlatformChange;
         // SignalConnection cs_LafChange;
         SignalConnection cs_FormChange;
+        SignalConnection cs_WindowDecorationChange;
 
         static foreach (v; ["X", "Y", "Width", "Height"])
         {
@@ -108,7 +114,7 @@ class Window : WindowI
     mixin mixin_multiple_properties_define!(WindowProperties);
     mixin mixin_multiple_properties_forward!(WindowProperties, false);
 
-    mixin(mixin_WindowSignals(false));
+    // mixin(mixin_WindowSignals(false));
 
     @disable this();
 
@@ -119,7 +125,9 @@ class Window : WindowI
         setTitle(window_settings.title);
 
         static foreach (Tuple!(string, string) v; [
-                tuple("x", "X"), tuple("y", "Y"), tuple("width", "Width"),
+                tuple("x", "X"),
+                tuple("y", "Y"),
+                tuple("width", "Width"),
                 tuple("height", "Height")
             ])
         {
@@ -163,8 +171,8 @@ class Window : WindowI
             // SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED);
 
             // SDL_CreateRenderer(
-            // sdl_window, 
-            // -1, 
+            // sdl_window,
+            // -1,
             // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
             // );
 
@@ -183,7 +191,10 @@ class Window : WindowI
         // setWindowEventMgr(new WindowEventMgr(this));
 
         cs_PlatformChange = connectToPlatform_onAfterChanged(
-                delegate void(SDLDesktopPlatform old_value, SDLDesktopPlatform new_value) {
+                delegate void(
+                    SDLDesktopPlatform old_value,
+                    SDLDesktopPlatform new_value
+                    ) {
             collectException({
                 if (old_value == new_value)
                     return;
@@ -197,12 +208,29 @@ class Window : WindowI
                 {
                     if (!new_value.haveWindow(this))
                         new_value.addWindow(this);
-                    platform_signal_connection = new_value.connectToSignal_Event(&onPlatformEvent);
+                    platform_signal_connection = new_value.connectToSignal_Event(
+                        &onPlatformEvent
+                        );
                 }
             }());
         });
 
-        cs_FormChange = connectToForm_onAfterChanged(delegate void(Form old_value, Form new_value) {
+        cs_FormChange = connectToForm_onAfterChanged(
+            delegate void(Form old_value, Form new_value) {
+            collectException({
+                if (old_value == new_value)
+                    return;
+
+                if (old_value !is null)
+                    old_value.unsetWindow();
+
+                if (new_value !is null && new_value.getWindow() != this)
+                    new_value.setWindow(this);
+            }());
+        });
+
+        cs_WindowDecorationChange = connectToForm_onAfterChanged(
+            delegate void(Form old_value, Form new_value) {
             collectException({
                 if (old_value == new_value)
                     return;
@@ -228,7 +256,7 @@ class Window : WindowI
     							{
     								if (old_value == new_value)
     									return;
-    								
+
     								static if ("%1$s" == "X" || "%1$s" == "Y")
     								{
     									intWindowPosChanged();
@@ -241,7 +269,7 @@ class Window : WindowI
     							);
     					}
     					);
-    				
+
     				cs_Form%1$sChange = connectToForm%1$s_onAfterChanged(
     					delegate void(
     						int old_value,
@@ -252,7 +280,7 @@ class Window : WindowI
     							{
     								if (old_value == new_value)
     									return;
-    								
+
     								static if ("%1$s" == "X" || "%1$s" == "Y")
     								{
     									intWindowFormPosChanged();
@@ -272,6 +300,20 @@ class Window : WindowI
     void setDebugName(dstring value)
     {
         debug_name = value;
+    }
+
+    DrawingSurfaceI getFormDrawingSurface()
+    {
+        auto ds = getDrawingSurface();
+        if (!ds)
+            return null;
+        auto bs = getBorderSizes();
+        auto ret = new DrawingSurfaceShift(
+            ds,
+            bs.leftTop.width,
+            bs.leftTop.height
+            );
+        return ret;
     }
 
     private void intWindowPosChanged()
@@ -309,13 +351,6 @@ class Window : WindowI
         {
             setY(validXY.y);
         }
-
-        // int x;
-        // int y;
-
-        // SDL_GetWindowPosition(sdl_window, &x, &y);
-        // if (x != getFormX() || y != getFormY())
-        // SDL_SetWindowPosition(sdl_window, getFormX(), getFormY());
     }
 
     private void intWindowFormSizeChanged()
@@ -331,13 +366,6 @@ class Window : WindowI
         {
             setHeight(validWH.height);
         }
-
-        // int w;
-        // int h;
-        // 
-        // SDL_GetWindowSize(sdl_window, &w, &h);
-        // if (w != getFormWidth() || h != getFormHeight())
-        // SDL_SetWindowSize(sdl_window, getFormWidth(), getFormHeight());
     }
 
     private void windowSyncPosition(bool externalStronger)
@@ -430,9 +458,32 @@ class Window : WindowI
         return l;
     }
 
+    // calculate if current system sizing functions include border size
+    private bool sdlWindowSizesIncludesBorderSizes()
+    {
+        if (isSetWindowDecoration())
+            return false;
+        SDL_SysWMinfo wminfo;
+        SDL_VERSION(&wminfo.version_);
+        SDL_bool res = SDL_GetWindowWMInfo(sdl_window, &wminfo);
+        if (res != SDL_TRUE)
+        {
+            getPlatform().printSDLError();
+            throw new Exception("SDL Error");
+        }
+        switch (wminfo.subsystem)
+        {
+        default:
+        case SDL_SYSWM_X11:
+            return false;
+        case SDL_SYSWM_WAYLAND:
+            return true;
+        }
+    }
+
     void onPlatformEvent(Event* event) nothrow
     {
-        collectException({
+        auto exc = collectException({
             if (event.window != this)
                 return;
 
@@ -464,14 +515,22 @@ class Window : WindowI
                 {
                 default:
                     break;
-                case EnumWindowEvent.resize:
                 case EnumWindowEvent.show:
+                case EnumWindowEvent.expose:
+                case EnumWindowEvent.resize:
                     int w;
                     int h;
                     SDL_GetWindowSize(this.sdl_window, &w, &h,);
                     debug writeln("Setting window form size to %sx%s".format(w, h));
-                    setFormWidth(w);
-                    setFormHeight(h);
+                    {
+                        auto new_size = Size2D(w, h);
+                        if (sdlWindowSizesIncludesBorderSizes())
+                        {
+                            new_size = sizeRemoveWindowBorder(new_size);
+                        }
+                        setFormWidth(new_size.width);
+                        setFormHeight(new_size.height);
+                    }
 
                     windowSyncSize(true);
 
@@ -486,10 +545,19 @@ class Window : WindowI
 
                     // NOTE: on SDL SDL_GetWindowPosition returns values
                     //       with borders added
-                    setFormX(x);
-                    setFormY(y);
+                    {
+                        auto new_pos = Position2D(x, y);
+                        if (sdlWindowSizesIncludesBorderSizes())
+                        {
+                            new_pos = positionRemoveWindowBorder(new_pos);
+                        }
+                        setFormX(new_pos.x);
+                        setFormY(new_pos.y);
+                    }
 
                     windowSyncPosition(true);
+                    // redraw();
+                    debug printParams();
                     break;
                 case EnumWindowEvent.unFocus:
 
@@ -516,16 +584,88 @@ class Window : WindowI
 
                 }
 
-                emitSignal_WindowEvents(event.ew);
+                debug writeln("before sendWindowEventToForm");
+				sendWindowEventToForm(event.ew);
 
             }
             else
             {
-                emitSignal_OtherEvents(event);
+                debug writeln("before sendNonWindowEventToForm/sendNonWindowEventToWindowDecoration");
+                if (isPositionInForm(Position2D(event.mouseX, event.mouseY)))
+                    sendNonWindowEventToForm(event);
+                else
+                    sendNonWindowEventToWindowDecoration(event);
             }
         }());
+        if (exc)
+        {
+            collectException({
+                debug writeln("onPlatformEvent : exception : %s".format(exc));
+                }());
+        }
         return;
     }
+
+    private bool isPositionInForm(Position2D pos)
+    {
+        auto bs = getBorderSizes();
+        auto ww = getWidth();
+        auto wh = getHeight();
+        auto px = pos.x;
+        auto py = pos.y;
+        auto top = bs.leftTop.height;
+        auto left = bs.leftTop.width;
+        auto bottom = bs.rightBottom.height;
+        auto right = bs.rightBottom.width;
+        bool ret;
+        ret = (
+            px >= left
+            && px < ww - right
+            && py >= top
+            && py < wh - bottom
+            );
+        return ret;
+    }
+
+	private void sendWindowEventToForm(EventWindow* e)
+	{
+		auto f = getForm();
+		if (f)
+        {
+            debug writeln("sendWindowEventToForm");
+			f.windowEventReceiver(e);
+        }
+	}
+
+    private void sendWindowEventToWindowDecoration(EventWindow* e)
+	{
+        auto f = getWindowDecoration();
+        if (f)
+        {
+            debug writeln("sendWindowEventToWindowDecoration");
+            f.windowEventReceiver(e);
+        }
+	}
+
+	private void sendNonWindowEventToForm(Event* e)
+	{
+		auto f = getForm();
+		if (f)
+        {
+            debug writeln("sendNonWindowEventToForm");
+			f.nonWindowEventReceiver(e);
+        }
+	}
+
+    private void sendNonWindowEventToWindowDecoration(Event* e)
+	{
+		auto f = getWindowDecoration();
+		if (f)
+        {
+            debug writeln("sendNonWindowEventToWindowDecoration");
+			f.nonWindowEventReceiver(e);
+        }
+	}
 
     void close()
     {
@@ -540,8 +680,11 @@ class Window : WindowI
             return;
         //setFormX(f.getDesiredX());
         //setFormY(f.getDesiredY());
-        setFormWidth(f.getDesiredWidth());
-        setFormHeight(f.getDesiredHeight());
+        auto w = f.getDesiredWidth();
+        auto h = f.getDesiredHeight();
+        debug writeln("Window :: form requested size change :: %sx%s".format(w, h));
+        setFormWidth(w);
+        setFormHeight(h);
         windowSyncPosition(false);
     }
 
@@ -552,43 +695,71 @@ class Window : WindowI
 
     void redraw()
     {
-        auto form = getForm();
+        if (isSetWindowDecoration())
+            getWindowDecoration().redraw();
 
-        if (form is null)
-            return;
-
-        form.redraw();
+        if (isSetForm())
+            getForm().redraw();
     }
 
     void printParams()
     {
-        import std.format;
+        // import std.format;
 
-        writeln(q{
-        		title      : %s
-        		x          : %d
-        		y          : %d
-        		width      : %d
-        		height     : %d
-        		form_width : %d
-        		form_height: %d
-        	}.format(title, getX(), getY(), getWidth(), getHeight(), getFormWidth(), getFormHeight()));
+        writeln(
+            q{printParams()
+    title      : %s
+    x          : %d
+    y          : %d
+    width      : %d
+    height     : %d
+    form_width : %d
+    form_height: %d
+}.format(
+                getTitle(),
+                getX(),
+                getY(),
+                getWidth(),
+                getHeight(),
+                getFormWidth(),
+                getFormHeight()
+                )
+                );
     }
+
+	void installWindowDecoration()
+	{
+		if (!isSetWindowDecoration())
+		{
+            SDL_SetWindowBordered(sdl_window, SDL_FALSE);
+			setWindowDecoration(new WindowDecoration(this));
+		}
+	}
 
     // return bool true on success
     WindowBorderSizes getBorderSizes()
     {
+		if (isSetWindowDecoration())
+			return getWindowDecoration().getBorderSizes();
 
         WindowBorderSizes ret;
-        auto res = SDL_GetWindowBordersSize(sdl_window, &ret.leftTop.height,
-                &ret.leftTop.width, &ret.rightBottom.height, &ret.rightBottom.width,);
+        auto res = SDL_GetWindowBordersSize(
+            sdl_window,
+            &ret.leftTop.height,
+            &ret.leftTop.width,
+            &ret.rightBottom.height,
+            &ret.rightBottom.width
+            );
         // TODO: add exception here
+        // NOTE: can't attend to this for now, because it's not in priority.
+        //       probably will do it after
+        //       https://issues.dlang.org/show_bug.cgi?id=23155 will be fixed.
         if (res != 0)
         {
-            ret.leftTop.height = 0;
-            ret.leftTop.width = 0;
-            ret.rightBottom.height = 0;
-            ret.rightBottom.width = 0;
+            getPlatform().printSDLError();
+            // throw new Exception("SDL Exception: couldn't determine window border sizes");
+			installWindowDecoration();
+			return getWindowDecoration().getBorderSizes();
         }
         return ret;
     }
@@ -607,23 +778,30 @@ class Window : WindowI
     Position2D positionRemoveWindowBorder(Position2D pos)
     {
         auto bs = getBorderSizes();
-        auto ret = Position2D(pos.x + bs.leftTop.width, pos.y + bs.leftTop.height);
+        auto ret = Position2D(
+            pos.x + bs.leftTop.width,
+            pos.y + bs.leftTop.height
+            );
         return ret;
     }
 
     Size2D sizeAddWindowBorder(Size2D size)
     {
         auto bs = getBorderSizes();
-        auto ret = Size2D(size.width + bs.leftTop.width + bs.rightBottom.width,
-                size.height + bs.leftTop.height + bs.rightBottom.height,);
+        auto ret = Size2D(
+            size.width + bs.leftTop.width + bs.rightBottom.width,
+            size.height + bs.leftTop.height + bs.rightBottom.height
+            );
         return ret;
     }
 
     Size2D sizeRemoveWindowBorder(Size2D size)
     {
         auto bs = getBorderSizes();
-        auto ret = Size2D(size.width - bs.leftTop.width + bs.rightBottom.width,
-                size.height - bs.leftTop.height + bs.rightBottom.height,);
+        auto ret = Size2D(
+            size.width - bs.leftTop.width + bs.rightBottom.width,
+            size.height - bs.leftTop.height + bs.rightBottom.height
+            );
         return ret;
     }
 
@@ -635,6 +813,8 @@ class Window : WindowI
 
     void setFormPosition(Position2D pos)
     {
+        if (sdlWindowSizesIncludesBorderSizes())
+            pos = positionAddWindowBorder(pos);
         SDL_SetWindowPosition(sdl_window, pos.x, pos.y);
     }
 
@@ -646,6 +826,8 @@ class Window : WindowI
 
     void setFormSize(Size2D size)
     {
+        if (sdlWindowSizesIncludesBorderSizes())
+            size = sizeAddWindowBorder(size);
         SDL_SetWindowSize(sdl_window, size.width, size.height);
     }
 }

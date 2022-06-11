@@ -110,6 +110,8 @@ class WidgetChild
 
         this.self = self;
         this.child = child;
+        if (child.getParent() != self)
+            child.setParent(self);
     }
 
 }
@@ -165,12 +167,18 @@ class Widget
     {
         mixin(mixin_multiple_properties_inst(WidgetProperties));
 
-        sc_desiredXChange = connectToDesiredX_onAfterChanged(&desiredXYWHchangedInformParent);
-        sc_desiredYChange = connectToDesiredY_onAfterChanged(&desiredXYWHchangedInformParent);
+        sc_desiredXChange = connectToDesiredX_onAfterChanged(
+            &desiredXYWHchangedInformParent
+            );
+        sc_desiredYChange = connectToDesiredY_onAfterChanged(
+            &desiredXYWHchangedInformParent
+            );
         sc_desiredWidthChange = connectToDesiredWidth_onAfterChanged(
-                &desiredXYWHchangedInformParent);
+            &desiredXYWHchangedInformParent
+            );
         sc_desiredHeightChange = connectToDesiredHeight_onAfterChanged(
-                &desiredXYWHchangedInformParent);
+            &desiredXYWHchangedInformParent
+            );
     }
 
     public
@@ -214,7 +222,7 @@ class Widget
             {
                 auto p = getParent();
                 if (p)
-                    p.childWidgetXYWHChanged(this);
+                    p.childWidgetDesiredXYWHChanged(this);
             }
             else
             {
@@ -225,10 +233,18 @@ class Widget
         }());
     }
 
-    private void childWidgetXYWHChanged(Widget w)
+    private void childWidgetDesiredXYWHChanged(Widget w)
     {
-        debug writeln("%s child %s desired values changed: %sx%s %sx%s".format(this, w,
-                w.getDesiredX(), w.getDesiredY(), w.getDesiredWidth(), w.getDesiredHeight(),));
+        debug writeln(
+            "%s child %s desired values changed: %sx%s %sx%s".format(
+                this,
+                w,
+                w.getDesiredX(),
+                w.getDesiredY(),
+                w.getDesiredWidth(),
+                w.getDesiredHeight()
+                )
+            );
         // if (getTriggerPropagatePosAndSizeRecalcOnChildrenPosSizeChange())
         // {
         propagatePerformLayout();
@@ -555,10 +571,18 @@ class Widget
             auto vw = v.getWidth();
             auto vh = v.getHeight();
 
-            if (px >= vx && px < vx + vw && py >= vy && py < vy + vh)
+            if (px >= vx
+                && px < vx + vw
+                && py >= vy
+                && py < vy + vh)
             {
-                v.child.getChildAtPosition(Position2D((px - vx), (py - vy)), breadCrumbs);
-
+                v.child.getChildAtPosition(
+                    Position2D(
+                        (px - vx),
+                        (py - vy)
+                        ),
+                    breadCrumbs
+                    );
                 return;
             }
         }
@@ -717,31 +741,21 @@ class Widget
         return ret;
     }
 
-    final DrawingSurfaceI getDrawingSurface()
+    DrawingSurfaceI getDrawingSurface()
     {
-        Form f = cast(Form) this;
-        WindowI w;
-        if (f !is null)
+        auto p = getParent();
+        if (p is null)
         {
-            w = f.getWindow();
+            debug writeln("%s can't get it's parent".format(this));
+            throw new Exception("parent is null");
         }
-        if (w !is null)
-        {
-            return w.getDrawingSurface();
-        }
-        else
-        {
-            auto p = getParent();
-            if (p is null)
-                throw new Exception("parent is null");
-            auto ds = p.getDrawingSurface();
-            if (ds is null)
-                throw new Exception("parent drawing surface is null");
-            auto dsc = p.shiftDrawingSurfaceForChild(ds, this);
-            if (dsc is null)
-                throw new Exception("parent drawing surface for child is null");
-            return dsc;
-        }
+        auto ds = p.getDrawingSurface();
+        if (ds is null)
+            throw new Exception("parent drawing surface is null");
+        auto dsc = p.shiftDrawingSurfaceForChild(ds, this);
+        if (dsc is null)
+            throw new Exception("parent drawing surface for child is null");
+        return dsc;
     }
 
     final Position2D getLeftTopPos()

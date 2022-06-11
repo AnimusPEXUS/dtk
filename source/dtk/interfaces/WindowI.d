@@ -12,18 +12,19 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Widget;
 import dtk.types.WindowBorderSizes;
+import dtk.wm.WindowDecoration;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
 import dtk.interfaces.LaFI;
 
-import dtk.signal_mixins.Window;
+// import dtk.signal_mixins.Window;
 
 import dtk.widgets.Form;
 
 interface WindowI
 {
-    mixin(mixin_WindowSignals(true));
+    // mixin(mixin_WindowSignals(true));
     // mixin(mixin_ContainerSignals(true));
 
     PlatformI getPlatform();
@@ -40,7 +41,12 @@ interface WindowI
     WindowI unsetForm();
     Form getForm();
 
+    WindowI setWindowDecoration(WindowDecoration wd);
+    WindowI unsetWindowDecoration();
+    WindowDecoration getWindowDecoration();
+
     DrawingSurfaceI getDrawingSurface();
+    DrawingSurfaceI getFormDrawingSurface();
 
     int getX();
     int getY();
@@ -51,7 +57,7 @@ interface WindowI
     int getFormWidth();
     int getFormHeight();
 
-    // Setting values to this variables - does not actually changes window's 
+    // Setting values to this variables - does not actually changes window's
     // position or size. Use setPosition() and/or setSize() function to change
     // window's position and/or size.
     WindowI setX(int v);

@@ -229,7 +229,7 @@ class TextEntry : Widget
                                         {
                                             writeln(err);
                                         }
-                                        
+
                                         static if(is(%1$s == DrawBewelAndBackground))
                                         {
                                         	recalcPaddings();
@@ -259,7 +259,7 @@ class TextEntry : Widget
 
         auto x = collectException({ redraw(); }());
         if (x !is null)
-            debug writeln("redraw error: ", x);
+            debug writeln("%s : redraw error : collected Exception: %s".format(this, x));
 
         return this;
     }

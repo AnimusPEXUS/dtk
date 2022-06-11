@@ -21,7 +21,7 @@
 			"name": "platform-sdl-desktop",
 			"targetType": "staticLibrary",
 			"versions": [
-				"SDL_205",
+				"SDL_206",
 				"SDL_Image",
 				"DTK_PLATFORM_SDL_DESKTOP"
 			]

@@ -438,4 +438,17 @@ class SDLDesktopPlatform : PlatformI
         debug writeln("widgetInternalDraggingEventEnd end");
     }
 
+    string getSDLError()
+    {
+        import std.string;
+        const (char) *err = SDL_GetError();
+        string ret = cast(string)fromStringz(err);
+        return ret;
+    }
+
+    void printSDLError()
+    {
+        writeln("SDL Error Message: %s".format(getSDLError()));
+    }
+
 }

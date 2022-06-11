@@ -13,13 +13,13 @@ mixin template mixin_forwardXYWH_from_Widget()
     			{
     				return super.get%1$s();
     			}
-    			
+
     			override typeof(this) set%1$s(int v)
     			{
     				super.set%1$s(v);
     				return this;
     			}
-    			
+
     		}.format(v));
     }
 }
@@ -40,7 +40,7 @@ string mixin_simple_parent_change_action()
     						{
     							o.removeChild();
     						}
-    						
+
     						if (n !is null && !n.haveChild(this))
     						{
     							n.addChild(this);
@@ -50,7 +50,7 @@ string mixin_simple_parent_change_action()
     			}
     			)
     		);
-    	
+
 	};
     return ret;
 }
@@ -78,27 +78,29 @@ mixin template mixin_Widget_renderImage(string widgetType, string override_str =
 			%2$s Image renderImage()
 			{
 				debug writeln(this, ".renderImage() called");
-				
+
 				Form form = this.getForm();
 				if (!form)
 					throw new Exception(
-						this.toString() ~ ".renderImage() can't get Form"
-						);
-				
+                        "%%s.renderImage() can't get Form".format(this)
+                        );
+
 				auto laf = form.getLaf();
 				if (!laf)
-					throw new Exception("Laf not set");
-				
+					throw new Exception(
+                        "%%s.renderImage() Laf isn't set".format(this)
+                        );
+
 				auto w = getWidth();
 				auto h = getHeight();
-				
+
 				auto ds = new Image(w, h);
-				
+
 				laf.draw%1$s(this, ds);
-				
+
 				return ds;
 			}
-			
+
 		}.format(widgetType, override_str));
 }
 

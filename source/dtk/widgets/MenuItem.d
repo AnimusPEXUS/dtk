@@ -135,7 +135,13 @@ class MenuItem : Widget
         desY = pos.y + borderSizes.leftTop.height + win.getY();
 
         WindowCreationSettings wcs = {
-            title: "Popup", x: desX, y: desY, width: 50, height: 50, resizable: true,// popup_menu: true,
+            title: "Popup",
+			x: desX,
+			y: desY,
+			width: 50,
+			height: 50,
+			resizable: true,
+			// popup_menu: true,
             // borderless: true
         };
 
@@ -150,20 +156,21 @@ class MenuItem : Widget
         w.setForm(f);
         f.setMainWidget(getSubmenu());
 
-        f.performLayout = delegate void(Widget w1) {
+        f.performLayout = delegate void(Widget w1)
+		{
             auto w = cast(Form) w1;
             auto c = w.getMainWidget();
             if (c)
             {
                 c.propagatePerformLayout();
 
-                auto cdx = c.getDesiredX();
-                auto cdy = c.getDesiredY();
+                // auto cdx = c.getDesiredX();
+                // auto cdy = c.getDesiredY();
                 auto cdw = c.getDesiredWidth();
                 auto cdh = c.getDesiredHeight();
 
-                w.setDesiredX(cdx);
-                w.setDesiredY(cdy);
+                // w.setDesiredX(cdx);
+                // w.setDesiredY(cdy);
                 w.setDesiredWidth(cdw);
                 w.setDesiredHeight(cdh);
 
@@ -175,11 +182,15 @@ class MenuItem : Widget
                 alignParentChild(0.5, 0.5, w, c);
             }
 
-            debug writeln("popup form performLayout:\n", "   form size : %sx%s\n".format(getWidth(), getHeight()),
-                    "   form dsize: %sx%s\n".format(getDesiredWidth(), getDesiredHeight()), !c
-                    ? "   (no child)" : "   child size : %sx%s\n".format(c.getWidth(),
-                        c.getHeight()) ~ "   child dsize: %sx%s\n".format(c.getDesiredWidth(),
-                        c.getDesiredHeight()));
+            debug writeln(
+				"popup form performLayout:\n",
+				"   form size : %sx%s\n".format(getWidth(), getHeight()),
+                "   form dsize: %sx%s\n".format(getDesiredWidth(), getDesiredHeight()), !c
+
+				? "   (no child)"
+				: "   child size : %sx%s\n".format(c.getWidth(), c.getHeight())
+				~ "   child dsize: %sx%s\n".format(c.getDesiredWidth(), c.getDesiredHeight())
+				);
         };
 
     }

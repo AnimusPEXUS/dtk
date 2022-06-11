@@ -72,7 +72,13 @@ class Menu : Widget
                     auto cdw = c.getDesiredWidth();
                     auto cdh = c.getDesiredHeight();
 
-                    debug writeln("%s %s desired WxH: %sx%s".format(this, c, cdw, cdh));
+                    debug writeln("%s %s desired WxH: %sx%s".format(
+                        this,
+                        c,
+                        cdw,
+                        cdh
+                        )
+                        );
 
                     c.setWidth(cdw);
                     c.setHeight(cdh);
@@ -91,7 +97,12 @@ class Menu : Widget
 
                 if (c)
                 {
-                    writeln("   menu child size: %sx%s".format(c.getWidth(), c.getHeight(),));
+                    writeln(
+                        "   menu child size: %sx%s".format(
+                            c.getWidth(),
+                            c.getHeight()
+                            )
+                        );
                 }
             }
         };
@@ -226,10 +237,13 @@ class Menu : Widget
 
         debug
         {
-            writeln("Menu:       size: %s x %s\n".format(w.getWidth(), w.getHeight()),
-                    "  Menu: des size: %s x %s\n".format(w.getDesiredWidth(), w.getDesiredHeight()),
-                    "  Menu: vp  size: %s x %s".format(w.getViewPortWidth(),
-                        w.getViewPortHeight()),);
+            auto f = getForm();
+            writeln(" Menu:    size: %s x %s\n".format(w.getWidth(), w.getHeight()),
+                    "      des size: %s x %s\n".format(w.getDesiredWidth(), w.getDesiredHeight()),
+                    "      vp  size: %s x %s\n".format(w.getViewPortWidth(), w.getViewPortHeight()),
+                    "     form size: %s x %s".format(f.getWidth(), f.getHeight()),
+                    );
+
             for (int i = 0; i != w.getLayoutChildCount(); i++)
             {
                 auto c = w.getLayoutChild(i);

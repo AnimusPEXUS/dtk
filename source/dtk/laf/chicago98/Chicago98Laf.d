@@ -1,4 +1,4 @@
-module dtk.themes.chicago98.Chicago98Laf;
+module dtk.laf.chicago98.Chicago98Laf;
 
 import std.format;
 import std.stdio;

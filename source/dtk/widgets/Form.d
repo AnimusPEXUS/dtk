@@ -69,8 +69,8 @@ class Form : Widget
         SignalConnection sc_windowChange;
         SignalConnection sc_focusedWidgetChange;
 
-        SignalConnection sc_windowOtherEvents;
-        SignalConnection sc_windowEvents;
+        // SignalConnection sc_windowOtherEvents;
+        // SignalConnection sc_windowEvents;
 
         SignalConnection sc_formEventHandler;
     }
@@ -89,18 +89,21 @@ class Form : Widget
                 if (o == n)
                     return;
 
-                sc_windowOtherEvents.disconnect();
-                sc_windowEvents.disconnect();
+                // sc_windowOtherEvents.disconnect();
+                // sc_windowEvents.disconnect();
 
                 if (o !is null)
                 {
-                    o.unsetForm();
+                    if (o.getForm() == this)
+                        o.unsetForm();
+                    if (o.getWindowDecoration() == this)
+                        o.unsetWindowDecoration();
                 }
 
                 if (n !is null)
                 {
-                    sc_windowOtherEvents = n.connectToSignal_OtherEvents(&onWindowOtherEvent);
-                    sc_windowEvents = n.connectToSignal_WindowEvents(&onWindowEvent);
+                    // sc_windowOtherEvents = n.connectToSignal_OtherEvents(&onWindowOtherEvent);
+                    // sc_windowEvents = n.connectToSignal_WindowEvents(&onWindowEvent);
                 }
 
                 // propagateParentChangeEmission();
@@ -152,6 +155,15 @@ class Form : Widget
         return this;
     }
 
+    override DrawingSurfaceI getDrawingSurface()
+    {
+        DrawingSurfaceI ret;
+        auto w = getWindow();
+        if (w)
+            ret = w.getFormDrawingSurface();
+        return ret;
+    }
+
     override WidgetChild[] calcWidgetChildren()
     {
         WidgetChild[] ret;
@@ -160,7 +172,7 @@ class Form : Widget
         return ret;
     }
 
-    void onWindowOtherEvent(Event* event) nothrow
+    void nonWindowEventReceiver(Event* event)
     {
         collectException({
             EventForm* fe = new EventForm();
@@ -235,7 +247,7 @@ class Form : Widget
         }());
     }
 
-    void onWindowEvent(EventWindow* event) nothrow
+    void windowEventReceiver(EventWindow* event) nothrow
     {
         collectException({
             auto e = collectException({

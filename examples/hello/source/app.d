@@ -97,7 +97,6 @@ void main()
 
     auto w = pl.createWindow(wcs);
 
-
     auto form = new Form();
     w.setForm(form);
 
