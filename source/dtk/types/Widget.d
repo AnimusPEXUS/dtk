@@ -427,7 +427,7 @@ class Widget
     }
 
     // Returns lates enclosing Menu, if any
-    final Menu getMenu()
+    final Menu findMenu()
     {
         synchronized
         {
@@ -685,6 +685,7 @@ class Widget
         ds.present();
     }
 
+    // TODO: get form related code to Form
     final LaFI getLaf()
     {
         // TODO: add recursion protection?
@@ -693,7 +694,7 @@ class Widget
     try_get_local_laf:
         {
             auto x = getLocalLaf();
-            if (x !is null)
+            if (x)
             {
                 ret = x;
                 goto ok_exit;
@@ -703,12 +704,12 @@ class Widget
     try_get_parent_laf:
         {
             auto p = getParent();
-            if (p is null)
+            if (!p)
             {
                 goto try_get_window_laf;
             }
             auto func_ret = p.getLaf();
-            if (func_ret !is null)
+            if (func_ret)
             {
                 ret = func_ret;
                 goto ok_exit;
@@ -718,17 +719,17 @@ class Widget
     try_get_window_laf:
         {
             Form f = cast(Form) this;
-            if (f is null)
+            if (!f)
             {
                 goto fail_exit;
             }
             auto w = f.getWindow();
-            if (w is null)
+            if (!w)
             {
                 goto fail_exit;
             }
             auto func_ret = w.getLaf();
-            if (func_ret !is null)
+            if (func_ret)
             {
                 ret = func_ret;
                 goto ok_exit;
@@ -896,13 +897,28 @@ class Widget
     {
     }
 
-    void intInternalDraggingEvent(Widget widget, int initX, int initY, int newX,
-            int newY, int relX, int relY)
+    void intInternalDraggingEvent(
+        Widget widget,
+        int initX,
+        int initY,
+        int newX,
+        int newY,
+        int relX,
+        int relY
+        )
     {
     }
 
-    void intInternalDraggingEventEnd(Widget widget, EnumWidgetInternalDraggingEventEndReason reason,
-            int initX, int initY, int newX, int newY, int relX, int relY)
+    void intInternalDraggingEventEnd(
+        Widget widget,
+        EnumWidgetInternalDraggingEventEndReason reason,
+        int initX,
+        int initY,
+        int newX,
+        int newY,
+        int relX,
+        int relY
+        )
     {
     }
 }

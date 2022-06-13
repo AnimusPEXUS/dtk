@@ -294,107 +294,108 @@ class Form : Widget
 
     void onFormSignal(EventForm* event) nothrow
     {
-        auto err = collectException({
-            if (onFormSignalBeforeProcessing !is null)
+        auto err = collectException(
             {
-                auto res = onFormSignalBeforeProcessing(event);
-                if (res == true)
+                if (onFormSignalBeforeProcessing !is null)
                 {
-                    return;
-                }
-            }
-
-            scope (exit)
-            {
-                if (onFormSignalAfterProcessing !is null)
-                {
-                    onFormSignalAfterProcessing(event);
-                }
-            }
-
-            if (event.mouseFocusedWidget != mouseFocusedWidget)
-            {
-                Widget old = mouseFocusedWidget;
-                mouseFocusedWidget = event.mouseFocusedWidget;
-                if (old !is null)
-                {
-                    old.intVisuallyRelease(old, event);
-                    old.intMouseLeave(old, mouseFocusedWidget, event);
-                }
-                if (this.pressreleaseSequenceStarted
-                    && this.pressreleaseSequenceWidget == mouseFocusedWidget)
-                {
-                    mouseFocusedWidget.intVisuallyPress(mouseFocusedWidget, event);
-                }
-                mouseFocusedWidget.intMouseEnter(old, mouseFocusedWidget, event);
-            }
-
-            switch (event.event.type)
-            {
-            default:
-                return;
-            case EventType.mouse:
-                switch (event.event.em.type)
-                {
-                default:
-                    return;
-                case EventMouseType.movement:
-                    // debug writeln("mouse widget: ", mouseFocusedWidget);
-                    event.mouseFocusedWidget.intMouseMove(event.mouseFocusedWidget, event);
-                    return;
-                case EventMouseType.button:
-                    switch (event.event.em.buttonState)
+                    auto res = onFormSignalBeforeProcessing(event);
+                    if (res == true)
                     {
-                    default:
-                        return;
-                    case EnumMouseButtonState.pressed:
-                        pressreleaseSequenceStarted = true;
-                        pressreleaseSequenceWidget = event.mouseFocusedWidget;
-                        pressreleaseSequenceBtn = event.event.em.button;
-                        setFocusedWidget(event.mouseFocusedWidget);
-                        event.mouseFocusedWidget.intMousePress(event.mouseFocusedWidget, event);
-                        event.mouseFocusedWidget.intVisuallyPress(event.mouseFocusedWidget, event);
-                        return;
-                    case EnumMouseButtonState.released:
-                        event.mouseFocusedWidget.intMouseRelease(event.mouseFocusedWidget, event);
-                        event.mouseFocusedWidget.intVisuallyRelease(event.mouseFocusedWidget,
-                            event);
-                        if (pressreleaseSequenceStarted && pressreleaseSequenceWidget == event.mouseFocusedWidget
-                            && pressreleaseSequenceBtn == event.event.em.button)
-                        {
-                            event.mouseFocusedWidget.intMousePressRelease(event.mouseFocusedWidget,
-                                event);
-                        }
-                        pressreleaseSequenceStarted = false;
                         return;
                     }
                 }
-            case EventType.keyboard:
-                switch (event.event.ek.keyState)
+
+                scope (exit)
+                {
+                    if (onFormSignalAfterProcessing !is null)
+                    {
+                        onFormSignalAfterProcessing(event);
+                    }
+                }
+
+                if (event.mouseFocusedWidget != mouseFocusedWidget)
+                {
+                    Widget old = mouseFocusedWidget;
+                    mouseFocusedWidget = event.mouseFocusedWidget;
+                    if (old !is null)
+                    {
+                        old.intVisuallyRelease(old, event);
+                        old.intMouseLeave(old, mouseFocusedWidget, event);
+                    }
+                    if (this.pressreleaseSequenceStarted
+                        && this.pressreleaseSequenceWidget == mouseFocusedWidget)
+                    {
+                        mouseFocusedWidget.intVisuallyPress(mouseFocusedWidget, event);
+                    }
+                    mouseFocusedWidget.intMouseEnter(old, mouseFocusedWidget, event);
+                }
+
+                switch (event.event.type)
                 {
                 default:
                     return;
-                case EnumKeyboardKeyState.pressed:
-                    event.focusedWidget.intKeyboardPress(event.focusedWidget, event);
-                    return;
-                case EnumKeyboardKeyState.released:
-                    event.focusedWidget.intKeyboardRelease(event.focusedWidget, event);
-                    return;
+                case EventType.mouse:
+                    switch (event.event.em.type)
+                    {
+                    default:
+                        return;
+                    case EventMouseType.movement:
+                        // debug writeln("mouse widget: ", mouseFocusedWidget);
+                        event.mouseFocusedWidget.intMouseMove(event.mouseFocusedWidget, event);
+                        return;
+                    case EventMouseType.button:
+                        switch (event.event.em.buttonState)
+                        {
+                        default:
+                            return;
+                        case EnumMouseButtonState.pressed:
+                            pressreleaseSequenceStarted = true;
+                            pressreleaseSequenceWidget = event.mouseFocusedWidget;
+                            pressreleaseSequenceBtn = event.event.em.button;
+                            setFocusedWidget(event.mouseFocusedWidget);
+                            event.mouseFocusedWidget.intMousePress(event.mouseFocusedWidget, event);
+                            event.mouseFocusedWidget.intVisuallyPress(event.mouseFocusedWidget, event);
+                            return;
+                        case EnumMouseButtonState.released:
+                            event.mouseFocusedWidget.intMouseRelease(event.mouseFocusedWidget, event);
+                            event.mouseFocusedWidget.intVisuallyRelease(event.mouseFocusedWidget,
+                                event);
+                            if (pressreleaseSequenceStarted && pressreleaseSequenceWidget == event.mouseFocusedWidget
+                                && pressreleaseSequenceBtn == event.event.em.button)
+                            {
+                                event.mouseFocusedWidget.intMousePressRelease(event.mouseFocusedWidget,
+                                    event);
+                            }
+                            pressreleaseSequenceStarted = false;
+                            return;
+                        }
+                    }
+                case EventType.keyboard:
+                    switch (event.event.ek.keyState)
+                    {
+                    default:
+                        return;
+                    case EnumKeyboardKeyState.pressed:
+                        event.focusedWidget.intKeyboardPress(event.focusedWidget, event);
+                        return;
+                    case EnumKeyboardKeyState.released:
+                        event.focusedWidget.intKeyboardRelease(event.focusedWidget, event);
+                        return;
+                    }
+                case EventType.textInput:
+                    switch (event.event.ek.keyState)
+                    {
+                    default:
+                        return;
+                    case EnumKeyboardKeyState.pressed:
+                        event.focusedWidget.intTextInput(event.focusedWidget, event);
+                        return;
+                    }
                 }
-            case EventType.textInput:
-                switch (event.event.ek.keyState)
-                {
-                default:
-                    return;
-                case EnumKeyboardKeyState.pressed:
-                    event.focusedWidget.intTextInput(event.focusedWidget, event);
-                    return;
-                }
-            }
         }());
-        debug if (err !is null)
+        debug if (err)
         {
-            writeln("form exception caught: ", err);
+            debug writeln("form exception caught: ", err);
         }
     }
 

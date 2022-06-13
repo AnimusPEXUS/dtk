@@ -134,7 +134,7 @@ class Menu : Widget
     void stdLayoutFunction(Widget w1)
     {
         auto w = cast(Layout) w1;
-        auto m = w.getMenu();
+        auto m = w.findMenu();
 
         if (!m)
         {

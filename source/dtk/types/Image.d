@@ -285,8 +285,15 @@ class Image : DrawingSurfaceI // TODO: enable DrawingSurfaceI
         }
     }
 
-    void drawRectangle(Position2D pos, Size2D size, LineStyle top_style, LineStyle left_style,
-            LineStyle bottom_style, LineStyle right_style, Nullable!(FillStyle) fill_style)
+    void drawRectangle(
+        Position2D pos,
+        Size2D size,
+        LineStyle top_style,
+        LineStyle left_style,
+        LineStyle bottom_style,
+        LineStyle right_style,
+        Nullable!(FillStyle) fill_style
+        )
     {
         debug writefln("drawing %s rectangle: %s %s", fill_style, pos, size);
 

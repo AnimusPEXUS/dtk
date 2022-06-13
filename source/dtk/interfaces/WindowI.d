@@ -32,6 +32,7 @@ interface WindowI
     LaFI getLaf();
 
     void setDebugName(dstring value);
+    void printParams();
 
     LaFI getForcedLaf();
     WindowI setForcedLaf(LaFI);

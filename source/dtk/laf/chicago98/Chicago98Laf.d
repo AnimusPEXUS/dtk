@@ -83,8 +83,13 @@ class Chicago98Laf : LaFI
 
         ds.drawRectangle(pos, size, LineStyle(c1), LineStyle(c2), Nullable!FillStyle());
 
-        ds.drawRectangle(Position2D(pos.x + 1, pos.y + 1), Size2D(size.width - 2,
-                size.height - 2), LineStyle(c3), LineStyle(c4), Nullable!FillStyle());
+        ds.drawRectangle(
+            Position2D(pos.x + 1, pos.y + 1),
+            Size2D(size.width - 2, size.height - 2),
+            LineStyle(c3),
+            LineStyle(c4),
+            Nullable!FillStyle()
+            );
     }
 
     void drawForm(Form e, DrawingSurfaceI ds)
@@ -105,8 +110,12 @@ class Chicago98Laf : LaFI
         );
         */
 
-        ds.drawRectangle(Position2D(pos_x, pos_y), Size2D(size_w, size_h),
-                LineStyle(formBackground), nullable(FillStyle(formBackground)));
+        ds.drawRectangle(
+            Position2D(pos_x, pos_y),
+            Size2D(size_w, size_h),
+            LineStyle(formBackground),
+            nullable(FillStyle(formBackground))
+            );
     }
 
     void drawButton(Button e, DrawingSurfaceI ds)
