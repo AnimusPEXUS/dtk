@@ -3,11 +3,13 @@ module dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.LaFI;
 import dtk.interfaces.FontMgrI;
+import dtk.interfaces.MouseCursorMgrI;
 
 import dtk.types.WindowCreationSettings;
 import dtk.types.Event;
 import dtk.types.Widget;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
+
 
 import dtk.miscs.signal_tools;
 
@@ -23,6 +25,7 @@ interface PlatformI
     LaFI getLaf();
 
     FontMgrI getFontManager();
+    MouseCursorMgrI getMouseCursorManager();
 
     bool canCreateWindow();
 

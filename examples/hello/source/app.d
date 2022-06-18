@@ -88,10 +88,10 @@ void main()
 
     WindowCreationSettings wcs = {
         title: "Example",
-        x: 200,
-        y: 200,
-        width: 800,
-        height: 800,
+        x: 500,
+        y: 500,
+        width: 500,
+        height: 500,
         resizable: true,
     };
 

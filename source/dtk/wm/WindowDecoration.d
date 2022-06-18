@@ -9,6 +9,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.types.WindowBorderSizes;
+import dtk.types.EnumMouseCursor;
 
 import dtk.laf.chicago98.Chicago98Laf;
 
@@ -21,13 +22,14 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Property;
 import dtk.types.EventForm;
+import dtk.types.EnumWindowMovementPossibleAction;
 
 import dtk.widgets.Form;
 import dtk.widgets.Button;
 import dtk.widgets.TextEntry;
 // import dtk.widgets.Image;
 
-// import dtk.signal_mixins.Window;
+import dtk.miscs.isPointInRegion;
 
 const auto WindowDecorationProperties = cast(PropSetting[])[
     PropSetting("gsun", "WindowI", "window", "Window", ""),
@@ -158,6 +160,123 @@ class WindowDecoration : Form
     override void intMouseMove(Widget widget, EventForm* event)
     {
         debug writeln("mouse movement detected");
+        auto x = event.event.mouseX;
+        auto y = event.event.mouseY;
+        auto cursorAct = calcMovementAction(Position2D(x, y));
+        debug writeln("%s selected mouse action %s (%s:%s)".format(this, cursorAct, x, y));
+
+        EnumMouseCursor resMC = EnumMouseCursor.crDefault;
+
+        with (EnumWindowMovementPossibleAction)
+        with (EnumMouseCursor)
+        final switch (cursorAct)
+        {
+            case undefined:
+            case move:
+                resMC = crDefault;
+                break;
+
+            case left:
+                resMC = crWResize;
+                break;
+
+            case leftTop:
+                resMC = crNWResize;
+                break;
+
+            case top:
+                resMC = crNResize;
+                break;
+
+            case rightTop:
+                resMC = crNEResize;
+                break;
+
+            case right:
+                resMC = crEResize;
+                break;
+
+            case rightBottom:
+                resMC = crSEResize;
+                break;
+
+            case bottom:
+                resMC = crSResize;
+                break;
+
+            case leftBottom:
+                resMC = crSWResize;
+                break;
+        }
+
+        {
+            auto w = getWindow();
+            if (!w)
+                return;
+
+            auto p = w.getPlatform();
+            if (!p)
+                return;
+
+            p.getMouseCursorManager().setCursorByType(resMC);
+        }
+    }
+
+    EnumWindowMovementPossibleAction calcMovementAction(Position2D pos)
+    {
+        auto x = pos.x;
+        auto y = pos.y;
+        auto w = getWidth();
+        auto h = getHeight();
+
+        // TODO: don't use constants
+        const auto borderSize = 2;
+        const auto titleSize = 18;
+        const auto cornerSize = 5;
+
+        auto w_m_bs = w - borderSize;
+        auto w_m_cs = w - cornerSize;
+        auto h_m_bs = h - borderSize;
+        auto h_m_cs = h - cornerSize;
+
+        // NOTE: rightBottom corner is prioritized above title
+        if (
+            isPointInRegion(Position2D(w_m_cs, h_m_bs), Size2D(cornerSize, borderSize), pos)
+            || isPointInRegion(Position2D(w_m_bs, h_m_cs), Size2D(borderSize, cornerSize), pos)
+            ) return EnumWindowMovementPossibleAction.rightBottom;
+
+        if (
+            isPointInRegion(Position2D(cornerSize, borderSize), Size2D(w_m_cs, titleSize), pos)
+            ) return EnumWindowMovementPossibleAction.move;
+
+        if (
+            isPointInRegion(Position2D(0, 0), Size2D(cornerSize, borderSize), pos)
+            || isPointInRegion(Position2D(0, 0), Size2D(borderSize, cornerSize), pos)
+            ) return EnumWindowMovementPossibleAction.leftTop;
+
+        if (
+            isPointInRegion(Position2D(w_m_cs, 0), Size2D(cornerSize, borderSize), pos)
+            || isPointInRegion(Position2D(w_m_bs, 0), Size2D(borderSize, cornerSize), pos)
+            ) return EnumWindowMovementPossibleAction.rightTop;
+
+        if (
+            isPointInRegion(Position2D(0, h_m_cs), Size2D(borderSize, cornerSize), pos)
+            || isPointInRegion(Position2D(0, h_m_bs), Size2D(cornerSize, borderSize), pos)
+            ) return EnumWindowMovementPossibleAction.rightBottom;
+
+        if (isPointInRegion(Position2D(0, cornerSize), Size2D(h_m_cs, borderSize), pos))
+            return EnumWindowMovementPossibleAction.left;
+
+        if (isPointInRegion(Position2D(cornerSize, 0), Size2D(w_m_cs, borderSize), pos))
+            return EnumWindowMovementPossibleAction.top;
+
+        if (isPointInRegion(Position2D(w_m_bs, cornerSize), Size2D(h_m_cs, borderSize), pos))
+            return EnumWindowMovementPossibleAction.left;
+
+        if (isPointInRegion(Position2D(cornerSize, h_m_bs), Size2D(w_m_cs, borderSize), pos))
+            return EnumWindowMovementPossibleAction.bottom;
+
+        return EnumWindowMovementPossibleAction.undefined;
     }
 
     override void intMousePressRelease(Widget widget, EventForm* event)

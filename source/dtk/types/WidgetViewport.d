@@ -82,7 +82,10 @@ class WidgetViewport
         foreach_reverse (k, v; map)
         {
             auto vd = v.visibilityData;
-            if (p_x >= vd.vx && p_x < vd.vx + vd.w && p_y >= vd.vy && p_y < vd.vy + vd.h)
+            if (p_x >= vd.vx
+                && p_x < vd.vx + vd.w
+                && p_y >= vd.vy
+                && p_y < vd.vy + vd.h)
             {
                 ret = tuple(v, Position2D((p_x - vd.vx), (p_y - vd.vy))) ~ ret;
                 if (only_last)

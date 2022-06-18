@@ -55,18 +55,6 @@ const auto WindowProperties = cast(PropSetting[])[
     PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
     PropSetting("gs_w_d", "dstring", "title", "Title", q{""d}),
-
-    // XYWH - XY relative to screen. XYWH = [form XYWH] plus window borders
-    /* PropSetting("gs_w_d", "int", "x", "X", "0"),
-    PropSetting("gs_w_d", "int", "y", "Y", "0"),
-    PropSetting("gs_w_d", "int", "width", "Width", "0"),
-    PropSetting("gs_w_d", "int", "height", "Height", "0"), */
-
-    // [form XYWH] - XY relative to screen. [form XYWH] = XYWH minus window borders
-    /* PropSetting("gs_w_d", "int", "formX", "FormX", "0"),
-    PropSetting("gs_w_d", "int", "formY", "FormY", "0"),
-    PropSetting("gs_w_d", "int", "formWidth", "FormWidth", "0"),
-    PropSetting("gs_w_d", "int", "formHeight", "FormHeight", "0"), */
 ];
 
 class Window : WindowI
@@ -213,59 +201,6 @@ class Window : WindowI
                     new_value.setWindow(this);
             }());
         });
-
-        /* static foreach (v; ["X", "Y", "Width", "Height"])
-        {
-            mixin(q{
-    				cs_%1$sChange = connectTo%1$s_onAfterChanged(
-    					delegate void(
-    						int old_value,
-    						int new_value
-    						)
-    					{
-    						collectException(
-    							{
-    								if (old_value == new_value)
-    									return;
-
-    								static if ("%1$s" == "X" || "%1$s" == "Y")
-    								{
-    									intWindowPosChanged();
-    								}
-    								else
-    								{
-    									intWindowSizeChanged();
-    								}
-    							}()
-    							);
-    					}
-    					);
-
-    				cs_Form%1$sChange = connectToForm%1$s_onAfterChanged(
-    					delegate void(
-    						int old_value,
-    						int new_value
-    						)
-    					{
-    						collectException(
-    							{
-    								if (old_value == new_value)
-    									return;
-
-    								static if ("%1$s" == "X" || "%1$s" == "Y")
-    								{
-    									intWindowFormPosChanged();
-    								}
-    								else
-    								{
-    									intWindowFormSizeChanged();
-    								}
-    							}()
-    							);
-    					}
-    					);
-    			}.format(v));
-        } */
     }
 
     void setDebugName(dstring value)
@@ -287,51 +222,7 @@ class Window : WindowI
         return ret;
     }
 
-    /* private void intWindowPosChanged()
-    {
-        auto validFormXY = positionRemoveWindowBorder(Position2D(getX(), getY()));
-
-        if (getFormX() != validFormXY.x)
-            setFormX(validFormXY.x);
-
-        if (getFormY() != validFormXY.y)
-            setFormY(validFormXY.y);
-    }
-
-    private void intWindowSizeChanged()
-    {
-        auto validFormWH = sizeRemoveWindowBorder(Size2D(getWidth(), getHeight()));
-
-        if (getFormWidth() != validFormWH.width)
-            setFormWidth(validFormWH.width);
-
-        if (getFormHeight() != validFormWH.height)
-            setFormHeight(validFormWH.height);
-    }
-
-    private void intWindowFormPosChanged()
-    {
-        auto validXY = positionAddWindowBorder(Position2D(getFormX(), getFormY()));
-
-        if (getX() != validXY.x)
-            setX(validXY.x);
-
-        if (getY() != validXY.y)
-            setY(validXY.y);
-    }
-
-    private void intWindowFormSizeChanged()
-    {
-        auto validWH = sizeAddWindowBorder(Size2D(getFormWidth(), getFormHeight()));
-
-        if (getWidth() != validWH.width)
-            setWidth(validWH.width);
-
-        if (getHeight() != validWH.height)
-            setHeight(validWH.height);
-    } */
-
-    private void windowSyncPosition(bool externalStronger)
+    /* private void windowSyncPosition(bool externalStronger)
     {
         auto pos = getFormPosition();
 
@@ -369,7 +260,7 @@ class Window : WindowI
         }
         else
             setFormSize(fsize);
-    }
+    } */
 
     LaFI getLaf()
     {
@@ -392,7 +283,7 @@ class Window : WindowI
     // calculate if current system sizing functions include border size
     private bool sdlWindowSizesIncludesBorderSizes()
     {
-        if (isSetWindowDecoration())
+        if (isSDLBorderless())
             return false;
         SDL_SysWMinfo wminfo;
         SDL_VERSION(&wminfo.version_);
@@ -408,117 +299,85 @@ class Window : WindowI
         case SDL_SYSWM_X11:
             return false;
         case SDL_SYSWM_WAYLAND:
+            // TODO: SDL having problems with this, so this result maybe invalid
             return true;
         }
     }
 
     void onPlatformEvent(Event* event) nothrow
     {
-        auto exc = collectException({
-            if (event.window != this)
-                return;
-
-            if (event.type == EventType.none)
+        auto exc = collectException(
             {
-                debug writeln("event.type == EventType.none");
-                return;
-            }
+                if (event.window != this)
+                    return;
 
-            // NOTE: this moved to platform
-            // if (event.type == EventType.mouse
-            // && event.em.type == EventMouseType.movement)
-            // {
-            // // TODO: save relative values too?
-            // mouseX = event.em.x;
-            // mouseY = event.em.y;
-            // }
-            //
-            // {
-            // event.mouseX = mouseX;
-            // event.mouseY = mouseY;
-            // }
-
-            if (event.type == EventType.window)
-            {
-                debug writeln("window \"%s\" got event %s".format(debug_name, event.ew.eventId));
-
-                switch (event.ew.eventId)
+                if (event.type == EventType.none)
                 {
-                default:
-                    break;
-                case EnumWindowEvent.show:
-                case EnumWindowEvent.expose:
-                case EnumWindowEvent.resize:
-                    {
-                        /* auto formSize = getFormSize();
-                        setFormWidth(formSize.width);
-                        setFormHeight(formSize.height); */
-                        // intWindowSizeChanged();
-                        // windowSyncSize(true);
-
-                        // NOTE: falling through here, because resizing may
-                        //       imply movement
-                    }
-                    goto case;
-                case EnumWindowEvent.move:
-                    {
-                        // auto formPos = getFormPosition();
-                        // setFormX(formPos.x);
-                        // setFormY(formPos.y);
-                        // intWindowPosChanged();
-                        // windowSyncPosition(true);
-                    }
-                    // redraw();
-                    // debug printParams();
-                    break;
-                case EnumWindowEvent.unFocus:
-
-                    auto f = getForm();
-                    if (!f)
-                        break;
-
-                    auto fc = f.getMainWidget();
-                    if (!fc)
-                        break;
-
-                    auto m = cast(Menu) fc;
-                    if (!m)
-                        break;
-
-                    if (m.getMode() == MenuMode.popup)
-                    {
-                        close();
-                    }
-                    break;
-                case EnumWindowEvent.close:
-                    debug writeln("close signal");
-                    close();
-
+                    debug writeln("event.type == EventType.none");
+                    return;
                 }
 
-                debug writeln("before sendWindowEventToForm");
-				sendWindowEventToForm(event.ew);
-
-            }
-            else
-            {
-                debug writeln("before sendNonWindowEventToForm/sendNonWindowEventToWindowDecoration");
-                auto pos = Position2D(event.mouseX, event.mouseY);
-                if (isPositionInForm(pos))
+                if (event.type == EventType.window)
                 {
-                    pos = positionAddWindowBorder(pos);
-                    event.mouseX = pos.x;
-                    event.mouseY = pos.y;
-                    if (event.type == EventType.mouse)
+                    debug writeln("window \"%s\" got event %s".format(debug_name, event.ew.eventId));
+
+                    switch (event.ew.eventId)
                     {
-                        event.em.x = event.mouseX;
-                        event.em.y = event.mouseY;
+                    default:
+                        break;
+                    case EnumWindowEvent.show:
+                    case EnumWindowEvent.expose:
+                        formDesiredPosSizeChanged();
+                        redraw();
+                        break;
+                    case EnumWindowEvent.unFocus:
+
+                        auto f = getForm();
+                        if (!f)
+                            break;
+
+                        auto fc = f.getMainWidget();
+                        if (!fc)
+                            break;
+
+                        auto m = cast(Menu) fc;
+                        if (!m)
+                            break;
+
+                        if (m.getMode() == MenuMode.popup)
+                        {
+                            close();
+                        }
+                        break;
+                    case EnumWindowEvent.close:
+                        debug writeln("close signal");
+                        close();
+
                     }
-                    sendNonWindowEventToForm(event);
+
+                    debug writeln("before sendWindowEventToForm");
+    				sendWindowEventToForm(event.ew);
+
                 }
                 else
-                    sendNonWindowEventToWindowDecoration(event);
-            }
+                {
+                    debug writeln("before sendNonWindowEventToForm/sendNonWindowEventToWindowDecoration");
+                    auto pos = Position2D(event.mouseX, event.mouseY);
+                    if (isPositionInForm(pos))
+                    {
+                        pos = positionAddWindowBorder(pos);
+                        event.mouseX = pos.x;
+                        event.mouseY = pos.y;
+                        if (event.type == EventType.mouse)
+                        {
+                            event.em.x = event.mouseX;
+                            event.em.y = event.mouseY;
+                        }
+                        sendNonWindowEventToForm(event);
+                    }
+                    else
+                        sendNonWindowEventToWindowDecoration(event);
+                }
         }());
         if (exc)
         {
@@ -601,15 +460,11 @@ class Window : WindowI
         auto f = getForm();
         if (!f)
             return;
-        //setFormX(f.getDesiredX());
-        //setFormY(f.getDesiredY());
         auto w = f.getDesiredWidth();
         auto h = f.getDesiredHeight();
         debug writeln("Window :: form requested size change :: %sx%s".format(w, h));
-        // setFormWidth(w);
-        // setFormHeight(h);
+        // TODO: maybe some policy should be implemented
         setFormSize(Size2D(w, h));
-        /* windowSyncSize(false); */
     }
 
     Tuple!(bool, Position2D) getMousePosition()
@@ -638,14 +493,6 @@ class Window : WindowI
         writeln(
             q{printParams()
     title       : %s
-    x           : %d
-    y           : %d
-    width       : %d
-    height      : %d
-    form_x      : %d
-    form_y      : %d
-    form_width  : %d
-    form_height : %d
     pos.x       : %d
     pos.y       : %d
     size.width  : %d
@@ -656,14 +503,6 @@ class Window : WindowI
     fsize.height: %d
 }.format(
                 getTitle(),
-                getX(),
-                getY(),
-                getWidth(),
-                getHeight(),
-                getFormX(),
-                getFormY(),
-                getFormWidth(),
-                getFormHeight(),
                 pos.x       ,
                 pos.y       ,
                 size.width  ,
@@ -685,30 +524,71 @@ class Window : WindowI
 		}
 	}
 
-    // return bool true on success
-    WindowBorderSizes getBorderSizes()
+    bool isBorderless()
     {
-		if (isSetWindowDecoration())
-			return getWindowDecoration().getBorderSizes();
+        return isSDLBorderless() && (!isSetWindowDecoration());
+    }
 
+    private bool isSDLBorderless()
+    {
+        uint flags = SDL_GetWindowFlags(sdl_window);
+        return (flags & SDL_WINDOW_BORDERLESS) != 0;
+    }
+
+    // return bool == true if error
+    private Tuple!(bool, WindowBorderSizes) getSDLBorderSizes()
+    {
+        auto ret_fail = tuple(true, WindowBorderSizes(Size2D(), Size2D()));
         WindowBorderSizes ret;
+
+        // NOTE: special order of variables in functions
         auto res = SDL_GetWindowBordersSize(
             sdl_window,
-            &ret.leftTop.height,
-            &ret.leftTop.width,
-            &ret.rightBottom.height,
-            &ret.rightBottom.width
+            &ret.leftTop.height, &ret.leftTop.width,
+            &ret.rightBottom.height, &ret.rightBottom.width
             );
-        // TODO: add exception here
-        // NOTE: can't attend to this for now, because it's not in priority.
-        //       probably will do it after
-        //       https://issues.dlang.org/show_bug.cgi?id=23155 will be fixed.
+
         if (res != 0)
         {
             getPlatform().printSDLError();
             // throw new Exception("SDL Exception: couldn't determine window border sizes");
-			installWindowDecoration();
-			return getWindowDecoration().getBorderSizes();
+            return ret_fail;
+        }
+
+        return tuple(false, ret);
+    }
+
+    // return bool true on success
+    WindowBorderSizes getBorderSizes()
+    {
+        WindowBorderSizes ret;
+
+		if (isSetWindowDecoration())
+        {
+			auto t = getWindowDecoration().getBorderSizes();
+            ret.leftTop.width += t.leftTop.width;
+            ret.leftTop.height += t.leftTop.height;
+            ret.rightBottom.width += t.rightBottom.width;
+            ret.rightBottom.height += t.rightBottom.height;
+        }
+
+        if (!isSDLBorderless())
+        {
+            auto res = getSDLBorderSizes();
+            if (res[0])
+            {
+                debug writeln(
+                    "SDL failed to return window border sizes. " ~
+                    "forcing artifical decoration usage."
+                    );
+                installWindowDecoration();
+                // reattempt with already forced own decoration
+                return getBorderSizes();
+            }
+            ret.leftTop.width += res[1].leftTop.width;
+            ret.leftTop.height += res[1].leftTop.height;
+            ret.rightBottom.width += res[1].rightBottom.width;
+            ret.rightBottom.height += res[1].rightBottom.height;
         }
         return ret;
     }
@@ -758,10 +638,51 @@ class Window : WindowI
         return ret;
     }
 
+    static foreach (v ;["X", "Y", "Width", "Height"])
+    {
+        import std.string;
+
+        static foreach (vform; ["", "Form"])
+        {
+
+            mixin(
+                q{
+                    int get%3$s%1$s()
+                    {
+                        static if ("%1$s" == "X" || "%1$s" == "Y")
+                            return get%3$sPosition().%2$s;
+                        else
+                            return get%3$sSize().%2$s;
+                    }
+
+                    Window set%3$s%1$s(int val)
+                    {
+                        static if ("%1$s" == "X" || "%1$s" == "Y")
+                            auto res = get%3$sPosition();
+                        else
+                            auto res = get%3$sSize();
+
+                        res.%2$s = val;
+
+                        static if ("%1$s" == "X" || "%1$s" == "Y")
+                            set%3$sPosition(res);
+                        else
+                            set%3$sSize(res);
+                        return this;
+                    }
+
+                }.format(v, v.toLower(), vform)
+                );
+        }
+    }
+
+    // get position on the screen including border if present
     Position2D getPosition()
     {
         Position2D pos;
         SDL_GetWindowPosition(this.sdl_window, &(pos.x), &(pos.y));
+        if (!sdlWindowSizesIncludesBorderSizes())
+            pos = positionAddWindowBorder(pos);
         return pos;
     }
 
@@ -769,6 +690,8 @@ class Window : WindowI
     {
         Size2D size;
         SDL_GetWindowSize(this.sdl_window, &(size.width), &(size.height));
+        if (!sdlWindowSizesIncludesBorderSizes())
+            size = sizeAddWindowBorder(size);
         return size;
     }
 
@@ -788,56 +711,6 @@ class Window : WindowI
         if (sdlWindowSizesIncludesBorderSizes())
             size = sizeRemoveWindowBorder(size);
         return size;
-    }
-
-    static foreach (v ;["X", "Y", "Width", "Height"])
-    {
-        import std.string;
-
-        static foreach (vform; ["", "Form"])
-        {
-
-            mixin(
-                q{
-                    int get%3$s%1$s()
-                    {
-                        static if ("%1$s" == "X" || "%1$s" == "Y")
-                        {
-                            return get%3$sPosition().%2$s;
-                        }
-                        else
-                        {
-                            return get%3$sSize().%2$s;
-                        }
-                    }
-
-                    Window set%3$s%1$s(int val)
-                    {
-                        static if ("%1$s" == "X" || "%1$s" == "Y")
-                        {
-                            auto res = get%3$sPosition();
-                        }
-                        else
-                        {
-                            auto res = get%3$sSize();
-                        }
-
-                        res.%2$s = val;
-
-                        static if ("%1$s" == "X" || "%1$s" == "Y")
-                        {
-                            set%3$sPosition(res);
-                        }
-                        else
-                        {
-                            set%3$sSize(res);
-                        }
-                        return this;
-                    }
-
-                }.format(v, v.toLower(), vform)
-                );
-        }
     }
 
     void setPosition(Position2D pos)

@@ -12,6 +12,8 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Widget;
 import dtk.types.WindowBorderSizes;
+// import dtk.types.EnumMouseCursor;
+
 import dtk.wm.WindowDecoration;
 
 import dtk.interfaces.PlatformI;
@@ -81,6 +83,8 @@ interface WindowI
 
     void setPosition(Position2D pos);
     void setSize(Size2D size);
+
+    // void setCursorByType(EnumMouseCursor type);
 
     void redraw();
 

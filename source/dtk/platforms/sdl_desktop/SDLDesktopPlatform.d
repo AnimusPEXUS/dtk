@@ -14,6 +14,7 @@ import dtk.interfaces.LaFI;
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
+import dtk.interfaces.MouseCursorMgrI;
 
 import dtk.types.Event;
 import dtk.types.Widget;
@@ -21,6 +22,7 @@ import dtk.types.Property;
 import dtk.types.WindowCreationSettings;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 
+import dtk.platforms.sdl_desktop.CursorMgr;
 import dtk.platforms.sdl_desktop.Window;
 import dtk.platforms.sdl_desktop.utils;
 
@@ -38,6 +40,7 @@ immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
 
 const auto SDLDesktopPlatformProperties = cast(PropSetting[])[
     PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
+    PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
     // PropSetting("gsun", "LaFI", "laf", "Laf", "null"),
 ];
 
@@ -109,6 +112,8 @@ class SDLDesktopPlatform : PlatformI
         {
             static assert(false, "Couldn't select Font Manager for platform");
         }
+
+        setMouseCursorManager(new CursorMgr());
     }
 
     void destroy()
