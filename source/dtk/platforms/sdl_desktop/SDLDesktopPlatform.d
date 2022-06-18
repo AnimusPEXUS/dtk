@@ -113,7 +113,7 @@ class SDLDesktopPlatform : PlatformI
             static assert(false, "Couldn't select Font Manager for platform");
         }
 
-        setMouseCursorManager(new CursorMgr());
+        setMouseCursorManager(new CursorMgr(this));
     }
 
     void destroy()

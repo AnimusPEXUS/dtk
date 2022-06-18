@@ -219,6 +219,7 @@ class WindowDecoration : Form
                 return;
 
             p.getMouseCursorManager().setCursorByType(resMC);
+            
         }
     }
 
