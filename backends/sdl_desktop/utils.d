@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.utils;
+module dtk.backends.sdl_desktop.utils;
 
 import std.stdio;
 import std.conv;
@@ -15,7 +15,7 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
-import dtk.platforms.sdl_desktop.sdlkeyconversion;
+import dtk.backends.sdl_desktop.sdlkeyconversion;
 
 Event* convertSDLEventToEvent(SDL_Event* event)
 {

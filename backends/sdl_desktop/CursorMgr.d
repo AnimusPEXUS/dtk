@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.CursorMgr;
+module dtk.backends.sdl_desktop.CursorMgr;
 
 import std.stdio;
 import std.format;
@@ -10,7 +10,7 @@ import dtk.interfaces.MouseCursorMgrI;
 import dtk.types.EnumMouseCursor;
 
 // import dtk.platforms.sdl_desktop.Window;
-import dtk.platforms.sdl_desktop.Platform;
+import dtk.backends.sdl_desktop.Platform;
 
 class CursorMgr : MouseCursorMgrI
 {

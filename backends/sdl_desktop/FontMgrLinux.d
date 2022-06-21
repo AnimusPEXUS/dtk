@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.FontMgrLinux;
+module dtk.backends.sdl_desktop.FontMgrLinux;
 
 import std.conv;
 import std.stdio;

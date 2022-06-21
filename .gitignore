@@ -14,7 +14,7 @@ dtk-test-*
 *.obj
 *.lst
 *~
-/theme_screenshots
+#/theme_screenshots
 /libdtk.a
 /examples/hello/hello
 /generators/sdl_desktop/KeyboardSourcesGenerator/EnumKeyboardKeyCode.d

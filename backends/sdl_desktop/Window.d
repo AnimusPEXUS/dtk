@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.Window;
+module dtk.backends.sdl_desktop.Window;
 
 import std.conv;
 import std.string;
@@ -18,9 +18,9 @@ import dtk.interfaces.WindowI;
 // import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.LaFI;
 
-import dtk.platforms.sdl_desktop.DrawingSurface;
-import dtk.platforms.sdl_desktop.Platform;
-import dtk.platforms.sdl_desktop.utils;
+import dtk.backends.sdl_desktop.DrawingSurface;
+import dtk.backends.sdl_desktop.Platform;
+import dtk.backends.sdl_desktop.utils;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;

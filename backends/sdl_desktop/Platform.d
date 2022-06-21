@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.Platform;
+module dtk.backends.sdl_desktop.Platform;
 
 import core.thread.osthread;
 
@@ -24,9 +24,9 @@ import dtk.types.WindowCreationSettings;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 import dtk.types.EnumWindowDraggingEventEndReason;
 
-import dtk.platforms.sdl_desktop.CursorMgr;
-import dtk.platforms.sdl_desktop.Window;
-import dtk.platforms.sdl_desktop.utils;
+import dtk.backends.sdl_desktop.CursorMgr;
+import dtk.backends.sdl_desktop.Window;
+import dtk.backends.sdl_desktop.utils;
 
 import dtk.miscs.signal_tools;
 
@@ -105,7 +105,7 @@ class Platform : PlatformI
 
         version (linux)
         {
-            import dtk.platforms.sdl_desktop.FontMgrLinux;
+            import dtk.backends.sdl_desktop.FontMgrLinux;
 
             setFontManager(new FontMgrLinux());
             // font_mgr = cast(FontMgrI) ;

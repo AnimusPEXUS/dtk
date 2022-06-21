@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.sdlkeyconversion;
+module dtk.backends.sdl_desktop.sdlkeyconversion;
 
 /*
     This file generated using one of the generators inside

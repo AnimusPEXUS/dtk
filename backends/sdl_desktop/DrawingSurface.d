@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.DrawingSurface;
+module dtk.backends.sdl_desktop.DrawingSurface;
 
 import std.stdio;
 import std.typecons;
@@ -21,7 +21,7 @@ import dtk.interfaces.FaceI;
 
 /* import dtk.miscs.DrawingSurfaceShift; */
 
-import dtk.platforms.sdl_desktop.Window;
+import dtk.backends.sdl_desktop.Window;
 
 class DrawingSurface : DrawingSurfaceI
 {

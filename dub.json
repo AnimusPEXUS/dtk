@@ -14,6 +14,9 @@
 		{
 			"name": "platform-sdl-desktop",
 			"targetType": "staticLibrary",
+			"sourcePaths": [
+			    "backends/sdl_desktop"
+			],
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
 				"bindbc-sdl": ">=1.0.0",
@@ -35,6 +38,9 @@
 		{
 			"name": "platform-glfw-desktop",
 			"targetType": "staticLibrary",
+			"sourcePaths": [
+			    "backends/glfw_desktop"
+			],
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
 				"bindbc-glfw": ">=1.0.0",
