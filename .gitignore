@@ -17,9 +17,9 @@ dtk-test-*
 /theme_screenshots
 /libdtk.a
 /examples/hello/hello
-/KeyboardSourcesGenerator/EnumKeyboardKeyCode.d
-/KeyboardSourcesGenerator/EnumKeyboardModCode.d
-/KeyboardSourcesGenerator/sdlkeyconversion.d
+/generators/sdl_desktop/KeyboardSourcesGenerator/EnumKeyboardKeyCode.d
+/generators/sdl_desktop/KeyboardSourcesGenerator/EnumKeyboardModCode.d
+/generators/sdl_desktop/KeyboardSourcesGenerator/sdlkeyconversion.d
 /examples/hello/before_property_convert.7z
 /examples/hello/hello*
 **/.ipynb_checkpoints

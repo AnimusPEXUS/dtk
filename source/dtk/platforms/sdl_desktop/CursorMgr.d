@@ -10,14 +10,14 @@ import dtk.interfaces.MouseCursorMgrI;
 import dtk.types.EnumMouseCursor;
 
 // import dtk.platforms.sdl_desktop.Window;
-import dtk.platforms.sdl_desktop.SDLDesktopPlatform;
+import dtk.platforms.sdl_desktop.Platform;
 
 class CursorMgr : MouseCursorMgrI
 {
     private SDL_Cursor*[SDL_SystemCursor] csrStorage;
-    private SDLDesktopPlatform platform;
+    private Platform platform;
 
-    this(SDLDesktopPlatform p)
+    this(Platform p)
     {
         platform = p;
     }

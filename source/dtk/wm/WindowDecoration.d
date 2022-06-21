@@ -23,6 +23,8 @@ import dtk.types.Size2D;
 import dtk.types.Property;
 import dtk.types.EventForm;
 import dtk.types.EnumWindowMovementPossibleAction;
+import dtk.types.EnumWidgetInternalDraggingEventEndReason;
+import dtk.types.EnumWindowDraggingEventEndReason;
 
 import dtk.widgets.Form;
 import dtk.widgets.Button;
@@ -154,7 +156,7 @@ class WindowDecoration : Form
             );
 
         // TODO: draw caption gradient
-		return cast(Image) ds;
+        return cast(Image) ds;
     }
 
     override void intMouseMove(Widget widget, EventForm* event)
@@ -219,7 +221,7 @@ class WindowDecoration : Form
                 return;
 
             p.getMouseCursorManager().setCursorByType(resMC);
-            
+
         }
     }
 
@@ -284,5 +286,50 @@ class WindowDecoration : Form
     {
         auto w = getWindow();
         w.printParams();
+    }
+
+    override void intMousePress(Widget widget, EventForm* event)
+    {
+        debug writeln("Window Title Mouse down");
+
+        debug writeln("mouse movement detected");
+        auto x = event.event.mouseX;
+        auto y = event.event.mouseY;
+        auto cursorAct = calcMovementAction(Position2D(x, y));
+        debug writeln("%s selected mouse action %s (%s:%s)".format(this, cursorAct, x, y));
+
+        EnumMouseCursor resMC = EnumMouseCursor.crDefault;
+
+        if (cursorAct == EnumWindowMovementPossibleAction.move)
+        {
+            {
+                auto w = getWindow();
+                if (!w)
+                    return;
+
+                auto p = w.getPlatform();
+                if (!p)
+                    return;
+
+                p.windowDraggingEventStart(
+                    w,
+                    // TODO: move this function to a better place
+                    delegate EnumWindowDraggingEventEndReason(Event* e)
+                    {
+                        if (
+                            e.type == EventType.mouse
+                            && e.em.type == EventMouseType.button
+                            && ((e.em.button & EnumMouseButton.bl) != 0)
+                            && e.em.buttonState == EnumMouseButtonState.released
+                        )
+                        {
+                            debug writeln("Window drag success");
+                            return EnumWindowDraggingEventEndReason.success;
+                        }
+                        return EnumWindowDraggingEventEndReason.notEnd;
+                    }
+                );
+            }
+        }
     }
 }

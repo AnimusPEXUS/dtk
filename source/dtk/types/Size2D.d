@@ -17,8 +17,18 @@ struct Size2D
         return Size2D(width - size.width, height - size.height);
     }
 
+    Size2D sub(int width, int height)
+    {
+        return Size2D(this.width - width, this.height - height);
+    }
+
     Size2D add(Size2D size)
     {
         return Size2D(width + size.width, height + size.height);
+    }
+
+    Size2D add(int width, int height)
+    {
+        return Size2D(this.width + width, this.height + height);
     }
 }

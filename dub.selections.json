@@ -2,8 +2,9 @@
 	"fileVersion": 1,
 	"versions": {
 		"bindbc-freetype": "1.0.3",
+		"bindbc-glfw": "1.0.1",
 		"bindbc-loader": "1.0.1",
-		"bindbc-sdl": "1.1.3",
+		"bindbc-sdl": "1.2.1",
 		"derelict-util": "2.0.6",
 		"eventcore": "0.9.20",
 		"fontconfig": "2.0.0+2.13.91",

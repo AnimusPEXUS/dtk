@@ -344,8 +344,15 @@ class ScrollBar : Widget
         }
     }
 
-    override void intInternalDraggingEvent(Widget widget, int initX, int initY,
-            int newX, int newY, int relX, int relY)
+    override void intInternalDraggingEvent(
+        Widget widget,
+        int initX,
+        int initY,
+        int newX,
+        int newY,
+        int relX,
+        int relY
+        )
     {
         // debug writeln(
         // ("intInternalDraggingEvent happened\n"~
@@ -377,8 +384,16 @@ class ScrollBar : Widget
         }
     }
 
-    override void intInternalDraggingEventEnd(Widget widget, EnumWidgetInternalDraggingEventEndReason reason,
-            int initX, int initY, int newX, int newY, int relX, int relY)
+    override void intInternalDraggingEventEnd(
+        Widget widget,
+        EnumWidgetInternalDraggingEventEndReason reason,
+        int initX,
+        int initY,
+        int newX,
+        int newY,
+        int relX,
+        int relY
+        )
     {
         if (reason != EnumWidgetInternalDraggingEventEndReason.success)
         {

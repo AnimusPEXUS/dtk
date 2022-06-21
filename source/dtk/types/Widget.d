@@ -789,8 +789,6 @@ class Widget
         Widget p = this;
         Widget prev_p;
 
-        // bool thisIsLast;
-
         while (true)
         {
             retX += pos.x;
@@ -814,16 +812,12 @@ class Widget
             }
 
             pos = p.calcWidgetRelativePos(prev_p);
-
-            // if (thisIsLast)
-            // break;
-
         }
         return Position2D(retX, retY);
     }
 
     // override this, if your widget have special widget position treatment
-    // TODO: this maybe a duplicate dunction or code. investigate/
+    // TODO: this maybe a duplicate function or code. investigate.
     Position2D calcWidgetRelativePos(Widget child)
     {
         auto c = getWidgetChildByChild(child);

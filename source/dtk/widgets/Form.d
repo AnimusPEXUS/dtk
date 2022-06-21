@@ -96,8 +96,8 @@ class Form : Widget
                 {
                     if (o.getForm() == this)
                         o.unsetForm();
-                    if (o.getWindowDecoration() == this)
-                        o.unsetWindowDecoration();
+                    if (o.getArtificalWD() == this)
+                        o.unsetArtificalWD();
                 }
 
                 if (n !is null)
@@ -247,7 +247,7 @@ class Form : Widget
         }());
     }
 
-    void windowEventReceiver(EventWindow* event) nothrow
+    void windowEventReceiver(Event* event) nothrow
     {
         collectException({
             auto e = collectException({
@@ -255,7 +255,7 @@ class Form : Widget
 
                 // debug writeln("form received window event: ", event.eventId);
 
-                switch (event.eventId)
+                switch (event.ew.eventId)
                 {
                 default:
                     break;

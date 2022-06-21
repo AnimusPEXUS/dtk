@@ -1,4 +1,4 @@
-module dtk.platforms.sdl_desktop.SDLDesktopPlatform;
+module dtk.platforms.sdl_desktop.Platform;
 
 import core.thread.osthread;
 
@@ -16,11 +16,13 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.MouseCursorMgrI;
 
+import dtk.types.EventWindow;
 import dtk.types.Event;
 import dtk.types.Widget;
 import dtk.types.Property;
 import dtk.types.WindowCreationSettings;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
+import dtk.types.EnumWindowDraggingEventEndReason;
 
 import dtk.platforms.sdl_desktop.CursorMgr;
 import dtk.platforms.sdl_desktop.Window;
@@ -38,13 +40,13 @@ immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
     cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
 ];
 
-const auto SDLDesktopPlatformProperties = cast(PropSetting[])[
+const auto PlatformProperties = cast(PropSetting[])[
     PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
     PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
     // PropSetting("gsun", "LaFI", "laf", "Laf", "null"),
 ];
 
-class SDLDesktopPlatform : PlatformI
+class Platform : PlatformI
 {
 
     string getName()
@@ -72,8 +74,8 @@ class SDLDesktopPlatform : PlatformI
         return true;
     }
 
-    mixin mixin_multiple_properties_define!(SDLDesktopPlatformProperties);
-    mixin mixin_multiple_properties_forward!(SDLDesktopPlatformProperties, false);
+    mixin mixin_multiple_properties_define!(PlatformProperties);
+    mixin mixin_multiple_properties_forward!(PlatformProperties, false);
 
     mixin(mixin_PlatformSignals(false));
 
@@ -88,7 +90,7 @@ class SDLDesktopPlatform : PlatformI
 
     void init() // TODO: check whatever this function name have special meaning in D
     {
-        mixin(mixin_multiple_properties_inst(SDLDesktopPlatformProperties));
+        mixin(mixin_multiple_properties_inst(PlatformProperties));
 
         SDL_Init(SDL_INIT_VIDEO);
         SDL_version v;
@@ -214,10 +216,10 @@ class SDLDesktopPlatform : PlatformI
                 break;
             }
         }
-        if (ret is null)
+        /* if (ret is null)
         {
             throw new Exception("got event for unregistered window");
-        }
+        } */
         return ret;
     }
 
@@ -321,6 +323,12 @@ class SDLDesktopPlatform : PlatformI
                     break main_loop;
                 }
 
+                if (!w)
+                {
+                    debug writeln("got event for unregistered window");
+                    // continue main_loop;
+                }
+
                 auto e = convertSDLEventToEvent(sdl_event);
                 if (e is null)
                 {
@@ -329,7 +337,7 @@ class SDLDesktopPlatform : PlatformI
                 }
                 e.window = w;
 
-                {
+                if (w && e.window) {
                     if (e.type == EventType.mouse && e.em.type == EventMouseType.movement)
                     {
                         // TODO: save relative values too?
@@ -371,11 +379,53 @@ class SDLDesktopPlatform : PlatformI
 
                     if (e.type == EventType.mouse && e.em.type == EventMouseType.movement)
                     {
-                        widgetInternalDraggingEventWidget.intInternalDraggingEvent(widgetInternalDraggingEventWidget,
-                                widgetInternalDraggingEventInitX,
-                                widgetInternalDraggingEventInitY, e.mouseX,
-                                e.mouseY, e.mouseX - widgetInternalDraggingEventInitX,
-                                e.mouseY - widgetInternalDraggingEventInitY);
+                        widgetInternalDraggingEventWidget.intInternalDraggingEvent(
+                            widgetInternalDraggingEventWidget,
+                            widgetInternalDraggingEventInitX,
+                            widgetInternalDraggingEventInitY,
+                            e.mouseX,
+                            e.mouseY,
+                            e.mouseX - widgetInternalDraggingEventInitX,
+                            e.mouseY - widgetInternalDraggingEventInitY
+                            );
+                    }
+
+                    continue main_loop;
+                }
+
+                if (windowDraggingEventActive)
+                {
+                    if (windowDraggingEventStopCheck is null)
+                    {
+                        debug writeln("error: windowDraggingEventStopCheck is null");
+                        windowDraggingEventEnd(e, EnumWindowDraggingEventEndReason.abort);
+                        continue main_loop;
+                    }
+                    if (windowDraggingEventWindow is null)
+                    {
+                        debug writeln("error: windowDraggingEventWindow is null");
+                        windowDraggingEventEnd(e, EnumWindowDraggingEventEndReason.abort);
+                        continue main_loop;
+                    }
+                    {
+                        auto res_drag_stop_check = windowDraggingEventStopCheck(e);
+                        debug writeln("res_drag_stop_check == %s".format(res_drag_stop_check));
+                        if (res_drag_stop_check != EnumWindowDraggingEventEndReason.notEnd)
+                        {
+                            windowDraggingEventEnd(e, res_drag_stop_check);
+                            continue main_loop;
+                        }
+                    }
+
+                    if (e.type == EventType.mouse && e.em.type == EventMouseType.movement)
+                    {
+                        intWindowDraggingEvent(
+                            // windowDraggingEventWindow,
+                            // e.mouseX,
+                            // e.mouseY,
+                            // e.mouseX - windowDraggingEventInitX,
+                            // e.mouseY - windowDraggingEventInitY
+                            );
                     }
 
                     continue main_loop;
@@ -392,13 +442,19 @@ class SDLDesktopPlatform : PlatformI
     {
         bool widgetInternalDraggingEventActive;
         Widget widgetInternalDraggingEventWidget;
-        EnumWidgetInternalDraggingEventEndReason delegate(Event* e) widgetInternalDraggingEventStopCheck;
+        EnumWidgetInternalDraggingEventEndReason
+            delegate(Event* e) widgetInternalDraggingEventStopCheck;
         int widgetInternalDraggingEventInitX;
         int widgetInternalDraggingEventInitY;
     }
 
-    void widgetInternalDraggingEventStart(Widget widget, int initX, int initY,
-            EnumWidgetInternalDraggingEventEndReason delegate(Event* e) widgetInternalDraggingEventStopCheck)
+    void widgetInternalDraggingEventStart(
+        Widget widget,
+        int initX,
+        int initY,
+        EnumWidgetInternalDraggingEventEndReason
+            delegate(Event* e) widgetInternalDraggingEventStopCheck
+        )
     {
         assert(widget !is null);
         assert(widgetInternalDraggingEventStopCheck !is null);
@@ -410,7 +466,8 @@ class SDLDesktopPlatform : PlatformI
 
         widgetInternalDraggingEventWidget = widget;
 
-        this.widgetInternalDraggingEventStopCheck = widgetInternalDraggingEventStopCheck;
+        this.widgetInternalDraggingEventStopCheck =
+            widgetInternalDraggingEventStopCheck;
 
         widgetInternalDraggingEventActive = true;
 
@@ -418,12 +475,17 @@ class SDLDesktopPlatform : PlatformI
         assert(this.widgetInternalDraggingEventStopCheck !is null);
 
         widgetInternalDraggingEventWidget.intInternalDraggingEventStart(
-                widgetInternalDraggingEventWidget, initX, initY);
+                widgetInternalDraggingEventWidget,
+                initX, initY
+                );
     }
 
-    void widgetInternalDraggingEventEnd(Event* e, EnumWidgetInternalDraggingEventEndReason reason)
+    void widgetInternalDraggingEventEnd(
+        Event* e,
+        EnumWidgetInternalDraggingEventEndReason reason
+        )
     {
-        debug writeln("widgetInternalDraggingEventEnd start");
+        debug writeln("widgetInternalDraggingEventEnd end");
         if (reason == EnumWidgetInternalDraggingEventEndReason.notEnd)
         {
             return;
@@ -432,16 +494,119 @@ class SDLDesktopPlatform : PlatformI
         SDL_CaptureMouse(SDL_FALSE);
 
         widgetInternalDraggingEventWidget.intInternalDraggingEventEnd(
-                widgetInternalDraggingEventWidget, reason, widgetInternalDraggingEventInitX,
+                widgetInternalDraggingEventWidget,
+                reason,
+                widgetInternalDraggingEventInitX,
                 widgetInternalDraggingEventInitY,
-                e.mouseX, e.mouseY, e.mouseX - widgetInternalDraggingEventInitX,
-                e.mouseY - widgetInternalDraggingEventInitY);
+                e.mouseX,
+                e.mouseY,
+                e.mouseX - widgetInternalDraggingEventInitX,
+                e.mouseY - widgetInternalDraggingEventInitY
+                );
 
         widgetInternalDraggingEventActive = false;
         widgetInternalDraggingEventWidget = null;
         this.widgetInternalDraggingEventStopCheck = null;
         debug writeln("widgetInternalDraggingEventEnd end");
     }
+
+    private
+    {
+        bool windowDraggingEventActive;
+
+        Window windowDraggingEventWindow;
+
+        EnumWindowDraggingEventEndReason
+            delegate(Event* e) windowDraggingEventStopCheck;
+
+        int windowDraggingEventInitX;
+        int windowDraggingEventInitY;
+        int windowDraggingEventCursorInitX;
+        int windowDraggingEventCursorInitY;
+    }
+
+    void windowDraggingEventStart(
+        WindowI window,
+        EnumWindowDraggingEventEndReason
+            delegate(Event* e) windowDraggingEventStopCheck
+        )
+    {
+        SDL_CaptureMouse(SDL_TRUE);
+
+        windowDraggingEventWindow = cast(Window)window;
+
+        // TODO: work on result
+        SDL_GetWindowPosition(
+            windowDraggingEventWindow.sdl_window,
+            &windowDraggingEventInitX,
+            &windowDraggingEventInitY,
+        );
+
+        // TODO: work on result
+        SDL_GetGlobalMouseState(
+            &windowDraggingEventCursorInitX,
+            &windowDraggingEventCursorInitY,
+        );
+
+        this.windowDraggingEventStopCheck = windowDraggingEventStopCheck;
+
+        windowDraggingEventActive = true;
+
+        assert(windowDraggingEventWindow !is null);
+        assert(windowDraggingEventStopCheck !is null);
+    }
+
+    void windowDraggingEventEnd(
+        Event* e,
+        EnumWindowDraggingEventEndReason reason
+        )
+    {
+        if (reason == EnumWindowDraggingEventEndReason.notEnd)
+        {
+            return;
+        }
+
+        SDL_CaptureMouse(SDL_FALSE);
+
+        windowDraggingEventActive = false;
+        windowDraggingEventWindow = null;
+        windowDraggingEventStopCheck = null;
+        debug writeln("windowDraggingEventEnd end");
+    }
+
+    void intWindowDraggingEvent(
+        // WindowI window,
+        //int initX,
+        //int initY,
+        // int x,
+        // int y,
+        // int relX,
+        // int relY
+        )
+    {
+        // TODO: todo
+        int x;
+        int y;
+
+        SDL_GetGlobalMouseState(&x, &y);
+
+        debug writeln("SDL_GetGlobalMouseState %sx%s".format(x, y));
+
+        SDL_SetWindowPosition(
+            windowDraggingEventWindow.sdl_window,
+            windowDraggingEventInitX - (windowDraggingEventCursorInitX - x),
+            windowDraggingEventInitY - (windowDraggingEventCursorInitY - y),
+        );
+    }
+
+//     void windowDraggingEventWidgetStart(
+//         WindowI window,
+//         int initX,
+//         int initY
+//         )
+//     {
+
+//     }
 
     string getSDLError()
     {

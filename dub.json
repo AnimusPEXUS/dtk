@@ -1,29 +1,55 @@
 {
+	"name": "dtk",
+	"description": "A minimal D application.",
+	"copyright": "Copyright © 2021-2022, animuspexus",
 	"authors": [
 		"animuspexus"
 	],
+	"license": "GPLv3",
+	"version": "0.0.0",
+	"dependencies": {
+		"observable": ">=1.0.0"
+	},
 	"configurations": [
 		{
+			"name": "platform-sdl-desktop",
+			"targetType": "staticLibrary",
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
 				"bindbc-sdl": ">=1.0.0",
 				"fontconfig": ">=2.0.0"
 			},
-			"libs": [
-				"SDL2",
-				"SDL2_image",
-				"freetype"
-			],
 			"subConfigurations": {
                                 "bindbc-sdl": "static",
                                 "bindbc-freetype": "static"
                         },
-			"name": "platform-sdl-desktop",
-			"targetType": "staticLibrary",
 			"versions": [
-				"SDL_206",
-				"SDL_Image",
+				"SDL_2022",
 				"DTK_PLATFORM_SDL_DESKTOP"
+			],
+			"libs": [
+				"SDL2",
+				"freetype"
+			]
+		},
+		{
+			"name": "platform-glfw-desktop",
+			"targetType": "staticLibrary",
+			"dependencies": {
+				"bindbc-freetype": ">=1.0.2",
+				"bindbc-glfw": ">=1.0.0",
+				"fontconfig": ">=2.0.0"
+			},
+			"subConfigurations": {
+                                "bindbc-glfw": "static",
+                                "bindbc-freetype": "static"
+                        },
+			"versions": [
+				"GLFW_33",
+				"DTK_PLATFORM_GLFW_DESKTOP"
+			],
+			"libs": [
+				"freetype"
 			]
 		},
 		{
@@ -47,12 +73,4 @@
 			]
 		}
 	],
-	"copyright": "Copyright © 2021-2022, animuspexus",
-	"dependencies": {
-		"observable": ">=1.0.0"
-	},
-	"description": "A minimal D application.",
-	"license": "GPLv3",
-	"name": "dtk",
-	"version": "0.0.0"
 }

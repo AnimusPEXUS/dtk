@@ -114,6 +114,10 @@ void main()
 
     auto btn = new Button().setTextLabel("Button 1");
     auto btn2 = new Button().setTextLabel("Button 2");
+	btn2.onMousePressRelease = delegate void(EventForm* event)
+	{
+		w.printParams();
+	};
     auto btn3 = new ButtonCheck().setTextLabel("ButtonRadio 1").setRadioGroup(rg);
     auto btn4 = new ButtonCheck().setTextLabel("CheckButton 1");
     auto btn5 = new ButtonCheck().setTextLabel("ButtonRadio 2").setRadioGroup(rg);

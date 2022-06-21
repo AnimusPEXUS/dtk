@@ -7,8 +7,10 @@ import dtk.interfaces.MouseCursorMgrI;
 
 import dtk.types.WindowCreationSettings;
 import dtk.types.Event;
+import dtk.types.EventWindow;
 import dtk.types.Widget;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
+import dtk.types.EnumWindowDraggingEventEndReason;
 
 
 import dtk.miscs.signal_tools;
@@ -41,9 +43,27 @@ interface PlatformI
     void mainLoop();
     void destroy();
 
-    void widgetInternalDraggingEventStart(Widget e, int initX, int initY,
-            EnumWidgetInternalDraggingEventEndReason delegate(Event* e) widgetInternalDraggingStopCheck);
-    void widgetInternalDraggingEventEnd(Event* e, EnumWidgetInternalDraggingEventEndReason reason);
+    void widgetInternalDraggingEventStart(
+        Widget e,
+        int initX, int
+        initY,
+        EnumWidgetInternalDraggingEventEndReason
+            delegate(Event* e) widgetInternalDraggingStopCheck
+        );
+    void widgetInternalDraggingEventEnd(
+        Event* e,
+        EnumWidgetInternalDraggingEventEndReason reason
+        );
+
+    void windowDraggingEventStart(
+        WindowI window,
+        EnumWindowDraggingEventEndReason
+            delegate(Event* e) windowDraggingEventStopCheck
+        );
+    void windowDraggingEventEnd(
+        Event* e,
+        EnumWindowDraggingEventEndReason reason
+        );
 
     mixin(mixin_PlatformSignals(true));
 }

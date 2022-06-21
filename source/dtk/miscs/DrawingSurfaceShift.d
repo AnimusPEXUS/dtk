@@ -26,6 +26,8 @@ class DrawingSurfaceShift : DrawingSurfaceI
 
     this(DrawingSurfaceI ds, int x_shift, int y_shift)
     {
+        // assert(x_shift >= 0);
+        // assert(y_shift >= 0);
         this.x_shift = x_shift;
         this.y_shift = y_shift;
         this.ds = ds;

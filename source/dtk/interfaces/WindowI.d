@@ -33,7 +33,7 @@ interface WindowI
 
     LaFI getLaf();
 
-    void setDebugName(dstring value);
+    WindowI setDebugName(dstring value);
     void printParams();
 
     LaFI getForcedLaf();
@@ -44,9 +44,9 @@ interface WindowI
     WindowI unsetForm();
     Form getForm();
 
-    WindowI setWindowDecoration(WindowDecoration wd);
-    WindowI unsetWindowDecoration();
-    WindowDecoration getWindowDecoration();
+    WindowI setArtificalWD(WindowDecoration wd);
+    WindowI unsetArtificalWD();
+    WindowDecoration getArtificalWD();
 
     DrawingSurfaceI getDrawingSurface();
     DrawingSurfaceI getFormDrawingSurface();
@@ -81,8 +81,18 @@ interface WindowI
 
     void formDesiredPosSizeChanged();
 
-    void setPosition(Position2D pos);
-    void setSize(Size2D size);
+    WindowI setPosition(Position2D pos);
+    WindowI setSize(Size2D size);
+    Position2D getPosition();
+    Size2D getSize();
+
+    WindowI setFormPosition(Position2D pos);
+    WindowI setFormSize(Size2D size);
+    Position2D getFormPosition();
+    Size2D getFormSize();
+
+    Size2D getArtificalWDSize();
+    // WindowI setArtificalWDSize(Size2D size)
 
     // void setCursorByType(EnumMouseCursor type);
 
