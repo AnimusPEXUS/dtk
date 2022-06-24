@@ -10,7 +10,7 @@
             "dtk": ">=0.0.0"
 	},
 	"subConfigurations": {
-		"dtk": "platform-glfw-desktop"
+		"dtk": "platform-sdl-desktop"
 	},
 	"version": "0.0.0"
 }

@@ -1,4 +1,4 @@
-module dtk.backends.sdl_desktop.FontMgrLinux;
+module dtk.fontMGRs.fcft.FontConfigFreeTypeLinux;
 
 import std.conv;
 import std.stdio;
@@ -21,7 +21,7 @@ import dtk.types.Position2D;
 import dtk.types.Size2D;
 import dtk.types.Image;
 
-class FontMgrLinux : FontMgrI
+class FontConfigFreeTypeLinux : FontMgrI
 {
     FT_Library ft_library;
 
@@ -136,7 +136,7 @@ class Face : FaceI
 {
     private
     {
-        FontMgrLinux fnt_mgr;
+        FontConfigFreeTypeLinux fnt_mgr;
         FaceInfo* face_info;
 
         uint charSizeW;
@@ -147,7 +147,7 @@ class Face : FaceI
 
     FT_Face face;
 
-    this(FontMgrLinux fnt_mgr, FaceInfo* face_info)
+    this(FontConfigFreeTypeLinux fnt_mgr, FaceInfo* face_info)
     {
         this.fnt_mgr = fnt_mgr;
         this.face_info = face_info;

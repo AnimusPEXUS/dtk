@@ -10,12 +10,15 @@
 	"dependencies": {
 		"observable": ">=1.0.0"
 	},
+	"sourcePaths": [],
 	"configurations": [
 		{
-			"name": "platform-sdl-desktop",
+			"name": "sdl-desktop",
 			"targetType": "staticLibrary",
 			"sourcePaths": [
-			    "backends/sdl_desktop"
+			    "source/backends/sdl_desktop",
+			    "source/fontMGRs",
+			    "source/dtk"
 			],
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
@@ -36,10 +39,12 @@
 			]
 		},
 		{
-			"name": "platform-glfw-desktop",
+			"name": "glfw-desktop",
 			"targetType": "staticLibrary",
 			"sourcePaths": [
-			    "backends/glfw_desktop"
+			    "source/backends/glfw_desktop",
+			    "source/fontMGRs",
+			    "source/dtk"
 			],
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
@@ -58,25 +63,5 @@
 				"freetype"
 			]
 		},
-		{
-			"dependencies": {
-				"bindbc-freetype": ">=1.0.2",
-				"wayland": ">=0.3.1",
-				"wayland:client": ">=0.1.0",
-				"fontconfig": ">=2.0.0"
-			},
-			"libs": [
-				"freetype"
-			],
-			"subConfigurations": {
-                                "bindbc-freetype": "static"
-                        },
-			"name": "platform-wayland-desktop",
-			"targetType": "staticLibrary",
-			"versions": [
-				"BindFT_Static",
-				"DTK_PLATFORM_WAYLAND_DESKTOP"
-			]
-		}
 	],
 }

@@ -7,7 +7,7 @@ import std.stdio;
 import std.algorithm;
 import std.parallelism;
 
-import fontconfig.fontconfig;
+// import fontconfig.fontconfig;
 import bindbc.sdl;
 
 import dtk.interfaces.LaFI;
@@ -59,11 +59,6 @@ class Platform : PlatformI
         return "DTK (D ToolKit). on SDL Platform";
     }
 
-    string getSystemTriplet()
-    {
-        return "x86_64-pc-linux-gnu"; // TODO: fix this
-    }
-
     bool canCreateWindow()
     {
         return true;
@@ -105,9 +100,9 @@ class Platform : PlatformI
 
         version (linux)
         {
-            import dtk.backends.sdl_desktop.FontMgrLinux;
+            import dtk.fontMGRs.fcft.FontConfigFreeTypeLinux;
 
-            setFontManager(new FontMgrLinux());
+            setFontManager(new FontConfigFreeTypeLinux());
             // font_mgr = cast(FontMgrI) ;
         }
         else

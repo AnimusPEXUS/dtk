@@ -21,7 +21,6 @@ interface PlatformI
 {
     string getName();
     string getDescription();
-    string getSystemTriplet();
 
     void setOnGetLaf(LaFI delegate());
     LaFI getLaf();
