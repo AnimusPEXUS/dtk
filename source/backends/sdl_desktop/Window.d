@@ -98,24 +98,25 @@ class Window : WindowI
         // without this SDL makes fullscreen window;
         auto flags = cast(SDL_WindowFlags) 0;
 
-        if (!window_settings.resizable.isNull() && window_settings.resizable.get())
+        if (window_settings.resizable)
         {
             flags |= SDL_WINDOW_RESIZABLE;
         }
 
-        if (!window_settings.popup_menu.isNull() && window_settings.popup_menu.get())
+        if (window_settings.popupMenu)
         {
             flags |= SDL_WINDOW_POPUP_MENU;
         }
 
         string tt = to!string(window_settings.title);
 
+        // TODO: check x, y, w, h usage
         sdl_window = SDL_CreateWindow(
             "DTK app window temporary title",
-            window_settings.x.get(),
-            window_settings.y.get(),
-            window_settings.width.get(),
-            window_settings.height.get(),
+            window_settings.x,
+            window_settings.y,
+            window_settings.w,
+            window_settings.h,
             flags
             );
         if (sdl_window is null)

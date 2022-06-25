@@ -136,12 +136,12 @@ class MenuItem : Widget
 
         WindowCreationSettings wcs = {
             title: "Popup",
-			x: desX,
-			y: desY,
-			width: 50,
-			height: 50,
-			resizable: true,
-			// popup_menu: true,
+            x: desX,
+            y: desY,
+            w: 50,
+            h: 50,
+            resizable: true,
+            // popup_menu: true,
             // borderless: true
         };
 

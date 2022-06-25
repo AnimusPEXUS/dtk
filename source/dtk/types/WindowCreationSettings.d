@@ -13,24 +13,27 @@ struct WindowCreationSettings
 
     // LaFI laf;
 
-    Nullable!int x;
-    Nullable!int y;
-    Nullable!int width;
-    Nullable!int height;
+    bool posDefined;
+    int x, y;
 
-    Nullable!bool fullscreen;
-    Nullable!bool fullscreen_desktop;
+    bool sizeDefined;
+    int w, h;
+
+    bool fullscreen;
+    bool fullscreen_desktop;
+
 
     // TODO: probably some interface have to be made to pass options specific to platform
-    Nullable!bool opengl;
-    Nullable!bool vulkan;
-    Nullable!bool metal;
-    Nullable!bool hidden;
-    Nullable!bool borderless;
-    Nullable!bool resizable;
-    Nullable!bool minimized;
-    Nullable!bool maximized;
-    Nullable!bool input_grabbed;
-    Nullable!bool allow_highdpi;
-    Nullable!bool popup_menu;
+    // Nullable!bool opengl;
+    // Nullable!bool vulkan;
+    // Nullable!bool metal;
+
+    bool visible;
+    bool borderless;
+    bool resizable;
+    bool minimized;
+    bool maximized;
+    bool inputGrabbed;
+    bool allowHighdpi;
+    bool popupMenu;
 }

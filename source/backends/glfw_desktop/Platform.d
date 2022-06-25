@@ -2,8 +2,60 @@ module dtk.backends.glfw_desktop.Platform;
 
 import dtk.interfaces.PlatformI;
 
+import dtk.types.Event;
+
+class PlatformEventSpool
+{
+    private Event*[] eventSpool;
+    private Mutex mtx;
+
+    this()
+    {
+        mtx = new Mutex();
+    }
+
+    void add(Event* e)
+    {
+        mtx.lock();
+        scope (exit) mtx.unlock();
+
+        eventSpool ~= e;
+    }
+
+    // returns null is spool is empty
+    Event* getFirst()
+    {
+        mtx.lock();
+        scope (exit) mtx.unlock();
+
+        Event* ret;
+
+        if (eventSpool.length != 0)
+            ret = eventSpool[0];
+
+        return ret;
+    }
+
+    void delFirst()
+    {
+        mtx.lock();
+        scope (exit) mtx.unlock();
+
+        if (eventSpool.length != 0)
+            eventSpool = eventSpool[1..];
+    }
+}
+
 class Platform : PlatformI
 {
+
+    private __gshared PlatformEventSpool esp;
+
+    this()
+    {
+        esp = new PlatformEventSpool();
+    }
+
     string getName()
     {
         return "GLFW-Desktop";
@@ -33,7 +85,7 @@ class Platform : PlatformI
         auto glfw_window = cast(Window) win;
         if (!glfw_window)
         {
-            throw new Exception("not a GLFW window");
+            throw new Exception("not a GLFW Window object");
         }
         return glfw_window;
     }
@@ -118,17 +170,29 @@ class Platform : PlatformI
     {
     }
 
-    void(* GLFWwindowrefreshfun) (GLFWwindow *window)
+    void cbGLFWwindowrefreshfun (GLFWwindow *window)
+    {
+    }
 
-    void(* GLFWwindowrefreshfun) (GLFWwindow *window)
+    void cbGLFWwindowrefreshfun (GLFWwindow *window)
+    {
+    }
 
-    void(* GLFWwindowfocusfun) (GLFWwindow *window, int focused)
+    void cbGLFWwindowfocusfun (GLFWwindow *window, int focused)
+    {
+    }
 
-    void(* GLFWwindowiconifyfun) (GLFWwindow *window, int iconified)
+    void cbGLFWwindowiconifyfun (GLFWwindow *window, int iconified)
+    {
+    }
 
-    void(* GLFWwindowmaximizefun) (GLFWwindow *window, int maximized)
+    void cbGLFWwindowmaximizefun (GLFWwindow *window, int maximized)
+    {
+    }
 
-    void(* GLFWframebuffersizefun) (GLFWwindow *window, int width, int height)
+    void cbGLFWframebuffersizefun (GLFWwindow *window, int width, int height)
+    {
+    }
 
     void timer500Loop()
     {
