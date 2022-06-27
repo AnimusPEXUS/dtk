@@ -1,4 +1,4 @@
-module dtk.backends.sdl_desktop.Window;
+module dtk.backends.glfw_desktop.Window;
 
 import std.conv;
 import std.string;
@@ -7,7 +7,8 @@ import std.stdio;
 import std.algorithm;
 import std.exception;
 
-import bindbc.sdl;
+import bindbc.glfw;
+import erupted;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
@@ -18,9 +19,9 @@ import dtk.interfaces.WindowI;
 // import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.LaFI;
 
-import dtk.backends.sdl_desktop.DrawingSurface;
-import dtk.backends.sdl_desktop.Platform;
-import dtk.backends.sdl_desktop.utils;
+import dtk.backends.glfw_desktop.DrawingSurface;
+import dtk.backends.glfw_desktop.Platform;
+// import dtk.backends.glfw_desktop.utils;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
@@ -64,8 +65,9 @@ class Window : WindowI
     // TODO: maybe this shouldn't be public
     public
     {
-        SDL_Window* sdl_window;
-        typeof(SDL_WindowEvent.windowID) sdl_window_id;
+        GLFWwindow* glfw_window;
+        VkSurfaceKHR * vk_surface;
+        // typeof(SDL_WindowEvent.windowID) sdl_window_id;
 
         dstring debug_name;
 

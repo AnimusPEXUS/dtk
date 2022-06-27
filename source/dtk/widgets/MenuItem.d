@@ -157,7 +157,7 @@ class MenuItem : Widget
         f.setMainWidget(getSubmenu());
 
         f.performLayout = delegate void(Widget w1)
-		{
+        {
             auto w = cast(Form) w1;
             auto c = w.getMainWidget();
             if (c)
@@ -183,14 +183,14 @@ class MenuItem : Widget
             }
 
             debug writeln(
-				"popup form performLayout:\n",
-				"   form size : %sx%s\n".format(getWidth(), getHeight()),
+                "popup form performLayout:\n",
+                "   form size : %sx%s\n".format(getWidth(), getHeight()),
                 "   form dsize: %sx%s\n".format(getDesiredWidth(), getDesiredHeight()), !c
 
-				? "   (no child)"
-				: "   child size : %sx%s\n".format(c.getWidth(), c.getHeight())
-				~ "   child dsize: %sx%s\n".format(c.getDesiredWidth(), c.getDesiredHeight())
-				);
+                ? "   (no child)"
+                : "   child size : %sx%s\n".format(c.getWidth(), c.getHeight())
+                ~ "   child dsize: %sx%s\n".format(c.getDesiredWidth(), c.getDesiredHeight())
+                );
         };
 
     }

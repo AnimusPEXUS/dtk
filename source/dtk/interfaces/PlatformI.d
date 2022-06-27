@@ -38,7 +38,7 @@ interface PlatformI
 
     bool getFormCanResizeWindow();
 
-    void init();
+    // void init();
     void mainLoop();
     void destroy();
 

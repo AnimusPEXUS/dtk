@@ -1,67 +1,69 @@
 {
-	"name": "dtk",
-	"description": "A minimal D application.",
-	"copyright": "Copyright © 2021-2022, animuspexus",
 	"authors": [
 		"animuspexus"
 	],
-	"license": "GPLv3",
-	"version": "0.0.0",
-	"dependencies": {
-		"observable": ">=1.0.0"
-	},
-	"sourcePaths": [],
 	"configurations": [
 		{
-			"name": "sdl-desktop",
-			"targetType": "staticLibrary",
-			"sourcePaths": [
-			    "source/backends/sdl_desktop",
-			    "source/fontMGRs",
-			    "source/dtk"
-			],
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
 				"bindbc-sdl": ">=1.0.0",
 				"fontconfig": ">=2.0.0"
 			},
-			"subConfigurations": {
-                                "bindbc-sdl": "static",
-                                "bindbc-freetype": "static"
-                        },
-			"versions": [
-				"SDL_2022",
-				"DTK_PLATFORM_SDL_DESKTOP"
-			],
 			"libs": [
 				"SDL2",
 				"freetype"
+			],
+			"name": "sdl-desktop",
+			"sourcePaths": [
+				"source/backends/sdl_desktop",
+				"source/fontMGRs",
+				"source/dtk"
+			],
+			"subConfigurations": {
+				"bindbc-freetype": "static",
+				"bindbc-sdl": "static"
+			},
+			"targetType": "staticLibrary",
+			"versions": [
+				"SDL_2022",
+				"DTK_PLATFORM_SDL_DESKTOP"
 			]
 		},
 		{
-			"name": "glfw-desktop",
-			"targetType": "staticLibrary",
-			"sourcePaths": [
-			    "source/backends/glfw_desktop",
-			    "source/fontMGRs",
-			    "source/dtk"
-			],
 			"dependencies": {
 				"bindbc-freetype": ">=1.0.2",
 				"bindbc-glfw": ">=1.0.0",
+				"erupted": ">=2.0.0",
 				"fontconfig": ">=2.0.0"
 			},
+			"libs": [
+				"freetype"
+			],
+			"name": "glfw-desktop",
+			"sourcePaths": [
+				"source/backends/glfw_desktop",
+				"source/fontMGRs",
+				"source/dtk"
+			],
 			"subConfigurations": {
-                                "bindbc-glfw": "static",
-                                "bindbc-freetype": "static"
-                        },
+				"bindbc-freetype": "static",
+				"bindbc-glfw": "static"
+			},
+			"targetType": "staticLibrary",
 			"versions": [
 				"GLFW_33",
 				"DTK_PLATFORM_GLFW_DESKTOP"
-			],
-			"libs": [
-				"freetype"
 			]
-		},
+		}
 	],
+	"copyright": "Copyright © 2021-2022, animuspexus",
+	"dependencies": {
+		"erupted": "~>2.1.64",
+		"observable": ">=1.0.0"
+	},
+	"description": "A minimal D application.",
+	"license": "GPLv3",
+	"name": "dtk",
+	"sourcePaths": [],
+	"version": "0.0.0"
 }

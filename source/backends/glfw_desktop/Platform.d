@@ -1,8 +1,27 @@
 module dtk.backends.glfw_desktop.Platform;
 
+import core.sync.mutex;
+
+import std.typecons;
+
 import dtk.interfaces.PlatformI;
+import dtk.interfaces.WindowI;
+import dtk.interfaces.LaFI;
+import dtk.interfaces.FontMgrI;
+import dtk.interfaces.MouseCursorMgrI;
 
 import dtk.types.Event;
+import dtk.types.Property;
+import dtk.types.Widget;
+import dtk.types.EnumWidgetInternalDraggingEventEndReason;
+import dtk.types.EnumWindowDraggingEventEndReason;
+
+import dtk.backends.glfw_desktop.Window;
+
+import dtk.miscs.signal_tools;
+
+import dtk.signal_mixins.Platform;
+
 
 class PlatformEventSpool
 {
@@ -42,12 +61,23 @@ class PlatformEventSpool
         scope (exit) mtx.unlock();
 
         if (eventSpool.length != 0)
-            eventSpool = eventSpool[1..];
+            eventSpool = eventSpool[1..$];
     }
 }
 
+const auto PlatformProperties = cast(PropSetting[])[
+    PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
+    PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
+];
+
+
 class Platform : PlatformI
 {
+
+    mixin mixin_multiple_properties_define!(PlatformProperties);
+    mixin mixin_multiple_properties_forward!(PlatformProperties, false);
+
+    mixin(mixin_PlatformSignals(false));
 
     private __gshared PlatformEventSpool esp;
 
@@ -63,7 +93,7 @@ class Platform : PlatformI
 
     string getDescription()
     {
-        return "GLFW Backend for DTK"
+        return "GLFW Backend for DTK";
     }
 
     LaFI delegate() onGetLaf;
@@ -141,12 +171,12 @@ class Platform : PlatformI
         return false;
     }
 
-    bool haveWindow(GLFWwindow* wp)
+    bool haveWindow(Window* wp)
     {
         return getWindowByWindowPointer(wp) !is null;
     }
 
-    Window getWindowByWindowPointer(GLFWwindow* wp)
+    Window getWindowByWindowPointer(Window* wp)
     {
         foreach (Window w; windows)
         {
@@ -158,39 +188,39 @@ class Platform : PlatformI
         return null;
     }
 
-    void cbGLFWwindowposfun (GLFWwindow *window, int xpos, int ypos)
+    void cbGLFWwindowposfun (Window *window, int xpos, int ypos)
     {
     }
 
-    void cbGLFWwindowsizefun (GLFWwindow *window, int width, int height)
+    void cbGLFWwindowsizefun (Window *window, int width, int height)
     {
     }
 
-    void cbGLFWwindowclosefun (GLFWwindow *window)
+    void cbGLFWwindowclosefun (Window *window)
     {
     }
 
-    void cbGLFWwindowrefreshfun (GLFWwindow *window)
+    void cbGLFWwindowrefreshfun (Window *window)
     {
     }
 
-    void cbGLFWwindowrefreshfun (GLFWwindow *window)
+    void cbGLFWwindowrefreshfun (Window *window)
     {
     }
 
-    void cbGLFWwindowfocusfun (GLFWwindow *window, int focused)
+    void cbGLFWwindowfocusfun (Window *window, int focused)
     {
     }
 
-    void cbGLFWwindowiconifyfun (GLFWwindow *window, int iconified)
+    void cbGLFWwindowiconifyfun (Window *window, int iconified)
     {
     }
 
-    void cbGLFWwindowmaximizefun (GLFWwindow *window, int maximized)
+    void cbGLFWwindowmaximizefun (Window *window, int maximized)
     {
     }
 
-    void cbGLFWframebuffersizefun (GLFWwindow *window, int width, int height)
+    void cbGLFWframebuffersizefun (Window *window, int width, int height)
     {
     }
 
@@ -591,7 +621,7 @@ class Platform : PlatformI
 
     Tuple!(int, string) printGLFWError()
     {
-        auto res = getGLFWError()
+        auto res = getGLFWError();
         return printGLFWError(res);
     }
 

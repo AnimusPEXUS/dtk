@@ -30,8 +30,6 @@ import dtk.backends.sdl_desktop.utils;
 
 import dtk.miscs.signal_tools;
 
-// import dtk.miscs.WindowEventMgr;
-
 import dtk.signal_mixins.Platform;
 
 // TODO: ensure those events are not needed
@@ -43,11 +41,15 @@ immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
 const auto PlatformProperties = cast(PropSetting[])[
     PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
     PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
-    // PropSetting("gsun", "LaFI", "laf", "Laf", "null"),
 ];
 
 class Platform : PlatformI
 {
+
+    mixin mixin_multiple_properties_define!(PlatformProperties);
+    mixin mixin_multiple_properties_forward!(PlatformProperties, false);
+
+    mixin(mixin_PlatformSignals(false));
 
     string getName()
     {
@@ -69,11 +71,6 @@ class Platform : PlatformI
         return true;
     }
 
-    mixin mixin_multiple_properties_define!(PlatformProperties);
-    mixin mixin_multiple_properties_forward!(PlatformProperties, false);
-
-    mixin(mixin_PlatformSignals(false));
-
     private
     {
         Window[] windows;
@@ -83,19 +80,14 @@ class Platform : PlatformI
         SDL_EventType timer500_event_id;
     }
 
-    void init() // TODO: check whatever this function name have special meaning in D
+    this()
     {
         mixin(mixin_multiple_properties_inst(PlatformProperties));
-
-        SDL_Init(SDL_INIT_VIDEO);
-        SDL_version v;
-        SDL_GetVersion(&v);
 
         {
             timer500_event_id = cast(SDL_EventType) SDL_RegisterEvents(1);
             if (timer500_event_id == -1)
                 throw new Exception("Couldn't register 500 ms timer event");
-
         }
 
         version (linux)
@@ -111,6 +103,8 @@ class Platform : PlatformI
         }
 
         setMouseCursorManager(new CursorMgr(this));
+
+        SDL_Init(SDL_INIT_VIDEO);
     }
 
     void destroy()
