@@ -4,6 +4,8 @@ import core.sync.mutex;
 
 import std.typecons;
 
+import bindbc.glfw;
+
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.LaFI;
@@ -13,6 +15,7 @@ import dtk.interfaces.MouseCursorMgrI;
 import dtk.types.Event;
 import dtk.types.Property;
 import dtk.types.Widget;
+import dtk.types.WindowCreationSettings;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 import dtk.types.EnumWindowDraggingEventEndReason;
 
@@ -23,51 +26,16 @@ import dtk.miscs.signal_tools;
 import dtk.signal_mixins.Platform;
 
 
-class PlatformEventSpool
-{
-    private Event*[] eventSpool;
-    private Mutex mtx;
-
-    this()
-    {
-        mtx = new Mutex();
-    }
-
-    void add(Event* e)
-    {
-        mtx.lock();
-        scope (exit) mtx.unlock();
-
-        eventSpool ~= e;
-    }
-
-    // returns null is spool is empty
-    Event* getFirst()
-    {
-        mtx.lock();
-        scope (exit) mtx.unlock();
-
-        Event* ret;
-
-        if (eventSpool.length != 0)
-            ret = eventSpool[0];
-
-        return ret;
-    }
-
-    void delFirst()
-    {
-        mtx.lock();
-        scope (exit) mtx.unlock();
-
-        if (eventSpool.length != 0)
-            eventSpool = eventSpool[1..$];
-    }
-}
 
 const auto PlatformProperties = cast(PropSetting[])[
     PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
-    PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
+    PropSetting(
+        "gsun", 
+        "MouseCursorMgrI", 
+        "mouse_cursor_mgr", 
+        "MouseCursorManager", 
+        "null"
+    ),
 ];
 
 
@@ -79,11 +47,15 @@ class Platform : PlatformI
 
     mixin(mixin_PlatformSignals(false));
 
-    private __gshared PlatformEventSpool esp;
-
-    this()
+    private
     {
-        esp = new PlatformEventSpool();
+        Window[] windows;
+
+        bool stop_flag;
+
+        // SDL_EventType timer500_event_id;
+
+        __gshared PlatformEventSpool esp;
     }
 
     string getName()
@@ -94,6 +66,36 @@ class Platform : PlatformI
     string getDescription()
     {
         return "GLFW Backend for DTK";
+    }
+
+    bool canCreateWindow()
+    {
+        return true;
+    }
+
+    bool getFormCanResizeWindow()
+    {
+        return true;
+    }
+
+    this()
+    {
+        mixin(mixin_multiple_properties_inst(PlatformProperties));
+        esp = new PlatformEventSpool();
+
+        glfwInit();
+    }
+
+    void destroy()
+    {
+        // SDL_Quit();
+    }
+
+    WindowI createWindow(WindowCreationSettings window_settings)
+    {
+        auto w = new Window(window_settings);
+        w.setPlatform(this);
+        return w;
     }
 
     LaFI delegate() onGetLaf;
@@ -122,7 +124,7 @@ class Platform : PlatformI
 
     void addWindow(WindowI win)
     {
-        auto glfw_window = convertWindowItoSDLWindow(win);
+        auto glfw_window = convertWindowItoGLFWWindow(win);
         if (haveWindow(glfw_window))
             return;
         foreach (ref Window w; windows)
@@ -137,13 +139,13 @@ class Platform : PlatformI
 
     void removeWindow(WindowI win)
     {
-        auto glfw_window = convertWindowItoSDLWindow(win);
+        auto glfw_window = convertWindowItoGLFWWindow(win);
         if (!haveWindow(glfw_window))
             return;
         size_t[] indexes;
         foreach (size_t i, ref Window w; windows)
         {
-            if (w == sdl_win)
+            if (w == glfw_window)
                 indexes ~= i;
         }
 
@@ -152,7 +154,7 @@ class Platform : PlatformI
             windows = windows[0 .. i] ~ windows[i + 1 .. $];
         }
 
-        sdl_win.unsetPlatform();
+        glfw_window.unsetPlatform();
     }
 
     bool haveWindow(WindowI win)
@@ -171,16 +173,16 @@ class Platform : PlatformI
         return false;
     }
 
-    bool haveWindow(Window* wp)
+    bool haveWindow(GLFWwindow* glfw_window)
     {
-        return getWindowByWindowPointer(wp) !is null;
+        return getWindow(glfw_window) !is null;
     }
 
-    Window getWindowByWindowPointer(Window* wp)
+    Window getWindow(GLFWwindow* glfw_window)
     {
         foreach (Window w; windows)
         {
-            if (w.glfw_window == wp)
+            if (w.glfw_window == glfw_window)
             {
                 return w;
             }
@@ -188,58 +190,54 @@ class Platform : PlatformI
         return null;
     }
 
-    void cbGLFWwindowposfun (Window *window, int xpos, int ypos)
+    protected void cbGLFWwindowposfun (Window *window, int xpos, int ypos)
     {
     }
 
-    void cbGLFWwindowsizefun (Window *window, int width, int height)
+    protected void cbGLFWwindowsizefun (Window *window, int width, int height)
     {
     }
 
-    void cbGLFWwindowclosefun (Window *window)
+    protected void cbGLFWwindowclosefun (Window *window)
     {
     }
 
-    void cbGLFWwindowrefreshfun (Window *window)
+    protected void cbGLFWwindowrefreshfun (Window *window)
     {
     }
 
-    void cbGLFWwindowrefreshfun (Window *window)
+    protected void cbGLFWwindowfocusfun (Window *window, int focused)
     {
     }
 
-    void cbGLFWwindowfocusfun (Window *window, int focused)
+    protected void cbGLFWwindowiconifyfun (Window *window, int iconified)
     {
     }
 
-    void cbGLFWwindowiconifyfun (Window *window, int iconified)
+    protected void cbGLFWwindowmaximizefun (Window *window, int maximized)
     {
     }
 
-    void cbGLFWwindowmaximizefun (Window *window, int maximized)
-    {
-    }
-
-    void cbGLFWframebuffersizefun (Window *window, int width, int height)
+    protected void cbGLFWframebuffersizefun (Window *window, int width, int height)
     {
     }
 
     void timer500Loop()
     {
-        import core.thread;
-        import core.time;
+        //         import core.thread;
+        //         import core.time;
 
-        //    auto sleep_f = core.thread.osthread.Thread.getThis.sleep;
-        const auto m500 = msecs(500);
-        while (!stop_flag)
-        {
-            Thread.sleep(m500);
-            // sleep_f(m500);
-            auto e = new SDL_Event();
-            e.user = SDL_UserEvent();
-            e.user.type = timer500_event_id;
-            SDL_PushEvent(e);
-        }
+        //         //    auto sleep_f = core.thread.osthread.Thread.getThis.sleep;
+        //         const auto m500 = msecs(500);
+        //         while (!stop_flag)
+        //         {
+        //             Thread.sleep(m500);
+        //             // sleep_f(m500);
+        //             auto e = new SDL_Event();
+        //             e.user = SDL_UserEvent();
+        //             e.user.type = timer500_event_id;
+        //             SDL_PushEvent(e);
+        //         }
     }
 
     void mainLoop()

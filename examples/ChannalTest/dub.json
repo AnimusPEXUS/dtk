@@ -1,0 +1,16 @@
+{
+    "authors": [
+        "Animus Pexus"
+    ],
+        "dependencies": {
+            "dtk": ">=0.0.0"
+        },
+        "subConfigurations": {
+            "dtk": "sdl-desktop"
+        },
+    "copyright": "Copyright © 2022, Animus Pexus",
+    "description": "A minimal D application.",
+    "license": "proprietary",
+    "name": "test",
+    "targetType": "executable"
+}

@@ -51,6 +51,15 @@ class Platform : PlatformI
 
     mixin(mixin_PlatformSignals(false));
 
+    private
+    {
+        Window[] windows;
+
+        bool stop_flag;
+
+        SDL_EventType timer500_event_id;
+    }
+
     string getName()
     {
         return "SDL-Desktop";
@@ -69,15 +78,6 @@ class Platform : PlatformI
     bool getFormCanResizeWindow()
     {
         return true;
-    }
-
-    private
-    {
-        Window[] windows;
-
-        bool stop_flag;
-
-        SDL_EventType timer500_event_id;
     }
 
     this()
