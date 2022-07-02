@@ -9,6 +9,8 @@ import dtk.miscs.Channel;
 // more documentation
 // https://tour.dlang.org/tour/en/multithreading/synchronization-sharing
 
+const THREADS_NUMBER_TO_TEST = 10;
+
 void prt(string s)
 {
     synchronized
@@ -17,21 +19,22 @@ void prt(string s)
     }
 }
 
-void sf1(shared(Channel!int) c)
+void sf1(shared (Channel!int) c, Tid parentId)
 {
-    while(true)
+    prt("sf1 entered");
+
+    for (int i = 0; i != THREADS_NUMBER_TO_TEST; i++)
     {
+        prt("pull: going to pull %drd value".format(i));
         int r = c.pull();
-        prt("pull: %s".format(r));
-        if (r == 101)
-        {
-            prt("pull: exiting");
-            break;
-        }
     }
+
+    prt("sf1 loop ended");
+
+    parentId.send(0);
 }
 
-void sf2(shared(Channel!int) c, int x)
+void sf2(shared (Channel!int) c, int x)
 {
     prt("push: %s".format(x));
     c.push(x);
@@ -39,18 +42,61 @@ void sf2(shared(Channel!int) c, int x)
 
 void main()
 {
-    shared (Channel!int) c = new shared (Channel!int)();
+    shared (Channel!int)  c = new shared (Channel!int)();
 
-    auto t = spawn(&sf1, c);
+    shared int ret_sf1;
 
-    Tid[] tids;
+    spawn(&sf1, c, thisTid);
 
-    for (int i = 0; i != 100; i++)
+    for (int i = 0; i != THREADS_NUMBER_TO_TEST; i++)
     {
-        auto tt = spawn(&sf2, c, i);
-
-        tids ~= tt;
+        spawn(&sf2, c, i);
+        prt("spawned push #%d thread".format(i));
     }
+    prt("   spawn push break");
 
-    c.push(101);
+    prt("waiting for pulling thread");
+
+    receive(
+        (int x) { ret_sf1 = x;}
+    );
+
+    prt("main exit (ret_sf1 %d)".format(ret_sf1));
 }
+
+// void prt(string s)
+// {
+//     synchronized
+//     {
+//         writeln(s);
+//     }
+// }
+
+// void sf1(Channel!int c)
+// {
+//     while(true)
+//     {
+//         int r = c.pull();
+//         prt("pull: %s".format(r));
+//     }
+// }
+
+// void sf2(Channel!int c, int x)
+// {
+//     prt("push: %s".format(x));
+//     c.push(x);
+// }
+
+// void main()
+// {
+//     __gshared Channel!int c = new Channel!int();
+
+//     spawn(&sf1, c);
+
+//     int i;
+//     while(true)
+//     {
+//         spawn(&sf2, c, i);
+//         i++;
+//     }
+// }
