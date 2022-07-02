@@ -9,7 +9,7 @@ import dtk.miscs.Channel;
 // more documentation
 // https://tour.dlang.org/tour/en/multithreading/synchronization-sharing
 
-const THREADS_NUMBER_TO_TEST = 10;
+const THREADS_NUMBER_TO_TEST = 50;
 
 void prt(string s)
 {
