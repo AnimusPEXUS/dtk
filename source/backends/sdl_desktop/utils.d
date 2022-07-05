@@ -15,7 +15,7 @@ import dtk.types.EventKeyboard;
 import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 
-import dtk.backends.sdl_desktop.sdlkeyconversion;
+import dtk.backends.sdl_desktop.keyconversion;
 
 Event* convertSDLEventToEvent(SDL_Event* event)
 {

@@ -6,7 +6,7 @@ import std.file;
 import std.csv;
 import std.format;
 
-import generate_templates;
+import generator_utils;
 
 int main()
 {
@@ -34,7 +34,7 @@ int main()
 
     fout.rawWrite("enum EnumKeyboardKeyCode\n{\n");
 
-    mixin makecsvreader;
+    auto reader = makecsvreader(keyinfo_csv);
     /* auto reader = makecsvreader(keyinfo_csv); */
     bool skipped = false;
     main_loop: foreach (row; reader)
@@ -50,7 +50,7 @@ int main()
             break;
         case "":
             continue main_loop;
-        case ".":
+        case "++++++ (generation ends here) ++++++":
             break main_loop;
         }
         fout.rawWrite(format("    %s,\n", row[TableColumns.COLUMN_BUTTONS]));
