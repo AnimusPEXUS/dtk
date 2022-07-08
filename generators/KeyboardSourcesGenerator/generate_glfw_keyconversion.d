@@ -33,7 +33,7 @@ string generate_convertGLWFKeycodeToEnumKeyboardKeyCode(string keyinfo_csv)
             {
                 cases ~=
                     q{
-                    case GLWF_Keycode.%1$s:
+                    case int.%1$s:
                         return tuple(EnumKeyboardKeyCode.%2$s, cast(Exception) null);
                 }.format(
                     subitem,
@@ -46,7 +46,7 @@ string generate_convertGLWFKeycodeToEnumKeyboardKeyCode(string keyinfo_csv)
     ret =
         q{
             Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(
-                GLWF_Keycode keycode
+                int keycode
             )
             {
                 switch (keycode)
@@ -83,7 +83,7 @@ string generate_convertEnumKeyboardKeyCodeToGLWFKeycode(string keyinfo_csv)
             cases ~=
                 q{
                 case EnumKeyboardKeyCode.%1$s:
-                    return tuple(GLWF_Keycode.%2$s, cast(Exception) null);
+                    return tuple(int.%2$s, cast(Exception) null);
             }.format(
                 row[TableColumns.COLUMN_BUTTONS],
                 row[TableColumns.COLUMN_GLFW_KEYCODE],
@@ -93,14 +93,14 @@ string generate_convertEnumKeyboardKeyCodeToGLWFKeycode(string keyinfo_csv)
 
     ret =
         q{
-            Tuple!(GLWF_Keycode, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(
+            Tuple!(int, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(
                 EnumKeyboardKeyCode keycode
             )
             {
                 switch (keycode)
                 {
                     default:
-                        return tuple(cast(GLWF_Keycode)0, new Exception("keycode not supported"));
+                        return tuple(cast(int)0, new Exception("keycode not supported"));
             %s
                 }
             }

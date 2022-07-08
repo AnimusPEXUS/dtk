@@ -30,6 +30,8 @@ interface WindowI
     // mixin(mixin_ContainerSignals(true));
 
     PlatformI getPlatform();
+    WindowI setPlatform(PlatformI value);
+    WindowI unsetPlatform();
 
     LaFI getLaf();
 
@@ -50,6 +52,9 @@ interface WindowI
 
     DrawingSurfaceI getDrawingSurface();
     DrawingSurfaceI getFormDrawingSurface();
+
+    WindowI setStoredMousePosition(Position2D pos);
+    Position2D getStoredMousePosition();
 
     int getX();
     int getY();

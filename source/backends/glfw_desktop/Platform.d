@@ -26,7 +26,6 @@ import dtk.miscs.signal_tools;
 import dtk.signal_mixins.Platform;
 
 
-
 const auto PlatformProperties = cast(PropSetting[])[
     PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
     PropSetting(
@@ -55,7 +54,7 @@ class Platform : PlatformI
 
         // SDL_EventType timer500_event_id;
 
-        __gshared PlatformEventSpool esp;
+        // __gshared PlatformEventSpool esp;
     }
 
     string getName()
@@ -80,9 +79,7 @@ class Platform : PlatformI
 
     this()
     {
-        mixin(mixin_multiple_properties_inst(PlatformProperties));
-        esp = new PlatformEventSpool();
-
+        super();
         glfwInit();
     }
 
@@ -238,6 +235,10 @@ class Platform : PlatformI
         //             e.user.type = timer500_event_id;
         //             SDL_PushEvent(e);
         //         }
+    }
+    
+    void consumeEvent(Event* e)
+    {
     }
 
     void mainLoop()
@@ -598,16 +599,7 @@ class Platform : PlatformI
         );
     }
 
-//     void windowDraggingEventWidgetStart(
-//         WindowI window,
-//         int initX,
-//         int initY
-//         )
-//     {
-
-//     }
-
-    Tuple!(int, string) getGLFWError()
+    override Tuple!(int, string) getPlatformError()
     {
         import std.string;
         const (char) *txt;
@@ -615,29 +607,6 @@ class Platform : PlatformI
         err = glfwGetError(&txt);
         string ret_str = cast(string)fromStringz(txt);
         return tuple(err, ret_str);
-    }
-
-    Tuple!(int, string) printGLFWError()
-    {
-        auto res = getGLFWError();
-        return printGLFWError(res);
-    }
-
-    Tuple!(int, string) printGLFWError(Tuple!(int, string) input)
-    {
-        if (input[0] == 0)
-        {
-            writeln(
-                "GLFW Error (0) Message: %s".format(
-                    (input[1].length == 0 ? "No Error" : input[1])
-                )
-            );
-        }
-        else
-        {
-            writeln("GLFW Error (%s) Message: %s".format(input[0], input[1]));
-        }
-        return input;
     }
 
 

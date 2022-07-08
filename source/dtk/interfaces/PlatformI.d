@@ -1,5 +1,7 @@
 module dtk.interfaces.PlatformI;
 
+import std.typecons;
+
 import dtk.interfaces.WindowI;
 import dtk.interfaces.LaFI;
 import dtk.interfaces.FontMgrI;
@@ -9,6 +11,7 @@ import dtk.types.WindowCreationSettings;
 import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.Widget;
+import dtk.types.Position2D;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 import dtk.types.EnumWindowDraggingEventEndReason;
 
@@ -27,6 +30,7 @@ interface PlatformI
 
     FontMgrI getFontManager();
     MouseCursorMgrI getMouseCursorManager();
+    Position2D getMouseCursorPosition();
 
     bool canCreateWindow();
 
@@ -63,6 +67,10 @@ interface PlatformI
         Event* e,
         EnumWindowDraggingEventEndReason reason
         );
+
+    Tuple!(int, string) getPlatformError();
+    Tuple!(int, string) printPlatformError();
+    Tuple!(int, string) printPlatformError(Tuple!(int, string) input);
 
     mixin(mixin_PlatformSignals(true));
 }

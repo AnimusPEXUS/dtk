@@ -73,7 +73,7 @@ class CursorMgr : MouseCursorMgrI
             auto sc = SDL_CreateSystemCursor(res);
             if (!sc)
             {
-                platform.printSDLError();
+                platform.printPlatformError();
                 return null;
             }
             csrStorage[res] = sc;

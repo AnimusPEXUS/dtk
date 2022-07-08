@@ -2,6 +2,7 @@ module dtk.backends.sdl_desktop.Platform;
 
 import core.thread.osthread;
 
+import std.typecons;
 import std.format;
 import std.stdio;
 import std.algorithm;
@@ -11,18 +12,21 @@ import std.parallelism;
 import bindbc.sdl;
 
 import dtk.interfaces.LaFI;
-import dtk.interfaces.PlatformI;
+//import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.MouseCursorMgrI;
 
 import dtk.types.EventWindow;
+import dtk.types.Position2D;
 import dtk.types.Event;
 import dtk.types.Widget;
 import dtk.types.Property;
 import dtk.types.WindowCreationSettings;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 import dtk.types.EnumWindowDraggingEventEndReason;
+
+import dtk.prototypes.PlatformPrototype001;
 
 import dtk.backends.sdl_desktop.CursorMgr;
 import dtk.backends.sdl_desktop.Window;
@@ -38,51 +42,46 @@ immutable SDL_WindowEventID[] ignoredSDLWindowEvents = [
     cast(SDL_WindowEventID) 15 //SDL_WINDOWEVENT_TAKE_FOCUS
 ];
 
-const auto PlatformProperties = cast(PropSetting[])[
-    PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
-    PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
-];
+// const auto PlatformProperties = cast(PropSetting[])[
+//     PropSetting("gsun", "FontMgrI", "font_mgr", "FontManager", "null"),
+//     PropSetting("gsun", "MouseCursorMgrI", "mouse_cursor_mgr", "MouseCursorManager", "null"),
+// ];
 
-class Platform : PlatformI
+class Platform : PlatformPrototype001
 {
-
-    mixin mixin_multiple_properties_define!(PlatformProperties);
-    mixin mixin_multiple_properties_forward!(PlatformProperties, false);
-
-    mixin(mixin_PlatformSignals(false));
 
     private
     {
-        Window[] windows;
-
-        bool stop_flag;
-
         SDL_EventType timer500_event_id;
     }
 
-    string getName()
+    override string getName()
     {
         return "SDL-Desktop";
     }
 
-    string getDescription()
+    override string getDescription()
     {
         return "DTK (D ToolKit). on SDL Platform";
     }
 
-    bool canCreateWindow()
+    override bool canCreateWindow()
     {
         return true;
     }
 
-    bool getFormCanResizeWindow()
+    override bool getFormCanResizeWindow()
     {
         return true;
     }
+
+    alias addWindow = PlatformPrototype001.addWindow;
+    alias removeWindow = PlatformPrototype001.removeWindow;
+    alias haveWindow = PlatformPrototype001.haveWindow;
 
     this()
     {
-        mixin(mixin_multiple_properties_inst(PlatformProperties));
+        super();
 
         {
             timer500_event_id = cast(SDL_EventType) SDL_RegisterEvents(1);
@@ -107,108 +106,66 @@ class Platform : PlatformI
         SDL_Init(SDL_INIT_VIDEO);
     }
 
-    void destroy()
+    override void destroy()
     {
         SDL_Quit();
     }
 
-    WindowI createWindow(WindowCreationSettings window_settings)
+    override WindowI createWindow(WindowCreationSettings window_settings)
     {
         auto w = new Window(window_settings);
         w.setPlatform(this);
         return w;
     }
 
-    LaFI delegate() onGetLaf;
-
-    void setOnGetLaf(LaFI delegate() cb)
+    WindowI convertSDLWindowtoWindowI(Window win)
     {
-        onGetLaf = cb;
+        return cast(WindowI) win;
     }
 
-    LaFI getLaf()
+    Window convertWindowItoSDLWindow(WindowI win)
     {
-        if (onGetLaf is null)
-            throw new Exception("onGetLaf is not set");
-        return onGetLaf();
+        return cast(Window) win;
     }
 
-    private Window convertWindowItoSDLWindow(WindowI win)
+    void addWindow(Window win)
     {
-        auto sdl_window = cast(Window) win;
-        if (sdl_window is null)
-        {
-            throw new Exception("not an SDL window");
-        }
-        return sdl_window;
+        auto res = convertSDLWindowtoWindowI(win);
+
+        super.addWindow(res);
     }
 
-    void addWindow(WindowI win)
+    void removeWindow(Window win)
     {
-        auto sdl_win = convertWindowItoSDLWindow(win);
-        if (haveWindow(sdl_win))
-            return;
-        foreach (ref Window w; windows)
-        {
-            if (w == sdl_win)
-                break;
-        }
-        windows ~= sdl_win;
-        if (sdl_win.getPlatform() != this)
-            sdl_win.setPlatform(this);
-    }
+        auto res = convertSDLWindowtoWindowI(win);
 
-    void removeWindow(WindowI win)
-    {
-        auto sdl_win = convertWindowItoSDLWindow(win);
-        if (!haveWindow(sdl_win))
-            return;
-        size_t[] indexes;
-        foreach (size_t i, ref Window w; windows)
-        {
-            if (w == sdl_win)
-                indexes ~= i;
-        }
-
-        foreach_reverse (size_t i; indexes)
-        {
-            windows = windows[0 .. i] ~ windows[i + 1 .. $];
-        }
-
-        sdl_win.unsetPlatform();
-    }
-
-    bool haveWindow(WindowI win)
-    {
-        auto sdl_win = convertWindowItoSDLWindow(win);
-        return haveWindow(sdl_win);
+        super.removeWindow(res);
     }
 
     bool haveWindow(Window win)
     {
-        foreach (ref Window w; windows)
-        {
-            if (w == win)
-                return true;
-        }
-        return false;
+        auto res = convertSDLWindowtoWindowI(win);
+
+        return super.haveWindow(res);
     }
 
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)
     {
         Window ret;
-        foreach (Window w; windows)
+        // foreach (WindowI w; getWindowIArray())
+        foreach (WindowI w; windows)
         {
-            if (w.sdl_window_id == windowID)
+            auto w_w = cast(Window)w;
+
+            if (!w_w)
+                throw new Exception("can't cast WindowI to Window (of SDL backend)");
+
+            if (w_w.sdl_window_id == windowID)
             {
-                ret = w;
+                ret = w_w;
                 break;
             }
         }
-        /* if (ret is null)
-        {
-            throw new Exception("got event for unregistered window");
-        } */
         return ret;
     }
 
@@ -230,7 +187,7 @@ class Platform : PlatformI
         }
     }
 
-    void mainLoop()
+    override void mainLoop()
     {
         import std.parallelism;
 
@@ -270,7 +227,7 @@ class Platform : PlatformI
             {
                 if (cast(SDL_EventType) sdl_event.user.type == timer500_event_id)
                 {
-                    signal_timer500.emit();
+                    emitSignal_Timer500();
                 }
             }
             else
@@ -309,6 +266,7 @@ class Platform : PlatformI
                     w = getWindowByWindowID(sdl_event.text.windowID);
                     break;
                 case SDL_QUIT:
+                    stop_flag = true;
                     break main_loop;
                 }
 
@@ -324,290 +282,50 @@ class Platform : PlatformI
                     debug writeln("convertSDLEventToEvent returned null: ignoring");
                     continue main_loop;
                 }
-                e.window = w;
 
-                if (w && e.window) {
-                    if (e.type == EventType.mouse && e.em.type == EventMouseType.movement)
-                    {
-                        // TODO: save relative values too?
-                        w.mouseX = e.em.x;
-                        w.mouseY = e.em.y;
-                    }
-
-                    {
-                        e.mouseX = w.mouseX;
-                        e.mouseY = w.mouseY;
-                    }
-                }
-
-                if (widgetInternalDraggingEventActive)
-                {
-                    if (widgetInternalDraggingEventStopCheck is null)
-                    {
-                        debug writeln("error: widgetInternalDraggingEventStopCheck is null");
-                        widgetInternalDraggingEventEnd(e,
-                                EnumWidgetInternalDraggingEventEndReason.abort);
-                        continue main_loop;
-                    }
-                    if (widgetInternalDraggingEventWidget is null)
-                    {
-                        debug writeln("error: widgetInternalDraggingEventWidget is null");
-                        widgetInternalDraggingEventEnd(e,
-                                EnumWidgetInternalDraggingEventEndReason.abort);
-                        continue main_loop;
-                    }
-                    {
-                        auto res_drag_stop_check = widgetInternalDraggingEventStopCheck(e);
-                        debug writeln("res_drag_stop_check == %s".format(res_drag_stop_check));
-                        if (res_drag_stop_check != EnumWidgetInternalDraggingEventEndReason.notEnd)
-                        {
-                            widgetInternalDraggingEventEnd(e, res_drag_stop_check);
-                            continue main_loop;
-                        }
-                    }
-
-                    if (e.type == EventType.mouse && e.em.type == EventMouseType.movement)
-                    {
-                        widgetInternalDraggingEventWidget.intInternalDraggingEvent(
-                            widgetInternalDraggingEventWidget,
-                            widgetInternalDraggingEventInitX,
-                            widgetInternalDraggingEventInitY,
-                            e.mouseX,
-                            e.mouseY,
-                            e.mouseX - widgetInternalDraggingEventInitX,
-                            e.mouseY - widgetInternalDraggingEventInitY
-                            );
-                    }
-
-                    continue main_loop;
-                }
-
-                if (windowDraggingEventActive)
-                {
-                    if (windowDraggingEventStopCheck is null)
-                    {
-                        debug writeln("error: windowDraggingEventStopCheck is null");
-                        windowDraggingEventEnd(e, EnumWindowDraggingEventEndReason.abort);
-                        continue main_loop;
-                    }
-                    if (windowDraggingEventWindow is null)
-                    {
-                        debug writeln("error: windowDraggingEventWindow is null");
-                        windowDraggingEventEnd(e, EnumWindowDraggingEventEndReason.abort);
-                        continue main_loop;
-                    }
-                    {
-                        auto res_drag_stop_check = windowDraggingEventStopCheck(e);
-                        debug writeln("res_drag_stop_check == %s".format(res_drag_stop_check));
-                        if (res_drag_stop_check != EnumWindowDraggingEventEndReason.notEnd)
-                        {
-                            windowDraggingEventEnd(e, res_drag_stop_check);
-                            continue main_loop;
-                        }
-                    }
-
-                    if (e.type == EventType.mouse && e.em.type == EventMouseType.movement)
-                    {
-                        intWindowDraggingEvent(
-                            // windowDraggingEventWindow,
-                            // e.mouseX,
-                            // e.mouseY,
-                            // e.mouseX - windowDraggingEventInitX,
-                            // e.mouseY - windowDraggingEventInitY
-                            );
-                    }
-
-                    continue main_loop;
-                }
-
-                emitSignal_Event(e);
+                consumeEvent(e);
             }
         }
+
+        stop_flag = true;
 
         return;
     }
 
-    private
-    {
-        bool widgetInternalDraggingEventActive;
-        Widget widgetInternalDraggingEventWidget;
-        EnumWidgetInternalDraggingEventEndReason
-            delegate(Event* e) widgetInternalDraggingEventStopCheck;
-        int widgetInternalDraggingEventInitX;
-        int widgetInternalDraggingEventInitY;
-    }
-
-    void widgetInternalDraggingEventStart(
-        Widget widget,
-        int initX,
-        int initY,
-        EnumWidgetInternalDraggingEventEndReason
-            delegate(Event* e) widgetInternalDraggingEventStopCheck
-        )
-    {
-        assert(widget !is null);
-        assert(widgetInternalDraggingEventStopCheck !is null);
-
-        SDL_CaptureMouse(SDL_TRUE);
-
-        widgetInternalDraggingEventInitX = initX;
-        widgetInternalDraggingEventInitY = initY;
-
-        widgetInternalDraggingEventWidget = widget;
-
-        this.widgetInternalDraggingEventStopCheck =
-            widgetInternalDraggingEventStopCheck;
-
-        widgetInternalDraggingEventActive = true;
-
-        assert(widgetInternalDraggingEventWidget !is null);
-        assert(this.widgetInternalDraggingEventStopCheck !is null);
-
-        widgetInternalDraggingEventWidget.intInternalDraggingEventStart(
-                widgetInternalDraggingEventWidget,
-                initX, initY
-                );
-    }
-
-    void widgetInternalDraggingEventEnd(
-        Event* e,
-        EnumWidgetInternalDraggingEventEndReason reason
-        )
-    {
-        debug writeln("widgetInternalDraggingEventEnd end");
-        if (reason == EnumWidgetInternalDraggingEventEndReason.notEnd)
-        {
-            return;
-        }
-
-        SDL_CaptureMouse(SDL_FALSE);
-
-        widgetInternalDraggingEventWidget.intInternalDraggingEventEnd(
-                widgetInternalDraggingEventWidget,
-                reason,
-                widgetInternalDraggingEventInitX,
-                widgetInternalDraggingEventInitY,
-                e.mouseX,
-                e.mouseY,
-                e.mouseX - widgetInternalDraggingEventInitX,
-                e.mouseY - widgetInternalDraggingEventInitY
-                );
-
-        widgetInternalDraggingEventActive = false;
-        widgetInternalDraggingEventWidget = null;
-        this.widgetInternalDraggingEventStopCheck = null;
-        debug writeln("widgetInternalDraggingEventEnd end");
-    }
-
-    private
-    {
-        bool windowDraggingEventActive;
-
-        Window windowDraggingEventWindow;
-
-        EnumWindowDraggingEventEndReason
-            delegate(Event* e) windowDraggingEventStopCheck;
-
-        int windowDraggingEventInitX;
-        int windowDraggingEventInitY;
-        int windowDraggingEventCursorInitX;
-        int windowDraggingEventCursorInitY;
-    }
-
-    void windowDraggingEventStart(
-        WindowI window,
-        EnumWindowDraggingEventEndReason
-            delegate(Event* e) windowDraggingEventStopCheck
-        )
+    override void beforeWidgetInternalDraggingEventStart()
     {
         SDL_CaptureMouse(SDL_TRUE);
-
-        windowDraggingEventWindow = cast(Window)window;
-
-        // TODO: work on result
-        SDL_GetWindowPosition(
-            windowDraggingEventWindow.sdl_window,
-            &windowDraggingEventInitX,
-            &windowDraggingEventInitY,
-        );
-
-        // TODO: work on result
-        SDL_GetGlobalMouseState(
-            &windowDraggingEventCursorInitX,
-            &windowDraggingEventCursorInitY,
-        );
-
-        this.windowDraggingEventStopCheck = windowDraggingEventStopCheck;
-
-        windowDraggingEventActive = true;
-
-        assert(windowDraggingEventWindow !is null);
-        assert(windowDraggingEventStopCheck !is null);
     }
 
-    void windowDraggingEventEnd(
-        Event* e,
-        EnumWindowDraggingEventEndReason reason
-        )
+    override void beforeWidgetInternalDraggingEventEnd()
     {
-        if (reason == EnumWindowDraggingEventEndReason.notEnd)
-        {
-            return;
-        }
-
         SDL_CaptureMouse(SDL_FALSE);
-
-        windowDraggingEventActive = false;
-        windowDraggingEventWindow = null;
-        windowDraggingEventStopCheck = null;
-        debug writeln("windowDraggingEventEnd end");
     }
 
-    void intWindowDraggingEvent(
-        // WindowI window,
-        //int initX,
-        //int initY,
-        // int x,
-        // int y,
-        // int relX,
-        // int relY
-        )
+    override void beforeWindowDraggingEventStart()
     {
-        // TODO: todo
-        int x;
-        int y;
-
-        SDL_GetGlobalMouseState(&x, &y);
-
-        debug writeln("SDL_GetGlobalMouseState %sx%s".format(x, y));
-
-        SDL_SetWindowPosition(
-            windowDraggingEventWindow.sdl_window,
-            windowDraggingEventInitX - (windowDraggingEventCursorInitX - x),
-            windowDraggingEventInitY - (windowDraggingEventCursorInitY - y),
-        );
+        SDL_CaptureMouse(SDL_TRUE);
     }
 
-//     void windowDraggingEventWidgetStart(
-//         WindowI window,
-//         int initX,
-//         int initY
-//         )
-//     {
+    override void beforeWindowDraggingEventEnd()
+    {
+        SDL_CaptureMouse(SDL_FALSE);
+    }
 
-//     }
-
-    string getSDLError()
+    override Tuple!(int, string) getPlatformError()
     {
         import std.string;
         const (char) *err = SDL_GetError();
         string ret = cast(string)fromStringz(err);
+        return tuple(cast(int) err, ret);
+    }
+
+    override Position2D getMouseCursorPosition()
+    {
+        Position2D ret;
+        SDL_GetMouseState(&ret.x, &ret.y);
         return ret;
     }
 
-    void printSDLError()
-    {
-        writeln("SDL Error Message: %s".format(getSDLError()));
-    }
 
 }

@@ -48,7 +48,7 @@ import dtk.wm.WindowDecoration;
 // import dtk.signal_mixins.Window;
 
 const auto WindowProperties = cast(PropSetting[])[
-    PropSetting("gsun", "Platform", "platform", "Platform", "null"),
+    PropSetting("gsun", "PlatformI", "platform", "Platform", "null"),
     PropSetting("gsun", "Form", "form", "Form", "null"),
     PropSetting("gsun", "WindowDecoration", "artificalWD", "ArtificalWD", "null"),
     PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", "null"),
@@ -56,10 +56,14 @@ const auto WindowProperties = cast(PropSetting[])[
     PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
     PropSetting("gs_w_d", "dstring", "title", "Title", q{""d}),
+    PropSetting("gs", "Position2D", "storedMousePosition", "StoredMousePosition", "null"),
 ];
 
 class Window : WindowI
 {
+
+    mixin mixin_multiple_properties_define!(WindowProperties);
+    mixin mixin_multiple_properties_forward!(WindowProperties, false);
 
     // TODO: maybe this shouldn't be public
     public
@@ -82,9 +86,6 @@ class Window : WindowI
 
         SignalConnection platform_signal_connection;
     }
-
-    mixin mixin_multiple_properties_define!(WindowProperties);
-    mixin mixin_multiple_properties_forward!(WindowProperties, false);
 
     @disable this();
 
@@ -153,8 +154,8 @@ class Window : WindowI
 
         cs_PlatformChange = connectToPlatform_onAfterChanged(
                 delegate void(
-                    Platform old_value,
-                    Platform new_value
+                    PlatformI old_value,
+                    PlatformI new_value
                     ) {
             collectException({
                 if (old_value == new_value)
@@ -163,12 +164,12 @@ class Window : WindowI
                 platform_signal_connection.disconnect();
 
                 if (old_value !is null)
-                    old_value.removeWindow(this);
+                    old_value.removeWindow(cast(WindowI)this);
 
                 if (new_value !is null)
                 {
-                    if (!new_value.haveWindow(this))
-                        new_value.addWindow(this);
+                    if (!new_value.haveWindow(cast(WindowI)this))
+                        new_value.addWindow(cast(WindowI)this);
                     platform_signal_connection = new_value.connectToSignal_Event(
                         &onPlatformEvent
                         );
@@ -609,7 +610,7 @@ class Window : WindowI
             );
         if (res != 0)
         {
-            getPlatform().printSDLError();
+            getPlatform().printPlatformError();
             debug writeln(
                 "SDL failed to return window border sizes. " ~
                 "forcing artifical decoration usage."
