@@ -2,9 +2,11 @@ module dtk.interfaces.WindowI;
 
 import std.typecons;
 
+import dtk.interfaces.FormI;
+import dtk.interfaces.WindowDecorationI;
+
 import dtk.types.Position2D;
 import dtk.types.Size2D;
-
 import dtk.types.Event;
 import dtk.types.EventWindow;
 import dtk.types.EventKeyboard;
@@ -12,6 +14,7 @@ import dtk.types.EventMouse;
 import dtk.types.EventTextInput;
 import dtk.types.Widget;
 import dtk.types.WindowBorderSizes;
+import dtk.types.ArtificalWDSpawner;
 // import dtk.types.EnumMouseCursor;
 
 import dtk.wm.WindowDecoration;
@@ -35,20 +38,35 @@ interface WindowI
 
     LaFI getLaf();
 
-    WindowI setDebugName(dstring value);
+    typeof(this) setDebugName(dstring value);
     void printParams();
 
     LaFI getForcedLaf();
     WindowI setForcedLaf(LaFI);
     WindowI unsetForcedLaf();
 
-    WindowI setForm(Form form);
+    WindowI setForm(FormI form);
     WindowI unsetForm();
-    Form getForm();
+    FormI getForm();
 
-    WindowI setArtificalWD(WindowDecoration wd);
-    WindowI unsetArtificalWD();
-    WindowDecoration getArtificalWD();
+    typeof(this) setPrefereArtificalWD(bool val);
+    bool getPrefereArtificalWD();
+
+    typeof(this) setPreferedArtificalWDSpawner(ArtificalWDSpawner wds);
+    ArtificalWDSpawner getPreferedArtificalWDSpawner();
+    typeof(this) unsetPreferedArtificalWDSpawner();
+
+    typeof(this) setInstalledArtificalWD(WindowDecorationI wd);
+    WindowDecorationI getInstalledArtificalWD();
+    typeof(this) unsetInstalledArtificalWD();
+
+    void installArtificalWD();
+    void uninstallArtificalWD();
+    void reinstallArtificalWD();
+    bool usingArtificalWD();
+    bool shouldUseArtificalWD();
+
+    ArtificalWDSpawner calcArtificalWDSpawnerToUse();
 
     DrawingSurfaceI getDrawingSurface();
     DrawingSurfaceI getFormDrawingSurface();

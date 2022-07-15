@@ -11,8 +11,9 @@ import bindbc.sdl;
 
 import dtk.interfaces.PlatformI;
 import dtk.interfaces.DrawingSurfaceI;
+import dtk.interfaces.WindowDecorationI;
 
-// import dtk.interfaces.FormI;
+import dtk.interfaces.FormI;
 import dtk.interfaces.WindowI;
 
 // import dtk.interfaces.WindowEventMgrI;
@@ -33,6 +34,7 @@ import dtk.types.EventTextInput;
 import dtk.types.Property;
 import dtk.types.Widget;
 import dtk.types.WindowBorderSizes;
+import dtk.types.ArtificalWDSpawner;
 
 // import dtk.miscs.WindowEventMgr;
 // import dtk.miscs.mixin_event_handler_reg;
@@ -49,14 +51,27 @@ import dtk.wm.WindowDecoration;
 
 const auto WindowProperties = cast(PropSetting[])[
     PropSetting("gsun", "PlatformI", "platform", "Platform", "null"),
-    PropSetting("gsun", "Form", "form", "Form", "null"),
-    PropSetting("gsun", "WindowDecoration", "artificalWD", "ArtificalWD", "null"),
+    PropSetting("gsun", "FormI", "form", "Form", "null"),
+
     PropSetting("gsun", "LaFI", "forced_laf", "ForcedLaf", "null"),
     // PropSetting("gsun", "WindowEventMgrI", "emgr", "WindowEventMgr", "null"),
     PropSetting("gsun", "DrawingSurfaceI", "drawing_surface", "DrawingSurface", "null"),
 
+    // Window Title storage
     PropSetting("gs_w_d", "dstring", "title", "Title", q{""d}),
+
+    // platform uses this to track mouse position on events which doesn't pass
+    // mouse coordinates
     PropSetting("gs", "Position2D", "storedMousePosition", "StoredMousePosition", "null"),
+
+    // set to true to override platform-wide value
+    PropSetting("gs_w_d", "bool", "prefereArtificalWD", "PrefereArtificalWD", q{false}),
+
+    // if this is set - it will be used instead of platform-wide AWD spawner
+    PropSetting("gsun", "ArtificalWDSpawner", "preferedArtificalWDSpawner", "PreferedArtificalWDSpawner", q{}),
+
+    // here is places actuall installed AWD if any
+    PropSetting("gsun", "WindowDecorationI", "installedArtificalWD", "InstalledArtificalWD", q{}),
 ];
 
 class Window : WindowI
@@ -82,7 +97,7 @@ class Window : WindowI
     {
         SignalConnection cs_PlatformChange;
         SignalConnection cs_FormChange;
-        SignalConnection cs_ArtificalWDChange;
+        SignalConnection cs_PreferedArtificalWD;
 
         SignalConnection platform_signal_connection;
     }
@@ -111,6 +126,7 @@ class Window : WindowI
 
         string tt = to!string(window_settings.title);
 
+        debug writeln("SDL_CreateWindow");
         // TODO: check x, y, w, h usage
         sdl_window = SDL_CreateWindow(
             "DTK app window temporary title",
@@ -178,7 +194,7 @@ class Window : WindowI
         });
 
         cs_FormChange = connectToForm_onAfterChanged(
-            delegate void(Form old_value, Form new_value) {
+            delegate void(FormI old_value, FormI new_value) {
             collectException({
                 if (old_value == new_value)
                     return;
@@ -191,22 +207,26 @@ class Window : WindowI
             }());
         });
 
-        cs_ArtificalWDChange = connectToForm_onAfterChanged(
-            delegate void(Form old_value, Form new_value) {
-            collectException({
-                if (old_value == new_value)
-                    return;
+//         cs_PreferedArtificalWD = connectToPreferedArtificalWD_onAfterChanged(
+//             delegate void(
+//                 WindowDecorationI old_value,
+//                 WindowDecorationI new_value
+//             ) {
+//             collectException({
+//                 if (old_value == new_value)
+//                     return;
 
-                if (old_value !is null)
-                    if (old_value.getWindow() == this)
-                        old_value.unsetWindow();
+//                 if (old_value !is null)
+//                     if (old_value.getWindow() == this)
+//                         old_value.unsetWindow();
 
-                if (new_value !is null && new_value.getWindow() != this)
-                    new_value.setWindow(this);
-            }());
-        });
+//                 if (new_value !is null && new_value.getWindow() != this)
+//                     new_value.setWindow(this);
+//             }());
+//         });
 
-        // installArtificalWD();
+        if (window_settings.prefereArtificalWD)
+            installArtificalWD();
     }
 
     Window setDebugName(dstring value)
@@ -220,9 +240,10 @@ class Window : WindowI
         auto ds = getDrawingSurface();
         if (!ds)
             return null;
-        if (isSetArtificalWD())
+
+        if (isSetInstalledArtificalWD())
         {
-            auto bs = getArtificalWD().getBorderSizes();
+            auto bs = getInstalledArtificalWD().getBorderSizes();
             ds = new DrawingSurfaceShift(
                 ds,
                 bs.leftTop.width,
@@ -388,9 +409,9 @@ class Window : WindowI
                     auto pos = Position2D(event.mouseX, event.mouseY);
                     if (isPositionInForm(pos))
                     {
-                        if (isSetArtificalWD())
+                        if (isSetInstalledArtificalWD())
                         {
-                            auto bs = getArtificalWD.getBorderSizes();
+                            auto bs = getInstalledArtificalWD().getBorderSizes();
                             pos = pos.add(Position2D(bs.leftTop.width, bs.leftTop.height));
                         }
                         event.mouseX = pos.x;
@@ -417,7 +438,7 @@ class Window : WindowI
 
     private bool isPositionInForm(Position2D pos)
     {
-        if (!isSetArtificalWD())
+        if (!isSetInstalledArtificalWD())
         {
             return true;
         }
@@ -425,7 +446,7 @@ class Window : WindowI
         {
             WindowBorderSizes bs;
 
-            bs = getArtificalWD().getBorderSizes();
+            bs = getInstalledArtificalWD().getBorderSizes();
 
             auto window_size = getFormSize();
 
@@ -457,7 +478,7 @@ class Window : WindowI
 
     private void sendWindowEventToArtificalWD(Event* e)
     {
-        auto f = getArtificalWD();
+        auto f = getInstalledArtificalWD();
         if (f)
         {
             debug writeln("sendWindowEventToArtificalWD");
@@ -477,7 +498,7 @@ class Window : WindowI
 
     private void sendNonWindowEventToArtificalWD(Event* e)
     {
-        auto f = getArtificalWD();
+        auto f = getInstalledArtificalWD();
         if (f)
         {
             debug writeln("sendNonWindowEventToArtificalWD");
@@ -510,11 +531,11 @@ class Window : WindowI
 
     void redraw()
     {
-        if (isSetArtificalWD())
+        if (isSetInstalledArtificalWD())
         {
             auto exc = collectException(
                 {
-                    getArtificalWD().redraw();
+                    getInstalledArtificalWD().redraw();
                 }()
                 );
             debug if (exc)
@@ -571,22 +592,9 @@ class Window : WindowI
                 );
     }
 
-    void installArtificalWD()
-    {
-        if (!isSetArtificalWD())
-        {
-            auto size = getFormSize();
-            auto pos = getFormPosition();
-            SDL_SetWindowBordered(sdl_window, SDL_FALSE);
-            setArtificalWD(new WindowDecoration(this));
-            setFormSize(size);
-            setFormPosition(pos);
-        }
-    }
-
     bool isBorderless()
     {
-        return isSDLBorderless() && (isUnsetArtificalWD());
+        return isSDLBorderless() && (!isSetInstalledArtificalWD());
     }
 
     private bool isSDLBorderless()
@@ -627,9 +635,9 @@ class Window : WindowI
     {
         WindowBorderSizes ret;
 
-        if (isSetArtificalWD())
+        if (isSetInstalledArtificalWD())
         {
-            auto t = getArtificalWD().getBorderSizes();
+            auto t = getInstalledArtificalWD().getBorderSizes();
             ret.leftTop = ret.leftTop.add(t.leftTop);
             ret.rightBottom = ret.rightBottom.add(t.rightBottom);
         }
@@ -686,9 +694,9 @@ class Window : WindowI
     {
         Position2D pos;
         SDL_GetWindowPosition(this.sdl_window, &(pos.x), &(pos.y));
-        /* if (isSetArtificalWD())
+        /* if (zyxuq())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = abcdefg().getBorderSizes();
             pos = pos.sub(
                     awdbs.leftTop.width,
                     awdbs.leftTop.height
@@ -709,9 +717,9 @@ class Window : WindowI
     {
         Size2D size;
         SDL_GetWindowSize(this.sdl_window, &(size.width), &(size.height));
-        /* if (isSetArtificalWD())
+        /* if (zyxuq())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = abcdefg().getBorderSizes();
             size = size.add(awdbs.leftTop);
             size = size.add(awdbs.rightBottom);
         } */
@@ -728,9 +736,9 @@ class Window : WindowI
     {
         Position2D pos;
         SDL_GetWindowPosition(this.sdl_window, &(pos.x), &(pos.y));
-        if (isSetArtificalWD())
+        if (isSetInstalledArtificalWD())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = getInstalledArtificalWD().getBorderSizes();
             pos = pos.add(
                     awdbs.leftTop.width,
                     awdbs.leftTop.height
@@ -743,9 +751,9 @@ class Window : WindowI
     {
         Size2D size;
         SDL_GetWindowSize(this.sdl_window, &(size.width), &(size.height));
-        if (isSetArtificalWD())
+        if (isSetInstalledArtificalWD())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = getInstalledArtificalWD().getBorderSizes();
             size = size.sub(awdbs.leftTop);
             size = size.sub(awdbs.rightBottom);
         }
@@ -754,9 +762,9 @@ class Window : WindowI
 
     Window setPosition(Position2D pos)
     {
-        /* if (isSetArtificalWD())
+        /* if (zyxuq())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = abcdefg().getBorderSizes();
             pos = pos.add(
                     awdbs.leftTop.width,
                     awdbs.leftTop.height
@@ -788,9 +796,9 @@ class Window : WindowI
 
     Window setFormPosition(Position2D pos)
     {
-        if (isSetArtificalWD())
+        if (isSetInstalledArtificalWD())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = getInstalledArtificalWD().getBorderSizes();
             pos = pos.sub(
                     awdbs.leftTop.width,
                     awdbs.leftTop.height
@@ -802,9 +810,9 @@ class Window : WindowI
 
     Window setFormSize(Size2D size)
     {
-        if (isSetArtificalWD())
+        if (isSetInstalledArtificalWD())
         {
-            auto awdbs = getArtificalWD().getBorderSizes();
+            auto awdbs = getInstalledArtificalWD().getBorderSizes();
             size = size.add(awdbs.leftTop);
             size = size.add(awdbs.rightBottom);
         }
@@ -818,4 +826,59 @@ class Window : WindowI
         SDL_GetWindowSize(this.sdl_window, &(size.width), &(size.height));
         return size;
     }
+
+    void installArtificalWD()
+    {
+        setPrefereArtificalWD(true);
+        auto wd_spawner = calcArtificalWDSpawnerToUse();
+        if (!wd_spawner)
+            throw new Exception("got null instead of ArtificalWDSpawner");
+        auto wd = wd_spawner(this);
+        setInstalledArtificalWD(wd);
+    }
+
+    void uninstallArtificalWD()
+    {
+        unsetInstalledArtificalWD();
+    }
+
+    void reinstallArtificalWD()
+    {
+        uninstallArtificalWD();
+        installArtificalWD();
+    }
+
+    bool usingArtificalWD()
+    {
+        return isSetInstalledArtificalWD();
+    }
+
+    // calculates true if Window should use AWD at all.
+    bool shouldUseArtificalWD()
+    {
+        if (getPrefereArtificalWD())
+            return true;
+        auto p = getPlatform();
+        if (!p)
+            return false;
+        if (p.getPrefereArtificalWD())
+            return true;
+        return false;
+    }
+
+    // this should not include installedAWD. it should be used to determine
+    // AWD to be installed
+    ArtificalWDSpawner calcArtificalWDSpawnerToUse()
+    {
+        if (!shouldUseArtificalWD())
+            return null;
+        if (isSetPreferedArtificalWDSpawner())
+            return getPreferedArtificalWDSpawner();
+        auto p = getPlatform();
+        if (!p)
+            return null;
+        return p.getPreferedArtificalWDSpawner();
+    }
 }
+// isSetInstalledArtificalWD
+// getInstalledArtificalWD

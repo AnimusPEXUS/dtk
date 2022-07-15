@@ -36,4 +36,6 @@ struct WindowCreationSettings
     bool inputGrabbed;
     bool allowHighdpi;
     bool popupMenu;
+
+    bool prefereArtificalWD;
 }

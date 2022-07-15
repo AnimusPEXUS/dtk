@@ -10,19 +10,12 @@ import std.typecons;
 import std.exception;
 import std.datetime;
 
-import observable.signal;
+//import observable.signal;
 
 import dtk.interfaces.WindowI;
-
-// import dtk.interfaces.FormI;
+import dtk.interfaces.FormI;
 import dtk.interfaces.LaFI;
-
-// import dtk.interfaces.Widget;
 import dtk.interfaces.DrawingSurfaceI;
-
-//import dtk.interfaces.Widget;
-// import dtk.interfaces.Widget;
-// import dtk.interfaces.LayoutI;
 
 import dtk.types.Position2D;
 import dtk.types.Size2D;
@@ -53,7 +46,7 @@ const auto FormProperties = cast(PropSetting[])[
     PropSetting("gsun", "Widget", "defaultWidget", "DefaultWidget", ""),
 ];
 
-class Form : Widget
+class Form : Widget, FormI
 {
     mixin(mixin_FormSignals(false));
     mixin mixin_multiple_properties_define!(FormProperties);
@@ -75,13 +68,35 @@ class Form : Widget
         SignalConnection sc_formEventHandler;
     }
 
+    // alias getDesiredWidth = Widget.getDesiredWidth;
+    // alias getDesiredHeight = Widget.getDesiredHeight;
+
+    override int getDesiredWidth()
+    {
+        return super.getDesiredWidth();
+    }
+
+    override int getDesiredHeight()
+    {
+        return super.getDesiredHeight();
+    }
+
+    override void redraw()
+    {
+        super.redraw();
+    }
+
     this()
     {
         mixin(mixin_multiple_properties_inst(FormProperties));
 
         setFocusedWidget(this);
 
-        sc_windowChange = connectToWindow_onAfterChanged(delegate void(WindowI o, WindowI n) {
+        sc_windowChange = connectToWindow_onAfterChanged(
+            delegate void(
+                WindowI o,
+                WindowI n
+            ) {
             // TODO: simplify this
             collectException({
                 debug writeln("Form window changed from ", o, " to ", n);
@@ -96,8 +111,6 @@ class Form : Widget
                 {
                     if (o.getForm() == this)
                         o.unsetForm();
-                    if (o.getArtificalWD() == this)
-                        o.unsetArtificalWD();
                 }
 
                 if (n !is null)
@@ -247,7 +260,7 @@ class Form : Widget
         }());
     }
 
-    void windowEventReceiver(Event* event) nothrow
+    void windowEventReceiver(Event* event)
     {
         collectException({
             auto e = collectException({

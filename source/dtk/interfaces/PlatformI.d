@@ -6,6 +6,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.LaFI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.MouseCursorMgrI;
+import dtk.interfaces.WindowDecorationI;
 
 import dtk.types.WindowCreationSettings;
 import dtk.types.Event;
@@ -14,6 +15,7 @@ import dtk.types.Widget;
 import dtk.types.Position2D;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 import dtk.types.EnumWindowDraggingEventEndReason;
+import dtk.types.ArtificalWDSpawner;
 
 
 import dtk.miscs.signal_tools;
@@ -25,12 +27,20 @@ interface PlatformI
     string getName();
     string getDescription();
 
-    void setOnGetLaf(LaFI delegate());
+    typeof(this) setOnGetLaf(LaFI delegate());
     LaFI getLaf();
 
     FontMgrI getFontManager();
     MouseCursorMgrI getMouseCursorManager();
     Position2D getMouseCursorPosition();
+
+    typeof(this) setPrefereArtificalWD(bool val);
+    bool getPrefereArtificalWD();
+
+    typeof(this) setPreferedArtificalWDSpawner(ArtificalWDSpawner wds);
+    ArtificalWDSpawner getPreferedArtificalWDSpawner();
+
+    // WindowDecorationI calcArtificalWD();
 
     bool canCreateWindow();
 

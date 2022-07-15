@@ -113,6 +113,8 @@ class Platform : PlatformPrototype001
 
     override WindowI createWindow(WindowCreationSettings window_settings)
     {
+        if (getPrefereArtificalWD())
+            window_settings.prefereArtificalWD = true;
         auto w = new Window(window_settings);
         w.setPlatform(this);
         return w;
@@ -132,21 +134,21 @@ class Platform : PlatformPrototype001
     {
         auto res = convertSDLWindowtoWindowI(win);
 
-        super.addWindow(res);
+        addWindow(res);
     }
 
     void removeWindow(Window win)
     {
         auto res = convertSDLWindowtoWindowI(win);
 
-        super.removeWindow(res);
+        removeWindow(res);
     }
 
     bool haveWindow(Window win)
     {
         auto res = convertSDLWindowtoWindowI(win);
 
-        return super.haveWindow(res);
+        return haveWindow(res);
     }
 
     Window getWindowByWindowID(typeof(SDL_WindowEvent.windowID) windowID)
@@ -193,7 +195,7 @@ class Platform : PlatformPrototype001
 
         ulong main_thread_id = core.thread.osthread.Thread.getThis().id;
 
-        SDL_Event* sdl_event = new SDL_Event;
+        SDL_Event sdl_event;
 
         auto timer500 = task(&timer500Loop);
         timer500.executeInNewThread();
@@ -208,7 +210,7 @@ class Platform : PlatformPrototype001
         main_loop: while (!stop_flag)
         {
             debug writeln("---------------------------- new iteration");
-            auto res = SDL_WaitEvent(sdl_event);
+            auto res = SDL_WaitEvent(&sdl_event);
 
             if (res == 0) // TODO: use GetError()
             {
@@ -276,7 +278,7 @@ class Platform : PlatformPrototype001
                     // continue main_loop;
                 }
 
-                auto e = convertSDLEventToEvent(sdl_event);
+                auto e = convertSDLEventToEvent(&sdl_event);
                 if (e is null)
                 {
                     debug writeln("convertSDLEventToEvent returned null: ignoring");

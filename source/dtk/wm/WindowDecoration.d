@@ -3,9 +3,11 @@ module dtk.wm.WindowDecoration;
 import std.stdio;
 import std.format;
 import std.typecons;
+import std.exception;
 
 import dtk.interfaces.LaFI;
 import dtk.interfaces.WindowI;
+import dtk.interfaces.WindowDecorationI;
 import dtk.interfaces.DrawingSurfaceI;
 
 import dtk.types.WindowBorderSizes;
@@ -31,6 +33,7 @@ import dtk.widgets.Button;
 import dtk.widgets.TextEntry;
 // import dtk.widgets.Image;
 
+import dtk.miscs.signal_tools;
 import dtk.miscs.isPointInRegion;
 
 const auto WindowDecorationProperties = cast(PropSetting[])[
@@ -40,7 +43,7 @@ const auto WindowDecorationProperties = cast(PropSetting[])[
     PropSetting("gsun", "Widget", "defaultWidget", "DefaultWidget", ""),
 ];
 
-class WindowDecoration : Form
+class WindowDecoration : Form, WindowDecorationI
 {
     mixin mixin_multiple_properties_define!(WindowDecorationProperties);
     mixin mixin_multiple_properties_forward!(WindowDecorationProperties, true);
@@ -54,6 +57,11 @@ class WindowDecoration : Form
     WidgetChild menuButton;
 
     Chicago98Laf laf;
+
+    private
+    {
+        SignalConnection sc_windowChange;
+    }
 
     this(WindowI window)
     {
@@ -75,6 +83,38 @@ class WindowDecoration : Form
         buttonMaximize.setParent(this);
         buttonMinimize.setParent(this);
         menuButton.setParent(this); */
+
+        sc_windowChange = connectToWindow_onAfterChanged(
+            delegate void(
+                WindowI o,
+                WindowI n
+            ) {
+            // TODO: simplify this
+            collectException({
+                debug writeln("WindowDecoration window changed from ", o, " to ", n);
+
+                if (o == n)
+                    return;
+
+                // sc_windowOtherEvents.disconnect();
+                // sc_windowEvents.disconnect();
+
+                if (o !is null)
+                {
+                    if (o.getInstalledArtificalWD() == this)
+                        o.unsetInstalledArtificalWD();
+                }
+
+                if (n !is null)
+                {
+                    // sc_windowOtherEvents = n.connectToSignal_OtherEvents(&onWindowOtherEvent);
+                    // sc_windowEvents = n.connectToSignal_WindowEvents(&onWindowEvent);
+                }
+
+                // propagateParentChangeEmission();
+
+            }());
+        });
     }
 
     override DrawingSurfaceI getDrawingSurface()
@@ -332,4 +372,9 @@ class WindowDecoration : Form
             }
         }
     }
+
+    // override void redraw()
+    // {
+    //     super.redraw();
+    // }
 }

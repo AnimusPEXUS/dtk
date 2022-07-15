@@ -119,6 +119,8 @@ class WidgetChild
 const auto WidgetProperties = cast(PropSetting[])[
     PropSetting("gsun", "Widget", "parent", "Parent", q{null}),
 
+    // PropSetting("gs", "string", "debugName", "DebugName", q{""}),
+
     PropSetting("gs_w_d_nrp", "int", "desiredX", "DesiredX", q{0}),
     PropSetting("gs_w_d_nrp", "int", "desiredY", "DesiredY", q{0}),
     PropSetting("gs_w_d_nrp", "int", "desiredWidth", "DesiredWidth", q{0}),
@@ -254,121 +256,121 @@ class Widget
     static foreach (v; ["Width", "Height", "X", "Y"])
     {
         mixin(q{
-				int get%1$s()
-				{
-					int ret;
-					Widget parent;
-					WindowI window;
-					Form f;
+                int get%1$s()
+                {
+                    int ret;
+                    Widget parent;
+                    WindowI window;
+                    Form f;
 
-					parent = getParent();
-					// if (parent is null)
-					// {
-					// throw new Exception("couldn't get parent");
-					// }
+                    parent = getParent();
+                    // if (parent is null)
+                    // {
+                    // throw new Exception("couldn't get parent");
+                    // }
 
-					f = cast(Form) this;
-					if (f !is null)
-					{
-						assert(
-							!(parent && window),
-							"on Form only parent or window can be set semiltaniously"
-							);
-						window = f.getWindow();
-					}
+                    f = cast(Form) this;
+                    if (f !is null)
+                    {
+                        assert(
+                            !(parent && window),
+                            "on Form only parent or window can be set semiltaniously"
+                            );
+                        window = f.getWindow();
+                    }
 
-					if (parent !is null)
-					{
-						ret = parent.getChild%1$s(this);
-					}
-					else if (window !is null)
-					{
-						static if ("%1$s" == "X" || "%1$s" == "Y")
-						{
-							ret = 0;
-						}
-						else
-						{
-							ret = window.getForm%1$s();
-						}
-					}
-					else
-					{
-						ret = 0;
-					}
+                    if (parent !is null)
+                    {
+                        ret = parent.getChild%1$s(this);
+                    }
+                    else if (window !is null)
+                    {
+                        static if ("%1$s" == "X" || "%1$s" == "Y")
+                        {
+                            ret = 0;
+                        }
+                        else
+                        {
+                            ret = window.getForm%1$s();
+                        }
+                    }
+                    else
+                    {
+                        ret = 0;
+                    }
 
-					return ret;
-				}
+                    return ret;
+                }
 
-				Widget set%1$s(int value)
-				{
-					Widget parent;
-					WindowI window;
-					Form f;
+                Widget set%1$s(int value)
+                {
+                    Widget parent;
+                    WindowI window;
+                    Form f;
 
-					parent = getParent();
+                    parent = getParent();
 
-					f = cast(Form) this;
-					if (f !is null)
-					{
-						assert(
-							!(parent && window),
-							"on Form only parent or window can be set semiltaniously"
-							);
-						window = f.getWindow();
-					}
+                    f = cast(Form) this;
+                    if (f !is null)
+                    {
+                        assert(
+                            !(parent && window),
+                            "on Form only parent or window can be set semiltaniously"
+                            );
+                        window = f.getWindow();
+                    }
 
-					if (parent !is null)
-					{
-						parent.setChild%1$s(this, value);
-					}
-					else if (window !is null)
-					{
-						// TODO: make this possible by influencing window
-						throw new Exception(
-							"root element can't change it's width/height"
-							~"/x/y by it's own will"
-							);
-					}
-					else
-					{
-						throw new Exception("nor window nor parent is set - can't change own size or position");
-					}
+                    if (parent !is null)
+                    {
+                        parent.setChild%1$s(this, value);
+                    }
+                    else if (window !is null)
+                    {
+                        // TODO: make this possible by influencing window
+                        throw new Exception(
+                            "root element can't change it's width/height"
+                            ~"/x/y by it's own will"
+                            );
+                    }
+                    else
+                    {
+                        throw new Exception("nor window nor parent is set - can't change own size or position");
+                    }
 
-					return this;
-				}
-			}.format(v));
+                    return this;
+                }
+            }.format(v));
     }
 
     static foreach (v; ["X", "Y", "Width", "Height"])
     {
 
         mixin(q{
-    			int getChild%1$s(Widget child)
-    			{
-    				auto c = getWidgetChildByChild(child);
-    				if (!c)
-    				{
-    					throw new ExcNotAParentsChild(
-    						"%s is not a child of %s".format(child, this)
-    						);
-    				}
-    				return c.get%1$s();
-    			}
+                int getChild%1$s(Widget child)
+                {
+                    auto c = getWidgetChildByChild(child);
+                    if (!c)
+                    {
+                        throw new ExcNotAParentsChild(
+                            "%s is not a child of %s".format(child, this)
+                            );
+                    }
+                    return c.get%1$s();
+                }
 
-    			void setChild%1$s(Widget child, int v)
-    			{
-    				auto c = getWidgetChildByChild(child);
-    				if (!c)
-    				{
-    					throw new ExcNotAParentsChild(
-    						"%s is not a child of %s".format(child, this)
-    						);
-    				}
-    				c.set%1$s(v);
-    				return;
-    			}
-    		}.format(v));
+                void setChild%1$s(Widget child, int v)
+                {
+                    auto c = getWidgetChildByChild(child);
+                    if (!c)
+                    {
+                        throw new ExcNotAParentsChild(
+                            "%s is not a child of %s".format(child, this)
+                            );
+                    }
+                    c.set%1$s(v);
+                    return;
+                }
+            }.format(v));
     }
 
     Image renderImage()
@@ -664,7 +666,7 @@ class Widget
                 Position2D(0, 0), img);
     }
 
-    final void redraw()
+    void redraw()
     {
         DrawingSurfaceI ds;
         auto e = collectException({ ds = getDrawingSurface(); }());
@@ -747,7 +749,7 @@ class Widget
         auto p = getParent();
         if (p is null)
         {
-            debug writeln("%s can't get it's parent".format(this));
+            debug writeln("%s (%s) can't get it's parent".format(this, getDebugName()));
             throw new Exception("parent is null");
         }
         auto ds = p.getDrawingSurface();
@@ -914,5 +916,18 @@ class Widget
         int relY
         )
     {
+    }
+
+    private string debugName;
+
+    typeof(this) setDebugName(string val)
+    {
+        debugName = val;
+        return this;
+    }
+
+    string getDebugName()
+    {
+        return debugName;
     }
 }

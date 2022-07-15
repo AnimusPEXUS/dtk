@@ -126,19 +126,24 @@ void main()
 
     auto sb1 = new ScrollBar().setOrientation(Orientation.horizontal);
 
-    foreach(v; [
-        mm,
-        btn,
-        btn2,
-        btn3,
-        btn4,
-        btn5,
-        lbl1,
-        lbl2,
-        sb1
+    static foreach(v; [
+        "mm",
+        "btn",
+        "btn2",
+        "btn3",
+        "btn4",
+        "btn5",
+        "lbl1",
+        "lbl2",
+        "sb1"
         ])
     {
-        lo.addLayoutChild(v);
+        mixin(
+            q{
+                lo.addLayoutChild(%1$s);
+                %1$s.setDebugName("%1$s");
+            }.format(v)
+        );
     }
 
     lbl1.setText(

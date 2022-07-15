@@ -11,6 +11,7 @@ import dtk.interfaces.WindowI;
 import dtk.interfaces.LaFI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.MouseCursorMgrI;
+import dtk.interfaces.WindowDecorationI;
 
 import dtk.types.Event;
 import dtk.types.Position2D;
@@ -19,6 +20,7 @@ import dtk.types.Widget;
 import dtk.types.WindowCreationSettings;
 import dtk.types.EnumWidgetInternalDraggingEventEndReason;
 import dtk.types.EnumWindowDraggingEventEndReason;
+import dtk.types.ArtificalWDSpawner;
 
 import dtk.miscs.signal_tools;
 
@@ -34,6 +36,9 @@ const auto PlatformProperties = cast(PropSetting[])[
         "MouseCursorManager", 
         "null"
     ),
+
+    PropSetting("gs_w_d", "bool", "prefereArtificalWD", "PrefereArtificalWD", q{false}),
+    PropSetting("gsun", "ArtificalWDSpawner", "preferedArtificalWDSpawner", "PreferedArtificalWDSpawner", q{}),
 ];
 
 // this is Platform prototype. as Prototype code is common for most platforms,
@@ -53,30 +58,52 @@ class PlatformPrototype001 : PlatformI
         bool stop_flag;
     }
 
-    abstract string getName();
-    abstract string getDescription();
-    abstract bool canCreateWindow();
-    abstract bool getFormCanResizeWindow();
+    string getName()
+    {
+        throw new Exception("abstract");
+    }
+
+    string getDescription()
+    {
+        throw new Exception("abstract");
+    }
+
+    bool canCreateWindow()
+    {
+        throw new Exception("abstract");
+    }
+
+    bool getFormCanResizeWindow()
+    {
+        throw new Exception("abstract");
+    }
 
     this()
     {
         mixin(mixin_multiple_properties_inst(PlatformProperties));
     }
 
-    abstract void destroy();
+    void destroy()
+    {
+        throw new Exception("abstract");
+    }
 
     WindowI[] getWindowIArray()
     {
         return windows;
     }
 
-    abstract WindowI createWindow(WindowCreationSettings window_settings);
+    WindowI createWindow(WindowCreationSettings window_settings)
+    {
+        throw new Exception("abstract");
+    }
 
     LaFI delegate() onGetLaf;
 
-    void setOnGetLaf(LaFI delegate() cb)
+    PlatformI setOnGetLaf(LaFI delegate() cb)
     {
         onGetLaf = cb;
+        return this;
     }
 
     LaFI getLaf()
@@ -152,16 +179,19 @@ class PlatformPrototype001 : PlatformI
 
         if (widgetInternalDraggingEventActive)
         {
+            debug writeln("if (widgetInternalDraggingEventActive) true");
             widgetInternalDraggingEventLoopRoutine(e);
             return;
         }
 
         if (windowDraggingEventActive)
         {
+            debug writeln("if (windowDraggingEventActive) true");
             windowDraggingEventLoopRoutine(e);
             return;
         }
 
+        debug writeln("emitSignal_Event(e)");
         emitSignal_Event(e);
     }
 
@@ -414,10 +444,10 @@ class PlatformPrototype001 : PlatformI
         );
     }
 
-    abstract Tuple!(int, string) getPlatformError();
-    // {
-    //     static assert(false, "must override");
-    // }
+    Tuple!(int, string) getPlatformError()
+    {
+        throw new Exception("abstract");
+    }
 
     Tuple!(int, string) printPlatformError()
     {
@@ -442,7 +472,14 @@ class PlatformPrototype001 : PlatformI
         return input;
     }
 
-    abstract Position2D getMouseCursorPosition();
+    Position2D getMouseCursorPosition()
+    {
+        throw new Exception("abstract");
+    }
 
+    // WindowDecorationI calcArtificalWD()
+    // {
+    //     if (getPrefere)
+    // }
 
 }
