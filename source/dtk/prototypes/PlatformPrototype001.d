@@ -24,6 +24,8 @@ import dtk.types.ArtificalWDSpawner;
 
 import dtk.miscs.signal_tools;
 
+import dtk.wm.WindowDecoration;
+
 import dtk.signal_mixins.Platform;
 
 
@@ -111,6 +113,16 @@ class PlatformPrototype001 : PlatformI
         if (onGetLaf is null)
             throw new Exception("onGetLaf is not set");
         return onGetLaf();
+    }
+
+    ArtificalWDSpawner getBuiltinWDSpawner()
+    {
+        return &builtinWDSpawner;
+    }
+
+    private WindowDecorationI builtinWDSpawner(WindowI win)
+    {
+        return new WindowDecoration(win);
     }
 
     void addWindow(WindowI win)

@@ -285,6 +285,8 @@ class Platform : PlatformPrototype001
                     continue main_loop;
                 }
 
+                e.window = w;
+
                 consumeEvent(e);
             }
         }

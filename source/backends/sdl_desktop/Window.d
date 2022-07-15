@@ -45,8 +45,6 @@ import dtk.miscs.isPointInRegion;
 import dtk.widgets.Form;
 import dtk.widgets.Menu;
 
-import dtk.wm.WindowDecoration;
-
 // import dtk.signal_mixins.Window;
 
 const auto WindowProperties = cast(PropSetting[])[
@@ -341,8 +339,12 @@ class Window : WindowI
     {
         auto exc = collectException(
             {
+                debug writeln("Window onPlatformEvent");
                 if (event.window != this)
+                {
+                    debug writeln("%s != %s".format(event.window, this));
                     return;
+                }
 
                 if (event.type == EventType.none)
                 {
@@ -474,6 +476,10 @@ class Window : WindowI
             debug writeln("sendWindowEventToForm");
             f.windowEventReceiver(e);
         }
+        else
+        {
+            debug writeln("sendWindowEventToForm no form");
+        }
     }
 
     private void sendWindowEventToArtificalWD(Event* e)
@@ -483,6 +489,10 @@ class Window : WindowI
         {
             debug writeln("sendWindowEventToArtificalWD");
             f.windowEventReceiver(e);
+        }
+        else
+        {
+            debug writeln("sendWindowEventToArtificalWD no wd");
         }
     }
 
@@ -877,7 +887,19 @@ class Window : WindowI
         auto p = getPlatform();
         if (!p)
             return null;
-        return p.getPreferedArtificalWDSpawner();
+
+        {
+            auto wds = p.getPreferedArtificalWDSpawner();
+            if (wds)
+                return wds;
+        }
+
+        {
+            auto wds = p.getBuiltinWDSpawner();
+            if (wds)
+                return wds;
+        }
+        return null;
     }
 }
 // isSetInstalledArtificalWD

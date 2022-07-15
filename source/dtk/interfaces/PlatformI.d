@@ -40,6 +40,8 @@ interface PlatformI
     typeof(this) setPreferedArtificalWDSpawner(ArtificalWDSpawner wds);
     ArtificalWDSpawner getPreferedArtificalWDSpawner();
 
+    ArtificalWDSpawner getBuiltinWDSpawner();
+
     // WindowDecorationI calcArtificalWD();
 
     bool canCreateWindow();

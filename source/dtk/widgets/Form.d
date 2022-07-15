@@ -188,6 +188,7 @@ class Form : Widget, FormI
     void nonWindowEventReceiver(Event* event)
     {
         collectException({
+            debug writeln("Form nonWindowEventReceiver");
             EventForm* fe = new EventForm();
 
             Widget focusedWidget = this.getFocusedWidget();
@@ -264,6 +265,7 @@ class Form : Widget, FormI
     {
         collectException({
             auto e = collectException({
+                debug writeln("Form windowEventReceiver");
                 bool propogate_resize_and_repaint = false;
 
                 // debug writeln("form received window event: ", event.eventId);
