@@ -6,7 +6,7 @@
 		"bindbc-loader": "1.0.1",
 		"bindbc-sdl": "1.2.1",
 		"derelict-util": "2.0.6",
-		"erupted": "2.1.64+v1.3.214",
+		"erupted": "2.1.69+v1.3.219",
 		"eventcore": "0.9.20",
 		"fontconfig": "2.0.0+2.13.91",
 		"libasync": "0.8.6",
