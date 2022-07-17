@@ -36,7 +36,7 @@ interface WindowI
     WindowI setPlatform(PlatformI value);
     WindowI unsetPlatform();
 
-    LaFI getLaf();
+    LaFI calcLaf();
 
     typeof(this) setDebugName(dstring value);
     void printParams();
@@ -98,7 +98,8 @@ interface WindowI
     dstring getTitle();
     WindowI setTitle(dstring value);
 
-    Tuple!(bool, Position2D) getMousePosition();
+    // Position2D getSavedMousePosition();
+    // WindowI setSavedMousePosition();
 
     WindowBorderSizes getBorderSizes();
 

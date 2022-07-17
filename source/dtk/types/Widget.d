@@ -126,6 +126,8 @@ const auto WidgetProperties = cast(PropSetting[])[
     PropSetting("gs_w_d_nrp", "int", "desiredWidth", "DesiredWidth", q{0}),
     PropSetting("gs_w_d_nrp", "int", "desiredHeight", "DesiredHeight", q{0}),
 
+    PropSetting("gs_w_d", "dstring", "debugName", "DebugName", q{""}),
+
     PropSetting("gsun", "LaFI", "localLaf", "LocalLaf", q{null}),
 
     PropSetting("gs_w_d", "bool", "visuallyPressed", "VisuallyPressed", "false"),
@@ -730,7 +732,7 @@ class Widget
             {
                 goto fail_exit;
             }
-            auto func_ret = w.getLaf();
+            auto func_ret = w.calcLaf();
             if (func_ret)
             {
                 ret = func_ret;
@@ -918,16 +920,4 @@ class Widget
     {
     }
 
-    private string debugName;
-
-    typeof(this) setDebugName(string val)
-    {
-        debugName = val;
-        return this;
-    }
-
-    string getDebugName()
-    {
-        return debugName;
-    }
 }
