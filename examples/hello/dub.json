@@ -9,9 +9,20 @@
 	"dependencies": {
             "dtk": ">=0.0.0"
 	},
-	"subConfigurations": {
-		"dtk": "sdl-desktop"
-	},
+	"configurations" : [
+		{
+			"name": "sdl-desktop",
+			"subConfigurations": {
+			    "dtk": "sdl-desktop"
+			},
+		},
+		{
+			"name": "glfw-desktop",
+			"subConfigurations": {
+			    "dtk": "glfw-desktop"
+			},
+		},
+	],
 	"version": "0.0.0",
 	"targetType": "executable"
 }
