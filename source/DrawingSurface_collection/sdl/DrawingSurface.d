@@ -1,4 +1,4 @@
-module dtk.backends.sdl_desktop.DrawingSurface;
+module dtk.DrawingSurface_collection.sdl.DrawingSurface;
 
 import std.stdio;
 import std.typecons;

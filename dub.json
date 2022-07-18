@@ -16,6 +16,7 @@
 			"name": "sdl-desktop",
 			"sourcePaths": [
 				"source/backends/sdl_desktop",
+				"source/DrawingSurface_collection/sdl",
 				"source/fontMGRs",
 				"source/dtk"
 			],
@@ -42,6 +43,7 @@
 			"name": "glfw-desktop",
 			"sourcePaths": [
 				"source/backends/glfw_desktop",
+				"source/DrawingSurface_collection/glfw",
 				"source/fontMGRs",
 				"source/dtk"
 			],
