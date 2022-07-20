@@ -361,10 +361,5 @@ import dtk.types.EnumKeyboardModCode;
 
     fout.rawWrite(txt);
 
-    scope (failure)
-    {
-        return 1;
-    }
-
     return 0;
 }

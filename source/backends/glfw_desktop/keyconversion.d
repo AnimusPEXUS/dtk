@@ -21,6 +21,7 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
     switch (keycode)
     {
     default:
+    case GLFW_KEY_UNKNOWN:
         return tuple(cast(EnumKeyboardKeyCode) 0, new Exception("keycode not supported"));
 
     case int.GLFW_KEY_ESCAPE:
@@ -778,88 +779,82 @@ Tuple!(int, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(EnumKeyboardKeyCo
     }
 }
 
-Tuple!(EnumKeyboardModCode, Exception) convertSingleGLWFKeymodToEnumKeyboardModCode(GLWF_Keymod code)
+Tuple!(EnumKeyboardModCode, Exception) convertSingleGLWFKeymodToEnumKeyboardModCode(int code)
 {
     switch (code)
     {
     default:
         return tuple(cast(EnumKeyboardModCode) 0,
                 new Exception("could not decode supplied keycode: " ~ format("%s", code)));
-    case GLWF_Keymod.GLFW_MOD_SHIFT:
-        return tuple(EnumKeyboardModCode.LeftShift,
-                cast(Exception) null);
-    case GLWF_Keymod.GLFW_MOD_CONTROL:
+    case cast(int) GLFW_MOD_SHIFT:
+        return tuple(EnumKeyboardModCode.LeftShift, cast(Exception) null);
+    case cast(int) GLFW_MOD_CONTROL:
         return tuple(EnumKeyboardModCode.LeftControl, cast(Exception) null);
-    case GLWF_Keymod.GLFW_MOD_SUPER:
-        return tuple(EnumKeyboardModCode.LeftSuper,
-                cast(Exception) null);
-    case GLWF_Keymod.GLFW_MOD_ALT:
+    case cast(int) GLFW_MOD_SUPER:
+        return tuple(EnumKeyboardModCode.LeftSuper, cast(Exception) null);
+    case cast(int) GLFW_MOD_ALT:
         return tuple(EnumKeyboardModCode.LeftAlt, cast(Exception) null);
     }
 }
 
-Tuple!(GLWF_Keymod, Exception) convertSingleEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)
+Tuple!(int, Exception) convertSingleEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)
 {
     switch (code)
     {
     default:
-        return tuple(cast(GLWF_Keymod) 0,
+        return tuple(cast(int) 0,
                 new Exception("could not decode supplied keycode: " ~ format("%s", code)));
     case EnumKeyboardModCode.LeftShift:
-        return tuple(GLWF_Keymod.GLFW_MOD_SHIFT,
-                cast(Exception) null);
+        return tuple(cast(int) GLFW_MOD_SHIFT, cast(Exception) null);
     case EnumKeyboardModCode.LeftControl:
-        return tuple(GLWF_Keymod.GLFW_MOD_CONTROL, cast(Exception) null);
+        return tuple(cast(int) GLFW_MOD_CONTROL, cast(Exception) null);
     case EnumKeyboardModCode.LeftSuper:
-        return tuple(GLWF_Keymod.GLFW_MOD_SUPER,
-                cast(Exception) null);
+        return tuple(cast(int) GLFW_MOD_SUPER, cast(Exception) null);
     case EnumKeyboardModCode.LeftAlt:
-        return tuple(GLWF_Keymod.GLFW_MOD_ALT, cast(Exception) null);
+        return tuple(cast(int) GLFW_MOD_ALT, cast(Exception) null);
     }
 }
 
-Tuple!(EnumKeyboardModCode, Exception) convertCombinationGLWFKeymodToEnumKeyboardModCode(
-        GLWF_Keymod code)
+Tuple!(EnumKeyboardModCode, Exception) convertCombinationGLWFKeymodToEnumKeyboardModCode(int code)
 {
     EnumKeyboardModCode ret;
-    if ((code & GLWF_Keymod.GLFW_MOD_SHIFT) != 0)
+    if ((code & GLFW_MOD_SHIFT) != 0)
     {
         ret |= EnumKeyboardModCode.LeftShift;
     }
-    if ((code & GLWF_Keymod.GLFW_MOD_CONTROL) != 0)
+    if ((code & GLFW_MOD_CONTROL) != 0)
     {
         ret |= EnumKeyboardModCode.LeftControl;
     }
-    if ((code & GLWF_Keymod.GLFW_MOD_SUPER) != 0)
+    if ((code & GLFW_MOD_SUPER) != 0)
     {
         ret |= EnumKeyboardModCode.LeftSuper;
     }
-    if ((code & GLWF_Keymod.GLFW_MOD_ALT) != 0)
+    if ((code & GLFW_MOD_ALT) != 0)
     {
         ret |= EnumKeyboardModCode.LeftAlt;
     }
     return tuple(ret, cast(Exception) null);
 }
 
-Tuple!(GLWF_Keymod, Exception) convertCombinationEnumKeyboardModCodeToGLWFKeymod(
-        EnumKeyboardModCode code)
+Tuple!(int, Exception) convertCombinationEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)
 {
-    GLWF_Keymod ret;
+    int ret;
     if ((code & EnumKeyboardModCode.LeftShift) != 0)
     {
-        ret |= GLWF_Keymod.GLFW_MOD_SHIFT;
+        ret |= cast(int) GLFW_MOD_SHIFT;
     }
     if ((code & EnumKeyboardModCode.LeftControl) != 0)
     {
-        ret |= GLWF_Keymod.GLFW_MOD_CONTROL;
+        ret |= cast(int) GLFW_MOD_CONTROL;
     }
     if ((code & EnumKeyboardModCode.LeftSuper) != 0)
     {
-        ret |= GLWF_Keymod.GLFW_MOD_SUPER;
+        ret |= cast(int) GLFW_MOD_SUPER;
     }
     if ((code & EnumKeyboardModCode.LeftAlt) != 0)
     {
-        ret |= GLWF_Keymod.GLFW_MOD_ALT;
+        ret |= cast(int) GLFW_MOD_ALT;
     }
     return tuple(ret, cast(Exception) null);
 }

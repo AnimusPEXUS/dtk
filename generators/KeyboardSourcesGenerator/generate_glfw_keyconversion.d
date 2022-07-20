@@ -52,6 +52,7 @@ string generate_convertGLWFKeycodeToEnumKeyboardKeyCode(string keyinfo_csv)
                 switch (keycode)
                 {
                     default:
+                    case GLFW_KEY_UNKNOWN:
                         return tuple(cast(EnumKeyboardKeyCode)0, new Exception("keycode not supported"));
             %s
                 }
@@ -113,7 +114,7 @@ string generate_convertSingleGLWFKeymodToEnumKeyboardModCode(string keyinfo_csv)
 {
     string ret;
     ret ~= (
-            "Tuple!(EnumKeyboardModCode, Exception) convertSingleGLWFKeymodToEnumKeyboardModCode(GLWF_Keymod code)\n{\n");
+            "Tuple!(EnumKeyboardModCode, Exception) convertSingleGLWFKeymodToEnumKeyboardModCode(int code)\n{\n");
 
     ret ~= ("    switch (code) {\n");
     ret ~= ("        default:\n");
@@ -121,7 +122,7 @@ string generate_convertSingleGLWFKeymodToEnumKeyboardModCode(string keyinfo_csv)
             "            return tuple(cast(EnumKeyboardModCode)0, new Exception(\"could not decode supplied keycode: \"~ format(\"%s\", code)) );\n");
 
     auto reader = makecsvreader(keyinfo_csv);
-    /* auto reader = makecsvreader(keyinfo_csv); */
+
     bool skipped = false;
     main_loop3: foreach (row; reader)
     {
@@ -145,9 +146,9 @@ string generate_convertSingleGLWFKeymodToEnumKeyboardModCode(string keyinfo_csv)
             continue;
         }
 
-        ret ~= ("        case GLWF_Keymod." ~ row[TableColumns.COLUMN_GLFW_KEYMOD] ~ ":\n");
+        ret ~= ("        case cast(int) " ~ row[TableColumns.COLUMN_GLFW_KEYMOD] ~ ":\n");
         ret ~= ("            return tuple(EnumKeyboardModCode."
-                ~ row[TableColumns.COLUMN_BUTTONS] ~ ", cast(Exception)null);\n");
+                ~ row[TableColumns.COLUMN_BUTTONS] ~ ", cast(Exception) null);\n");
     }
 
     ret ~= ("    }\n");
@@ -161,15 +162,15 @@ string generate_convertSingleEnumKeyboardModCodeToGLWFKeymod(string keyinfo_csv)
 {
     string ret;
     ret ~= (
-            "Tuple!(GLWF_Keymod, Exception) convertSingleEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)\n{\n");
+            "Tuple!(int, Exception) convertSingleEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)\n{\n");
 
     ret ~= ("    switch (code) {\n");
     ret ~= ("        default:\n");
     ret ~= (
-            "            return tuple(cast(GLWF_Keymod)0, new Exception(\"could not decode supplied keycode: \"~ format(\"%s\", code)) );\n");
+            "            return tuple(cast(int) 0, new Exception(\"could not decode supplied keycode: \"~ format(\"%s\", code)) );\n");
 
     auto reader = makecsvreader(keyinfo_csv);
-    /* auto reader = makecsvreader(keyinfo_csv); */
+
     bool skipped = false;
     main_loop4: foreach (row; reader)
     {
@@ -196,7 +197,7 @@ string generate_convertSingleEnumKeyboardModCodeToGLWFKeymod(string keyinfo_csv)
         ret ~= (
                 "        case EnumKeyboardModCode." ~ row[TableColumns.COLUMN_BUTTONS] ~ ":\n");
         ret ~= (
-                "            return tuple(GLWF_Keymod."
+                "            return tuple(cast(int) "
                 ~ row[TableColumns.COLUMN_GLFW_KEYMOD] ~ ",cast(Exception)null);\n");
     }
 
@@ -210,7 +211,7 @@ string generate_convertCombinationGLWFKeymodToEnumKeyboardModCode(string keyinfo
 {
     string ret;
 
-    ret ~= ("Tuple!(EnumKeyboardModCode, Exception) convertCombinationGLWFKeymodToEnumKeyboardModCode(GLWF_Keymod code)\n{\n");
+    ret ~= ("Tuple!(EnumKeyboardModCode, Exception) convertCombinationGLWFKeymodToEnumKeyboardModCode(int code)\n{\n");
 
     ret ~= ("    EnumKeyboardModCode ret;\n");
 
@@ -240,7 +241,7 @@ string generate_convertCombinationGLWFKeymodToEnumKeyboardModCode(string keyinfo
             continue;
         }
 
-        ret ~= (format("if ((code & GLWF_Keymod.%s) != 0)\n",
+        ret ~= (format("if ((code & %s) != 0)\n",
                 row[TableColumns.COLUMN_GLFW_KEYMOD]));
         ret ~= ("{\n");
         ret ~= (format("    ret |= EnumKeyboardModCode.%s;\n",
@@ -260,9 +261,9 @@ string generate_convertCombinationEnumKeyboardModCodeToGLWFKeymod(string keyinfo
 {
     string ret;
 
-    ret ~= ("Tuple!(GLWF_Keymod, Exception) convertCombinationEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)\n{\n");
+    ret ~= ("Tuple!(int, Exception) convertCombinationEnumKeyboardModCodeToGLWFKeymod(EnumKeyboardModCode code)\n{\n");
 
-    ret ~= ("    GLWF_Keymod ret;\n");
+    ret ~= ("    int ret;\n");
 
     auto reader = makecsvreader(keyinfo_csv);
     /* auto reader = makecsvreader(keyinfo_csv); */
@@ -292,7 +293,7 @@ string generate_convertCombinationEnumKeyboardModCodeToGLWFKeymod(string keyinfo
         ret ~= (format("if ((code & EnumKeyboardModCode.%s) != 0)\n",
                 row[TableColumns.COLUMN_BUTTONS]));
         ret ~= ("{\n");
-        ret ~= (format("    ret |= GLWF_Keymod.%s;\n",
+        ret ~= (format("    ret |= cast(int) %s;\n",
                 row[TableColumns.COLUMN_GLFW_KEYMOD]));
         ret ~= ("}\n");
     }
@@ -360,11 +361,6 @@ import dtk.types.EnumKeyboardModCode;
         fout.close();
 
     fout.rawWrite(txt);
-
-    scope (failure)
-    {
-        return 1;
-    }
 
     return 0;
 }
