@@ -19,7 +19,7 @@ import dtk.interfaces.WindowI;
 // import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.LaFI;
 
-import dtk.DrawingSurface_collection.sdl.DrawingSurface;
+import dtk.DrawingSurface_collection.sdl_software.DrawingSurface;
 
 import dtk.backends.sdl_desktop.Platform;
 import dtk.backends.sdl_desktop.utils;

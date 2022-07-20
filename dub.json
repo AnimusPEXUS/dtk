@@ -16,7 +16,7 @@
 			"name": "sdl-desktop",
 			"sourcePaths": [
 				"source/backends/sdl_desktop",
-				"source/DrawingSurface_collection/sdl",
+				"source/DrawingSurface_collection/sdl_software",
 				"source/fontMGRs",
 				"source/dtk"
 			],
