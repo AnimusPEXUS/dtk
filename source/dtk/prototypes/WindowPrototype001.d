@@ -99,10 +99,6 @@ class WindowPrototype001 : WindowI
 
         setDrawingSurface(makePlatformDrawingSurface(this));
 
-        string tt = to!string(window_settings.title);
-
-        setTitle(window_settings.title);
-
         // setWindowEventMgr(new WindowEventMgr(this));
 
         cs_PlatformChange = connectToPlatform_onAfterChanged(
@@ -144,8 +140,27 @@ class WindowPrototype001 : WindowI
             }());
         });
 
+        cs_TitleChange = connectToForm_onAfterChanged(
+            delegate void(FormI old_value, FormI new_value) {
+            collectException({
+                if (old_value == new_value)
+                    return;
+
+                if (old_value !is null)
+                    old_value.unsetWindow();
+
+                if (new_value !is null && new_value.getWindow() != this)
+                    new_value.setWindow(this);
+            }());
+        });
+
         if (window_settings.prefereArtificalWD)
             installArtificalWD();
+    }
+
+    WindowI setPlatformTitle(dstring value)
+    {
+        return this;
     }
 
     DrawingSurfaceI makePlatformDrawingSurface(WindowI)

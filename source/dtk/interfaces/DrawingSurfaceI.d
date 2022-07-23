@@ -69,6 +69,7 @@ interface DrawingSurfaceI
             );
     }
 
+    // TODO: what's this?
     /* void drawText(string text, Position2D pos, FontI font,
             FontStyle font_style); // , TextStyle text_style
  */

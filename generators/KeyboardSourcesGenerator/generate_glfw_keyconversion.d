@@ -33,7 +33,7 @@ string generate_convertGLWFKeycodeToEnumKeyboardKeyCode(string keyinfo_csv)
             {
                 cases ~=
                     q{
-                    case int.%1$s:
+                    case %1$s:
                         return tuple(EnumKeyboardKeyCode.%2$s, cast(Exception) null);
                 }.format(
                     subitem,
@@ -84,7 +84,7 @@ string generate_convertEnumKeyboardKeyCodeToGLWFKeycode(string keyinfo_csv)
             cases ~=
                 q{
                 case EnumKeyboardKeyCode.%1$s:
-                    return tuple(int.%2$s, cast(Exception) null);
+                    return tuple(cast(int)%2$s, cast(Exception) null);
             }.format(
                 row[TableColumns.COLUMN_BUTTONS],
                 row[TableColumns.COLUMN_GLFW_KEYCODE],

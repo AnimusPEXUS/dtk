@@ -8,11 +8,9 @@ import std.stdio;
 import std.algorithm;
 import std.parallelism;
 
-// import fontconfig.fontconfig;
 import bindbc.sdl;
 
 import dtk.interfaces.LaFI;
-//import dtk.interfaces.PlatformI;
 import dtk.interfaces.WindowI;
 import dtk.interfaces.FontMgrI;
 import dtk.interfaces.MouseCursorMgrI;
@@ -62,7 +60,7 @@ class Platform : PlatformPrototype001
 
     override string getDescription()
     {
-        return "DTK (D ToolKit). on SDL Platform";
+        return "SDL Backend for DTK";
     }
 
     override bool canCreateWindow()
@@ -120,33 +118,33 @@ class Platform : PlatformPrototype001
         return w;
     }
 
-    WindowI convertSDLWindowtoWindowI(Window win)
+    WindowI convertWindowtoWindowI(Window win)
     {
         return cast(WindowI) win;
     }
 
-    Window convertWindowItoSDLWindow(WindowI win)
+    Window convertWindowItoWindow(WindowI win)
     {
         return cast(Window) win;
     }
 
     void addWindow(Window win)
     {
-        auto res = convertSDLWindowtoWindowI(win);
+        auto res = convertWindowtoWindowI(win);
 
         addWindow(res);
     }
 
     void removeWindow(Window win)
     {
-        auto res = convertSDLWindowtoWindowI(win);
+        auto res = convertWindowtoWindowI(win);
 
         removeWindow(res);
     }
 
     bool haveWindow(Window win)
     {
-        auto res = convertSDLWindowtoWindowI(win);
+        auto res = convertWindowtoWindowI(win);
 
         return haveWindow(res);
     }

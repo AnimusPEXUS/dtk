@@ -43,7 +43,7 @@
 			"name": "glfw-desktop",
 			"sourcePaths": [
 				"source/backends/glfw_desktop",
-				"source/DrawingSurface_collection/glfw",
+				"source/DrawingSurface_collection/vulkan",
 				"source/fontMGRs",
 				"source/dtk"
 			],
