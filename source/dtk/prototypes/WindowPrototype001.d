@@ -86,6 +86,7 @@ class WindowPrototype001 : WindowI
     {
         SignalConnection cs_PlatformChange;
         SignalConnection cs_FormChange;
+        SignalConnection cs_TitleChange;
         SignalConnection cs_PreferedArtificalWD;
 
         SignalConnection platform_signal_connection;

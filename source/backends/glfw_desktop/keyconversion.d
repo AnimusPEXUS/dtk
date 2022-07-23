@@ -27,9 +27,6 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
     case GLFW_KEY_ESCAPE:
         return tuple(EnumKeyboardKeyCode.Escape, cast(Exception) null);
 
-    case GLFW_KEY_ESC:
-        return tuple(EnumKeyboardKeyCode.Escape, cast(Exception) null);
-
     case GLFW_KEY_F1:
         return tuple(EnumKeyboardKeyCode.F1, cast(Exception) null);
 
@@ -225,35 +222,17 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
     case GLFW_KEY_LEFT_SHIFT:
         return tuple(EnumKeyboardKeyCode.LeftShift, cast(Exception) null);
 
-    case GLFW_KEY_LSHIFT:
-        return tuple(EnumKeyboardKeyCode.LeftShift, cast(Exception) null);
-
-    case GLFW_KEY_LCTRL:
-        return tuple(EnumKeyboardKeyCode.LeftControl, cast(Exception) null);
-
     case GLFW_KEY_LEFT_CONTROL:
         return tuple(EnumKeyboardKeyCode.LeftControl, cast(Exception) null);
 
-    case GLFW_KEY_LSUPER:
-        return tuple(EnumKeyboardKeyCode.LeftSuper, cast(Exception) null);
-
     case GLFW_KEY_LEFT_SUPER:
         return tuple(EnumKeyboardKeyCode.LeftSuper, cast(Exception) null);
-
-    case GLFW_KEY_LALT:
-        return tuple(EnumKeyboardKeyCode.LeftAlt, cast(Exception) null);
 
     case GLFW_KEY_LEFT_ALT:
         return tuple(EnumKeyboardKeyCode.LeftAlt, cast(Exception) null);
 
     case GLFW_KEY_RIGHT_SHIFT:
         return tuple(EnumKeyboardKeyCode.RightShift, cast(Exception) null);
-
-    case GLFW_KEY_RSHIFT:
-        return tuple(EnumKeyboardKeyCode.RightShift, cast(Exception) null);
-
-    case GLFW_KEY_RCTRL:
-        return tuple(EnumKeyboardKeyCode.RightControl, cast(Exception) null);
 
     case GLFW_KEY_RIGHT_CONTROL:
         return tuple(EnumKeyboardKeyCode.RightControl, cast(Exception) null);
@@ -264,12 +243,6 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
     case GLFW_KEY_RIGHT_SUPER:
         return tuple(EnumKeyboardKeyCode.RightSuper, cast(Exception) null);
 
-    case GLFW_KEY_RSUPER:
-        return tuple(EnumKeyboardKeyCode.RightSuper, cast(Exception) null);
-
-    case GLFW_KEY_RALT:
-        return tuple(EnumKeyboardKeyCode.RightAlt, cast(Exception) null);
-
     case GLFW_KEY_RIGHT_ALT:
         return tuple(EnumKeyboardKeyCode.RightAlt, cast(Exception) null);
 
@@ -277,9 +250,6 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
         return tuple(EnumKeyboardKeyCode.CapsLock, cast(Exception) null);
 
     case GLFW_KEY_NUM_LOCK:
-        return tuple(EnumKeyboardKeyCode.NumLock, cast(Exception) null);
-
-    case GLFW_KEY_KP_NUM_LOCK:
         return tuple(EnumKeyboardKeyCode.NumLock, cast(Exception) null);
 
     case GLFW_KEY_SCROLL_LOCK:
@@ -318,9 +288,6 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
     case GLFW_KEY_INSERT:
         return tuple(EnumKeyboardKeyCode.Insert, cast(Exception) null);
 
-    case GLFW_KEY_DEL:
-        return tuple(EnumKeyboardKeyCode.Delete, cast(Exception) null);
-
     case GLFW_KEY_DELETE:
         return tuple(EnumKeyboardKeyCode.Delete, cast(Exception) null);
 
@@ -333,13 +300,7 @@ Tuple!(EnumKeyboardKeyCode, Exception) convertGLWFKeycodeToEnumKeyboardKeyCode(i
     case GLFW_KEY_PAGE_UP:
         return tuple(EnumKeyboardKeyCode.PageUp, cast(Exception) null);
 
-    case GLFW_KEY_PAGEUP:
-        return tuple(EnumKeyboardKeyCode.PageUp, cast(Exception) null);
-
     case GLFW_KEY_PAGE_DOWN:
-        return tuple(EnumKeyboardKeyCode.PageDown, cast(Exception) null);
-
-    case GLFW_KEY_PAGEDOWN:
         return tuple(EnumKeyboardKeyCode.PageDown, cast(Exception) null);
 
     case GLFW_KEY_PRINT_SCREEN:
@@ -419,8 +380,7 @@ Tuple!(int, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(EnumKeyboardKeyCo
         return tuple(cast(int) 0, new Exception("keycode not supported"));
 
     case EnumKeyboardKeyCode.Escape:
-        return tuple(cast(int) GLFW_KEY_ESCAPE,
-                GLFW_KEY_ESC, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_ESCAPE, cast(Exception) null);
 
     case EnumKeyboardKeyCode.F1:
         return tuple(cast(int) GLFW_KEY_F1, cast(Exception) null);
@@ -615,47 +575,39 @@ Tuple!(int, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(EnumKeyboardKeyCo
         return tuple(cast(int) GLFW_KEY_TAB, cast(Exception) null);
 
     case EnumKeyboardKeyCode.LeftShift:
-        return tuple(cast(int) GLFW_KEY_LEFT_SHIFT,
-                GLFW_KEY_LSHIFT, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_LEFT_SHIFT, cast(Exception) null);
 
     case EnumKeyboardKeyCode.LeftControl:
-        return tuple(cast(int) GLFW_KEY_LCTRL,
-                GLFW_KEY_LEFT_CONTROL, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_LEFT_CONTROL, cast(Exception) null);
 
     case EnumKeyboardKeyCode.LeftSuper:
-        return tuple(cast(int) GLFW_KEY_LSUPER,
-                GLFW_KEY_LEFT_SUPER, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_LEFT_SUPER, cast(Exception) null);
 
     case EnumKeyboardKeyCode.LeftAlt:
-        return tuple(cast(int) GLFW_KEY_LALT,
-                GLFW_KEY_LEFT_ALT, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_LEFT_ALT, cast(Exception) null);
 
     case EnumKeyboardKeyCode.RightShift:
-        return tuple(cast(int) GLFW_KEY_RIGHT_SHIFT,
-                GLFW_KEY_RSHIFT, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_RIGHT_SHIFT, cast(Exception) null);
 
     case EnumKeyboardKeyCode.RightControl:
-        return tuple(cast(int) GLFW_KEY_RCTRL,
-                GLFW_KEY_RIGHT_CONTROL, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_RIGHT_CONTROL, cast(Exception) null);
 
     case EnumKeyboardKeyCode.RightMenu:
         return tuple(cast(int) GLFW_KEY_MENU, cast(Exception) null);
 
     case EnumKeyboardKeyCode.RightSuper:
-        return tuple(cast(int) GLFW_KEY_RIGHT_SUPER,
-                GLFW_KEY_RSUPER, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_RIGHT_SUPER, cast(Exception) null);
 
     case EnumKeyboardKeyCode.RightAlt:
-        return tuple(cast(int) GLFW_KEY_RALT,
-                GLFW_KEY_RIGHT_ALT, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_RIGHT_ALT,
+                cast(Exception) null);
 
     case EnumKeyboardKeyCode.CapsLock:
         return tuple(cast(int) GLFW_KEY_CAPS_LOCK,
                 cast(Exception) null);
 
     case EnumKeyboardKeyCode.NumLock:
-        return tuple(cast(int) GLFW_KEY_NUM_LOCK,
-                GLFW_KEY_KP_NUM_LOCK, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_NUM_LOCK, cast(Exception) null);
 
     case EnumKeyboardKeyCode.ScrollLock:
         return tuple(cast(int) GLFW_KEY_SCROLL_LOCK, cast(Exception) null);
@@ -694,8 +646,7 @@ Tuple!(int, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(EnumKeyboardKeyCo
         return tuple(cast(int) GLFW_KEY_INSERT, cast(Exception) null);
 
     case EnumKeyboardKeyCode.Delete:
-        return tuple(cast(int) GLFW_KEY_DEL,
-                GLFW_KEY_DELETE, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_DELETE, cast(Exception) null);
 
     case EnumKeyboardKeyCode.Home:
         return tuple(cast(int) GLFW_KEY_HOME, cast(Exception) null);
@@ -704,12 +655,11 @@ Tuple!(int, Exception) convertEnumKeyboardKeyCodeToGLWFKeycode(EnumKeyboardKeyCo
         return tuple(cast(int) GLFW_KEY_END, cast(Exception) null);
 
     case EnumKeyboardKeyCode.PageUp:
-        return tuple(cast(int) GLFW_KEY_PAGE_UP,
-                GLFW_KEY_PAGEUP, cast(Exception) null);
+        return tuple(cast(int) GLFW_KEY_PAGE_UP, cast(Exception) null);
 
     case EnumKeyboardKeyCode.PageDown:
         return tuple(cast(int) GLFW_KEY_PAGE_DOWN,
-                GLFW_KEY_PAGEDOWN, cast(Exception) null);
+                cast(Exception) null);
 
     case EnumKeyboardKeyCode.PrintScreen:
         return tuple(cast(int) GLFW_KEY_PRINT_SCREEN, cast(Exception) null);
