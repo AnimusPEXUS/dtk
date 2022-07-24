@@ -19,6 +19,10 @@ import dtk.interfaces.FaceI;
 
 class DrawingSurface : DrawingSurfaceI
 {
+    this()
+    {
+    }
+
     void drawDot(Position2D pos, ImageDot dot)
     {
     }

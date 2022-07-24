@@ -71,6 +71,11 @@ class Platform : PlatformPrototype001
         // SDL_Quit();
     }
 
+    override WindowI createWindow(WindowCreationSettings window_settings)
+    {
+        return new Window(window_settings);
+    }
+
     WindowI convertWindowtoWindowI(Window win)
     {
         return cast(WindowI) win;

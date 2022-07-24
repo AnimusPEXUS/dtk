@@ -38,6 +38,7 @@
 				"fontconfig": ">=2.0.0"
 			},
 			"libs": [
+				"glfw3",
 				"freetype"
 			],
 			"name": "glfw-desktop",

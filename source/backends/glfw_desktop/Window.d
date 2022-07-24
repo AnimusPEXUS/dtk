@@ -26,8 +26,6 @@ import dtk.interfaces.WindowI;
 // import dtk.interfaces.WindowEventMgrI;
 import dtk.interfaces.LaFI;
 
-import dtk.DrawingSurface_collection.vulkan.DrawingSurface;
-
 import dtk.backends.glfw_desktop.Platform;
 // import dtk.backends.glfw_desktop.utils;
 
@@ -116,7 +114,8 @@ class Window : WindowPrototype001
 
     override DrawingSurfaceI makePlatformDrawingSurface(WindowI win)
     {
-        return new DrawingSurface(cast(Window)win);
+        import dtk.DrawingSurface_collection.vulkan.DrawingSurface;
+        return new DrawingSurface();
     }
 
     override void close()

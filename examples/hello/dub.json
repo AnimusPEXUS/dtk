@@ -21,7 +21,7 @@
 			"subConfigurations": {
 			    "dtk": "glfw-desktop"
 			},
-		},
+		}
 	],
 	"version": "0.0.0",
 	"targetType": "executable"
